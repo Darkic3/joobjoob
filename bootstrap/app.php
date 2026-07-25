@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'adminPermission' => adminPermission::class,
+            'log.admin' => LogAdminRequests::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
