@@ -8,7 +8,7 @@ Route::middleware(['adminPermission', 'log.admin'])->prefix('admin')->name('admi
 Route::get('/admin/settings/{group?}', [SettingController::class, 'edit'])->name('admin.settings.edit');
 Route::post('/admin/settings/{group}', [SettingController::class, 'update'])->name('admin.settings.update');
 
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
 
 
 Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
