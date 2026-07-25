@@ -1,89 +1,104 @@
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/samim-font@v4.0.5/dist/font-face.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://cdn.jsdelivr.net/gh/vazirmatn/Vazirmatn@31.002/Vazirmatn-font-face.css');
-
+/* ===== استایل‌های پایه ===== */
 @layer base {
-    html {
-        direction: rtl;
-        font-family: 'Vazirmatn', sans-serif;
-    }
-
     body {
+        font-family: 'Vazirmatn', 'Samim', sans-serif;
         @apply bg-gray-50 text-gray-800 antialiased;
     }
 
+    /* اسکرول‌بار سفارشی */
     ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
     }
 
     ::-webkit-scrollbar-track {
-        @apply bg-gray-100;
+        @apply bg-gray-100 rounded-full;
     }
 
     ::-webkit-scrollbar-thumb {
-        @apply bg-gray-300 rounded-full;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        @apply bg-gray-400;
+        @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
     }
 }
 
+/* ===== کامپوننت‌های سفارشی ===== */
 @layer components {
+    /* لینک‌های سایدبار */
     .sidebar-link {
-        @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
-               text-gray-600 hover:bg-gray-100 hover:text-gray-900
-               transition-all duration-200;
+        @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600
+        rounded-xl transition-all duration-200 hover:bg-gray-50 hover:text-gray-900
+        group relative;
     }
 
     .sidebar-link-active {
-        @apply bg-primary-50 text-primary-700 hover:bg-primary-50 hover:text-primary-700;
+        @apply bg-primary-50 text-primary-700 hover:bg-primary-100 hover:text-primary-800
+        shadow-sm;
     }
 
+    .sidebar-link-active::before {
+        content: '';
+        @apply absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-600 rounded-l-full;
+    }
+
+    /* زیرمنوی سایدبار */
     .sidebar-submenu {
-        @apply mr-12 mt-1 space-y-0.5;
+        @apply mt-1 ms-4 ps-3 border-r-2 border-gray-100 space-y-1;
     }
 
-    .topbar {
-        @apply bg-white border-b border-gray-200 px-6 py-3;
-    }
-
+    /* کارت‌های داشبورد */
     .stat-card {
-        @apply bg-white rounded-xl border border-gray-100 p-5
-               hover:shadow-md transition-shadow duration-200;
+        @apply bg-white p-4 rounded-2xl border border-gray-100 hover:border-primary-200
+        hover:shadow-lg transition-all duration-300 group;
     }
 
-    .admin-table {
-        @apply w-full text-sm text-right;
+    /* دکمه‌های سفارشی */
+    .btn-primary {
+        @apply px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl
+        hover:bg-primary-700 active:bg-primary-800 transition-all duration-200
+        shadow-sm hover:shadow-md;
     }
 
-    .admin-table thead {
-        @apply bg-gray-50 text-gray-600 text-xs uppercase tracking-wider;
-    }
-
-    .admin-table th {
-        @apply px-4 py-3 font-semibold;
-    }
-
-    .admin-table td {
-        @apply px-4 py-3 border-t border-gray-100;
-    }
-
-    .admin-table tbody tr {
-        @apply hover:bg-gray-50 transition-colors duration-150;
+    /* اینپوت‌های سفارشی */
+    .input-custom {
+        @apply w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl
+        focus:border-primary-500 focus:ring-2 focus:ring-primary-100
+        transition-all duration-200 outline-none;
     }
 }
 
+/* ===== انیمیشن‌های سفارشی ===== */
 @layer utilities {
-    .shadow-soft {
-        box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07),
-                    0 10px 20px -2px rgba(0, 0, 0, 0.04);
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
     }
 
-    .shadow-soft-lg {
-        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+    .animate-slide-up {
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }
