@@ -10,7 +10,7 @@ class DashboardController
 
     public function index()
     {
-        $content = $this->dashboardService->÷dashboardIndexContent();
+        $content = $this->dashboardService->dashboardIndexContent();
         return view('admin.dashboard.index', compact('content'));
     }
 }
