@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('tab-name', 'پنل مدیریت')</title>
-    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">
+{{--    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">--}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -109,7 +109,7 @@
 
             {{-- Sidebar Header --}}
             <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100">
-                <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-2.5 overflow-hidden">
+                <a href="#" class="flex items-center gap-2.5 overflow-hidden">
                     <div class="flex-shrink-0 w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
                         <span class="text-white font-bold text-lg">S</span>
                     </div>
@@ -133,7 +133,7 @@
             {{-- Sidebar Navigation --}}
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                 {{-- Dashboard --}}
-                <a href="{{ route('admin.dashboard.index') }}"
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.dashboard.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -146,9 +146,10 @@
                 <div x-show="sidebarOpen" class="pt-4 pb-1">
                     <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">تعاملات</p>
                 </div>
-
-                @if($user->hasAccess('admin.recruitment.index'))
-                <a href="{{ route('admin.recruitment.index') }}"
+{{-- TODO:ahora_fix --}}
+{{--                @if($user->hasAccess('admin.recruitment.index'))--}}
+{{--                <a href="#"--}}
+                <a href=""
                    class="sidebar-link {{ request()->routeIs('admin.recruitment.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -159,10 +160,10 @@
                     <span x-show="sidebarOpen" class="mr-auto bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $unreadRecruitmentCount }}</span>
                     @endif
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.contact.index'))
-                <a href="{{ route('admin.contact.index') }}"
+{{--                @if($user->hasAccess('admin.contact.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.contact.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -173,10 +174,10 @@
                     <span x-show="sidebarOpen" class="mr-auto bg-rose-100 text-rose-700 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $unreadContactCount }}</span>
                     @endif
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.comments.index'))
-                <a href="{{ route('admin.comments.index') }}"
+{{--                @if($user->hasAccess('admin.comments.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.comments.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -187,7 +188,7 @@
                     <span x-show="sidebarOpen" class="mr-auto bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $unreadCommentCount }}</span>
                     @endif
                 </a>
-                @endif
+{{--                @endif--}}
 
                 {{-- Divider: Content --}}
                 <div x-show="sidebarOpen" class="pt-4 pb-1">
@@ -195,7 +196,7 @@
                 </div>
 
                 {{-- Blog Dropdown --}}
-                @if($user->hasAccess('admin.blogs.index'))
+{{--                @if($user->hasAccess('admin.blogs.index'))--}}
                 <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-category.*') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-category.*') ? 'sidebar-link-active' : '' }}">
@@ -212,22 +213,22 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        <a href="{{ route('admin.blogs.index') }}"
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.blogs.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             لیست مقالات
                         </a>
-                        @if($user->hasAccess('admin.blog-category.index'))
-                        <a href="{{ route('admin.blog-category.index') }}"
+{{--                        @if($user->hasAccess('admin.blog-category.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.blog-category.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             دسته‌بندی مقالات
                         </a>
-                        @endif
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
                 {{-- News Dropdown --}}
-                @if($user->hasAccess('admin.news.index'))
+{{--                @if($user->hasAccess('admin.news.index'))--}}
                 <div x-data="{ open: {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.news-category.*') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.news-category.*') ? 'sidebar-link-active' : '' }}">
@@ -244,22 +245,22 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        <a href="{{ route('admin.news.index') }}"
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.news.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             لیست اخبار
                         </a>
-                        @if($user->hasAccess('admin.news-category.index'))
-                        <a href="{{ route('admin.news-category.index') }}"
+{{--                        @if($user->hasAccess('admin.news-category.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.news-category.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             دسته‌بندی اخبار
                         </a>
-                        @endif
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
                 {{-- Advertisement Dropdown --}}
-                @if($user->hasAccess('admin.advertisement.index'))
+{{--                @if($user->hasAccess('admin.advertisement.index'))--}}
                 <div x-data="{ open: {{ request()->routeIs('admin.advertisement.*') || request()->routeIs('admin.advertisement-category.*') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.advertisement.*') || request()->routeIs('admin.advertisement-category.*') ? 'sidebar-link-active' : '' }}">
@@ -276,22 +277,22 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        <a href="{{ route('admin.advertisement.index') }}"
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.advertisement.*') && !request()->routeIs('admin.advertisement-category.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             لیست آگهی‌ها
                         </a>
-                        @if($user->hasAccess('admin.advertisement-category.index'))
-                        <a href="{{ route('admin.advertisement-category.index') }}"
+{{--                        @if($user->hasAccess('admin.advertisement-category.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.advertisement-category.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             دسته‌بندی آگهی
                         </a>
-                        @endif
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.sliders.index'))
-                <a href="{{ route('admin.sliders.index') }}"
+{{--                @if($user->hasAccess('admin.sliders.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.sliders.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -299,15 +300,15 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">اسلایدرها</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 {{-- Divider: Organization --}}
                 <div x-show="sidebarOpen" class="pt-4 pb-1">
                     <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">ساختار سازمانی</p>
                 </div>
 
-                @if($user->hasAccess('admin.information.index'))
-                <a href="{{ route('admin.information.index') }}"
+{{--                @if($user->hasAccess('admin.information.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.information.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -315,10 +316,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">درباره ما</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.branches.index'))
-                <a href="{{ route('admin.branches.index') }}"
+{{--                @if($user->hasAccess('admin.branches.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.branches.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -327,10 +328,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">شعب</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.suppliers.index'))
-                <a href="{{ route('admin.suppliers.index') }}"
+{{--                @if($user->hasAccess('admin.suppliers.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.suppliers.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -338,10 +339,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">تامین‌کنندگان</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 {{-- Team Dropdown --}}
-                @if($user->hasAccess('admin.managers.index') || $user->hasAccess('admin.teams.index'))
+{{--                @if($user->hasAccess('admin.managers.index') || $user->hasAccess('admin.teams.index'))--}}
                 <div x-data="{ open: {{ request()->routeIs('admin.managers.*') || request()->routeIs('admin.teams.*') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.managers.*') || request()->routeIs('admin.teams.*') ? 'sidebar-link-active' : '' }}">
@@ -358,24 +359,24 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        @if($user->hasAccess('admin.managers.index'))
-                        <a href="{{ route('admin.managers.index') }}"
+{{--                        @if($user->hasAccess('admin.managers.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.managers.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             مدیران ستاد
                         </a>
-                        @endif
-                        @if($user->hasAccess('admin.teams.index'))
-                        <a href="{{ route('admin.teams.index') }}"
+{{--                        @endif--}}
+{{--                        @if($user->hasAccess('admin.teams.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.teams.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             هیئت مدیره
                         </a>
-                        @endif
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.contact_infos.index'))
-                <a href="{{ route('admin.contact_infos.index') }}"
+{{--                @if($user->hasAccess('admin.contact_infos.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.contact_infos.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -383,7 +384,7 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">اطلاعات تماس</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 {{-- Divider: System --}}
                 <div x-show="sidebarOpen" class="pt-4 pb-1">
@@ -391,7 +392,7 @@
                 </div>
 
                 {{-- Access Management Dropdown --}}
-                @if($user->hasAccess('admin.user.index') || $user->hasAccess('admin.permissions.index'))
+{{--                @if($user->hasAccess('admin.user.index') || $user->hasAccess('admin.permissions.index'))--}}
                 <div x-data="{ open: {{ request()->routeIs('admin.user.*') || request()->routeIs('admin.permissions.*') ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.user.*') || request()->routeIs('admin.permissions.*') ? 'sidebar-link-active' : '' }}">
@@ -408,24 +409,24 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        @if($user->hasAccess('admin.user.index'))
-                        <a href="{{ route('admin.user.index') }}"
+{{--                        @if($user->hasAccess('admin.user.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.user.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             ادمین‌ها
                         </a>
-                        @endif
-                        @if($user->hasAccess('admin.permissions.index'))
-                        <a href="{{ route('admin.permissions.index') }}"
+{{--                        @endif--}}
+{{--                        @if($user->hasAccess('admin.permissions.index'))--}}
+                        <a href="#"
                            class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('admin.permissions.*') ? 'text-primary-700 bg-primary-50 font-medium' : '' }}">
                             نقش‌ها و دسترسی‌ها
                         </a>
-                        @endif
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.seo.index'))
-                <a href="{{ route('admin.seo.index') }}"
+{{--                @if($user->hasAccess('admin.seo.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.seo.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -433,10 +434,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">سئو</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.logos.index'))
-                <a href="{{ route('admin.logos.index') }}"
+{{--                @if($user->hasAccess('admin.logos.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.logos.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -444,10 +445,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">نمادهای فوتر</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.menu.index'))
-                <a href="{{ route('admin.menu.index') }}"
+{{--                @if($user->hasAccess('admin.menu.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.menu.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -455,10 +456,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">تنظیمات منو</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.settings.edit'))
-                <a href="{{ route('admin.settings.edit') }}"
+{{--                @if($user->hasAccess('admin.settings.edit'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -467,10 +468,10 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">تنظیمات کلی</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.request-logs.index'))
-                <a href="{{ route('admin.request-logs.index') }}"
+{{--                @if($user->hasAccess('admin.request-logs.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.request-logs.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -478,11 +479,11 @@
                     </svg>
                     <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">لاگ‌های سیستم</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 {{-- Logout --}}
                 <div class="pt-4">
-                    <a href="{{ route('admin.logout') }}"
+                    <a href="#"
                        class="sidebar-link text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -510,7 +511,7 @@
                class="fixed inset-y-0 right-0 w-72 bg-white z-50 lg:hidden flex flex-col shadow-soft-lg" x-cloak>
 
             <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100">
-                <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-2.5">
+                <a href="#" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
                         <span class="text-white font-bold text-lg">S</span>
                     </div>
@@ -524,7 +525,7 @@
             </div>
 
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-                <a href="{{ route('admin.dashboard.index') }}"
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.dashboard.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -537,8 +538,8 @@
                     <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">تعاملات</p>
                 </div>
 
-                @if($user->hasAccess('admin.recruitment.index'))
-                <a href="{{ route('admin.recruitment.index') }}"
+{{--                @if($user->hasAccess('admin.recruitment.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.recruitment.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -546,10 +547,10 @@
                     </svg>
                     <span class="whitespace-nowrap">درخواست‌های استخدام</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.contact.index'))
-                <a href="{{ route('admin.contact.index') }}"
+{{--                @if($user->hasAccess('admin.contact.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.contact.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -557,10 +558,10 @@
                     </svg>
                     <span class="whitespace-nowrap">درخواست مخاطبین</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.comments.index'))
-                <a href="{{ route('admin.comments.index') }}"
+{{--                @if($user->hasAccess('admin.comments.index'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.comments.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -568,13 +569,13 @@
                     </svg>
                     <span class="whitespace-nowrap">نظرات کاربران</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 <div class="pt-4 pb-1">
                     <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">مدیریت محتوا</p>
                 </div>
 
-                @if($user->hasAccess('admin.blogs.index'))
+{{--                @if($user->hasAccess('admin.blogs.index'))--}}
                 <div x-data="{ open: false }">
                     <button @click="open = !open"
                             class="sidebar-link w-full {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-category.*') ? 'sidebar-link-active' : '' }}">
@@ -588,16 +589,16 @@
                         </svg>
                     </button>
                     <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                        <a href="{{ route('admin.blogs.index') }}" class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100">لیست مقالات</a>
-                        @if($user->hasAccess('admin.blog-category.index'))
-                        <a href="{{ route('admin.blog-category.index') }}" class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100">دسته‌بندی مقالات</a>
-                        @endif
+                        <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100">لیست مقالات</a>
+{{--                        @if($user->hasAccess('admin.blog-category.index'))--}}
+                        <a href="#" class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100">دسته‌بندی مقالات</a>
+{{--                        @endif--}}
                     </div>
                 </div>
-                @endif
+{{--                @endif--}}
 
-                @if($user->hasAccess('admin.settings.edit'))
-                <a href="{{ route('admin.settings.edit') }}"
+{{--                @if($user->hasAccess('admin.settings.edit'))--}}
+                <a href="#"
                    class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'sidebar-link-active' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -606,10 +607,10 @@
                     </svg>
                     <span class="whitespace-nowrap">تنظیمات کلی</span>
                 </a>
-                @endif
+{{--                @endif--}}
 
                 <div class="pt-4">
-                    <a href="{{ route('admin.logout') }}"
+                    <a href="#"
                        class="sidebar-link text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -706,7 +707,7 @@
                                     <p class="text-sm font-semibold text-gray-800">{{ $user->name ?? 'نامعلوم' }} {{ $user->family ?? '' }}</p>
                                     <p class="text-xs text-gray-400 mt-0.5">{{ $user->email ?? '' }}</p>
                                 </div>
-                                <a href="{{ route('admin.logout') }}"
+                                <a href="#"
                                    class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
