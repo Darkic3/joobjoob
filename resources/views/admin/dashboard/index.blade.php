@@ -5,10 +5,47 @@
 @section('content')
     <div class="space-y-6">
 
-        {{-- Welcome Banner --}}
-        <div class="bg-gradient-to-l from-primary-600 to-primary-500 rounded-2xl p-6 sm:p-8 text-white shadow-soft">
-            <h2 class="text-xl sm:text-2xl font-bold">سلام، {{ Auth::user()->name ?? 'کاربر' }} 👋</h2>
-            <p class="mt-1 text-primary-100 text-sm sm:text-base">خوش آمدید به پنل مدیریت Shopora. امروز چه کاری انجام می‌دهید؟</p>
+        {{-- Welcome Banner with Dynamic Greeting & Animation --}}
+        <div x-data="{
+        show: false,
+        greeting: (() => {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'صبح بخیر';
+            if (hour < 17) return 'ظهر بخیر';
+            return 'عصر بخیر';
+        })()
+    }"
+             x-init="setTimeout(() => show = true, 100)"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-700"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="bg-gradient-to-l from-primary-600 to-primary-500 rounded-2xl p-6 sm:p-8 text-white shadow-soft relative overflow-hidden">
+
+            {{-- یک المان تزئینی پس‌زمینه برای زیبایی بیشتر --}}
+            <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+
+            <div class="relative z-10">
+                {{-- ✅ اصلاح: استفاده از x-text برای متغیر JS و span برای جدا کردن --}}
+                <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                    <span x-text="greeting"></span>، {{ Auth::user()->name ?? 'کاربر' }} 👋
+                </h2>
+
+                <p class="mt-2 text-primary-100 text-sm sm:text-base max-w-2xl">
+                    خوش آمدید به پنل مدیریت Shopora.
+                    <span class="hidden sm:inline">امروز {{ now()->format('j F Y') }} است و همه سیستم‌ها آماده به کار هستند.</span>
+                </p>
+
+                {{-- دکمه‌های اکشن سریع داخل بنر (اختیاری ولی حرفه‌ای) --}}
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="{{ route('admin.settings.edit') }}" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-sm font-medium rounded-lg transition-colors border border-white/20">
+                        ⚙️ تنظیمات سریع
+                    </a>
+                    <a href="/" target="_blank" class="px-4 py-2 bg-white text-primary-600 hover:bg-primary-50 text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        👁️ مشاهده سایت
+                    </a>
+                </div>
+            </div>
         </div>
 
         {{-- Stats Grid --}}
