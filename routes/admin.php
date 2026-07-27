@@ -13,3 +13,5 @@ Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dash
 
 Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
 Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+Route::post('/admin/ckeditor/upload', [App\Http\Controllers\Admin\CkeditorController::class, 'upload'])->name('admin.ckeditor.upload');

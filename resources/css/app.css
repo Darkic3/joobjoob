@@ -33,7 +33,6 @@
 
 @layer components {
     .sidebar-link {
-        /* کلمه group از اینجا حذف شد تا خطا ندهد */
         @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium
         text-gray-600 dark:text-gray-300
         rounded-xl transition-all duration-200
@@ -60,5 +59,35 @@
         @apply bg-white dark:bg-gray-800
         border border-gray-100 dark:border-gray-700
         hover:shadow-lg transition-all duration-300;
+    }
+
+    .pagination {
+        @apply flex justify-center mt-3 space-x-1;
+    }
+
+    .pagination li {
+        @apply mx-1 bg-gray-100 dark:bg-gray-700 rounded;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        @apply block px-3 py-2 text-sm text-gray-700 dark:text-gray-200;
+    }
+
+    .pagination li.active {
+        @apply bg-primary-500 dark:bg-primary-600;
+    }
+
+    .pagination li.active a,
+    .pagination li.active span {
+        @apply text-white;
+    }
+
+    .pagination li.disabled {
+        @apply opacity-50 cursor-not-allowed;
+    }
+
+    .swal2-container {
+        z-index: 11111111111 !important;
     }
 }

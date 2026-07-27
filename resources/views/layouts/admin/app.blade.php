@@ -23,14 +23,12 @@
 
 <x-admin.toast />
 
-{{-- x-data را اینجا تعریف می‌کنیم تا تمام کامپوننت‌های زیر به آن دسترسی داشته باشند --}}
 <div x-data="{ sidebarOpen: true, mobileSidebar: false }"
      @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
      @toggle-mobile.window="mobileSidebar = true"
      @close-mobile.window="mobileSidebar = false"
      class="flex min-h-screen">
 
-    {{-- دیگر نیازی به پاس دادن متغیر نیست --}}
     <x-admin.sidebar />
 
     <div class="flex-1 flex flex-col min-h-screen transition-all duration-300"
@@ -46,7 +44,7 @@
     <x-admin.mobile-sidebar />
 </div>
 
-@stack('modals')
+<x-admin.scripts />
 @stack('scripts')
 </body>
 </html>
