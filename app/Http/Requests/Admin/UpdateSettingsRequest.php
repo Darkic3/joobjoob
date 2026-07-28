@@ -8,7 +8,7 @@ class UpdateSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // بعداً با Middleware ادمین محدود می‌شود
+        return false; // TODO: ahora_fix in false or true ?
     }
 
     public function rules(): array
