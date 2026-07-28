@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
 
-Route::middleware(['adminPermission', 'log.admin'])->prefix('admin')->name('admin.')->group(function () {});
 
-Route::resource('articles', BlogController::class)->names('admin.blogs');
+Route::middleware(['adminPermission', 'log.admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('blogs', BlogController::class);
+    Route::resource('blog-categories', BlogCategoryController::class);
+});
+
 
 Route::get('/admin/settings/{group?}', [SettingController::class, 'edit'])->name('admin.settings.edit');
 Route::post('/admin/settings/{group}', [SettingController::class, 'update'])->name('admin.settings.update');
