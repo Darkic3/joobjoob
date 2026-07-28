@@ -5,8 +5,8 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
 
-
-Route::middleware(['adminPermission', 'log.admin'])->prefix('admin')->name('admin.')->group(function () {
+//middleware(['adminPermission', 'log.admin'])->
+Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('blogs', BlogController::class);
     Route::resource('blog-categories', BlogCategoryController::class);
 });

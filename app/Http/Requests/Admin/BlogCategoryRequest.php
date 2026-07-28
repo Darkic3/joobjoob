@@ -34,7 +34,7 @@ class BlogCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('blogCategory')?->id;
+        $id = $this->route('blogCategory')?->id ?? $this->route('blog_category')?->id;
 
         return [
             'parent_id' => [

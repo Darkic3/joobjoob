@@ -1,5 +1,4 @@
 <?php
-// app/Rules/admin/UrlRule.php
 
 namespace App\Rules;
 
@@ -21,7 +20,7 @@ class UrlRule implements Rule
         $model = new $this->modelClass;
 
         $query = $model->newQuery()
-            ->where('url', $value)
+            ->where('slug', $value)
             ->whereNull('deleted_at');
 
         if ($this->exceptId) {

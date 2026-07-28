@@ -33,7 +33,16 @@ class BlogCategoryController extends Controller
             $imagePath = $request->file('image')->store('blog-categories', 'public');
         }
 
-        BlogCategory::create(array_merge($validated, ['image' => $imagePath]));
+        BlogCategory::create([
+            'parent_id' => $validated['parent_id'] ?? null,
+            'title' => $validated['title'],
+            'slug' => $validated['url'],
+            'description' => $validated['description'] ?? null,
+            'image' => $imagePath,
+            'is_active' => $validated['is_active'] ?? true,
+            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ]);
 
         return redirect()->route('admin.blog-categories.index')
             ->with('success', 'دسته‌بندی با موفقیت ایجاد شد.');
@@ -60,7 +69,16 @@ class BlogCategoryController extends Controller
             $imagePath = $request->file('image')->store('blog-categories', 'public');
         }
 
-        $blogCategory->update(array_merge($validated, ['image' => $imagePath]));
+        $blogCategory->update([
+            'parent_id' => $validated['parent_id'] ?? null,
+            'title' => $validated['title'],
+            'slug' => $validated['url'],
+            'description' => $validated['description'] ?? null,
+            'image' => $imagePath,
+            'is_active' => $validated['is_active'] ?? true,
+            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ]);
 
         return redirect()->route('admin.blog-categories.index')
             ->with('success', 'دسته‌بندی با موفقیت به‌روزرسانی شد.');

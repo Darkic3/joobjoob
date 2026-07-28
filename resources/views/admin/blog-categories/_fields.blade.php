@@ -1,3 +1,5 @@
+@props(['category' => null, 'parentCategories' => []])
+
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     {{-- عنوان --}}
@@ -65,7 +67,7 @@
     <x-admin.image-upload
         name="image"
         label="تصویر دسته‌بندی"
-        :currentImage="$category->image ? Storage::url($category->image) : null" />
+        :currentImage="$category && $category->image ? Storage::url($category->image) : null" />
 
     {{-- توضیحات --}}
     <div class="md:col-span-2">

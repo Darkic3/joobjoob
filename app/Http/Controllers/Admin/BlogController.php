@@ -50,10 +50,19 @@ class BlogController extends Controller
             $imagePath = $request->file('image')->store('blogs', 'public');
         }
 
-        Blog::create(array_merge($validated, [
+        $data = [
+            'slug' => $validated['url'],
+            'title' => $validated['title'],
+            'excerpt' => $validated['description'] ?? null,
+            'content' => $validated['content'],
+            'blog_category_id' => $validated['blog_category_id'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
             'image' => $imagePath,
             'user_id' => auth()->id(),
-        ]));
+        ];
+
+        Blog::create($data);
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'مقاله با موفقیت ایجاد شد.');
@@ -77,7 +86,16 @@ class BlogController extends Controller
             $imagePath = $request->file('image')->store('blogs', 'public');
         }
 
-        $blog->update(array_merge($validated, ['image' => $imagePath]));
+        $blog->update([
+            'slug' => $validated['url'],
+            'title' => $validated['title'],
+            'excerpt' => $validated['description'] ?? null,
+            'content' => $validated['content'],
+            'blog_category_id' => $validated['blog_category_id'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
+            'image' => $imagePath,
+        ]);
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'مقاله با موفقیت به‌روزرسانی شد.');

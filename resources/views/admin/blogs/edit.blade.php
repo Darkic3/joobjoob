@@ -3,9 +3,8 @@
 @section('tab-name', 'ویرایش مقاله: ' . ($blog->title ?? ''))
 
 @section('content')
-    <div class="max-w-5xl mx-auto space-y-6 animate-slide-up">
+    <div class="max-w-5xl mx-auto space-y-6">
 
-        {{-- هدر --}}
         <div class="flex items-center gap-4">
             <a href="{{ route('admin.blogs.index') }}"
                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -19,12 +18,11 @@
             </div>
         </div>
 
-        {{-- فرم --}}
         <form action="{{ route('admin.blogs.update', $blog) }}" method="POST" enctype="multipart/form-data"
               class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
             @csrf
             @method('PUT')
-            @include('admin.blogs.form', ['blog' => $blog])
+            @include('admin.blogs._fields', ['blog' => $blog, 'categories' => $categories])
         </form>
 
     </div>
