@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Services\CartService;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    public function __construct(protected CartService $cart) {}
+
+    public function index()
+    {
+        return view('cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart]);
+    }
+
+    public function add(Request $request, Product $product)
+    {
+        $request->validate(['qty' => 'nullable|integer|min:1']);
+
+        $this->cart->add($product, $request->get('qty', 1), $request->get('color'), $request->get('size'));
+
+        return back()->with('success', __('messages.added_to_cart'));
+    }
+
+    public function update(Request $request, string $rowId)
+    {
+        $request->validate(['qty' => 'required|integer|min:1']);
+        $this->cart->update($rowId, $request->qty);
+
+        return back();
+    }
+
+    public function remove(string $rowId)
+    {
+        $this->cart->remove($rowId);
+
+        return back();
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+        $ok = $this->cart->applyCoupon($request->code);
+
+        return back()->with($ok ? 'success' : 'error', $ok ? __('messages.coupon_applied') : __('messages.coupon_invalid'));
+    }
+}

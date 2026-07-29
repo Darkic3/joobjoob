@@ -21,7 +21,7 @@
 <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center gap-4 h-16">
-            <a href="#" class="text-xl font-bold text-gray-900 shrink-0">مارکت<span class="text-indigo-600">پلاس</span></a>
+            <a href="#" class="text-xl font-bold text-gray-900 shrink-0">شاپ<span class="text-indigo-600">ورا</span></a>
 
             {{-- نوار جستجو --}}
             <div class="flex-1 max-w-xl relative">

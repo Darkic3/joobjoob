@@ -12,8 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'adminPermission' => adminPermission::class,
-            'log.admin' => LogAdminRequests::class,
+            'adminPermission' => \App\Http\Middleware\AdminPermission::class,
+            'log.admin' => \App\Http\Middleware\LogAdminRequests::class,
+        ]);
+
+        $middleware->prepend([
+            \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\SetTheme::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
