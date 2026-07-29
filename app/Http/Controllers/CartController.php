@@ -21,6 +21,16 @@ class CartController extends Controller
 
         $this->cart->add($product, $request->get('qty', 1), $request->get('color'), $request->get('size'));
 
+        // اگر درخواست از نوع AJAX (JSON) بود، پاسخ جیسون بده
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.added_to_cart'),
+                'cart_count' => $this->cart->count(),
+            ]);
+        }
+
+        // در غیر این صورت، رفتار عادی (رفرش صفحه) را حفظ کن
         return back()->with('success', __('messages.added_to_cart'));
     }
 

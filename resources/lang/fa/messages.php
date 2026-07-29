@@ -67,4 +67,17 @@ return [
     'support_desc' => 'پاسخگویی در تمام ساعات روز',
     'new_arrivals' => 'جدیدترین محصولات',
     'quick_view' => 'مشاهده سریع',
+    // Trust Badges
+    'trust_free_shipping' => 'ارسال رایگان',
+    'trust_free_shipping_desc' => 'برای سفارش بالای ۵۰۰ هزار تومان',
+    'trust_authenticity' => 'ضمانت اصالت کالا',
+    'trust_authenticity_desc' => '۱۰۰٪ اورجینال',
+    'trust_return' => '۷ روز ضمانت بازگشت',
+    'trust_return_desc' => 'بدون هیچ سوالی',
+    'trust_support' => 'پشتیبانی ۲۴/۷',
+    'trust_support_desc' => 'همیشه در دسترس',
+
+    // Psychology & Cart
+    'only_left' => '🔥 تنها :count عدد باقی مانده!',
+    'added' => 'افزوده شد',
 ];

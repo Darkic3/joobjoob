@@ -1,56 +1,56 @@
 export function initCart() {
-    // افزودن به سبد خرید با انیمیشن
     document.querySelectorAll('[data-add-to-cart]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const originalText = this.innerHTML;
-            this.classList.add('added');
-            this.innerHTML = '<i class="fas fa-check"></i> {{ __("messages.added") }}';
-
-            setTimeout(() => {
-                this.classList.remove('added');
-                this.innerHTML = originalText;
-            }, 2000);
-
-            // آپدیت تعداد سبد خرید
-            updateCartCount();
-        });
-    });
-}
-
-function updateCartCount() {
-    // ارسال AJAX برای آپدیت تعداد
-    fetch('/cart/count')
-        .then(res => res.json())
-        .then(data => {
-            document.querySelector('[data-cart-count]').textContent = data.count;
-        });
-}
-
-// Quick View محصول
-export function initQuickView() {
-    document.querySelectorAll('[data-quick-view]').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
             const productId = this.dataset.productId;
-            // باز کردن مودال با اطلاعات محصول
-            showQuickViewModal(productId);
-        });
-    });
-}
+            const originalContent = this.innerHTML;
 
-// Favorite/Wishlist
-export function initWishlist() {
-    document.querySelectorAll('[data-toggle-wishlist]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            const icon = this.querySelector('i');
-            if (this.classList.contains('active')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                icon.style.color = 'var(--danger)';
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                icon.style.color = '';
+            // ۱. حالت لودینگ
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            this.disabled = true;
+
+            try {
+                // ۲. ارسال درخواست واقعی به سرور
+                const response = await fetch(`/cart/add/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ qty: 1 })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // ۳. نمایش تیک موفقیت
+                    this.innerHTML = '<i class="fas fa-check"></i> ' + (data.message || 'افزوده شد');
+                    this.style.background = 'var(--success)';
+                    this.style.color = '#fff';
+
+                    // ۴. آپدیت بج سبد خرید در هدر
+                    const cartBadge = document.querySelector('[data-cart-count]');
+                    if (cartBadge) cartBadge.textContent = data.cart_count;
+
+                    // ۵. نمایش Toast Notification
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(data.message, 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (typeof window.showToast === 'function') {
+                    window.showToast('خطا در افزودن به سبد خرید', 'error');
+                }
+            } finally {
+                // ۶. برگشت به حالت اول بعد از ۲ ثانیه
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                    this.style.background = '';
+                    this.style.color = '';
+                    this.disabled = false;
+                }, 2000);
             }
         });
     });

@@ -6,25 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 
-/**
- * پنل ادمین: انتخاب تم پیش‌فرض سایت از بین تم‌های از پیش تعریف‌شده.
- */
 class ThemeSettingController extends Controller
 {
     public function edit()
     {
         $themes = Theme::all();
-
         return view('admin.theme-settings', compact('themes'));
     }
 
     public function update(Request $request)
     {
-        $request->validate(['theme_id' => 'required|exists:themes,id']);
+        $request->validate([
+            'theme_id' => 'required|exists:themes,id',
+            'colors' => 'nullable|array',
+            'colors.bg' => 'nullable|string',
+            'colors.accent' => 'nullable|string',
+            // سایر رنگ‌ها را هم می‌توانید ولیدیت کنید
+        ]);
 
+        // ۱. تنظیم تم پیش‌فرض
         Theme::query()->update(['is_default' => false]);
-        Theme::where('id', $request->theme_id)->update(['is_default' => true]);
+        $theme = Theme::findOrFail($request->theme_id);
+        $theme->update(['is_default' => true]);
 
-        return back()->with('success', __('messages.theme_updated'));
+        // ۲. ذخیره رنگ‌های سفارشی (اگر ارسال شده باشد)
+        if ($request->has('colors')) {
+            $currentVars = $theme->css_variables ?? [];
+            $newVars = array_merge($currentVars, array_filter($request->colors));
+            $theme->update(['css_variables' => $newVars]);
+        }
+
+        // ۳. پاک کردن کش برای اعمال فوری تغییرات
+        \Illuminate\Support\Facades\Cache::forget('themes.all');
+
+        return back()->with('success', 'تنظیمات تم با موفقیت و به صورت آنی ذخیره شد!');
     }
 }

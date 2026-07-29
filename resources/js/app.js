@@ -1,9 +1,14 @@
-import Alpine from 'alpinejs';
-
 import Swiper from 'swiper';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+
+import Alpine from 'alpinejs';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { initCart } from './cart';
+
+
 const heroSwiper = new Swiper('.hero-swiper', {
     modules: [Navigation, Pagination, Autoplay],
     loop: true,
@@ -32,5 +37,11 @@ document.querySelectorAll('[data-countdown]').forEach(timer => {
     }, 1000);
 });
 
+
 window.Alpine = Alpine;
 Alpine.start();
+
+// اجرای اولیه سبد خرید
+document.addEventListener('DOMContentLoaded', () => {
+    initCart();
+});

@@ -1,46 +1,84 @@
 <?php
 
 return [
-    'general' => [
-        'label' => 'تنظیمات عمومی',
-        'fields' => [
-            'site_name' => [
-                'type' => 'text',
-                'label' => 'نام سایت',
-                'default' => 'فروشگاه شاپورا',
-                'validation' => 'required|string|max:100',
-            ],
-            'site_logo' => [
-                'type' => 'file',
-                'label' => 'لوگوی سایت',
-                'default' => null,
-                'validation' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-                'options' => ['width' => 200, 'height' => 80], // برای نمایش در فرم
-            ],
-            'site_description' => [
-                'type' => 'textarea',
-                'label' => 'توضیحات کوتاه سایت (Meta Description)',
-                'default' => '',
-                'validation' => 'nullable|string|max:500',
-            ],
-        ],
+    'tabs' => [
+        'general' => 'عمومی',
+        'home' => 'صفحه اصلی',
+        'home_about' => 'صفحه اصلی - درباره',
+        'feature_home' => 'ویژگی‌ها',
+        'socials' => 'شبکه‌های اجتماعی',
+        'banners' => 'بنرها',
+        'contact' => 'تماس با ما',
+        'about' => 'درباره ما',
+        'footer' => 'فوتر',
+        'pages' => 'عناوین صفحات',
     ],
-    'payment' => [
-        'label' => 'تنظیمات پرداخت',
-        'fields' => [
-            'zarinpal_merchant_id' => [
-                'type' => 'text',
-                'label' => 'مرچنت کد زرین‌پال',
-                'default' => '',
-                'validation' => 'required|string|size:36',
-            ],
-            'is_payment_active' => [
-                'type' => 'select',
-                'label' => 'وضعیت درگاه پرداخت',
-                'default' => '1',
-                'options' => ['1' => 'فعال', '0' => 'غیرفعال'],
-                'validation' => 'required|in:0,1',
-            ],
+
+    'fields' => [
+        // --- عمومی ---
+        'site_name' => [
+            'label' => 'نام سایت',
+            'type' => 'text',
+            'tab' => 'general',
+            'required' => true,
         ],
+        'logo' => [
+            'label' => 'لوگو',
+            'type' => 'file',
+            'tab' => 'general',
+            'required' => false,
+        ],
+
+        // --- صفحه اصلی ---
+        'slider_title' => [
+            'label' => 'عنوان اسلایدر',
+            'type' => 'text',
+            'tab' => 'home',
+            'required' => false,
+        ],
+        'slider_description' => [
+            'label' => 'توضیحات اسلایدر',
+            'type' => 'textarea',
+            'tab' => 'home',
+            'required' => false,
+        ],
+
+        // --- درباره ما (مثال) ---
+        'home_info_title' => [
+            'label' => 'عنوان درباره ما',
+            'type' => 'text',
+            'tab' => 'home_about',
+            'required' => false,
+        ],
+        'compony_history' => [
+            'label' => 'تاریخچه شرکت',
+            'type' => 'textarea',
+            'tab' => 'about',
+            'required' => false,
+            'ckeditor' => true,
+        ],
+
+        // --- تماس با ما (مثال) ---
+        'email' => [
+            'label' => 'ایمیل',
+            'type' => 'text',
+            'tab' => 'contact',
+            'required' => false,
+        ],
+        'address_one' => [
+            'label' => 'آدرس دفتر مرکزی',
+            'type' => 'textarea',
+            'tab' => 'contact',
+            'required' => false,
+        ],
+
+        // --- فوتر (مثال) ---
+        'footer_description' => [
+            'label' => 'توضیحات فوتر',
+            'type' => 'textarea',
+            'tab' => 'footer',
+            'required' => false,
+        ],
+
     ],
 ];

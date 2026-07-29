@@ -1,6 +1,6 @@
 @php
     $locales = config('app.available_locales', ['fa' => 'فارسی', 'en' => 'English', 'ar' => 'العربية', 'tr' => 'Türkçe']);
-    $cartCount = 0;
+    $cartCount = app(\App\Services\CartService::class)->count();
 @endphp
 
 <header class="sticky top-0 z-50 backdrop-blur-md border-b transition-all duration-300"
@@ -53,8 +53,7 @@
             <a href="{{ route('cart.index') }}" class="neu-btn neu-btn-icon relative">
                 🛒
                 @if($cartCount > 0)
-                    <span class="absolute -top-1 -end-1 neu-badge"
-                          style="padding: 0 6px; font-size: .65rem;">{{ $cartCount }}</span>
+                    <span class="absolute -top-1 -end-1 neu-badge" data-cart-count style="padding: 0 6px; font-size: .65rem;">{{ $cartCount }}</span>
                 @endif
             </a>
 

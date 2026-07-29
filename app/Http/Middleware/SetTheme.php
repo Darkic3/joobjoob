@@ -1,34 +1,24 @@
 <?php
-
 namespace App\Http\Middleware;
-
 use App\Models\Theme;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * تشخیص و اعمال تم فعال (Light/Dark/سفارشی).
- * منبع تم: کوکی کاربر (که با JS از localStorage ست می‌شود) > کاربر لاگین > تم پیش‌فرض ادمین
- */
 class SetTheme
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $themeSlug = null;
+        $themeSlug = $request->cookie('theme')
+            ?? ($request->user()?->theme)
+            ?? (Theme::where('is_default', true)->value('slug') ?? 'light-neumorphism');
 
-        if ($request->cookie('theme')) {
-            $themeSlug = $request->cookie('theme');
-        } elseif ($request->user() && $request->user()->theme) {
-            $themeSlug = $request->user()->theme;
-        }
+        $theme = Theme::where('slug', $themeSlug)->first();
 
-        if (!$themeSlug) {
-            $default = Theme::where('is_default', true)->value('slug');
-            $themeSlug = $default ?? 'light-neumorphism';
-        }
-
+        // ارسال نام تم و متغیرهای رنگی به همه ویوها
         view()->share('activeTheme', $themeSlug);
+        view()->share('themeVariables', $theme ? $theme->getMergedVariables() : []);
 
         return $next($request);
     }
