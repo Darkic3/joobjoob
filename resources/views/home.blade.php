@@ -34,6 +34,67 @@
         </div>
     </section>
 
+
+    {{-- اضافه کردن بخش ویژگی‌ها --}}
+    <section class="mb-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="neu-card text-center">
+                <div class="neu-icon-circle mx-auto mb-3">
+                    <i class="fas fa-truck text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">{{ __('messages.free_shipping') }}</h3>
+                <p class="text-xs" style="color: var(--text-secondary)">{{ __('messages.free_shipping_desc') }}</p>
+            </div>
+
+            <div class="neu-card text-center">
+                <div class="neu-icon-circle mx-auto mb-3">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">{{ __('messages.warranty') }}</h3>
+                <p class="text-xs" style="color: var(--text-secondary)">{{ __('messages.warranty_desc') }}</p>
+            </div>
+
+            <div class="neu-card text-center">
+                <div class="neu-icon-circle mx-auto mb-3">
+                    <i class="fas fa-undo text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">{{ __('messages.return') }}</h3>
+                <p class="text-xs" style="color: var(--text-secondary)">{{ __('messages.return_desc') }}</p>
+            </div>
+
+            <div class="neu-card text-center">
+                <div class="neu-icon-circle mx-auto mb-3">
+                    <i class="fas fa-headset text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">{{ __('messages.support') }}</h3>
+                <p class="text-xs" style="color: var(--text-secondary)">{{ __('messages.support_desc') }}</p>
+            </div>
+        </div>
+    </section>
+
+    {{-- بنرهای تبلیغاتی --}}
+    <section class="mb-12">
+        <div class="grid md:grid-cols-2 gap-5">
+            <div class="neu-flat-lg p-6 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-2">{{ __('messages.new_arrivals') }}</h3>
+                    <p class="mb-4" style="color: var(--text-secondary)">جدیدترین محصولات رو ببینید</p>
+                    <a href="{{ route('products.index') }}" class="neu-btn neu-btn-primary">{{ __('messages.view_all') }}</a>
+                </div>
+                <img src="https://picsum.photos/seed/banner1/400/200" class="absolute -bottom-10 -left-10 w-40 h-40 object-cover rounded-2xl opacity-20" alt="">
+            </div>
+
+            <div class="neu-flat-lg p-6 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-2">{{ __('messages.best_sellers') }}</h3>
+                    <p class="mb-4" style="color: var(--text-secondary)">پرفروش‌ترین محصولات</p>
+                    <a href="{{ route('products.index') }}" class="neu-btn neu-btn-primary">{{ __('messages.view_all') }}</a>
+                </div>
+                <img src="https://picsum.photos/seed/banner2/400/200" class="absolute -top-10 -right-10 w-40 h-40 object-cover rounded-2xl opacity-20" alt="">
+            </div>
+        </div>
+    </section>
+
     {{-- پیشنهادات ویژه با تایمر --}}
     @if($deals->isNotEmpty())
         <section class="mb-12">
@@ -78,6 +139,8 @@
             @endforeach
         </div>
     </section>
+
+
 
     {{-- نظرات مشتریان --}}
     @if($reviews->isNotEmpty())

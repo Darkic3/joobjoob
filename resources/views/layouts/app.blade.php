@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? app()->getLocale() }}" dir="{{ $direction ?? 'rtl' }}" data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
+<html lang="{{ $currentLocale ?? 'fa' }}" dir="{{ $direction ?? 'rtl' }}" data-theme="{{ session('theme', 'light-neumorphism') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,11 @@
     @if(($direction ?? 'rtl') === 'rtl')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
     @endif
+    {{-- Preload فونت‌ها --}}
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" as="style">
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 
     @vite(['resources/css/app.css','resources/css/neumorphism.css', 'resources/js/theme.js', 'resources/js/language.js', 'resources/js/slider.js'])
     @stack('styles')
@@ -30,6 +35,34 @@
 
     <x-footer />
 
+    <script>
+        document.querySelectorAll('[data-add-to-cart]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const originalContent = this.innerHTML;
+
+                // حالت لودینگ
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                this.disabled = true;
+
+                // شبیه‌سازی درخواست AJAX (اینجا باید درخواست واقعی به سرور بفرستید)
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> افزوده شد';
+                    this.style.background = 'var(--success)';
+                    this.style.color = '#fff';
+
+                    // برگشت به حالت اول بعد از ۲ ثانیه
+                    setTimeout(() => {
+                        this.innerHTML = originalContent;
+                        this.style.background = '';
+                        this.style.color = '';
+                        this.disabled = false;
+                    }, 2000);
+                }, 800);
+            });
+        });
+
+    </script>
     @stack('scripts')
 </body>
 </html>
