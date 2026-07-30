@@ -13,7 +13,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 
 Route::get('/admin/settings/{group?}', [SettingController::class, 'edit'])->name('admin.settings.edit');
-Route::post('/admin/settings/{group}', [SettingController::class, 'update'])->name('admin.settings.update');
+Route::put('/admin/settings/{group}', [SettingController::class, 'update'])->name('admin.settings.update');
 
 Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
 

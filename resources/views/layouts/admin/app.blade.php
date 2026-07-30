@@ -6,7 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('tab-name', 'پنل مدیریت')</title>
-{{--    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">--}}
+    {{--    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">--}}
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -16,13 +20,13 @@
         }
     </script>
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-{{--    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>--}}
+    {{--    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>--}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50">
 
-<x-admin.toast />
+<x-admin.toast/>
 
 <div x-data="{ sidebarOpen: true, mobileSidebar: false }"
      @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
@@ -30,22 +34,22 @@
      @close-mobile.window="mobileSidebar = false"
      class="flex min-h-screen">
 
-    <x-admin.sidebar />
+    <x-admin.sidebar/>
 
     <div class="flex-1 flex flex-col min-h-screen transition-all duration-300"
          :class="{ 'lg:mr-20': !sidebarOpen, 'lg:mr-64': sidebarOpen }">
 
-        <x-admin.header />
+        <x-admin.header/>
 
         <main class="flex-1 p-4 sm:p-6 lg:p-8">
             @yield('content')
         </main>
     </div>
 
-    <x-admin.mobile-sidebar />
+    <x-admin.mobile-sidebar/>
 </div>
 
-<x-admin.scripts />
+<x-admin.scripts/>
 @stack('scripts')
 </body>
 </html>

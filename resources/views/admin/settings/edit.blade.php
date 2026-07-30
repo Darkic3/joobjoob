@@ -154,7 +154,7 @@
                                                                        value="{{ $value }}" class="form-control rounded-3"
                                                                        @if ($isRequired) required @endif>
                                                                 @endif
-                                                                </div3>
+                                                                </div>
                                                         </div>
                                                         @endif
                                                         @endforeach
