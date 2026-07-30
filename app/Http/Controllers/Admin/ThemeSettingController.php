@@ -1,44 +1,48 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Theme;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ThemeSettingController extends Controller
 {
     public function edit()
     {
-        $themes = Theme::all();
-        return view('admin.theme-settings', compact('themes'));
+        // فقط تم پیش‌فرض را برای ویرایش می‌گیریم
+        $theme = Theme::where('is_default', true)->first();
+        return view('admin.theme-settings', compact('theme'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
-            'theme_id' => 'required|exists:themes,id',
-            'colors' => 'nullable|array',
-            'colors.bg' => 'nullable|string',
-            'colors.accent' => 'nullable|string',
-            // سایر رنگ‌ها را هم می‌توانید ولیدیت کنید
+            'bg' => 'required|string',
+            'accent' => 'required|string',
+            'text_primary' => 'required|string',
+            'danger' => 'required|string',
         ]);
 
-        // ۱. تنظیم تم پیش‌فرض
-        Theme::query()->update(['is_default' => false]);
-        $theme = Theme::findOrFail($request->theme_id);
-        $theme->update(['is_default' => true]);
+        $theme = Theme::where('is_default', true)->first();
 
-        // ۲. ذخیره رنگ‌های سفارشی (اگر ارسال شده باشد)
-        if ($request->has('colors')) {
-            $currentVars = $theme->css_variables ?? [];
-            $newVars = array_merge($currentVars, array_filter($request->colors));
-            $theme->update(['css_variables' => $newVars]);
-        }
+        // نگاشت نام inputها به متغیرهای CSS
+        $customColors = [
+            '--bg' => $request->bg,
+            '--bg-elevated' => $request->bg, // در نئومورفیسم معمولاً یکی هستند
+            '--accent' => $request->accent,
+            '--text-primary' => $request->text_primary,
+            '--danger' => $request->danger,
+        ];
 
-        // ۳. پاک کردن کش برای اعمال فوری تغییرات
-        \Illuminate\Support\Facades\Cache::forget('themes.all');
+        $theme->update([
+            'preview_color' => $request->bg,
+            'css_variables' => $customColors,
+        ]);
 
-        return back()->with('success', 'تنظیمات تم با موفقیت و به صورت آنی ذخیره شد!');
+        // پاک کردن کش تم برای اعمال فوری
+        Cache::forget('active_theme_variables');
+
+        return back()->with('success', 'رنگ‌بندی سایت با موفقیت به‌روزرسانی شد. (برای مشاهده تغییرات، صفحه را رفرش کنید)');
     }
 }

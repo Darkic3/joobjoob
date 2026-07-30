@@ -28,7 +28,7 @@
             </div>
             <div class="relative">
                 <div class="neu-flat p-4 rounded-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <img src="https://picsum.photos/seed/hero-main/700/400" class="rounded-xl w-full object-cover shadow-inner" alt="banner">
+                    <img src="https://picsum.photos/seed/hero/700/400" class="rounded-xl w-full object-cover shadow-inner" alt="banner">
                 </div>
             </div
         </div>

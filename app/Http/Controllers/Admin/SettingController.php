@@ -56,6 +56,9 @@ class SettingController extends Controller
 
             // پاک کردن کش تم برای اعمال فوری
             \Illuminate\Support\Facades\Cache::forget('active_theme_variables');
+            
+            // افزایش نسخه تم پیش‌فرض تا کاربران تم جدید را بگیرند
+            \Illuminate\Support\Facades\Cache::increment('theme_default_version');
         }
 
         // ۲. ذخیره سایر تنظیمات (این خط هم حالا بدون خطا کار می‌کند)

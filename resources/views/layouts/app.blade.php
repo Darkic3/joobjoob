@@ -17,17 +17,15 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 
-    @vite(['resources/css/app.css','resources/css/neumorphism.css', 'resources/js/theme.js', 'resources/js/language.js', 'resources/js/slider.js'])
-    {{-- Dynamic Theme Injection --}}
-    @if(!empty($themeVariables))
-        <style>
-            :root, [data-theme="{{ $activeTheme }}"] {
-                @foreach($themeVariables as $key => $value)
-                --{{ $key }}: {{ $value }};
-            @endforeach
-        }
-        </style>
-    @endif
+    @vite(['resources/css/app.css', 'resources/css/neumorphism.css', 'resources/js/theme.js', 'resources/js/language.js', 'resources/js/slider.js'])
+    {{-- Dynamic Theme Injection --}}    <style>
+        [data-theme="{{ $activeTheme ?? 'light-neumorphism' }}"] {
+        @foreach($themeVariables as $key => $value)
+            {{ $key }}: {{ $value }};
+        @endforeach
+}
+    </style>
+
 
     {{-- اضافه کردن Alpine.js برای تعاملات سبد خرید --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>

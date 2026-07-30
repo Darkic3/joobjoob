@@ -1,9 +1,9 @@
 <?php
 namespace App\Http\Middleware;
+
 use App\Models\Theme;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetTheme
@@ -16,9 +16,8 @@ class SetTheme
 
         $theme = Theme::where('slug', $themeSlug)->first();
 
-        // ارسال نام تم و متغیرهای رنگی به همه ویوها
         view()->share('activeTheme', $themeSlug);
-        view()->share('themeVariables', $theme ? $theme->getMergedVariables() : []);
+        view()->share('themeVariables', $theme ? $theme->getMergedCssVariables() : []);
 
         return $next($request);
     }
