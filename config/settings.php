@@ -12,6 +12,7 @@ return [
         'about' => 'درباره ما',
         'footer' => 'فوتر',
         'pages' => 'عناوین صفحات',
+        'appearance' => 'ظاهر و تم',
     ],
 
     'fields' => [
@@ -77,6 +78,14 @@ return [
             'label' => 'توضیحات فوتر',
             'type' => 'textarea',
             'tab' => 'footer',
+            'required' => false,
+        ],
+
+        // --- ظاهر و تم ---
+        'default_theme' => [
+            'label' => 'تم پیش‌فرض سایت',
+            'type' => 'text',
+            'tab' => 'appearance',
             'required' => false,
         ],
 
