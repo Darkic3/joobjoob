@@ -17,7 +17,7 @@
         <div class="neu-card">
             <h4 class="font-semibold mb-3">{{ __('messages.account_info') }}</h4>
             <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                <li><span class="hover:opacity-80 cursor-default">{{ __('messages.dashboard') }}</span></li>
+                <li><a href="{{ route('dashboard') }}" class="hover:opacity-80">{{ __('messages.dashboard') }}</a></li>
                 <li><a href="{{ route('cart.index') }}" class="hover:opacity-80">{{ __('messages.cart') }}</a></li>
             </ul>
         </div>

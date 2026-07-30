@@ -1,0 +1,21 @@
+{{--
+    toast اثبات اجتماعی چرخشی — "فلانی همین الان این محصول را خرید".
+    Props: items — آرایه‌ای از [نام, پیام]؛ در پروژه واقعی از جدول orders آخرین چند خرید را بگیرید.
+--}}
+@props(['items' => [
+    ['علی از تهران', '۲ دقیقه پیش «کتانی رانینگ پرو» را خرید'],
+    ['نگار از اصفهان', 'همین الان «ساعت هوشمند اسپرت» را خرید'],
+    ['حسین از شیراز', '۵ دقیقه پیش «هدفون بی‌سیم» را خرید'],
+]])
+
+<div id="social-toast" class="fixed bottom-5 start-5 z-50 hidden toast-enter" data-items='@json($items)'>
+    <div class="neu-flat-sm px-4 py-3 flex items-center gap-3 max-w-xs">
+        <span class="neu-icon-circle w-9 h-9 grid place-items-center text-sm shrink-0">🛍️</span>
+        <div class="text-xs">
+            <p class="font-bold" id="toast-name"></p>
+            <p style="color:var(--text-secondary);" id="toast-msg"></p>
+        </div>
+        <button type="button" onclick="document.getElementById('social-toast').classList.add('hidden')"
+                class="text-sm shrink-0" style="color:var(--text-secondary);">✕</button>
+    </div>
+</div>

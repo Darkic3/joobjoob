@@ -21,7 +21,7 @@
     </script>
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     {{--    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>--}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50">
