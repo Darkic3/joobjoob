@@ -1,128 +1,72 @@
 /* ==========================================================================
-   Neumorphism PRO — لایه‌ی تکمیلی برای فروشگاه حرفه‌ای
-   این فایل روی neumorphism.css قبلی سوار می‌شود و فقط شامل موارد جدید است:
-   انیمیشن‌ها، بج‌های کمیابی/فوریت، نوار پیشرفت فروش، تست‌مونیال، تست پرداخت
+   Neumorphism PRO — روان‌شناسی فروش: بج‌ها، انیمیشن‌ها، نشان رتبه
    ========================================================================== */
 
-/* ---------- توکن‌های رنگی جدید برای روان‌شناسی فروش ---------- */
 :root {
-    --urgency: #ff5b5b;
-    --urgency-soft: #ffe1e1;
     --gold: #f5a623;
+    --silver: #a0aec0;
+    --bronze: #c98a4b;
+    --urgency: #ff5b5b;
+    --gold: #f5a623;
+    --silver: #c7cdd6;   /* برای مدال نقره‌ی رتبه ۲ */
+    --bronze: #c98a4b;   /* برای مدال برنز رتبه ۳ */
     --live-dot: #2ecc71;
 }
 [data-theme="dark-neumorphism"] {
     --urgency: #ff7a7a;
-    --urgency-soft: #4a2626;
     --gold: #f6c453;
+    --silver: #a8b2c0;
+    --bronze: #b8763f;
     --live-dot: #4ade80;
 }
 
-/* ---------- انیمیشن سیگنیچر: کارت دیل زنده (Pulse Glow) ---------- */
 @keyframes pulseGlow {
     0%, 100% { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 0 color-mix(in srgb, var(--urgency) 35%, transparent); }
     50%      { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 10px color-mix(in srgb, var(--urgency) 0%, transparent); }
 }
-.neu-pulse { animation: pulseGlow 2.2s ease-in-out infinite; }
-
-@keyframes livePing {
-    0%   { transform: scale(1); opacity: 1; }
-    75%, 100% { transform: scale(2.2); opacity: 0; }
-}
-.live-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--live-dot); display: inline-block; }
-.live-dot::after {
-    content: ''; position: absolute; inset: 0; border-radius: 50%;
-    background: var(--live-dot); animation: livePing 1.6s cubic-bezier(0,0,.2,1) infinite;
-}
-
-/* ---------- شمارنده‌ی اعداد (count-up) ---------- */
-@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.count-pop { animation: popIn .4s ease; }
-
-/* ---------- بج‌های کمیابی/فوریت ---------- */
-.badge-urgency {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: var(--urgency); color: #fff; font-weight: 700; font-size: .68rem;
-    padding: .3rem .65rem; border-radius: 999px;
-    box-shadow: 0 3px 8px color-mix(in srgb, var(--urgency) 50%, transparent);
-}
-.badge-new {
-    background: var(--accent); color: var(--accent-contrast);
-    font-weight: 700; font-size: .68rem; padding: .3rem .65rem; border-radius: 999px;
-}
-.badge-sale {
-    background: var(--bg-elevated); color: var(--urgency); font-weight: 800; font-size: .7rem;
-    padding: .3rem .65rem; border-radius: 999px;
-    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
-}
-
-/* ---------- نوار پیشرفت فروش (X از Y فروخته شد) ---------- */
-.stock-bar {
-    width: 100%; height: 8px; border-radius: 999px; overflow: hidden;
-    background: var(--bg-elevated);
-    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
-}
-.stock-bar-fill {
-    height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, var(--urgency), var(--gold));
-    transition: width .6s ease;
-}
-
-/* ---------- ستاره‌های امتیاز ---------- */
-.stars { color: var(--gold); letter-spacing: 1px; }
-
-/* ---------- کارت محصول: overlay اکشن سریع روی هاور ---------- */
-.product-actions {
-    position: absolute; top: 10px; inset-inline-end: 10px;
-    display: flex; flex-direction: column; gap: 8px;
-    opacity: 0; transform: translateX(var(--slide, 8px));
-    transition: opacity .2s ease, transform .2s ease;
-}
-[dir="rtl"] .product-actions { --slide: -8px; }
-.group:hover .product-actions { opacity: 1; transform: translateX(0); }
-
-/* ---------- toast اعلان (اضافه به سبد / خرید اجتماعی) ---------- */
-@keyframes toastIn {
-    from { opacity: 0; transform: translateY(12px) scale(.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.toast-enter { animation: toastIn .35s cubic-bezier(.2,.9,.3,1.2); }
-
-/* ---------- نوار اعلان بالای هدر ---------- */
-.announce-bar {
-    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--gold)));
-    color: #fff; font-size: .78rem; font-weight: 600;
-}
-
-/* ---------- دکمه‌ی افزودن به سبد: حالت‌های idle/loading/success ---------- */
-.btn-spinner {
-    width: 16px; height: 16px; border-radius: 50%;
-    border: 2px solid color-mix(in srgb, var(--accent-contrast) 35%, transparent);
-    border-top-color: var(--accent-contrast);
-    animation: spin .7s linear infinite;
-}
+@keyframes livePing { 0% { transform: scale(1); opacity: 1; } 75%, 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes popIn { from { transform: scale(.8); } to { transform: scale(1); } }
 
-/* ---------- نشان اعتماد فشرده (چک‌مارک ریز) ---------- */
-.trust-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: .74rem; color: var(--text-secondary);
+@layer components {
+
+    .neu-pulse { animation: pulseGlow 2.2s ease-in-out infinite; }
+
+    .live-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--live-dot); display: inline-block; }
+    .live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--live-dot); animation: livePing 1.6s cubic-bezier(0,0,.2,1) infinite; }
+
+    .badge-urgency { display: inline-flex; align-items: center; gap: 4px; background: var(--urgency); color: #fff; font-weight: 700; font-size: .68rem; padding: .3rem .65rem; border-radius: 999px; box-shadow: 0 3px 8px color-mix(in srgb, var(--urgency) 50%, transparent); }
+    .badge-new { background: var(--accent); color: var(--accent-contrast); font-weight: 700; font-size: .68rem; padding: .3rem .65rem; border-radius: 999px; }
+    .badge-sale { background: var(--bg-elevated); color: var(--urgency); font-weight: 800; font-size: .7rem; padding: .3rem .65rem; border-radius: 999px; box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
+
+    /* ---------- نشان رتبه (پرفروش‌ترین‌ها): یک کلاس، رنگ از طریق CSS var پاس داده می‌شود ----------
+       دیگر هیچ هگز هاردکد یا shadow-lg ناهماهنگ با نئومورفیسم در Blade لازم نیست. */
+    .neu-rank-badge {
+        position: absolute; top: -10px; inset-inline-start: -10px; z-index: 10;
+        width: 34px; height: 34px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: .8rem;
+        background: var(--rank-color, var(--bg-elevated));
+        color: var(--rank-text, var(--text-secondary));
+        box-shadow: 3px 3px 8px var(--shadow-dark), -2px -2px 6px var(--shadow-light);
+    }
+
+    .stock-bar { width: 100%; height: 7px; border-radius: 999px; overflow: hidden; background: var(--bg-elevated); box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
+    .stock-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--urgency), var(--gold)); transition: width .6s ease; }
+
+    .stars { color: var(--gold); letter-spacing: 1px; }
+
+    .product-actions { position: absolute; top: 10px; inset-inline-end: 10px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transform: translateX(var(--slide, 8px)); transition: opacity .2s ease, transform .2s ease; }
+    [dir="rtl"] .product-actions { --slide: -8px; }
+    .group:hover .product-actions { opacity: 1; transform: translateX(0); }
+
+    .toast-enter { animation: toastIn .35s cubic-bezier(.2,.9,.3,1.2); }
+    .announce-bar { background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--gold))); color: #fff; font-size: .78rem; font-weight: 600; }
+
+    .btn-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--accent-contrast) 35%, transparent); border-top-color: var(--accent-contrast); animation: spin .7s linear infinite; }
+
+    .count-pop { animation: popIn .3s ease; }
 }
-.trust-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
 
-/* ---------- اسکلتون بارگذاری تصویر ---------- */
-@keyframes shimmer { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
-.img-skeleton {
-    background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--shadow-light) 50%, var(--bg-elevated) 75%);
-    background-size: 400px 100%;
-    animation: shimmer 1.4s infinite linear;
-}
-
-/* ---------- اسکرول‌بار مخفی ---------- */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ---------- ریسپانسیو خاص فروشگاه ---------- */
-@media (max-width: 640px) {
-  .hero-visual { display: none; }
-}
+@media (max-width: 640px) { .hero-visual { display: none; } }

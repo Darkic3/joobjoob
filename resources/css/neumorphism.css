@@ -1,13 +1,8 @@
 /* ===================================================================
-   Neumorphism Design System
-   استفاده: به تگ <body> یا <html> اتریبیوت data-theme بدهید:
-   data-theme="light-neumorphism" | "dark-neumorphism" | "blue-theme" | "green-theme"
-   theme.js این اتریبیوت را بر اساس localStorage/کوکی مدیریت می‌کند.
-=================================================================== */
+   Neumorphism Design System — Core Tokens & Primitives
+   =================================================================== */
 
-/* ---------- ۱. متغیرهای پایه برای هر تم ---------- */
-:root,
-[data-theme="light-neumorphism"] {
+:root, [data-theme="light-neumorphism"] {
     --bg: #e0e5ec;
     --bg-elevated: #e0e5ec;
     --shadow-light: #ffffff;
@@ -22,251 +17,137 @@
     --radius-md: 18px;
     --radius-lg: 28px;
     --radius-pill: 999px;
-    --gap: 1.25rem;
+    --gap: 1.25rem;         /* تنها پدینگ استاندارد کارت‌ها — جای دیگری آن را override نکنید */
 }
 
 [data-theme="dark-neumorphism"] {
-    --bg: #2d3748;
-    --bg-elevated: #2d3748;
-    --shadow-light: #3a4759;
-    --shadow-dark: #212a37;
-    --text-primary: #edf2f7;
-    --text-secondary: #a0aec0;
-    --accent: #8b83ff;
-    --accent-contrast: #1a202c;
-    --danger: #fc8181;
-    --success: #68d391;
+    --bg: #2d3748; --bg-elevated: #2d3748;
+    --shadow-light: #3a4759; --shadow-dark: #212a37;
+    --text-primary: #edf2f7; --text-secondary: #a0aec0;
+    --accent: #8b83ff; --accent-contrast: #1a202c;
+    --danger: #fc8181; --success: #68d391;
 }
-
 [data-theme="blue-theme"] {
-    --bg: #dde9f7;
-    --bg-elevated: #dde9f7;
-    --shadow-light: #ffffff;
-    --shadow-dark: #a9c1de;
-    --text-primary: #1a365d;
-    --text-secondary: #4a6584;
-    --accent: #3182ce;
-    --accent-contrast: #ffffff;
-    --danger: #e53e5c;
-    --success: #38a169;
+    --bg: #dde9f7; --bg-elevated: #dde9f7;
+    --shadow-light: #ffffff; --shadow-dark: #a9c1de;
+    --text-primary: #1a365d; --text-secondary: #4a6584;
+    --accent: #3182ce; --accent-contrast: #ffffff;
+    --danger: #e53e5c; --success: #38a169;
 }
-
 [data-theme="green-theme"] {
-    --bg: #e2ece3;
-    --bg-elevated: #e2ece3;
-    --shadow-light: #ffffff;
-    --shadow-dark: #a9c2ab;
-    --text-primary: #1c3a24;
-    --text-secondary: #4d6b53;
-    --accent: #38a169;
-    --accent-contrast: #ffffff;
-    --danger: #e53e5c;
-    --success: #2f855a;
+    --bg: #e2ece3; --bg-elevated: #e2ece3;
+    --shadow-light: #ffffff; --shadow-dark: #a9c2ab;
+    --text-primary: #1c3a24; --text-secondary: #4d6b53;
+    --accent: #38a169; --accent-contrast: #ffffff;
+    --danger: #e53e5c; --success: #2f855a;
 }
 
-/* ---------- ۲. پایه ---------- */
 body {
     background: var(--bg);
     color: var(--text-primary);
-    font-family: 'Vazirmatn', 'Inter', system-ui, sans-serif;
+    font-family: 'Vazirmatn', system-ui, sans-serif;
     transition: background-color .35s ease, color .35s ease;
 }
 
-[dir="rtl"] body { font-family: 'Vazirmatn', system-ui, sans-serif; }
-[dir="ltr"] body { font-family: 'Inter', system-ui, sans-serif; }
+@layer components {
 
-/* ---------- ۳. سایه‌های نئومورفیک پایه ---------- */
-.neu-flat {
-    background: var(--bg-elevated);
-    border-radius: var(--radius-md);
-    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
-    transition: box-shadow .25s ease, transform .15s ease;
+    /* ---------- سطوح پایه ---------- */
+    .neu-flat    { background: var(--bg-elevated); border-radius: var(--radius-md); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light); }
+    .neu-flat-sm { background: var(--bg-elevated); border-radius: var(--radius-sm); box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); }
+    .neu-flat-lg { background: var(--bg-elevated); border-radius: var(--radius-lg); box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light); }
+    .neu-pressed { background: var(--bg-elevated); border-radius: var(--radius-md); box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light); }
+
+    .neu-interactive:hover { box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light); transform: translateY(-2px); }
+    .neu-interactive:active { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); transform: translateY(0); }
+
+    /* ---------- کارت‌ها: پدینگ فقط این‌جا تعریف می‌شود — در Blade هرگز p-* روی neu-card نگذارید ---------- */
+    .neu-card {
+        background: var(--bg-elevated);
+        border-radius: var(--radius-md);
+        box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+        padding: var(--gap);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .neu-card:hover { transform: translateY(-4px); box-shadow: 10px 10px 22px var(--shadow-dark), -10px -10px 22px var(--shadow-light); }
+
+    /* ---------- دکمه‌ها: ارتفاع/پدینگ ثابت برای همه، به‌جای py-2/py-2.5/py-3 پراکنده در Blade ---------- */
+    .neu-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+        min-height: 46px; padding: 0 1.5rem;
+        border: none; border-radius: var(--radius-pill);
+        background: var(--bg-elevated); color: var(--text-primary);
+        font-weight: 600; font-size: .875rem;
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        cursor: pointer; transition: box-shadow .2s ease, transform .15s ease;
+    }
+    .neu-btn:hover { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light); transform: translateY(-1px); }
+    .neu-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); transform: translateY(0); }
+    .neu-btn[disabled] { opacity: .55; cursor: not-allowed; box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); }
+
+    .neu-btn-sm { min-height: 38px; padding: 0 1.1rem; font-size: .75rem; }
+    .neu-btn-primary {
+        background: var(--accent); color: var(--accent-contrast);
+        box-shadow: 6px 6px 14px color-mix(in srgb, var(--accent) 45%, transparent), -6px -6px 14px var(--shadow-light);
+    }
+    .neu-btn-primary:hover { filter: brightness(1.08); }
+    .neu-btn-icon { width: 46px; height: 46px; min-height: 0; padding: 0; border-radius: 50%; }
+    .neu-btn-icon-sm { width: 36px; height: 36px; }
+
+    /* ---------- اینپوت‌ها ---------- */
+    .neu-input {
+        width: 100%; padding: .85rem 1.1rem; border: none;
+        border-radius: var(--radius-sm); background: var(--bg-elevated); color: var(--text-primary);
+        box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+        outline: none; transition: box-shadow .2s ease;
+    }
+    .neu-input:focus { box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
+    .neu-input::placeholder { color: var(--text-secondary); }
+
+    /* ---------- دایره‌های آیکون: اندازه و مرکزچینی فقط یک‌بار، همه‌جا یکسان ----------
+       نکته‌ی مهم: line-height:1 روی خود دایره باعث می‌شود ایموجی/حروف همیشه
+       دقیقاً وسط دایره بنشینند، صرف‌نظر از این‌که چه فونت/سایزی باشد. */
+    .neu-icon-circle {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        width: 56px; height: 56px; border-radius: 50%;
+        background: var(--bg-elevated); color: var(--accent);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        font-size: 1.4rem; line-height: 1;
+    }
+    .neu-icon-circle-sm { width: 44px; height: 44px; font-size: 1rem; }
+    .neu-icon-circle-lg { width: 72px; height: 72px; font-size: 1.75rem; }
+
+    /* ---------- تاگل تم: موقعیت دات فقط با CSS، بدون JS دستی ---------- */
+    .neu-toggle {
+        width: 56px; height: 30px; border-radius: var(--radius-pill);
+        background: var(--bg-elevated); border: none; flex-shrink: 0; cursor: pointer;
+        box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+        position: relative;
+    }
+    .neu-toggle-dot {
+        position: absolute; top: 3px; inset-inline-start: 3px;
+        width: 24px; height: 24px; border-radius: 50%;
+        background: var(--accent); box-shadow: 2px 2px 4px var(--shadow-dark);
+        transition: inset-inline-start .25s ease;
+    }
+    [data-theme="dark-neumorphism"] .neu-toggle-dot { inset-inline-start: 29px; }
+
+    /* ---------- صفحه‌بندی ---------- */
+    .neu-page-item { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated); box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); color: var(--text-primary); cursor: pointer; }
+    .neu-page-item.active { box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); color: var(--accent); font-weight: 700; }
+
+    /* ---------- بج ساده ---------- */
+    .neu-badge { display: inline-block; padding: .25rem .75rem; border-radius: var(--radius-pill); font-size: .75rem; font-weight: 700; background: var(--danger); color: #fff; }
+    .neu-badge-success { background: var(--success); }
 }
 
-.neu-pressed {
-    background: var(--bg-elevated);
-    border-radius: var(--radius-md);
-    box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
-}
-
-.neu-flat-sm {
-    background: var(--bg-elevated);
-    border-radius: var(--radius-sm);
-    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
-}
-
-.neu-flat-lg {
-    background: var(--bg-elevated);
-    border-radius: var(--radius-lg);
-    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
-}
-
-/* هاور: کمی برجسته‌تر */
-.neu-interactive:hover {
-    box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
-    transform: translateY(-2px);
-}
-
-.neu-interactive:active {
-    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-    transform: translateY(0);
-}
-
-/* ---------- ۴. کارت‌ها ---------- */
-.neu-card {
-    background: var(--bg-elevated);
-    border-radius: var(--radius-md);
-    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
-    padding: var(--gap);
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-
-.neu-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 10px 10px 22px var(--shadow-dark), -10px -10px 22px var(--shadow-light);
-}
-
-/* ---------- ۵. دکمه‌ها ---------- */
-.neu-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    padding: .75rem 1.5rem;
-    border: none;
-    border-radius: var(--radius-pill);
-    background: var(--bg-elevated);
-    color: var(--text-primary);
-    font-weight: 600;
-    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-    cursor: pointer;
-    transition: all .2s ease;
-}
-
-.neu-btn:hover { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light); }
-.neu-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
-
-.neu-btn-primary {
-    background: var(--accent);
-    color: var(--accent-contrast);
-    box-shadow: 6px 6px 14px color-mix(in srgb, var(--accent) 45%, transparent),
-    -6px -6px 14px var(--shadow-light);
-}
-
-.neu-btn-primary:hover { filter: brightness(1.08); }
-
-.neu-btn-icon {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 50%;
-}
-
-/* ---------- ۶. اینپوت‌ها ---------- */
-.neu-input {
-    width: 100%;
-    padding: .85rem 1.1rem;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--bg-elevated);
-    color: var(--text-primary);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-    outline: none;
-    transition: box-shadow .2s ease;
-}
-
-.neu-input:focus {
-    box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light),
-    0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
-}
-
-.neu-input::placeholder { color: var(--text-secondary); }
-
-/* ---------- ۷. آیکون‌های دایره‌ای دسته‌بندی ---------- */
-.neu-icon-circle {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-elevated);
-    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-    color: var(--accent);
-}
-
-/* ---------- ۸. تاگل تم ---------- */
-.neu-toggle {
-    width: 56px;
-    height: 30px;
-    border-radius: var(--radius-pill);
-    background: var(--bg-elevated);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-    position: relative;
-    cursor: pointer;
-}
-
-.neu-toggle-dot {
-    position: absolute;
-    top: 3px;
-    inset-inline-start: 3px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--accent);
-    transition: inset-inline-start .25s ease;
-    box-shadow: 2px 2px 4px var(--shadow-dark);
-}
-
-[data-theme="dark-neumorphism"] .neu-toggle-dot { inset-inline-start: 29px; }
-
-/* ---------- ۹. پیجینیشن ---------- */
-.neu-page-item {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-elevated);
-    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
-    color: var(--text-primary);
-    cursor: pointer;
-}
-
-.neu-page-item.active {
-    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-    color: var(--accent);
-    font-weight: 700;
-}
-
-/* ---------- ۱۰. بج تخفیف / وضعیت ---------- */
-.neu-badge {
-    display: inline-block;
-    padding: .25rem .75rem;
-    border-radius: var(--radius-pill);
-    font-size: .75rem;
-    font-weight: 700;
-    background: var(--danger);
-    color: #fff;
-}
-
-.neu-badge-success { background: var(--success); }
-
-/* ---------- ۱۱. اسکرول‌بار ظریف ---------- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb {
-    background: var(--shadow-dark);
-    border-radius: var(--radius-pill);
-}
+::-webkit-scrollbar-thumb { background: var(--shadow-dark); border-radius: var(--radius-pill); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ---------- ۱۲. جهت‌دهی خودکار برای فلش‌ها/آیکون‌های جهت‌دار ---------- */
 [dir="rtl"] .flip-rtl { transform: scaleX(-1); }
 
-/* ---------- ۱۳. ریسپانسیو ---------- */
 @media (max-width: 768px) {
-    .neu-card { padding: 1rem; }
-    .neu-icon-circle { width: 56px; height: 56px; }
-    :root { --gap: .85rem; }
+    :root { --gap: .9rem; }
 }

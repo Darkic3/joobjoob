@@ -5,11 +5,12 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-// راه‌اندازی Alpine
+// تعاملات UI فروشگاه (تم، تایمر، toast، دکمه افزودن به سبد) — قبلاً به اشتباه './language' ایمپورت می‌شد که وجود نداشت
+import './ui-effects';
+
 window.Alpine = Alpine;
 Alpine.start();
 
-// راه‌اندازی Swiper (اگر المان وجود داشت)
 const heroSwiper = document.querySelector('.hero-swiper');
 if (heroSwiper) {
     new Swiper(heroSwiper, {
@@ -19,8 +20,3 @@ if (heroSwiper) {
         pagination: { el: '.swiper-pagination', clickable: true },
     });
 }
-
-// اجرای اسکریپت‌های سفارشی شما (اگر فایل‌های جداگانه دارید، آن‌ها را اینجا ایمپورت کنید)
-// import './theme';
-import './language';
-// import './slider';

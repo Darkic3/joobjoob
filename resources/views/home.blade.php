@@ -88,14 +88,11 @@
         </div>
     </section>
 
-    {{-- دسته‌بندی‌ها --}}
+    {{-- دسته‌بندی‌ها: هر کارت از کامپوننت category-card با ابعاد ثابت --}}
     <section class="py-6">
         <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
             @foreach($categories as $cat)
-                <a href="{{ route('products.index') }}" class="neu-card shrink-0 w-28 flex flex-col items-center gap-2 py-5 px-3 text-center">
-                    <span class="neu-icon-circle w-14 h-14 grid place-items-center text-xl">{{ $cat['icon'] }}</span>
-                    <span class="text-xs font-semibold">{{ $cat['name'] }}</span>
-                </a>
+                <x-category-card :category="$cat" />
             @endforeach
         </div>
     </section>
