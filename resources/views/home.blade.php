@@ -141,22 +141,46 @@
     </section>
 
     {{-- پرفروش‌ترین‌ها: رتبه‌بندی واقعی، عدد رتبه اطلاعات معنادار می‌دهد --}}
+    {{-- پرفروش‌ترین‌ها --}}
     <section class="py-6">
         <h2 class="text-lg font-extrabold mb-5">{{ __('messages.best_sellers') }}</h2>
-        <div class="flex gap-5 overflow-x-auto no-scrollbar pb-2">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
             @foreach($bestSellers as $item)
                 @php
-                    $rankColors = [1 => 'var(--gold)', 2 => 'var(--text-secondary)', 3 => '#b08d57'];
-                    $rankColor = $rankColors[$item['rank']] ?? 'var(--bg-elevated)';
+                    $rankColors = [
+                        1 => ['bg' => '#FFD700', 'text' => '#000'], // طلا
+                        2 => ['bg' => '#C0C0C0', 'text' => '#000'], // نقره
+                        3 => ['bg' => '#CD7F32', 'text' => '#fff'], // برنز
+                    ];
+                    $rankStyle = $rankColors[$item['rank']] ?? ['bg' => 'var(--bg-elevated)', 'text' => 'var(--text-primary)'];
                 @endphp
-                <div class="neu-card p-4 shrink-0 w-56 relative">
-                    <span class="absolute -top-3 -start-3 w-9 h-9 rounded-full grid place-items-center font-black text-sm z-10"
-                          style="background: {{ $rankColor }}; color: {{ $item['rank'] <= 3 ? '#fff' : 'var(--text-secondary)' }};">
-                        {{ $item['rank'] }}
+                <div class="neu-card neu-interactive p-4 relative group">
+                    {{-- نشان رتبه --}}
+                    <span class="absolute -top-3 -end-3 w-8 h-8 rounded-full grid place-items-center font-bold text-xs shadow-lg z-10"
+                          style="background: {{ $rankStyle['bg'] }}; color: {{ $rankStyle['text'] }};">
+                    {{ $item['rank'] }}
+                </span>
+
+                    {{-- تصویر محصول --}}
+                    <div class="relative mb-3 overflow-hidden rounded-xl" style="aspect-ratio:1/1;">
+                        <img src="{{ $item['image'] ?? 'https://picsum.photos/seed/best'.$item['rank'].'/300/300' }}"
+                             onerror="this.src='https://picsum.photos/seed/fallback/300/300'"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                             alt="{{ $item['name'] }}">
+                    </div>
+
+                    {{-- اطلاعات محصول --}}
+                    <h4 class="text-xs font-semibold mb-2 line-clamp-2" style="color: var(--text-primary);">
+                        {{ $item['name'] }}
+                    </h4>
+                    <div class="flex items-center justify-between">
+                    <span class="mono font-bold text-sm" style="color: var(--accent);">
+                        {{ number_format($item['price']) }}
                     </span>
-                    <img src="{{ $item['image'] }}" class="w-full rounded-xl mb-3 object-cover" style="aspect-ratio:1/1;">
-                    <h4 class="text-xs font-semibold mb-1 line-clamp-2">{{ $item['name'] }}</h4>
-                    <span class="mono font-bold text-sm" style="color: var(--accent);">{{ number_format($item['price']) }}</span>
+                        <button class="neu-btn neu-btn-icon w-8 h-8 p-0 text-xs">
+
+                        </button>
+                    </div>
                 </div>
             @endforeach
         </div>
