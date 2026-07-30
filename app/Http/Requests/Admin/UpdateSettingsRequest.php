@@ -8,7 +8,7 @@ class UpdateSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return false; // TODO: ahora_fix in false or true ?
+        return true ;
     }
 
     public function rules(): array
