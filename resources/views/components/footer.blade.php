@@ -17,7 +17,13 @@
         <div class="neu-card">
             <h4 class="font-semibold mb-3">{{ __('messages.account_info') }}</h4>
             <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                <li><a href="{{ route('dashboard') }}" class="hover:opacity-80">{{ __('messages.dashboard') }}</a></li>
+                @auth
+                    <li><a href="" class="hover:opacity-80">{{ __('messages.dashboard') }}</a></li>
+                    <li><a href="" class="hover:opacity-80">{{ __('messages.my_orders') }}</a></li>
+                @else
+                    <li><a href="" class="hover:opacity-80">{{ __('messages.login') }}</a></li>
+                    <li><a href="" class="hover:opacity-80">{{ __('messages.register') }}</a></li>
+                @endauth
                 <li><a href="{{ route('cart.index') }}" class="hover:opacity-80">{{ __('messages.cart') }}</a></li>
             </ul>
         </div>
