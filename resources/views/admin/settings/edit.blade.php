@@ -43,31 +43,6 @@
                             @foreach ($tabs as $tabKey => $tabLabel)
                                 <div class="tab-pane fade @if ($activeGroup === $tabKey) show active @endif" id="tab-{{ $tabKey }}" role="tabpanel">
 
-                                    {{-- بخش ویژه: تنظیمات ظاهر و تم سایت --}}
-                                    @if ($tabKey === 'appearance' || $tabKey === 'ظاهر_و_تم')
-                                        <div class="row g-4 mb-4">
-                                            <div class="col-12">
-                                                <h5 class="fw-bold mb-3">انتخاب تم پیش‌فرض سایت</h5>
-                                                <p class="text-muted small mb-4">تمی که کاربران در اولین بازدید مشاهده خواهند کرد.</p>
-                                                <div class="row g-3">
-                                                    @foreach($themes as $theme)
-                                                        <div class="col-md-3 col-sm-6">
-                                                            <input type="radio" class="btn-check" name="default_theme" id="theme_{{ $theme->id }}" value="{{ $theme->slug }}" @if($defaultThemeSlug === $theme->slug) checked @endif>
-                                                            <label class="btn btn-outline-primary w-100 p-3 text-start rounded-3 h-100 d-flex flex-column" for="theme_{{ $theme->id }}">
-                                                                <div class="d-flex align-items-center mb-3">
-                                                                    <span class="rounded-circle me-2" style="width: 24px; height: 24px; background-color: {{ $theme->preview_color }}; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></span>
-                                                                    <span class="fw-bold">{{ $theme->name }}</span>
-                                                                </div>
-                                                                <small class="text-muted">مقدار پیش‌فرض: <code>{{ $theme->slug }}</code></small>
-                                                            </label>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr class="my-4 text-muted opacity-25">
-                                    @endif
-
                                     {{-- بخش ویژه: آیتم‌های منو --}}
                                     @if ($tabKey == 'menu_items')
                                         @include('admin.settings.menu_item')

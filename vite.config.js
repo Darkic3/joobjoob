@@ -4,7 +4,7 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/css/neumorphism.css', 'resources/js/app.js', 'resources/js/theme.js', 'resources/js/language.js', 'resources/js/slider.js'],
+            input: ['resources/css/app.css', 'resources/js/ui-effects.js'],
             refresh: true,
         }),
     ],

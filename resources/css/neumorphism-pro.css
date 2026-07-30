@@ -118,7 +118,11 @@
     animation: shimmer 1.4s infinite linear;
 }
 
+/* ---------- اسکرول‌بار مخفی ---------- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ---------- ریسپانسیو خاص فروشگاه ---------- */
 @media (max-width: 640px) {
-    .hero-visual { display: none; }
+  .hero-visual { display: none; }
 }
