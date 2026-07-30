@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->is_admin ?? false;
     }
+
+    public function hasAccess(string $routeName): bool
+    {
+        return $this->isAdmin();
+    }
 }
