@@ -8,3 +8,19 @@
 
 * { font-family: 'Vazirmatn', sans-serif; }
 .mono { font-family: 'JetBrains Mono', monospace; }
+
+
+/*========================= FOR SCROLL PAGE  =========================*/
+/* حالت اولیه: المان کمی پایین‌تر و نامرئی است */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+    will-change: opacity, transform;
+}
+
+/* حالت فعال: وقتی کلاس اضافه شد، المان ظاهر می‌شود */
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}

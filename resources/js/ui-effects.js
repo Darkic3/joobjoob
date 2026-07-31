@@ -129,3 +129,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+
+//FOR Scroll ======================================================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 // وقتی ۱۰ درصد المان دیده شد فعال شود
+    };
+
+    const scrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target); // فقط یک بار اجرا شود تا پرفورمنس حفظ شود
+            }
+        });
+    }, observerOptions);
+
+    // فقط المان‌هایی که کلاس reveal-on-scroll دارند را رصد کن
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        scrollObserver.observe(el);
+    });
+});
+//======================================================================================================
