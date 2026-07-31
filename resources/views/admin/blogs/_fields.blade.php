@@ -16,19 +16,21 @@
             @enderror
         </div>
 
-        {{-- URL --}}
+        {{-- URL (Slug) --}}
         <div class="space-y-1.5">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 آدرس یکتا (URL) <span class="text-red-500">*</span>
             </label>
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ url('/') }}/</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap font-mono">{{ url('/') }}/</span>
+                {{-- ✅ اضافه شدن data-auto-slug برای فعال‌سازی اسکریپت --}}
                 <input type="text" name="slug" value="{{ old('slug', $blog->slug ?? '') }}"
-                       class="input-custom flex-1"
-                       placeholder="my-article-url" dir="ltr">
+                       class="input-custom flex-1 font-mono text-sm"
+                       placeholder="my-article-url" dir="ltr" data-auto-slug>
             </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-                در صورت خالی بودن، خودکار از عنوان ساخته می‌شود
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                در صورت خالی بودن، به‌صورت خودکار از روی عنوان ساخته می‌شود. فاصله‌ها خودکار به خط تیره (-) تبدیل می‌شوند.
             </p>
             @error('slug')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -67,7 +69,10 @@
 
         {{-- کارت تنظیمات انتشار --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
-            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">تنظیمات انتشار</h3>
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                تنظیمات انتشار
+            </h3>
 
             <div class="space-y-4">
                 {{-- دسته‌بندی --}}
@@ -117,13 +122,17 @@
 
         {{-- کارت تصویر شاخص --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
-            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">تصویر شاخص</h3>
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                تصویر شاخص
+            </h3>
 
             <div class="space-y-3">
                 @if($blog && $blog->image)
                     <div class="relative group">
-                        <img src="{{ Storage::url($blog->image) }}"
-                             class="w-full rounded-lg border border-gray-200 dark:border-gray-600"
+                        {{-- ✅ اصلاح آدرس تصویر برای هماهنگی با ImageUploader --}}
+                        <img src="{{ asset(config('paths.upload', 'uploads') . '/blogs/' . $blog->image) }}"
+                             class="w-full rounded-lg border border-gray-200 dark:border-gray-600 object-cover"
                              alt="تصویر فعلی">
                         <button type="button" onclick="this.parentElement.remove()"
                                 class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm opacity-0 group-hover:opacity-100">
@@ -135,7 +144,7 @@
                 @endif
 
                 <input type="file" name="image" accept="image/*"
-                       class="input-custom file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300 cursor-pointer">
+                       class="input-custom file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300 cursor-pointer w-full">
 
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                     فرمت‌های مجاز: JPG, PNG, WebP | حداکثر حجم: ۲ مگابایت
