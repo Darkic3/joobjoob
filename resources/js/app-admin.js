@@ -1,20 +1,11 @@
+import Alpine from 'alpinejs';
 import Swiper from 'swiper';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import Alpine from 'alpinejs';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import { initCart } from './cart';
-
-
-const heroSwiper = new Swiper('.hero-swiper', {
-    modules: [Navigation, Pagination, Autoplay],
-    loop: true,
-    autoplay: { delay: 4000 },
-    pagination: { el: '.swiper-pagination', clickable: true },
-});
+window.Alpine = Alpine;
+Alpine.start();
 
 document.querySelectorAll('[data-countdown]').forEach(timer => {
     const endDate = new Date(timer.dataset.countdown).getTime();
@@ -35,13 +26,4 @@ document.querySelectorAll('[data-countdown]').forEach(timer => {
 
         timer.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }, 1000);
-});
-
-
-window.Alpine = Alpine;
-Alpine.start();
-
-// اجرای اولیه سبد خرید
-document.addEventListener('DOMContentLoaded', () => {
-    initCart();
 });

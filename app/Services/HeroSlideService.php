@@ -11,4 +11,8 @@ class HeroSlideService
     {
         return HeroSlide::active()->get();
     }
+
+    public function dashboardIndexContent()
+    {
+    }
 }

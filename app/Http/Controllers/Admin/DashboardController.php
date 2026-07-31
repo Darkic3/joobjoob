@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Services\HeroSlideService;
+use App\Services\DashboardService;
 
 class DashboardController
 {
-    public function __construct(protected HeroSlideService $dashboardService){}
+    public function __construct(protected DashboardService $dashboardService){}
 
     public function index()
     {
