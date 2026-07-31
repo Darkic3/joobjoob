@@ -1,5 +1,4 @@
 <section class="relative w-full mb-12 overflow-hidden rounded-[var(--radius-lg)]">
-    {{-- هاله‌های پس‌زمینه برای عمق دادن به نئومورفیسم --}}
     <div
         class="absolute top-0 end-0 w-96 h-96 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-[100px] opacity-10 animate-blob"></div>
     <div
@@ -7,51 +6,31 @@
 
     <div class="swiper hero-swiper rounded-[var(--radius-lg)] relative z-10">
         <div class="swiper-wrapper">
-            @php
-                $slides = [
-                    [
-                        'badge' => 'کالکشن پاییزه',
-                        'title' => 'خرید هوشمند، <span style="color: var(--accent);">لذتِ بی‌پایان</span>',
-                        'desc' => 'بیش از ۱۲ هزار کالای اورجینال با ضمانت بازگشت ۷ روزه و ارسال فوری به سراسر کشور.',
-                        'image' => 'https://picsum.photos/seed/hero-shoe/600/600',
-                        'price' => '۲,۴۹۰,۰۰۰',
-                        'old_price' => '۳,۸۰۰,۰۰۰',
-                        'btn_text' => 'مشاهده محصولات',
-                        'btn_link' => route('products.index')
-                    ],
-                    [
-                        'badge' => 'تخفیف ویژه',
-                        'title' => 'تکنولوژی روز، <span style="color: var(--accent);">در دستان شما</span>',
-                        'desc' => 'جدیدترین لپ‌تاپ‌ها و گجت‌های هوشمند با گارانتی اصلی و بهترین قیمت بازار.',
-                        'image' => 'https://picsum.photos/seed/hero-laptop/600/600',
-                        'price' => '۳۲,۵۰۰,۰۰۰',
-                        'old_price' => '۳۵,۰۰۰,۰۰۰',
-                        'btn_text' => 'پیشنهادات شگفت‌انگیز',
-                        'btn_link' => '#deals'
-                    ],
-                ];
-            @endphp
-
-            @foreach($slides as $slide)
+            @forelse($slides as $slide)
                 <div class="swiper-slide">
                     <div class="grid lg:grid-cols-2 items-center gap-8 p-6 md:p-12 min-h-[450px] md:min-h-[550px]">
 
-                        {{-- ستون متن --}}
                         <div class="order-2 lg:order-1 z-10 text-center lg:text-start">
-                            <span
-                                class="hero-anim hero-badge badge-new inline-block mb-4 px-4 py-1.5 text-xs">✦ {{ $slide['badge'] }}</span>
+                            @if($slide->trans('badge'))
+                                <span class="hero-anim hero-badge badge-new inline-block mb-4 px-4 py-1.5 text-xs">
+                                ✦ {{ $slide->trans('badge') }}
+                            </span>
+                            @endif
+
                             <h1 class="hero-anim hero-title text-3xl md:text-5xl lg:text-6xl font-black leading-[1.2] mb-6">
-                                {!! $slide['title'] !!}
+                                {!! $slide->trans('title') !!}
                             </h1>
+
                             <p class="hero-anim hero-desc text-sm md:text-base mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed"
                                style="color: var(--text-secondary);">
-                                {{ $slide['desc'] }}
+                                {{ $slide->trans('desc') }}
                             </p>
+
                             <div
                                 class="hero-anim hero-btns flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                                <a href="{{ $slide['btn_link'] }}"
+                                <a href="{{ $slide->btn_link }}"
                                    class="neu-btn neu-btn-primary px-8 py-3.5 font-bold text-sm shadow-lg hover:shadow-xl transition-all">
-                                    {{ $slide['btn_text'] }}
+                                    {{ $slide->trans('btn_text') ?: 'مشاهده' }}
                                 </a>
                                 <a href="#deals" class="neu-btn px-8 py-3.5 font-bold text-sm">
                                     پیشنهادات ویژه 🔥
@@ -62,47 +41,65 @@
                         {{-- ستون تصویر با افکت شناوری --}}
                         <div
                             class="hero-anim hero-image-wrap order-1 lg:order-2 relative flex justify-center items-center">
-                            {{-- کارت پایه نئومورفیک --}}
                             <div class="neu-flat-lg p-6 md:p-10 w-full max-w-sm relative">
                                 <span class="badge-urgency absolute -top-3 start-6 z-20 animate-bounce">۳۵٪ تخفیف</span>
 
-                                {{-- تصویر با انیمیشن شناور --}}
                                 <div class="relative overflow-hidden rounded-2xl float-anim">
-                                    <img src="{{ $slide['image'] }}"
+                                    {{-- استفاده از Storage::url برای نمایش تصویر --}}
+                                    <img src="{{ Storage::url($slide->image) }}"
                                          class="w-full rounded-2xl object-cover"
-                                         style="aspect-ratio:1/1;" alt="محصول ویژه">
+                                         style="aspect-ratio:1/1;" alt="{{ $slide->trans('title') }}">
                                 </div>
 
-                                {{-- کارت شناور روی تصویر (افکت لایه‌بندی خفن) --}}
-                                <div
-                                    class="absolute -bottom-4 -end-4 neu-flat-sm p-3 flex items-center gap-3 z-20 backdrop-blur-sm"
-                                    style="background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);">
-                                    <div class="neu-icon-circle-sm w-10 h-10 grid place-items-center text-sm">⭐</div>
-                                    <div>
-                                        <p class="text-[10px] font-bold" style="color: var(--text-secondary);">امتیاز
-                                            کاربران</p>
-                                        <p class="text-sm font-black" style="color: var(--accent);">۴.۹ از ۵.۰</p>
+                                {{-- کارت شناور روی تصویر --}}
+                                @if($slide->price || $slide->old_price)
+                                    <div
+                                        class="absolute -bottom-4 -end-4 neu-flat-sm p-3 flex items-center gap-3 z-20 backdrop-blur-sm"
+                                        style="background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);">
+                                        <div class="neu-icon-circle-sm w-10 h-10 grid place-items-center text-sm">⭐
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-bold" style="color: var(--text-secondary);">شروع
+                                                قیمت از</p>
+                                            <p class="text-sm font-black"
+                                               style="color: var(--accent);">{{ $slide->price }} تومان</p>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
 
                                 {{-- قیمت زیر تصویر --}}
                                 <div class="mt-6 flex items-center justify-between">
                                     <div class="flex flex-col">
-                                        <span class="mono text-xs line-through"
-                                              style="color: var(--text-secondary);">{{ $slide['old_price'] }}</span>
-                                        <span class="mono font-extrabold text-xl"
-                                              style="color: var(--accent);">{{ $slide['price'] }}</span>
+                                        @if($slide->trans('old_price'))
+                                            <span class="mono text-xs line-through"
+                                                  style="color: var(--text-secondary);">
+                                                {{ $slide->trans('old_price') }}
+                                            </span>
+                                        @endif
+
+                                        @if($slide->trans('price'))
+                                            <span class="mono font-extrabold text-xl" style="color: var(--accent);">
+                                                {{ $slide->trans('price') }}
+                                            </span>
+                                        @endif
                                     </div>
                                     <span class="flex items-center gap-1.5 text-[11px] font-semibold"
                                           style="color: var(--text-secondary);">
-                                        <span class="live-dot"></span> <span class="live-viewers">۴۲</span> نفر در حال مشاهده
-                                    </span>
+                                    <span class="live-dot"></span> <span class="live-viewers">۴۲</span> نفر در حال مشاهده
+                                </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                {{-- حالت fallback اگر هیچ اسلایدی در دیتابیس نبود --}}
+                <div class="swiper-slide">
+                    <div class="text-center py-20 text-gray-500">
+                        <p>هنوز بنری تعریف نشده است.</p>
+                    </div>
+                </div>
+            @endforelse
         </div>
 
         {{-- ناوبری --}}
@@ -161,4 +158,5 @@
                 }, 3000);
             }
         });
-    </script>@endpush
+    </script>
+@endpush
