@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? app()->getLocale() }}" dir="{{ $direction ?? 'rtl' }}" data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
+<html lang="{{ $currentLocale ?? app()->getLocale() }}" dir="{{ $direction ?? 'rtl' }}"
+      data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +16,10 @@
     @vite(['resources/css/app.css', 'resources/js/ui-effects.js'])
     @stack('styles')
 </head>
+
+
+{{--@include('layouts.site._partials.head')--}}
+
 <body class="min-h-screen" style="background: var(--bg);">
 
 {{-- تعریف آرایه پیام‌ها در PHP برای جلوگیری از باگ کامپایلر Blade --}}
@@ -31,7 +37,7 @@
         </span>
 </div>
 
-<x-header :cart-count="$cartCount ?? 0" />
+<x-header :cart-count="$cartCount ?? 0"/>
 
 <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
     @if (session('success'))
@@ -44,10 +50,11 @@
     @yield('content')
 </main>
 
-<x-footer />
+<x-footer/>
 
-<x-social-proof-toast />
+<x-social-proof-toast/>
 
+{{--@include('layouts.site._partials.scripts')--}}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 @stack('scripts')
 </body>
