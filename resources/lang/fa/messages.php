@@ -48,6 +48,12 @@ return [
     'dark_mode' => 'حالت تیره',
     'deal_ends_in' => 'پایان پیشنهاد تا',
 
+    'login' => 'ورود',
+    'register' => 'ثبت نام',
+    'footer_desc' => 'توضیحات فوتر',
+    'newsletter' => 'خبر نامه',
+
+
     'trust_free_shipping' => 'ارسال رایگان',
     'trust_free_shipping_desc' => 'بالای ۵۰۰ هزار تومان',
     'trust_authenticity' => 'ضمانت اصالت کالا',
@@ -56,4 +62,6 @@ return [
     'trust_return_desc' => 'بدون هیچ سوالی',
     'trust_support' => 'پشتیبانی ۲۴/۷',
     'trust_support_desc' => 'همیشه در دسترس',
+
+
 ];
