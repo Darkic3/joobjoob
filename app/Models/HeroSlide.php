@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class HeroSlide extends Model
 {
     protected $fillable = [
-        'badge', 'title', 'desc', 'image', 'price', 'old_price',
-        'btn_text', 'btn_link', 'is_active', 'sort_order'
+        'badge', 'title', 'desc', 'btn_text',
+        'price', 'currency',
+        'linkable_type', 'linkable_id',
+        'image', 'is_active', 'sort_order'
     ];
 
     protected $casts = [
@@ -18,18 +20,20 @@ class HeroSlide extends Model
         'title' => 'array',
         'desc' => 'array',
         'btn_text' => 'array',
-        'price' => 'array',
-        'old_price' => 'array',
+        'price' => 'integer',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
 
-    // Scope
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)->orderBy('sort_order', 'asc');
     }
 
+    public function linkable(): MorphTo
+    {
+        return $this->morphTo();
+    }
 
     public function trans(string $field): string
     {
@@ -37,11 +41,7 @@ class HeroSlide extends Model
         if (!is_array($value) || empty($value)) {
             return '';
         }
-
         $currentLocale = app()->getLocale();
-
-        return $value[$currentLocale]
-            ?? $value['fa']
-            ?? reset($value);
+        return $value[$currentLocale] ?? $value['fa'] ?? reset($value);
     }
 }

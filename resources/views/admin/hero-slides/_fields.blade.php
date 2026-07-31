@@ -1,9 +1,26 @@
 @props(['heroSlide' => null])
 
+@php
+    // تعیین هوشمند نوع لینک برای مقداردهی اولیه Alpine.js
+    $currentLinkType = 'custom';
+    if ($heroSlide?->linkable_type) {
+        if ($heroSlide->linkable_type === 'url') {
+            $currentLinkType = 'custom';
+        } elseif (str_contains($heroSlide->linkable_type, 'Product')) {
+            $currentLinkType = 'product';
+        } elseif (str_contains($heroSlide->linkable_type, 'Category')) {
+            $currentLinkType = 'category';
+        } elseif (str_contains($heroSlide->linkable_type, 'Blog')) {
+            $currentLinkType = 'blog';
+        }
+    }
+    $currentLinkType = old('link_type', $currentLinkType);
+@endphp
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-6">
 
-        {{-- بخش چندزبانه: عنوان --}}
+        {{-- اطلاعات متنی چندزبانه --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -13,80 +30,92 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عنوان (فارسی) <span class="text-red-500">*</span></label>
-                    <input type="text" name="title[fa]" value="{{ old('title.fa', $heroSlide->title['fa'] ?? '') }}" class="input-custom" required>
+                    <input type="text" name="title[fa]" value="{{ old('title.fa', $heroSlide?->title['fa'] ?? '') }}" class="input-custom" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title (English)</label>
-                    <input type="text" name="title[en]" value="{{ old('title.en', $heroSlide->title['en'] ?? '') }}" class="input-custom" dir="ltr">
+                    <input type="text" name="title[en]" value="{{ old('title.en', $heroSlide?->title['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">توضیحات (فارسی)</label>
-                    <textarea name="desc[fa]" rows="3" class="input-custom resize-y">{{ old('desc.fa', $heroSlide->desc['fa'] ?? '') }}</textarea>
+                    <textarea name="desc[fa]" rows="3" class="input-custom resize-y">{{ old('desc.fa', $heroSlide?->desc['fa'] ?? '') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (English)</label>
-                    <textarea name="desc[en]" rows="3" class="input-custom resize-y" dir="ltr">{{ old('desc.en', $heroSlide->desc['en'] ?? '') }}</textarea>
+                    <textarea name="desc[en]" rows="3" class="input-custom resize-y" dir="ltr">{{ old('desc.en', $heroSlide?->desc['en'] ?? '') }}</textarea>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نشان / برچسب (فارسی)</label>
-                    <input type="text" name="badge[fa]" value="{{ old('badge.fa', $heroSlide->badge['fa'] ?? '') }}" class="input-custom" placeholder="مثال: پیشنهاد ویژه">
+                    <input type="text" name="badge[fa]" value="{{ old('badge.fa', $heroSlide?->badge['fa'] ?? '') }}" class="input-custom" placeholder="مثال: پیشنهاد ویژه">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Badge (English)</label>
-                    <input type="text" name="badge[en]" value="{{ old('badge.en', $heroSlide->badge['en'] ?? '') }}" class="input-custom" dir="ltr">
+                    <input type="text" name="badge[en]" value="{{ old('badge.en', $heroSlide?->badge['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
             </div>
         </div>
 
-        {{-- بخش چندزبانه: قیمت و دکمه --}}
+        {{-- قیمت، ارز و تنظیمات لینک --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                قیمت و اقدام (CTA)
+                قیمت و هدف لینک (CTA)
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت (فارسی)</label>
-                    <input type="text" name="price[fa]" value="{{ old('price.fa', $heroSlide->price['fa'] ?? '') }}" class="input-custom" placeholder="مثال: ۵۰۰,۰۰۰ تومان">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت (فقط عدد)</label>
+                    <input type="number" name="price" value="{{ old('price', $heroSlide?->price ?? 0) }}" class="input-custom" placeholder="مثال: 500000" min="0">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (English)</label>
-                    <input type="text" name="price[en]" value="{{ old('price.en', $heroSlide->price['en'] ?? '') }}" class="input-custom" dir="ltr">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت قدیمی (فارسی)</label>
-                    <input type="text" name="old_price[fa]" value="{{ old('old_price.fa', $heroSlide->old_price['fa'] ?? '') }}" class="input-custom">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Old Price (English)</label>
-                    <input type="text" name="old_price[en]" value="{{ old('old_price.en', $heroSlide->old_price['en'] ?? '') }}" class="input-custom" dir="ltr">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">واحد پول</label>
+                    <select name="currency" class="input-custom">
+                        <option value="IRT" {{ old('currency', $heroSlide?->currency ?? 'IRT') == 'IRT' ? 'selected' : '' }}>تومان (IRT)</option>
+                        <option value="USD" {{ old('currency', $heroSlide?->currency ?? '') == 'USD' ? 'selected' : '' }}>دلار (USD)</option>
+                        <option value="EUR" {{ old('currency', $heroSlide?->currency ?? '') == 'EUR' ? 'selected' : '' }}>یورو (EUR)</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">متن دکمه (فارسی)</label>
-                    <input type="text" name="btn_text[fa]" value="{{ old('btn_text.fa', $heroSlide->btn_text['fa'] ?? '') }}" class="input-custom" placeholder="مثال: مشاهده محصول">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Text (English)</label>
-                    <input type="text" name="btn_text[en]" value="{{ old('btn_text.en', $heroSlide->btn_text['en'] ?? '') }}" class="input-custom" dir="ltr">
-                </div>
-            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">لینک دکمه</label>
-                <input type="text" name="btn_link" value="{{ old('btn_link', $heroSlide->btn_link ?? '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://...">
+            {{-- انتخابگر هوشمند لینک --}}
+            <div x-data="{
+                linkType: '{{ $currentLinkType }}',
+                get isCustom() { return this.linkType === 'custom'; }
+            }" class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع مقصد لینک</label>
+                    <select x-model="linkType" name="link_type" class="input-custom">
+                        <option value="custom">آدرس دلخواه (URL)</option>
+                        <option value="product">محصول (به زودی)</option>
+                        <option value="category">دسته‌بندی محصول (به زودی)</option>
+                        <option value="blog">مقاله وبلاگ</option>
+                    </select>
+                </div>
+
+                {{-- فیلد آدرس دلخواه --}}
+                <div x-show="isCustom" x-transition>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس لینک (URL)</label>
+                    <input type="url" name="link_value" value="{{ old('link_value', $heroSlide?->linkable_type === 'url' ? $heroSlide?->linkable_id : '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
+                </div>
+
+                {{-- فیلد ID برای مدل‌ها --}}
+                <div x-show="!isCustom" x-transition>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <span x-text="linkType === 'product' ? 'شناسه محصول' : (linkType === 'category' ? 'شناسه دسته‌بندی' : 'شناسه مقاله')"></span>
+                    </label>
+                    <input type="number" name="link_value" value="{{ old('link_value', $heroSlide?->linkable_type !== 'url' ? $heroSlide?->linkable_id : '') }}" class="input-custom" placeholder="ID را وارد کنید">
+                    <p class="text-xs text-amber-600 mt-1">
+                        ⚠️ نکته: در حال حاضر شناسه (ID) را دستی وارد کنید. پس از ساخت فرم‌های انتخابگر، این بخش خودکار می‌شود.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -99,20 +128,18 @@
                 تنظیمات نمایش
             </h3>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">ترتیب نمایش (Sort Order)</label>
-                <input type="number" name="sort_order" value="{{ old('sort_order', $heroSlide->sort_order ?? 0) }}" class="input-custom" min="0">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">اعداد کوچک‌تر زودتر نمایش داده می‌شوند.</p>
-            </div>
-
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">فعال</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="hidden" name="is_active" value="0">
-                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $heroSlide->is_active ?? true) ? 'checked' : '' }} class="sr-only peer">
+                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $heroSlide?->is_active ?? true) ? 'checked' : '' }} class="sr-only peer">
                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                 </label>
             </div>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                💡 ترتیب نمایش (Sort Order) در بخش مدیریت چیدمان صفحه اصلی تنظیم خواهد شد.
+            </p>
         </div>
 
         {{-- کارت تصویر --}}
