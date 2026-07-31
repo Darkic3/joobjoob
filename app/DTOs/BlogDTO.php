@@ -2,56 +2,46 @@
 
 namespace App\DTOs;
 
+use App\Http\Requests\Admin\BlogRequest;
 use Illuminate\Http\UploadedFile;
 
 readonly class BlogDTO
 {
     public function __construct(
-        public string        $title,
-        public string        $slug,
-        public ?string       $excerpt,
-        public string        $content,
-        public ?int          $blog_category_id,
-        public ?UploadedFile $image,
-        public bool          $is_active,
-        public bool          $show_in_first_page,
-        public int           $user_id,
-    )
-    {
-    }
+        private string        $title,
+        private string        $slug,
+        private ?string       $excerpt,
+        private string        $content,
+        private ?int          $blogCategoryId,
+        private bool          $isActive,
+        private bool          $showInFirstPage,
+        private ?UploadedFile $image,
+        private ?int          $userId = null,
+    ) {}
 
-    /**
-     *  DTO  Request
-     */
-    public static function fromRequest(array $validated, int $userId): self
+    public static function fromRequest(BlogRequest $request, ?int $userId = null): self
     {
         return new self(
-            title: $validated['title'],
-            slug: $validated['slug'],
-            excerpt: $validated['excerpt'] ?? null,
-            content: $validated['content'],
-            blog_category_id: $validated['blog_category_id'] ?? null,
-            image: $validated['image'] ?? null,
-            is_active: $validated['is_active'] ?? true,
-            show_in_first_page: $validated['show_in_first_page'] ?? false,
-            user_id: $userId,
+            title: $request->validated('title'),
+            slug: $request->validated('slug'),
+            excerpt: $request->validated('excerpt'),
+            content: $request->validated('content'),
+            blogCategoryId: $request->validated('blog_category_id'),
+            isActive: $request->boolean('is_active'),
+            showInFirstPage: $request->boolean('show_in_first_page'),
+            image: $request->file('image'),
+            userId: $userId
         );
     }
 
-    /**
-     * تبدیل DTO به آرایه برای ذخیره در دیتابیس (بدون فایل)
-     */
-    public function toArray(): array
-    {
-        return [
-            'title' => $this->title,
-            'slug' => $this->slug,
-            'excerpt' => $this->excerpt,
-            'content' => $this->content,
-            'blog_category_id' => $this->blog_category_id,
-            'is_active' => $this->is_active,
-            'show_in_first_page' => $this->show_in_first_page,
-            'user_id' => $this->user_id,
-        ];
-    }
+    // Getters
+    public function getTitle(): string { return $this->title; }
+    public function getSlug(): string { return $this->slug; }
+    public function getExcerpt(): ?string { return $this->excerpt; }
+    public function getContent(): string { return $this->content; }
+    public function getBlogCategoryId(): ?int { return $this->blogCategoryId; }
+    public function getIsActive(): bool { return $this->isActive; }
+    public function getShowInFirstPage(): bool { return $this->showInFirstPage; }
+    public function getImage(): ?UploadedFile { return $this->image; }
+    public function getUserId(): ?int { return $this->userId; }
 }

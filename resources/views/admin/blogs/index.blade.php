@@ -67,9 +67,11 @@
                     @forelse($blogs as $blog)
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors group">
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $loop->iteration }}</td>
+
+                            {{-- ✅ اصلاح بخش نمایش تصویر --}}
                             <td class="px-6 py-4">
                                 @if($blog->image)
-                                    <img src="{{ Storage::url($blog->image) }}"
+                                    <img src="{{ asset(config('paths.upload', 'uploads') . '/blogs/' . $blog->image) }}"
                                          class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600"
                                          alt="{{ $blog->title }}">
                                 @else
@@ -80,12 +82,17 @@
                                     </div>
                                 @endif
                             </td>
+
+                            {{-- ✅ اصلاح بخش نمایش slug به جای url --}}
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                     {{ Str::limit($blog->title, 50) }}
                                 </div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $blog->url }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 dir-ltr text-left">
+                                    /{{ $blog->slug }}
+                                </div>
                             </td>
+
                             <td class="px-6 py-4">
                                 @if($blog->category)
                                     <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">

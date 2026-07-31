@@ -2,100 +2,53 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTOs\BlogDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BlogRequest;
 use App\Models\Blog;
 use App\Models\BlogCategory;
-use Illuminate\Support\Facades\Storage;
+use App\Services\BlogService;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function __construct(protected BlogService $blogService) {}
+
+    public function index(Request $request): View
     {
-        $query = Blog::with('category');
-
-        // فیلتر جستجو
-        if (request('search')) {
-            $query->where('title', 'like', '%' . request('search') . '%');
-        }
-
-        // فیلتر دسته‌بندی
-        if (request('category')) {
-            $query->where('blog_category_id', request('category'));
-        }
-
-        // فیلتر وضعیت
-        if (request('status') !== null) {
-            $query->where('is_active', request('status'));
-        }
-
-        $blogs = $query->latest()->paginate(15);
         $categories = BlogCategory::where('is_active', true)->get();
+        $blogs = $this->blogService->getPaginatedBlogs($request->all());
+        $blogs->appends($request->query()); // حفظ فیلترها در صفحه‌بندی
 
         return view('admin.blogs.index', compact('blogs', 'categories'));
     }
 
-    public function create()
+    public function create(): View
     {
-        $categories = BlogCategory::where('is_active', true)->get();
+        $categories = BlogCategory::where('is_active', true)->orderByDesc('id')->get();
         return view('admin.blogs.create', compact('categories'));
     }
 
     public function store(BlogRequest $request)
     {
-        $validated = $request->validated();
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('blogs', 'public');
-        }
-
-        $data = [
-            'slug' => $validated['url'],
-            'title' => $validated['title'],
-            'excerpt' => $validated['description'] ?? null,
-            'content' => $validated['content'],
-            'blog_category_id' => $validated['blog_category_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
-            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
-            'image' => $imagePath,
-            'user_id' => auth()->id(),
-        ];
-
-        Blog::create($data);
+        $blogDTO = BlogDTO::fromRequest($request, auth()->id());
+        $this->blogService->store($blogDTO);
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'مقاله با موفقیت ایجاد شد.');
     }
 
-    public function edit(Blog $blog)
+    public function edit(Blog $blog): View
     {
-        $categories = BlogCategory::where('is_active', true)->get();
+        $categories = BlogCategory::where('is_active', true)->orderByDesc('id')->get();
         return view('admin.blogs.edit', compact('blog', 'categories'));
     }
 
     public function update(BlogRequest $request, Blog $blog)
     {
-        $validated = $request->validated();
-
-        $imagePath = $blog->image;
-        if ($request->hasFile('image')) {
-            if ($blog->image) {
-                Storage::disk('public')->delete($blog->image);
-            }
-            $imagePath = $request->file('image')->store('blogs', 'public');
-        }
-
-        $blog->update([
-            'slug' => $validated['url'],
-            'title' => $validated['title'],
-            'excerpt' => $validated['description'] ?? null,
-            'content' => $validated['content'],
-            'blog_category_id' => $validated['blog_category_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
-            'show_in_first_page' => $validated['show_in_first_page'] ?? false,
-            'image' => $imagePath,
-        ]);
+        $blogDTO = BlogDTO::fromRequest($request, auth()->id());
+        $this->blogService->update($blog, $blogDTO);
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'مقاله با موفقیت به‌روزرسانی شد.');
@@ -103,11 +56,7 @@ class BlogController extends Controller
 
     public function destroy(Blog $blog)
     {
-        if ($blog->image) {
-            Storage::disk('public')->delete($blog->image);
-        }
-
-        $blog->delete();
+        $this->blogService->destroy($blog);
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'مقاله با موفقیت حذف شد.');

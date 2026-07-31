@@ -23,14 +23,14 @@
             </label>
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ url('/') }}/</span>
-                <input type="text" name="url" value="{{ old('url', $blog->url ?? '') }}"
+                <input type="text" name="slug" value="{{ old('slug', $blog->slug ?? '') }}"
                        class="input-custom flex-1"
                        placeholder="my-article-url" dir="ltr">
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400">
                 در صورت خالی بودن، خودکار از عنوان ساخته می‌شود
             </p>
-            @error('url')
+            @error('slug')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
@@ -40,10 +40,10 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 خلاصه
             </label>
-            <textarea name="description" rows="4"
+            <textarea name="excerpt" rows="4"
                       class="input-custom resize-y min-h-[100px]"
-                      placeholder="خلاصه‌ای از مقاله...">{{ old('description', $blog->excerpt ?? '') }}</textarea>
-            @error('description')
+                      placeholder="خلاصه‌ای از مقاله...">{{ old('excerpt', $blog->excerpt ?? '') }}</textarea>
+            @error('excerpt')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
