@@ -5,7 +5,7 @@ namespace App\DTOs;
 use App\Http\Requests\Admin\HeroSlideRequest;
 use Illuminate\Http\UploadedFile;
 
-class HeroSlideData
+class HeroSlideDTO
 {
     public function __construct(
         public array $title,

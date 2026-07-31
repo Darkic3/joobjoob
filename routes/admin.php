@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
 
@@ -9,6 +10,8 @@ use App\Http\Controllers\Admin\DashboardController;
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('blogs', BlogController::class);
     Route::resource('blog-categories', BlogCategoryController::class);
+    Route::resource('hero-slides', HeroSlideController::class);
+
 });
 
 
