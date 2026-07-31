@@ -88,9 +88,10 @@
         </div>
     </section>
 
-    {{-- دسته‌بندی‌ها: هر کارت از کامپوننت category-card با ابعاد ثابت --}}
-    <section class="py-6">
-        <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+    {{-- دسته‌بندی‌ها --}}
+    <section class="mt-10 mb-8">
+        <h2 class="text-lg font-extrabold mb-6">{{ __('messages.categories') }}</h2>
+        <div class="flex flex-wrap justify-center gap-4">
             @foreach($categories as $cat)
                 <x-category-card :category="$cat" />
             @endforeach

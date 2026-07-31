@@ -20,7 +20,6 @@
     $rankStyle = $rank ? ($rankStyles[$rank] ?? ['color' => 'var(--bg-elevated)', 'text' => 'var(--text-secondary)']) : null;
 @endphp
 
-{{-- flex flex-col + h-full: کارت‌های یک ردیف همیشه هم‌قد می‌مانند و دکمه همیشه ته کارت می‌چسبد --}}
 <div class="neu-card group relative flex flex-col h-full">
 
     @if($rank)
@@ -32,22 +31,22 @@
         <button type="button" class="neu-btn neu-btn-icon neu-btn-icon-sm text-sm" title="نمایش سریع">👁</button>
     </div>
 
-    {{-- وقتی رتبه نشان داده می‌شود، بج تخفیف/کمبود را نمی‌گذاریم تا با نشان رتبه تداخل نکند --}}
-    @if(!$rank)
-        @if($lowStock)
-            <span class="badge-urgency absolute top-3 start-3 z-10">فقط {{ $p->stock }} عدد مانده!</span>
-        @elseif($hasDiscount)
-            <span class="badge-sale absolute top-3 start-3 z-10">{{ $discountPercent }}٪-</span>
-        @elseif(!empty($p->is_new))
-            <span class="badge-new absolute top-3 start-3 z-10">جدید</span>
-        @endif
-    @endif
-
     <a href="{{ $p->url ?? '#' }}" class="block">
-        <img src="{{ $p->image }}" alt="{{ $p->name }}" loading="lazy"
-             class="w-full rounded-xl mb-3 object-cover" style="aspect-ratio:1/1;">
+        <div class="relative mb-3 overflow-hidden rounded-xl">
+            <img src="{{ $p->image }}" alt="{{ $p->name }}" loading="lazy"
+                 class="w-full aspect-square object-cover">
 
-        {{-- min-h ثابت: عناوین یک‌خطی و دوخطی هر دو همان فضا را می‌گیرند --}}
+            @if(!$rank)
+                @if($lowStock)
+                    <span class="badge-urgency absolute top-2 start-2 z-10">فقط {{ $p->stock }} عدد!</span>
+                @elseif($hasDiscount)
+                    <span class="badge-sale absolute top-2 start-2 z-10">{{ $discountPercent }}٪-</span>
+                @elseif(!empty($p->is_new))
+                    <span class="badge-new absolute top-2 start-2 z-10">جدید</span>
+                @endif
+            @endif
+        </div>
+
         <h4 class="text-xs font-semibold mb-1 line-clamp-2 min-h-[2rem]">{{ $p->name }}</h4>
 
         <div class="flex items-center gap-1 text-[11px] mb-2">
@@ -56,7 +55,6 @@
         </div>
     </a>
 
-    {{-- mt-auto: قیمت + نوار موجودی + دکمه همیشه به کف کارت می‌چسبند --}}
     <div class="mt-auto">
         <div class="flex items-baseline gap-2 mb-2">
             <span class="mono font-bold text-sm" style="color:var(--accent);">{{ number_format($p->price) }}</span>
