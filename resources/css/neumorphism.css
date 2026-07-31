@@ -166,3 +166,153 @@ body {
 @media (max-width: 768px) {
     :root { --gap: .9rem; }
 }
+
+
+
+/* ==========================================================================
+   HERO SLIDER PRO ANIMATIONS
+   ========================================================================== */
+
+/* انیمیشن شناوری تصویر */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+.float-anim {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* انیمیشن هاله‌های پس‌زمینه */
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+.animate-blob {
+    animation: blob 10s infinite;
+}
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+/* انیمیشن‌های پله‌ای برای محتوای اسلاید فعال */
+.hero-anim {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.swiper-slide-active .hero-badge { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.swiper-slide-active .hero-title { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.swiper-slide-active .hero-desc { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.swiper-slide-active .hero-btns { opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
+.swiper-slide-active .hero-image-wrap { opacity: 1; transform: translateY(0) scale(0.95); transition-delay: 0.3s; }
+
+/* جلوگیری از باگ رندرینگ در کروم */
+.swiper-slide {
+    overflow: visible;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* استایل دکمه‌های سوئیپر برای هماهنگی با نئومورفیسم */
+.swiper-button-next, .swiper-button-prev {
+    background: var(--bg-elevated);
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+    transition: all 0.3s ease;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+}
+.swiper-button-next:hover, .swiper-button-prev:hover {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    transform: scale(0.95);
+}
+[dir="rtl"] .swiper-button-next::after { content: '→' !important; font-family: 'Vazirmatn', sans-serif; font-weight: 900; font-size: 1.2rem !important; color: var(--accent); }
+[dir="rtl"] .swiper-button-prev::after { content: '←' !important; font-family: 'Vazirmatn', sans-serif; font-weight: 900; font-size: 1.2rem !important; color: var(--accent); }
+
+.swiper-pagination-bullet {
+    background: var(--text-secondary);
+    opacity: 0.3;
+    width: 10px;
+    height: 10px;
+    transition: all 0.3s ease;
+}
+.swiper-pagination-bullet-active {
+    background: var(--accent);
+    opacity: 1;
+    width: 24px;
+    border-radius: 999px;
+}
+/* انتقال فلش‌ها به بیرون از فضای سوئیپر */
+.swiper-button-next,
+.swiper-button-prev {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    background: var(--bg-elevated) !important;
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* در حالت RTL */
+[dir="rtl"] .swiper-button-next {
+    left: -60px !important; /* فلش بعدی سمت چپ (بیرون از کادر) */
+    right: auto !important;
+}
+
+[dir="rtl"] .swiper-button-prev {
+    right: -60px !important; /* فلش قبلی سمت راست (بیرون از کادر) */
+    left: auto !important;
+}
+
+/* در حالت LTR */
+[dir="ltr"] .swiper-button-next {
+    right: -60px !important;
+    left: auto !important;
+}
+
+[dir="ltr"] .swiper-button-prev {
+    left: -60px !important;
+    right: auto !important;
+}
+
+/* هاور افکت */
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light) !important;
+    transform: translateY(-50%) scale(0.95) !important;
+}
+
+/* تغییر آیکون‌ها برای RTL */
+[dir="rtl"] .swiper-button-next::after {
+    content: '←' !important; /* فلش چپ برای اسلاید بعدی */
+    font-family: 'Vazirmatn', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    color: var(--accent) !important;
+}
+
+[dir="rtl"] .swiper-button-prev::after {
+    content: '→' !important; /* فلش راست برای اسلاید قبلی */
+    font-family: 'Vazirmatn', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    color: var(--accent) !important;
+}
+
+/* در موبایل فلش‌ها مخفی بشن یا داخل کادر باشن */
+@media (max-width: 1024px) {
+    [dir="rtl"] .swiper-button-next {
+        left: 10px !important;
+        right: auto !important;
+    }
+
+    [dir="rtl"] .swiper-button-prev {
+        right: 10px !important;
+        left: auto !important;
+    }
+}
