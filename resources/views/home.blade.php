@@ -88,6 +88,154 @@
         </div>
     </section>
 
+
+    {{-- هیرو اسلایدر خفن --}}
+    @php
+        $heroSlides = [
+            [
+                'title' => 'خرید هوشمند، لذتِ بی‌پایان',
+                'subtitle' => 'بیش از ۱۲ هزار کالای اورجینال با ضمانت بازگشت ۷ روزه',
+                'image' => 'https://picsum.photos/seed/hero-shoe/600/600',
+                'badge' => 'کالکشن پاییزه رسید',
+                'btn_text' => 'مشاهده محصولات',
+                'btn_link' => route('products.index')
+            ],
+            [
+                'title' => 'تکنولوژی روز دنیا در دستان شما',
+                'subtitle' => 'جدیدترین لپ‌تاپ‌ها و گجت‌های هوشمند با گارانتی اصلی',
+                'image' => 'https://picsum.photos/seed/hero-laptop/600/600',
+                'badge' => 'تخفیف‌های ویژه',
+                'btn_text' => 'پیشنهادات شگفت‌انگیز',
+                'btn_link' => '#deals'
+            ],
+            [
+                'title' => 'استایل خودت رو بساز',
+                'subtitle' => 'جدیدترین کالکشن پوشاک و اکسسوری با طراحی‌های منحصر به فرد',
+                'image' => 'https://picsum.photos/seed/hero-fashion/600/600',
+                'badge' => 'ارسال رایگان',
+                'btn_text' => 'خرید پوشاک',
+                'btn_link' => route('products.index')
+            ],
+        ];
+    @endphp
+    <section class="relative w-full mb-10 overflow-hidden rounded-[var(--radius-lg)]">
+        <div class="swiper myHeroSwiper rounded-[var(--radius-lg)]">
+            <div class="swiper-wrapper">
+                @foreach($heroSlides as $slide)
+                    <div class="swiper-slide">
+                        <div class="grid lg:grid-cols-2 items-center gap-8 p-6 md:p-12 min-h-[400px] md:min-h-[500px]">
+                            {{-- متن اسلاید --}}
+                            <div class="order-2 lg:order-1 z-10 text-center lg:text-start">
+                                <span class="badge-new inline-block mb-4 animate-pulse">✦ {{ $slide['badge'] }}</span>
+                                <h1 class="text-3xl md:text-5xl font-black leading-[1.3] mb-5 text-primary">
+                                    {{ $slide['title'] }}
+                                </h1>
+                                <p class="text-sm md:text-base mb-8 max-w-md mx-auto lg:mx-0"
+                                   style="color: var(--text-secondary);">
+                                    {{ $slide['subtitle'] }}
+                                </p>
+                                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                                    <a href="{{ $slide['btn_link'] }}"
+                                       class="neu-btn neu-btn-primary px-7 py-3 font-bold text-sm shadow-lg hover:shadow-xl transition-all">
+                                        {{ $slide['btn_text'] }}
+                                    </a>
+                                    <a href="#deals" class="neu-btn px-7 py-3 font-bold text-sm">
+                                        {{ __('messages.special_offers') }} 🔥
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- تصویر اسلاید با افکت نئومورفیسم --}}
+                            <div class="order-1 lg:order-2 relative flex justify-center items-center">
+                                <div class="neu-flat-lg p-4 md:p-8 w-full max-w-sm relative group cursor-pointer"
+                                     id="tilt-card">
+                                    <span
+                                        class="badge-urgency absolute -top-3 start-6 z-20 animate-bounce">۳۵٪ تخفیف</span>
+                                    <div class="relative overflow-hidden rounded-2xl">
+                                        <img src="{{ $slide['image'] }}"
+                                             class="w-full rounded-2xl object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                             style="aspect-ratio:1/1;" alt="محصول ویژه">
+                                        {{-- افکت درخشش روی تصویر --}}
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-sm mb-1">محصول ویژه فصل</h3>
+                                            <div class="flex items-center gap-1 text-xs">
+                                                <span class="stars">★★★★★</span>
+                                                <span style="color: var(--text-secondary);">(۲۴۸ نظر)</span>
+                                            </div>
+                                        </div>
+                                        <span class="flex items-center gap-1.5 text-[11px] font-semibold"
+                                              style="color: var(--text-secondary);">
+                                        <span class="live-dot"></span> <span class="live-viewers">۳۱</span> نفر در حال مشاهده
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- دکمه‌های ناوبری و صفحه‌بندی نئومورفیک --}}
+            <div class="swiper-pagination !bottom-4"></div>
+            <div
+                class="swiper-button-next !w-10 !h-10 !rounded-full neu-flat-sm flex items-center justify-center !text-[var(--accent)] after:!text-lg"></div>
+            <div
+                class="swiper-button-prev !w-10 !h-10 !rounded-full neu-flat-sm flex items-center justify-center !text-[var(--accent)] after:!text-lg"></div>
+        </div>
+    </section>
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // ۱. راه‌اندازی سوئیپر
+                if (typeof Swiper !== 'undefined') {
+                    const swiper = new Swiper('.myHeroSwiper', {
+                        direction: 'horizontal',
+                        rtl: true,
+                        loop: true,
+                        speed: 800,
+                        effect: 'creative',
+                        creativeEffect: {
+                            prev: { shadow: true, translate: ['-20%', 0, -1] },
+                            next: { translate: ['100%', 0, 0] },
+                        },
+                        autoplay: {
+                            delay: 5000,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                    });
+                }
+
+                // ۲. زنده کردن تعداد بازدیدکنندگان (Live Viewers)
+                const viewersElement = document.querySelector('.live-viewers');
+                if (viewersElement) {
+                    setInterval(() => {
+                        let current = parseInt(viewersElement.innerText.replace(/[^0-9]/g, '')) || 30;
+                        let change = Math.floor(Math.random() * 5) - 2;
+                        let newValue = Math.max(15, current + change);
+                        viewersElement.innerText = newValue;
+
+                        // انیمیشن کوچک هنگام تغییر عدد
+                        viewersElement.classList.add('count-pop');
+                        setTimeout(() => viewersElement.classList.remove('count-pop'), 300);
+                    }, 3000);
+                }
+            });
+        </script>
+    @endpush
+
     {{-- دسته‌بندی‌ها --}}
     <section class="reveal-on-scroll mt-10 mb-8">
         <h2 class="text-lg font-extrabold mb-6">{{ __('messages.categories') }}</h2>
