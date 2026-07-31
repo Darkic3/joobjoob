@@ -61,7 +61,8 @@
                 بیش از ۱۲ هزار کالای اورجینال، ارسال از همان روز سفارش و ضمانت بازگشت بدون قید و شرط تا ۷ روز.
             </p>
             <div class="flex flex-wrap items-center gap-3 mb-8">
-                <a href="{{ route('products.index') }}" class="neu-btn neu-btn-primary px-7 py-3 font-bold text-sm">{{ __('messages.products') }}</a>
+                <a href="{{ route('products.index') }}"
+                   class="neu-btn neu-btn-primary px-7 py-3 font-bold text-sm">{{ __('messages.products') }}</a>
                 <a href="#deals" class="neu-btn px-7 py-3 font-bold text-sm">{{ __('messages.special_offers') }} 🔥</a>
             </div>
         </div>
@@ -69,7 +70,8 @@
         <div class="order-1 lg:order-2 relative flex justify-center hero-visual">
             <div class="neu-flat-lg neu-pulse p-6 w-full max-w-sm relative">
                 <span class="badge-urgency absolute -top-3 start-6 z-10">۳۵٪ تخفیف</span>
-                <img src="https://picsum.photos/seed/hero-shoe/500/500" class="w-full rounded-2xl object-cover mb-4" style="aspect-ratio:1/1;" alt="محصول ویژه">
+                <img src="https://picsum.photos/seed/hero-shoe/500/500" class="w-full rounded-2xl object-cover mb-4"
+                     style="aspect-ratio:1/1;" alt="محصول ویژه">
                 <h3 class="font-bold text-sm mb-1">کتانی رانینگ ایرفلوی مدل پرو</h3>
                 <div class="flex items-center gap-1 mb-2 text-xs">
                     <span class="stars">★★★★★</span>
@@ -80,7 +82,8 @@
                         <span class="mono font-extrabold text-lg" style="color: var(--accent);">۲,۴۹۰,۰۰۰</span>
                         <span class="mono text-xs line-through" style="color: var(--text-secondary);">۳,۸۰۰,۰۰۰</span>
                     </div>
-                    <span class="flex items-center gap-1.5 text-[11px] font-semibold" style="color: var(--text-secondary);">
+                    <span class="flex items-center gap-1.5 text-[11px] font-semibold"
+                          style="color: var(--text-secondary);">
                         <span class="live-dot"></span> ۳۱ نفر الان می‌بینند
                     </span>
                 </div>
@@ -257,12 +260,12 @@
                         <p class="text-xs" style="color: var(--text-secondary);">تا تمام نشده، از دستش نده</p>
                     </div>
                 </div>
-                <x-countdown-timer :ends-in-seconds="9912" id="deal-cd" />
+                <x-countdown-timer :ends-in-seconds="9912" id="deal-cd"/>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($deals as $product)
-                    <x-product-card :product="$product" />
+                    <x-product-card :product="$product"/>
                 @endforeach
             </div>
         </div>
@@ -277,11 +280,12 @@
     <section class="reveal-on-scroll py-6">
         <div class="flex items-center justify-between mb-5">
             <h2 class="text-lg font-extrabold">{{ __('messages.featured_products') }}</h2>
-            <a href="{{ route('products.index') }}" class="text-xs font-semibold" style="color: var(--accent);">{{ __('messages.view_all') }} ←</a>
+            <a href="{{ route('products.index') }}" class="text-xs font-semibold"
+               style="color: var(--accent);">{{ __('messages.view_all') }} ←</a>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
             @foreach($featured as $product)
-                <x-product-card :product="$product" />
+                <x-product-card :product="$product"/>
             @endforeach
         </div>
     </section>
@@ -294,18 +298,21 @@
             @foreach($bestSellers as $item)
                 @php
                     $rankColors = [
-                        1 => ['bg' => '#FFD700', 'text' => '#000'], // طلا
-                        2 => ['bg' => '#C0C0C0', 'text' => '#000'], // نقره
-                        3 => ['bg' => '#CD7F32', 'text' => '#fff'], // برنز
+                        1 => 'var(--gold)',
+                        2 => 'var(--silver)',
+                        3 => 'var(--bronze)',
                     ];
-                    $rankStyle = $rankColors[$item['rank']] ?? ['bg' => 'var(--bg-elevated)', 'text' => 'var(--text-primary)'];
+                    $rankTextColor = [
+                        1 => '#000', 2 => '#000', 3 => '#fff'
+                    ];
+                    $color = $rankColors[$item['rank']] ?? 'var(--bg-elevated)';
+                    $textColor = $rankTextColor[$item['rank']] ?? 'var(--text-primary)';
                 @endphp
                 <div class="neu-card neu-interactive p-4 relative group">
                     {{-- نشان رتبه --}}
-                    <span class="absolute -top-3 -end-3 w-8 h-8 rounded-full grid place-items-center font-bold text-xs shadow-lg z-10"
-                          style="background: {{ $rankStyle['bg'] }}; color: {{ $rankStyle['text'] }};">
-                    {{ $item['rank'] }}
-                </span>
+                    <span class="neu-rank-badge" style="--rank-color: {{ $color }}; --rank-text: {{ $textColor }};">
+                        {{ $item['rank'] }}
+                    </span>
 
                     {{-- تصویر محصول --}}
                     <div class="relative mb-3 overflow-hidden rounded-xl" style="aspect-ratio:1/1;">
@@ -323,8 +330,12 @@
                     <span class="mono font-bold text-sm" style="color: var(--accent);">
                         {{ number_format($item['price']) }}
                     </span>
-                        <button class="neu-btn neu-btn-icon w-8 h-8 p-0 text-xs">
-
+                        <button class="neu-btn neu-btn-icon w-8 h-8 p-0 text-xs"
+                                title="{{ __('messages.add_to_cart') }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -339,10 +350,12 @@
             @foreach($reviews as $review)
                 <div class="neu-card p-5">
                     <div class="flex items-center gap-3 mb-3">
-                        <span class="neu-icon-circle w-11 h-11 grid place-items-center font-bold text-sm" style="color: var(--accent);">{{ $review['initials'] }}</span>
+                        <span class="neu-icon-circle w-11 h-11 grid place-items-center font-bold text-sm"
+                              style="color: var(--accent);">{{ $review['initials'] }}</span>
                         <div>
                             <p class="text-sm font-bold">{{ $review['name'] }}</p>
-                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" style="background: var(--success); color: #fff;">خرید تایید شده ✓</span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                                  style="background: var(--success); color: #fff;">خرید تایید شده ✓</span>
                         </div>
                     </div>
                     <p class="stars text-sm mb-2">{{ str_repeat('★', $review['rating']) }}{{ str_repeat('☆', 5 - $review['rating']) }}</p>
@@ -357,12 +370,16 @@
         <div class="neu-flat-lg p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="text-center md:text-start">
                 <h3 class="font-extrabold text-lg mb-2">۱۰٪ تخفیف خرید اول، هدیه‌ی ماست</h3>
-                <p class="text-xs" style="color: var(--text-secondary);">با عضویت در خبرنامه، کد تخفیف رو همین الان بگیر</p>
+                <p class="text-xs" style="color: var(--text-secondary);">با عضویت در خبرنامه، کد تخفیف رو همین الان
+                    بگیر</p>
             </div>
             <form class="flex gap-2 w-full md:w-auto" action="#" method="POST">
                 @csrf
-                <input type="email" name="email" placeholder="ایمیل شما" class="neu-input px-4 py-3 text-sm flex-1 md:w-64">
-                <button type="submit" class="neu-btn neu-btn-primary px-6 py-3 text-sm font-bold whitespace-nowrap">عضویت</button>
+                <input type="email" name="email" placeholder="ایمیل شما"
+                       class="neu-input px-4 py-3 text-sm flex-1 md:w-64">
+                <button type="submit" class="neu-btn neu-btn-primary px-6 py-3 text-sm font-bold whitespace-nowrap">
+                    عضویت
+                </button>
             </form>
         </div>
     </section>
