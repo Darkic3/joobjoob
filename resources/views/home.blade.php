@@ -89,17 +89,17 @@
     </section>
 
     {{-- دسته‌بندی‌ها --}}
-    <section class="mt-10 mb-8">
+    <section class="reveal-on-scroll mt-10 mb-8">
         <h2 class="text-lg font-extrabold mb-6">{{ __('messages.categories') }}</h2>
         <div class="flex flex-wrap justify-center gap-4">
             @foreach($categories as $cat)
-                <x-category-card :category="$cat" />
+                <x-category-card :category="$cat"/>
             @endforeach
         </div>
     </section>
 
     {{-- پیشنهادهای داغ با تایمر --}}
-    <section id="deals" class="py-6">
+    <section id="deals" class="reveal-on-scroll py-6">
         <div class="neu-flat-lg p-5 md:p-7">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div class="flex items-center gap-3">
@@ -121,12 +121,12 @@
     </section>
 
     {{-- نشان‌های اعتماد --}}
-    <section class="py-6">
-        <x-trust-badges />
+    <section class="reveal-on-scroll py-6">
+        <x-trust-badges/>
     </section>
 
     {{-- محصولات ویژه --}}
-    <section class="py-6">
+    <section class="reveal-on-scroll py-6">
         <div class="flex items-center justify-between mb-5">
             <h2 class="text-lg font-extrabold">{{ __('messages.featured_products') }}</h2>
             <a href="{{ route('products.index') }}" class="text-xs font-semibold" style="color: var(--accent);">{{ __('messages.view_all') }} ←</a>
@@ -140,7 +140,7 @@
 
     {{-- پرفروش‌ترین‌ها: رتبه‌بندی واقعی، عدد رتبه اطلاعات معنادار می‌دهد --}}
     {{-- پرفروش‌ترین‌ها --}}
-    <section class="py-6">
+    <section class="reveal-on-scroll py-6">
         <h2 class="text-lg font-extrabold mb-5">{{ __('messages.best_sellers') }}</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
             @foreach($bestSellers as $item)
@@ -185,7 +185,7 @@
     </section>
 
     {{-- نظرات مشتریان --}}
-    <section class="py-6">
+    <section class="reveal-on-scroll py-6">
         <h2 class="text-lg font-extrabold mb-5">{{ __('messages.customer_reviews') }}</h2>
         <div class="grid md:grid-cols-3 gap-5">
             @foreach($reviews as $review)
@@ -205,7 +205,7 @@
     </section>
 
     {{-- بنر خبرنامه --}}
-    <section class="py-6 mb-4">
+    <section class="reveal-on-scroll py-6 mb-4">
         <div class="neu-flat-lg p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="text-center md:text-start">
                 <h3 class="font-extrabold text-lg mb-2">۱۰٪ تخفیف خرید اول، هدیه‌ی ماست</h3>
