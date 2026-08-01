@@ -9,10 +9,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class HeroSlide extends Model
 {
     protected $fillable = [
-        'badge', 'title', 'desc', 'btn_text',
-        'price', 'currency',
-        'linkable_type', 'linkable_id',
-        'image', 'is_active', 'sort_order'
+        'hero_type', 'badge', 'title', 'desc', 'btn_text',
+        'price', 'old_price', 'currency', 'rating', 'viewers',
+        'linkable_type', 'linkable_id', 'image', 'is_active', 'sort_order'
     ];
 
     protected $casts = [
@@ -21,6 +20,8 @@ class HeroSlide extends Model
         'desc' => 'array',
         'btn_text' => 'array',
         'price' => 'integer',
+        'old_price' => 'integer',
+        'viewers' => 'integer',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];

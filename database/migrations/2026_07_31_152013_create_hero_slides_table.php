@@ -14,26 +14,31 @@ return new class extends Migration
         Schema::create('hero_slides', function (Blueprint $table) {
             $table->id();
 
-            // فیلدهای چندزبانه (JSON)
+            // ۱. نوع بنر (تعیین‌کننده رفتار و فیلدهای نمایشی)
+            $table->string('hero_type')->default('internal'); // informational, external, internal
+
+            // ۲. فیلدهای چندزبانه (JSON)
             $table->json('badge')->nullable();
             $table->json('title');
             $table->json('desc')->nullable();
             $table->json('btn_text')->nullable();
 
-            // قیمت و ارز (عدد صحیح به جای JSON برای محاسبات دقیق)
+            // ۳. قیمت، ارز و اطلاعات بازاریابی
             $table->unsignedBigInteger('price')->default(0);
+            $table->unsignedBigInteger('old_price')->nullable(); // برای نمایش خط‌خوردگی و درصد تخفیف
             $table->string('currency', 10)->default('IRT'); // IRT = تومان
+            $table->string('rating')->nullable(); // مثلاً "4.8"
+            $table->unsignedInteger('viewers')->default(0); // تعداد بازدیدکننده زنده
 
-            // روابط چندشکلی (Polymorphic) برای لینک به محصول، دسته‌بندی یا مقاله
-            // این دو فیلد جایگزین btn_link قدیمی می‌شوند
+            // ۴. روابط چندشکلی (Polymorphic) برای لینک به محصول، دسته‌بندی یا مقاله
             $table->string('linkable_type')->nullable();
             $table->unsignedBigInteger('linkable_id')->nullable();
-            $table->index(['linkable_type', 'linkable_id']); // ایندکس برای سرعت بالای کوئری
+            $table->index(['linkable_type', 'linkable_id']); // ایندکس ترکیبی برای سرعت کوئری
 
-            // تصویر و تنظیمات نمایش
-            $table->string('image')->nullable(); // nullable گذاشتم که بدون عکس هم بتوان اسلاید ساخت
+            // ۵. تصویر و تنظیمات نمایش
+            $table->string('image')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->integer('sort_order')->default(0); // در دیتابیس هست، ولی در فرم نمایش نمی‌دهیم
+            $table->integer('sort_order')->default(0);
 
             $table->timestamps();
         });

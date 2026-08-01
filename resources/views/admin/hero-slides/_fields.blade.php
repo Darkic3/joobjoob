@@ -1,26 +1,42 @@
 @props(['heroSlide' => null])
 
 @php
-    // تعیین هوشمند نوع لینک برای مقداردهی اولیه Alpine.js
+    $currentType = old('hero_type', $heroSlide?->hero_type ?? 'internal');
     $currentLinkType = 'custom';
     if ($heroSlide?->linkable_type) {
-        if ($heroSlide->linkable_type === 'url') {
-            $currentLinkType = 'custom';
-        } elseif (str_contains($heroSlide->linkable_type, 'Product')) {
-            $currentLinkType = 'product';
-        } elseif (str_contains($heroSlide->linkable_type, 'Category')) {
-            $currentLinkType = 'category';
-        } elseif (str_contains($heroSlide->linkable_type, 'Blog')) {
-            $currentLinkType = 'blog';
-        }
+        if ($heroSlide->linkable_type === 'url') $currentLinkType = 'custom';
+        elseif (str_contains($heroSlide->linkable_type, 'Product')) $currentLinkType = 'product';
+        elseif (str_contains($heroSlide->linkable_type, 'Category')) $currentLinkType = 'category';
+        elseif (str_contains($heroSlide->linkable_type, 'Blog')) $currentLinkType = 'blog';
     }
     $currentLinkType = old('link_type', $currentLinkType);
 @endphp
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div x-data="{
+    heroType: '{{ $currentType }}',
+    linkType: '{{ $currentLinkType }}',
+    get isInfo() { return this.heroType === 'informational'; },
+    get isExternal() { return this.heroType === 'external'; },
+    get isInternal() { return this.heroType === 'internal'; },
+    get isCustomLink() { return this.linkType === 'custom'; }
+}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
     <div class="lg:col-span-2 space-y-6">
 
-        {{-- اطلاعات متنی چندزبانه --}}
+        {{-- ۱. انتخاب نوع هیرو (همیشه نمایش داده می‌شود) --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/></svg>
+                نوع بنر هیرو
+            </h3>
+            <select x-model="heroType" name="hero_type" class="input-custom">
+                <option value="informational">۱. فقط اطلاع‌رسانی (عکس + متن + بج، بدون دکمه و قیمت)</option>
+                <option value="external">۲. لینک خارجی (عکس + متن + دکمه با آدرس URL دلخواه)</option>
+                <option value="internal">۳. لینک داخلی (محصول، دسته‌بندی یا مقاله + نمایش قیمت/امتیاز/بازدید)</option>
+            </select>
+        </div>
+
+        {{-- ۲. اطلاعات متنی (برای هر ۳ حالت مشترک است) --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -61,67 +77,93 @@
             </div>
         </div>
 
-        {{-- قیمت، ارز و تنظیمات لینک --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
+        {{-- ۳. تنظیمات لینک و دکمه (مخفی برای حالت informational) --}}
+        <div x-show="!isInfo" x-transition class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                قیمت و هدف لینک (CTA)
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                تنظیمات دکمه و مقصد
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت (فقط عدد)</label>
-                    <input type="number" name="price" value="{{ old('price', $heroSlide?->price ?? 0) }}" class="input-custom" placeholder="مثال: 500000" min="0">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">متن دکمه (فارسی)</label>
+                    <input type="text" name="btn_text[fa]" value="{{ old('btn_text.fa', $heroSlide?->btn_text['fa'] ?? '') }}" class="input-custom" placeholder="مثال: مشاهده محصول">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">واحد پول</label>
-                    <select name="currency" class="input-custom">
-                        <option value="IRT" {{ old('currency', $heroSlide?->currency ?? 'IRT') == 'IRT' ? 'selected' : '' }}>تومان (IRT)</option>
-                        <option value="USD" {{ old('currency', $heroSlide?->currency ?? '') == 'USD' ? 'selected' : '' }}>دلار (USD)</option>
-                        <option value="EUR" {{ old('currency', $heroSlide?->currency ?? '') == 'EUR' ? 'selected' : '' }}>یورو (EUR)</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Text (English)</label>
+                    <input type="text" name="btn_text[en]" value="{{ old('btn_text.en', $heroSlide?->btn_text['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
             </div>
 
             <hr class="border-gray-100 dark:border-gray-700">
 
-            {{-- انتخابگر هوشمند لینک --}}
-            <div x-data="{
-                linkType: '{{ $currentLinkType }}',
-                get isCustom() { return this.linkType === 'custom'; }
-            }" class="space-y-3">
+            <div class="space-y-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع مقصد لینک</label>
                     <select x-model="linkType" name="link_type" class="input-custom">
-                        <option value="custom">آدرس دلخواه (URL)</option>
-                        <option value="product">محصول (به زودی)</option>
-                        <option value="category">دسته‌بندی محصول (به زودی)</option>
+                        <option value="custom">آدرس دلخواه (URL خارجی)</option>
+                        <option value="product">محصول خاص</option>
+                        <option value="category">دسته‌بندی محصول</option>
                         <option value="blog">مقاله وبلاگ</option>
                     </select>
                 </div>
 
-                {{-- فیلد آدرس دلخواه --}}
-                <div x-show="isCustom" x-transition>
+                <div x-show="isCustomLink" x-transition>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس لینک (URL)</label>
                     <input type="url" name="link_value" value="{{ old('link_value', $heroSlide?->linkable_type === 'url' ? $heroSlide?->linkable_id : '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
                 </div>
 
-                {{-- فیلد ID برای مدل‌ها --}}
-                <div x-show="!isCustom" x-transition>
+                <div x-show="!isCustomLink" x-transition>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        <span x-text="linkType === 'product' ? 'شناسه محصول' : (linkType === 'category' ? 'شناسه دسته‌بندی' : 'شناسه مقاله')"></span>
+                        <span x-text="linkType === 'product' ? 'شناسه (ID) محصول' : (linkType === 'category' ? 'شناسه (ID) دسته‌بندی' : 'شناسه (ID) مقاله')"></span>
                     </label>
-                    <input type="number" name="link_value" value="{{ old('link_value', $heroSlide?->linkable_type !== 'url' ? $heroSlide?->linkable_id : '') }}" class="input-custom" placeholder="ID را وارد کنید">
-                    <p class="text-xs text-amber-600 mt-1">
-                        ⚠️ نکته: در حال حاضر شناسه (ID) را دستی وارد کنید. پس از ساخت فرم‌های انتخابگر، این بخش خودکار می‌شود.
-                    </p>
+                    <input type="number" name="link_value" value="{{ old('link_value', $heroSlide?->linkable_type !== 'url' ? $heroSlide?->linkable_id : '') }}" class="input-custom" placeholder="مثال: 15">
+                    <p class="text-xs text-amber-600 mt-1">⚠️ در حال حاضر ID را دستی وارد کنید. در آینده با انتخابگر هوشمند جایگزین می‌شود.</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- ۴. اطلاعات بازاریابی (فقط برای حالت internal) --}}
+        <div x-show="isInternal" x-transition class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                اطلاعات بازاریابی (نمایش در بنر)
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">این مقادیر به‌صورت دستی روی بنر نمایش داده می‌شوند تا جذابیت بصری را افزایش دهند.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت (عدد)</label>
+                    <input type="number" name="price" value="{{ old('price', $heroSlide?->price ?? 0) }}" class="input-custom" placeholder="مثال: 500000" min="0">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">قیمت قدیمی (اختیاری)</label>
+                    <input type="number" name="old_price" value="{{ old('old_price', $heroSlide?->old_price ?? 0) }}" class="input-custom" placeholder="برای نمایش تخفیف">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">واحد پول</label>
+                    <select name="currency" class="input-custom">
+                        <option value="IRT" {{ old('currency', $heroSlide?->currency ?? 'IRT') == 'IRT' ? 'selected' : '' }}>تومان (IRT)</option>
+                        <option value="USD" {{ old('currency', $heroSlide?->currency ?? '') == 'USD' ? 'selected' : '' }}>دلار (USD)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">امتیاز (Rating)</label>
+                    <input type="text" name="rating" value="{{ old('rating', $heroSlide?->rating ?? '') }}" class="input-custom" placeholder="مثال: 4.8 از 5">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تعداد بازدیدکننده زنده</label>
+                    <input type="number" name="viewers" value="{{ old('viewers', $heroSlide?->viewers ?? 42) }}" class="input-custom" placeholder="مثال: 42">
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- ستون کناری: تصویر و تنظیمات --}}
     <div class="space-y-6">
-        {{-- کارت تنظیمات --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -136,13 +178,8 @@
                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                 </label>
             </div>
-
-            <p class="text-xs text-gray-500 dark:text-gray-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-800">
-                💡 ترتیب نمایش (Sort Order) در بخش مدیریت چیدمان صفحه اصلی تنظیم خواهد شد.
-            </p>
         </div>
 
-        {{-- کارت تصویر --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

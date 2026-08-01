@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\HeroSlideRequest;
 use App\Models\HeroSlide;
 use App\Services\HeroSlideService;
 use App\DTOs\HeroSlideDTO;
-use Illuminate\Http\Request;
 
 class HeroSlideController extends Controller
 {
@@ -23,7 +23,8 @@ class HeroSlideController extends Controller
         return view('admin.hero-slides.create');
     }
 
-    public function store(Request $request)
+    // ✅ نکته کلیدی: استفاده از HeroSlideRequest به جای Request معمولی
+    public function store(HeroSlideRequest $request)
     {
         $dto = HeroSlideDTO::fromRequest($request);
         $this->service->store($dto);
@@ -35,7 +36,7 @@ class HeroSlideController extends Controller
         return view('admin.hero-slides.edit', compact('heroSlide'));
     }
 
-    public function update(Request $request, HeroSlide $heroSlide)
+    public function update(HeroSlideRequest $request, HeroSlide $heroSlide)
     {
         $dto = HeroSlideDTO::fromRequest($request);
         $this->service->update($heroSlide, $dto);
