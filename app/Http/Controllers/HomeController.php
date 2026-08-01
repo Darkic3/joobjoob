@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Services\HeroSlideService;
 use Database\Seeders\ProductCategorySeeder;
 use Database\Seeders\ProductSeeder;
+use Illuminate\Support\Facades\Artisan;
 
 class HomeController extends Controller
 {
@@ -34,6 +35,7 @@ class HomeController extends Controller
         return view('site.home.index', compact('categories', 'deals', 'featured', 'bestSellers', 'reviews','slides'));
     }
 
+
     public function seed()
     {
         if (!app()->environment('local')) {
@@ -50,5 +52,12 @@ class HomeController extends Controller
         Artisan::call('db:seed', [
             '--class' => \Database\Seeders\ReviewSeeder::class
         ]);
+
+
+        return response()->json([
+            'message' => 'داده‌های نمونه با موفقیت در دیتابیس ثبت شدند.',
+            'output' => Artisan::output()
+        ]);
+
     }
 }
