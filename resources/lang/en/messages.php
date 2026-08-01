@@ -48,6 +48,11 @@ return [
     'dark_mode' => 'Dark Mode',
     'deal_ends_in' => 'Deal ends in',
 
+    'login' => 'login',
+    'register' => 'register',
+    'footer_desc' => 'footer_description',
+    'newsletter' => 'newsletter',
+
     'trust_free_shipping' => 'Free Shipping',
     'trust_free_shipping_desc' => 'On orders over $50',
     'trust_authenticity' => 'Authenticity Guarantee',
