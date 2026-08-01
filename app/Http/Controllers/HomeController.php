@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Review;
 use App\Services\HeroSlideService;
+use Database\Seeders\ProductCategorySeeder;
+use Database\Seeders\ProductSeeder;
 
 class HomeController extends Controller
 {
@@ -15,7 +18,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $categories = Category::where('is_active', true)->withCount('products')->take(8)->get();
+        $categories = ProductCategory::where('is_active', true)->withCount('products')->take(8)->get();
         $featured = Product::with(['images', 'category'])->where('is_featured', true)->take(8)->get();
         $bestSellers = Product::with(['images', 'category'])->where('is_best_seller', true)->take(8)->get();
         $deals = Product::with('images')->whereNotNull('deal_ends_at')->where('deal_ends_at', '>', now())->take(4)->get();
@@ -23,5 +26,13 @@ class HomeController extends Controller
         $slides = $this->heroSlideService::getSlides();
 
         return view('site.home.index', compact('categories', 'featured', 'bestSellers', 'deals', 'reviews','slides'));
+    }
+
+    public function seed()
+    {
+        $this->call([
+            ProductCategorySeeder::class,
+            ProductSeeder::class,
+        ]);
     }
 }

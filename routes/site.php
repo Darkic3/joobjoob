@@ -9,6 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/seed', [HomeController::class, 'seed'])->name('seed');
 
 // محصولات
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
