@@ -1,33 +1,3 @@
-@php
-    use App\Models\HeroSlide;
-
-    // ۱. ایمن‌سازی متغیر $slides (دریافت از دیتابیس یا ساخت نمونه)
-    if (isset($slides) && $slides instanceof \Illuminate\Database\Eloquent\Builder) {
-        $slides = $slides->get();
-    } elseif (!isset($slides)) {
-        $slides = collect();
-    } else {
-        $slides = collect($slides);
-    }
-
-    // ۲. داده‌های نمونه دقیقاً منطبق با طراحی مورد علاقه‌ی شما
-    if ($slides->isEmpty()) {
-        $dummySlide = new HeroSlide();
-        $dummySlide->title = ['fa' => 'خرید هوشمند، <span style="color: var(--accent);">لذتِ بی‌پایان</span>', 'en' => 'Smart Shopping'];
-        $dummySlide->desc = ['fa' => 'بیش از ۱۲ هزار کالای اورجینال با ضمانت بازگشت ۷ روزه و ارسال فوری به سراسر کشور.', 'en' => 'Over 12k original products with 7-day return guarantee.'];
-        $dummySlide->badge = ['fa' => 'کالکشن پاییزه', 'en' => 'Autumn Collection'];
-        $dummySlide->btn_text = ['fa' => 'مشاهده محصولات', 'en' => 'View Products'];
-        $dummySlide->price = 2490000;
-        $dummySlide->old_price = 3800000;
-        $dummySlide->currency = 'تومان';
-        $dummySlide->image = 'https://picsum.photos/seed/hero-shoe/600/600';
-        $dummySlide->linkable_type = 'url';
-        $dummySlide->linkable_id = '#';
-
-        $slides = collect([$dummySlide]);
-    }
-@endphp
-
 <section class="relative w-full mb-12 overflow-hidden rounded-[var(--radius-lg)]">
     {{-- هاله‌های پس‌زمینه برای عمق دادن به نئومورفیسم --}}
     <div
