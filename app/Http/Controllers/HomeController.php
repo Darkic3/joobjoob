@@ -18,14 +18,20 @@ class HomeController extends Controller
 
     public function index()
     {
-        $categories = ProductCategory::where('is_active', true)->withCount('products')->take(8)->get();
-        $featured = Product::with(['images', 'category'])->where('is_featured', true)->take(8)->get();
-        $bestSellers = Product::with(['images', 'category'])->where('is_best_seller', true)->take(8)->get();
-        $deals = Product::with('images')->whereNotNull('deal_ends_at')->where('deal_ends_at', '>', now())->take(4)->get();
-        $reviews = Review::with(['user', 'product'])->latest()->take(6)->get();
-        $slides = $this->heroSlideService::getSlides();
-
-        return view('site.home.index', compact('categories', 'featured', 'bestSellers', 'deals', 'reviews','slides'));
+        $categories = ProductCategory::whereNull('parent_id')->where('is_active', true)->withCount('products')->take(8)->get();
+        $deals = Product::with('images')->where('status', 'published')->whereNotNull('deal_ends_at')->where('deal_ends_at', '>', now())->take(4)->get()
+            ->map(function ($product) {
+                // محاسبه درصد فروش (فرض: اگر sold_count در دیتابیس دارید از آن استفاده کنید)
+                // در اینجا یک فرمول تقریبی بر اساس موجودی فعلی و فرض فروش ۵۰ عدد استفاده شده است
+                $estimatedSold = 50;
+                $total = $estimatedSold + $product->stock;
+                $product->sold_percent = $total > 0 ? min(100, round(($estimatedSold / $total) * 100)) : 0;
+                return $product;
+            });
+        $featured = Product::with('images')->where('status', 'published')->where('is_featured', true)->take(4)->get();
+        $bestSellers = Product::with('images')->where('status', 'published')->where('is_best_seller', true)->take(4)->get();
+        $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();        $slides = $this->heroSlideService->getSlides();
+        return view('site.home.index', compact('categories', 'deals', 'featured', 'bestSellers', 'reviews','slides'));
     }
 
     public function seed()
