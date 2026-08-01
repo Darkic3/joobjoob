@@ -4,6 +4,8 @@ return [
     'site_name' => 'فروشگاه من',
     'home' => 'صفحه اصلی',
     'products' => 'محصولات',
+    'product' => 'محصول',
+    'no_products_found' => 'هیچ محصولی یافت نشد',
     'categories' => 'دسته‌بندی‌ها',
     'cart' => 'سبد خرید',
     'checkout' => 'پرداخت',
@@ -47,6 +49,8 @@ return [
     'light_mode' => 'حالت روشن',
     'dark_mode' => 'حالت تیره',
     'deal_ends_in' => 'پایان پیشنهاد تا',
+
+    'verified_purchase' => 'تایید شده',
 
     'login' => 'ورود',
     'register' => 'ثبت نام',
