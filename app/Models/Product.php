@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -20,9 +19,9 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'name' => 'json',
-        'short_description' => 'json',
-        'description' => 'json',
+        'name' => 'array',
+        'short_description' => 'array',
+        'description' => 'array',
         'colors' => 'array',
         'sizes' => 'array',
         'price' => 'integer',
@@ -34,7 +33,10 @@ class Product extends Model
         'deal_ends_at' => 'datetime',
     ];
 
-    // روابط
+    // ==========================================
+    // روابط (Relationships)
+    // ==========================================
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
@@ -45,12 +47,16 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    // ⚠️ توجه: فقط یک متد reviews وجود دارد که شامل اسکوپ approved است
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class)->approved();
     }
 
-    // اسکوپ‌های کاربردی (Advanced Tip برای تمیزی کد)
+    // ==========================================
+    // اسکوپ‌های کوئری (Query Scopes)
+    // ==========================================
+
     public function scopePublished($query)
     {
         return $query->where('status', 'published');
@@ -61,7 +67,10 @@ class Product extends Model
         return $query->where('is_featured', true);
     }
 
-    // Accessorها
+    // ==========================================
+    // اکسسورها (Accessors)
+    // ==========================================
+
     public function getFinalPriceAttribute(): int
     {
         return $this->discount_price ?? $this->price;
@@ -80,7 +89,29 @@ class Product extends Model
         return null;
     }
 
-    // کمک‌کننده ترجمه
+    // دریافت میانگین امتیاز (بهینه‌شده برای جلوگیری از N+1)
+    public function getAverageRatingAttribute(): float
+    {
+        if ($this->relationLoaded('reviews')) {
+            return round($this->reviews->avg('rating') ?? 0, 1);
+        }
+        return round($this->reviews()->avg('rating') ?? 0, 1);
+    }
+
+    // دریافت تعداد نظرات (بهینه‌شده)
+    public function getReviewsCountAttribute(): int
+    {
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->count();
+        }
+        return $this->reviews()->count();
+    }
+
+    // ==========================================
+    // متدهای کمکی (Helpers)
+    // ==========================================
+
+    // کمک‌کننده برای دریافت ترجمه فیلدهای JSON
     public function trans(string $field): ?string
     {
         $value = $this->$field;
