@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.site.app')
 
 @section('title', __('messages.products'))
 
