@@ -30,9 +30,19 @@ class HomeController extends Controller
 
     public function seed()
     {
-        $this->call([
-            ProductCategorySeeder::class,
-            ProductSeeder::class,
+        if (!app()->environment('local')) {
+            abort(403, 'این عملیات فقط در محیط توسعه مجاز است.');
+        }
+
+        Artisan::call('db:seed', [
+            '--class' => \Database\Seeders\ProductCategorySeeder::class
+        ]);
+
+        Artisan::call('db:seed', [
+            '--class' => \Database\Seeders\ProductSeeder::class
+        ]);
+        Artisan::call('db:seed', [
+            '--class' => \Database\Seeders\ReviewSeeder::class
         ]);
     }
 }
