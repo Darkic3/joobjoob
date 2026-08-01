@@ -44,4 +44,25 @@ class HeroSlide extends Model
         $currentLocale = app()->getLocale();
         return $value[$currentLocale] ?? $value['fa'] ?? reset($value);
     }
+
+    // اکسسور برای دریافت لینک نهایی اسلاید
+    public function getUrlAttribute(): string
+    {
+        // اگر لینک دستی (URL) وارد شده باشد
+        if ($this->linkable_type === 'url') {
+            return $this->linkable_id ?? '#';
+        }
+
+        // اگر به یک مدل (محصول، دسته، مقاله) لینک شده باشد
+        if ($this->linkable_type && $this->linkable_id) {
+            // نکته: در آینده وقتی روت‌های فرانت‌اند را ساختی، این قسمت را آپدیت کن.
+            // مثال: if ($this->linkable_type === \App\Models\Blog::class) return route('blog.show', $this->linkable_id);
+
+            // فعلاً برای جلوگیری از ارور، یک لینک پیش‌فرض برمی‌گردانیم
+            return '#';
+        }
+
+        return '#';
+    }
+
 }

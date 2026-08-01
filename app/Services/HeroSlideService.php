@@ -11,6 +11,11 @@ class HeroSlideService
 {
     protected const UPLOAD_FOLDER = 'hero-slides';
 
+    public static function getSlides()
+    {
+        return HeroSlide::active()->get();
+    }
+
     public function getPaginated(int $perPage = 15)
     {
         return HeroSlide::orderBy('sort_order', 'asc')
