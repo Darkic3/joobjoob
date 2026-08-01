@@ -51,7 +51,10 @@ return [
     'deal_ends_in' => 'پایان پیشنهاد تا',
 
     'verified_purchase' => 'تایید شده',
+    'dont_miss_out' => 'از دستش نده',
 
+    'reset' => 'حذف فیلترها',
+    'all' => 'همه',
     'login' => 'ورود',
     'register' => 'ثبت نام',
     'footer_desc' => 'توضیحات فوتر',

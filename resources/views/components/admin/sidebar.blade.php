@@ -41,6 +41,45 @@
             <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">مدیریت محتوا</p>
         </div>
 
+        {{-- Hero-Slide --}}
+        <div x-data="{ open: {{ request()->routeIs('admin.hero-slides.*') ? 'true' : 'false' }} }">
+            <button @click="open = !open"
+                    class="sidebar-link w-full {{ request()->routeIs('admin.hero-slides.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">اسلایدر اصلی</span>
+                <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
+                     :class="open ? '-rotate-90' : ''"
+                     class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            {{-- Subs --}}
+            <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
+                <a href="{{ route('admin.hero-slides.index') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.hero-slides.index') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                لیست اسلایدها
+            </span>
+                </a>
+                <a href="{{ route('admin.hero-slides.create') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.hero-slides.create') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                افزودن اسلاید
+            </span>
+                </a>
+            </div>
+        </div>
+
         {{-- Blog --}}
         <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
@@ -80,14 +119,14 @@
             </div>
         </div>
 
-        {{-- Hero-Slide --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.hero-slides.*') ? 'true' : 'false' }} }">
+        {{-- Trust Badges --}}
+        <div x-data="{ open: {{ request()->routeIs('admin.trust-badges.*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
-                    class="sidebar-link w-full {{ request()->routeIs('admin.hero-slides.*') ? 'sidebar-link-active' : '' }}">
+                    class="sidebar-link w-full {{ request()->routeIs('admin.trust-badges.*') ? 'sidebar-link-active' : '' }}">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">اسلایدر اصلی</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">نشان‌های اعتماد</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -98,23 +137,14 @@
 
             {{-- Subs --}}
             <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
-                <a href="{{ route('admin.hero-slides.index') }}"
-                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.hero-slides.index') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
-            <span class="flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-                لیست اسلایدها
-            </span>
-                </a>
-                <a href="{{ route('admin.hero-slides.create') }}"
-                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.hero-slides.create') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
-            <span class="flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                افزودن اسلاید
-            </span>
+                <a href="{{ route('admin.trust-badges.index') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.trust-badges.*') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        مدیریت نشان‌ها
+                    </span>
                 </a>
             </div>
         </div>
