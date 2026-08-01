@@ -10,21 +10,35 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
+            $table->foreignId('product_category_id')->constrained('product_categories')->cascadeOnDelete();
+
+            $table->json('name');
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
+            $table->json('short_description')->nullable();
+            $table->json('description')->nullable();
+
+            $table->string('sku')->unique()->nullable();
+            $table->string('brand')->nullable();
+
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('discount_price')->nullable();
             $table->unsignedInteger('stock')->default(0);
-            $table->string('brand')->nullable();
-            $table->string('sku')->unique()->nullable();
+
+            $table->unsignedInteger('weight')->nullable();
+
+            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_best_seller')->default(false);
+
             $table->json('colors')->nullable();
             $table->json('sizes')->nullable();
             $table->timestamp('deal_ends_at')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
+
+            $table->index(['status', 'is_featured']);
+            $table->index('product_category_id');
         });
     }
 
