@@ -2,11 +2,9 @@
 
 
 // صفحه اول
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Site\CartController;
+use App\Http\Controllers\Site\HomeController;
+use App\Http\Controllers\Site\ProductController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/seed', [HomeController::class, 'seed'])->name('seed');
