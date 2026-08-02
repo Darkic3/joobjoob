@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\HeroSlideSearchController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TrustBadgeController;
@@ -13,6 +14,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('blog-categories', BlogCategoryController::class);
     Route::resource('hero-slides', HeroSlideController::class);
     Route::resource('trust-badges', TrustBadgeController::class);
+    Route::get('hero-slides/search-model', [HeroSlideSearchController::class, 'searchModel'])->name('hero-slides.search-model');
 });
 
 

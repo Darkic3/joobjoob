@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class HeroSlide extends Model
 {
     protected $fillable = [
-        'hero_type', 'badge', 'title', 'desc', 'btn_text',
+        'badge', 'title', 'desc', 'btn_text',
         'price', 'old_price', 'currency', 'rating', 'viewers',
         'linkable_type', 'linkable_id', 'image', 'is_active', 'sort_order'
     ];
@@ -54,6 +54,11 @@ class HeroSlide extends Model
             return $this->linkable_id ?? '#';
         }
 
+        // اگر صفحه استاتیک باشد
+        if ($this->linkable_type === 'page') {
+            return route('site.page', $this->linkable_id);
+        }
+
         // اگر به یک مدل (محصول، دسته، مقاله) لینک شده باشد
         if ($this->linkable_type && $this->linkable_id) {
             // نکته: در آینده وقتی روت‌های فرانت‌اند را ساختی، این قسمت را آپدیت کن.
@@ -66,4 +71,21 @@ class HeroSlide extends Model
         return '#';
     }
 
+    // بررسی آیا دکمه فعال است
+    public function hasButton(): bool
+    {
+        return !empty($this->btn_text['fa']) || !empty($this->linkable_type);
+    }
+
+    // بررسی آیا امتیاز فعال است
+    public function hasRating(): bool
+    {
+        return !empty($this->rating);
+    }
+
+    // بررسی آیا بازدیدکنندگان زنده فعال است
+    public function hasViewers(): bool
+    {
+        return !empty($this->viewers) && $this->viewers > 0;
+    }
 }

@@ -65,8 +65,8 @@
                                     @endif
                                 </div>
 
-                                {{-- کارت شناور روی تصویر (فقط اگر نوع داخلی باشد یا امتیازی ثبت شده باشد) --}}
-                                @if($slide->hero_type === 'internal' || $slide->rating)
+                                {{-- کارت شناور روی تصویر (فقط اگر امتیاز فعال باشد) --}}
+                                @if($slide->hasRating())
                                     <div
                                         class="absolute -bottom-4 -end-4 neu-flat-sm p-3 flex items-center gap-3 z-20 backdrop-blur-sm"
                                         style="background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);">
