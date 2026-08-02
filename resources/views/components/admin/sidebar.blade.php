@@ -80,6 +80,90 @@
             </div>
         </div>
 
+        {{-- ========================================== --}}
+        {{-- مدیریت محصولات --}}
+        {{-- ========================================== --}}
+        <div x-data="{ open: {{ request()->routeIs('admin.products.*') ? 'true' : 'false' }} }">
+            <button @click="open = !open"
+                    class="sidebar-link w-full {{ request()->routeIs('admin.products.*') ? 'sidebar-link-active' : '' }}">
+                {{-- آیکون جعبه/محصول --}}
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">محصولات</span>
+                <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
+                     :class="open ? '-rotate-90' : ''"
+                     class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            {{-- زیرمنوهای محصول --}}
+            <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
+                <a href="{{ route('admin.products.index') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.products.index') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                لیست محصولات
+            </span>
+                </a>
+                <a href="{{ route('admin.products.create') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.products.create') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                افزودن محصول
+            </span>
+                </a>
+            </div>
+        </div>
+
+        {{-- ========================================== --}}
+        {{-- مدیریت دسته‌بندی محصولات --}}
+        {{-- ========================================== --}}
+        <div x-data="{ open: {{ request()->routeIs('admin.product-categories.*') ? 'true' : 'false' }} }">
+            <button @click="open = !open"
+                    class="sidebar-link w-full {{ request()->routeIs('admin.product-categories.*') ? 'sidebar-link-active' : '' }}">
+                {{-- آیکون تگ/دسته‌بندی --}}
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">دسته‌بندی محصولات</span>
+                <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
+                     :class="open ? '-rotate-90' : ''"
+                     class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            {{-- زیرمنوهای دسته‌بندی --}}
+            <div x-show="open" x-collapse x-cloak class="sidebar-submenu">
+                <a href="{{ route('admin.product-categories.index') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.product-categories.index') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                لیست دسته‌بندی‌ها
+            </span>
+                </a>
+                <a href="{{ route('admin.product-categories.create') }}"
+                   class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.product-categories.create') ? 'text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 font-medium' : '' }}">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                افزودن دسته‌بندی
+            </span>
+                </a>
+            </div>
+        </div>
+
         {{-- Blog --}}
         <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') ? 'true' : 'false' }} }">
             <button @click="open = !open"

@@ -6,7 +6,8 @@ use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TrustBadgeController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductCategoryController;
 
 //middleware(['adminPermission', 'log.admin'])->
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -15,6 +16,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('hero-slides', HeroSlideController::class);
     Route::resource('trust-badges', TrustBadgeController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('product-categories', ProductCategoryController::class);
 });
 
 

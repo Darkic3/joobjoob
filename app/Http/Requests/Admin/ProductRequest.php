@@ -18,9 +18,23 @@ class ProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        // تولید خودکار اسلاگ اگر خالی باشد
         if (empty($this->slug) && !empty($this->name['fa'])) {
             $this->merge([
                 'slug' => $this->prepareSlug($this->name['fa'], null),
+            ]);
+        }
+
+        // تبدیل رشته‌های جدا شده با کاما به آرایه برای colors و sizes
+        if ($this->has('colors') && is_string($this->colors)) {
+            $this->merge([
+                'colors' => array_map('trim', explode(',', $this->colors)),
+            ]);
+        }
+
+        if ($this->has('sizes') && is_string($this->sizes)) {
+            $this->merge([
+                'sizes' => array_map('trim', explode(',', $this->sizes)),
             ]);
         }
     }
