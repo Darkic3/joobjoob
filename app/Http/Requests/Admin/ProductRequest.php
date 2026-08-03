@@ -61,7 +61,7 @@ class ProductRequest extends FormRequest
             'stock'                 => 'required|integer|min:0',
             'weight'                => 'nullable|integer|min:0',
 
-            'status'                => 'required|in:draft,published,archived',
+            'is_active'             => 'boolean',
             'is_featured'           => 'boolean',
             'is_best_seller'        => 'boolean',
 

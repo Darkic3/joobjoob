@@ -164,13 +164,17 @@
                 </label>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وضعیت انتشار <span class="text-rose-500">*</span></label>
-                <select name="status" class="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-gray-800 dark:text-white">
-                    <option value="draft" @if($oldVal('status', 'draft') == 'draft') selected @endif>پیش‌نویس</option>
-                    <option value="published" @if($oldVal('status') == 'published') selected @endif>منتشر شده</option>
-                    <option value="archived" @if($oldVal('status') == 'archived') selected @endif>آرشیو شده</option>
-                </select>
+            <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700" x-data="{ active: {{ $oldVal('is_active', true) ? 'true' : 'false' }} }">
+                <div>
+                    <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">نمایش در سایت</span>
+                    <span class="block text-xs mt-0.5 font-medium" :class="active ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'" x-text="active ? 'فعال' : 'غیرفعال'">{{ $oldVal('is_active', true) ? 'فعال' : 'غیرفعال' }}</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="is_active" value="0">
+                    <input type="checkbox" name="is_active" value="1" x-model="active" class="sr-only peer" @if($oldVal('is_active', true)) checked @endif>
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:ring-2 peer-checked:ring-indigo-500 dark:bg-gray-600 peer-checked:bg-indigo-600 transition-all"></div>
+                    <div class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:-translate-x-5 dark:bg-gray-300"></div>
+                </label>
             </div>
         </div>
     </div>

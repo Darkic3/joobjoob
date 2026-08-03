@@ -86,8 +86,9 @@ class ProductService
         // فیلتر دسته‌بندی
         $query->when(!empty($filters['category']), fn($q) => $q->where('product_category_id', $filters['category']));
 
-        // فیلتر وضعیت انتشار
-        $query->when(isset($filters['status']) && $filters['status'] !== '', fn($q) => $q->where('status', $filters['status']));
+        // فیلتر وضعیت نمایش (فعال/غیرفعال)
+        $query->when(($filters['status'] ?? '') === '1', fn($q) => $q->where('is_active', true));
+        $query->when(($filters['status'] ?? '') === '0', fn($q) => $q->where('is_active', false));
 
         // فیلتر موجودی انبار
         $query->when(($filters['availability'] ?? '') === 'in_stock', fn($q) => $q->where('stock', '>', 0));
@@ -144,7 +145,7 @@ class ProductService
             'discount_price'      => $dto->getDiscountPrice(),
             'stock'               => $dto->getStock(),
             'weight'              => $dto->getWeight(),
-            'status'              => $dto->getStatus(),
+            'is_active'           => $dto->getIsActive(),
             'is_featured'         => $dto->getIsFeatured(),
             'is_best_seller'      => $dto->getIsBestSeller(),
             'colors'              => $dto->getColors(),

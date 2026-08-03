@@ -11,7 +11,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['images', 'category'])->where('status', 'published');
+        $query = Product::with(['images', 'category'])->where('is_active', true);
 
         // ۱. فیلتر دسته‌بندی (چون ممکن است چند دسته انتخاب شود)
         if ($request->filled('category')) {
@@ -72,7 +72,7 @@ class ProductController extends Controller
         // محصولات مرتبط بر اساس دسته‌بندی
         $related = Product::where('product_category_id', $product->product_category_id)
             ->where('id', '!=', $product->id)
-            ->where('status', 'published')
+            ->where('is_active', true)
             ->take(4)
             ->get();
 

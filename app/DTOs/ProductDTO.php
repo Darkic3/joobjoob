@@ -19,7 +19,7 @@ readonly class ProductDTO
         private ?int            $discountPrice,
         private int             $stock,
         private ?int            $weight,
-        private string          $status,
+        private bool            $isActive,
         private bool            $isFeatured,
         private bool            $isBestSeller,
         private ?array          $colors,
@@ -42,7 +42,7 @@ readonly class ProductDTO
             discountPrice: $request->integer('discount_price'),
             stock: $request->integer('stock'),
             weight: $request->integer('weight'),
-            status: $request->validated('status'),
+            isActive: $request->boolean('is_active', true),
             isFeatured: $request->boolean('is_featured'),
             isBestSeller: $request->boolean('is_best_seller'),
             colors: $request->validated('colors'),
@@ -64,7 +64,7 @@ readonly class ProductDTO
     public function getDiscountPrice(): ?int { return $this->discountPrice; }
     public function getStock(): int { return $this->stock; }
     public function getWeight(): ?int { return $this->weight; }
-    public function getStatus(): string { return $this->status; }
+    public function getIsActive(): bool { return $this->isActive; }
     public function getIsFeatured(): bool { return $this->isFeatured; }
     public function getIsBestSeller(): bool { return $this->isBestSeller; }
     public function getColors(): ?array { return $this->colors; }

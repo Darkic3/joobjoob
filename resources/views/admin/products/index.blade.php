@@ -4,7 +4,6 @@
 @section('content')
     @php
         // ساخت چیپ‌های فیلترهای فعال برای نمایش زیر کارت جستجو
-        $statusLabels = ['published' => 'منتشر شده', 'draft' => 'پیش‌نویس', 'archived' => 'آرشیو شده'];
         $sortLabels = ['newest' => 'جدیدترین', 'oldest' => 'قدیمی‌ترین', 'price_asc' => 'ارزان‌ترین', 'price_desc' => 'گران‌ترین', 'name_asc' => 'نام (الفبایی)', 'name_desc' => 'نام (معکوس)'];
         $availabilityLabels = ['in_stock' => 'موجود', 'out_of_stock' => 'ناموجود'];
 
@@ -14,7 +13,7 @@
             $catName = $categories->firstWhere('id', (int) request('category'))?->trans('name') ?? 'دسته انتخاب‌شده';
             $activeFilters[] = ['label' => 'دسته: ' . $catName, 'url' => route('admin.products.index', request()->except(['page', 'category']))];
         }
-        if (request('status')) $activeFilters[] = ['label' => 'وضعیت: ' . ($statusLabels[request('status')] ?? request('status')), 'url' => route('admin.products.index', request()->except(['page', 'status']))];
+        if (request('status') !== '' && request('status') !== null) $activeFilters[] = ['label' => 'وضعیت: ' . (request('status') == '1' ? 'فعال' : 'غیرفعال'), 'url' => route('admin.products.index', request()->except(['page', 'status']))];
         if (request('sort') && request('sort') !== 'newest') $activeFilters[] = ['label' => 'مرتب‌سازی: ' . ($sortLabels[request('sort')] ?? request('sort')), 'url' => route('admin.products.index', request()->except(['page', 'sort']))];
         if (request('availability')) $activeFilters[] = ['label' => 'موجودی: ' . ($availabilityLabels[request('availability')] ?? request('availability')), 'url' => route('admin.products.index', request()->except(['page', 'availability']))];
         if (request('price_min')) $activeFilters[] = ['label' => 'قیمت از: ' . number_format((int) request('price_min')) . ' تومان', 'url' => route('admin.products.index', request()->except(['page', 'price_min']))];
@@ -95,12 +94,11 @@
                         </select>
                     </div>
                     <div>
-                        <label for="filter-status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وضعیت</label>
+                        <label for="filter-status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وضعیت نمایش</label>
                         <select name="status" id="filter-status" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
                             <option value="">همه</option>
-                            <option value="published" @if(request('status')=='published') selected @endif>منتشر شده</option>
-                            <option value="draft" @if(request('status')=='draft') selected @endif>پیش‌نویس</option>
-                            <option value="archived" @if(request('status')=='archived') selected @endif>آرشیو شده</option>
+                            <option value="1" @if(request('status') == '1') selected @endif>فعال</option>
+                            <option value="0" @if(request('status') == '0') selected @endif>غیرفعال</option>
                         </select>
                     </div>
                 </div>
@@ -215,22 +213,15 @@
                                 {{ $product->category?->trans('name') ?? 'بدون دسته' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @switch($product->status)
-                                    @case('published')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> منتشر شده
+                                @if($product->is_active)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> فعال
                                     </span>
-                                        @break
-                                    @case('draft')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> پیش‌نویس
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-gray-600/50 dark:text-gray-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> غیرفعال
                                     </span>
-                                        @break
-                                    @default
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> آرشیو شده
-                                    </span>
-                                @endswitch
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if($product->stock > 0)

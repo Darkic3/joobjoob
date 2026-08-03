@@ -15,7 +15,7 @@ class Product extends Model
     protected $fillable = [
         'product_category_id', 'name', 'slug', 'short_description', 'description',
         'sku', 'brand', 'price', 'discount_price', 'stock', 'weight',
-        'status', 'is_featured', 'is_best_seller', 'colors', 'sizes', 'deal_ends_at',
+        'is_active', 'is_featured', 'is_best_seller', 'colors', 'sizes', 'deal_ends_at',
     ];
 
     protected $casts = [
@@ -30,6 +30,7 @@ class Product extends Model
         'weight' => 'integer',
         'is_featured' => 'boolean',
         'is_best_seller' => 'boolean',
+        'is_active' => 'boolean',
         'deal_ends_at' => 'datetime',
     ];
 
@@ -57,9 +58,9 @@ class Product extends Model
     // اسکوپ‌های کوئری (Query Scopes)
     // ==========================================
 
-    public function scopePublished($query)
+    public function scopeActive($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('is_active', true);
     }
 
     public function scopeFeatured($query)
