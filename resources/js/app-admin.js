@@ -119,3 +119,124 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+/* ==========================================
+   Global Slug Helper (همگانی)
+   تمام فیلدهای slug در صفحات ادمین از این تابع استفاده می‌کنند
+   ========================================== */
+
+window.SlugHelper = {
+    /**
+     * تمیزسازی یک رشته به اسلاگ امن
+     * - حذف کاراکترهای غیرمجاز و فارسی
+     * - تبدیل فاصله به خط تیره
+     * - جلوگیری از تکرار خط تیره/فاصله
+     */
+    slugify(value) {
+        return String(value ?? '')
+            .replace(/\s+/g, '-')          // هر نوع فاصله → خط تیره
+            .toLowerCase()                  // حروف انگلیسی → کوچک
+            .replace(/[^a-z0-9\-_]/g, '')  // حذف کاراکترهای غیرمجاز (فارسی و ...)
+            .replace(/-{2,}/g, '-');        // جلوگیری از -- تکراری
+    },
+
+    /**
+     * راه‌اندازی یک input اسلاگ
+     * @param {HTMLInputElement} input
+     */
+    init(input) {
+        if (!input || input.dataset.slugInit) return;
+        input.dataset.slugInit = '1';
+
+        let isManual = input.value.trim() !== '';
+
+        // جلوگیری از تایپ کاراکترهای غیرمجاز (کلید به کلید)
+        input.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length !== 1) return; // کلیدهای کنترلی مانند Backspace, Arrow
+
+            const last = input.value.slice(-1);
+            const isSpace = e.key === ' ';
+            const isDash = e.key === '-';
+
+            // جلوگیری از دوبار فاصله یا خط تیره پشت سر هم
+            if ((isSpace || isDash) && (last === ' ' || last === '-')) {
+                e.preventDefault();
+                return;
+            }
+
+            // فقط حروف انگلیسی، اعداد، فاصله، آندرلاین و خط تیره مجازند
+            if (!/[a-zA-Z0-9\-_ ]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // تمیزکاری هنگام ورود (پوشش paste و ...)
+        input.addEventListener('input', (e) => {
+            if (input.value !== '') isManual = true;
+
+            const start = input.selectionStart;
+            const raw = input.value;
+            const cleaned = window.SlugHelper.slugify(raw);
+
+            if (cleaned !== raw) {
+                const diff = raw.length - cleaned.length;
+                input.value = cleaned;
+                const pos = Math.max(0, (start ?? 0) - diff);
+                input.setSelectionRange(pos, pos);
+            }
+        });
+
+        // حذف خط تیره‌های ابتدا و انتها هنگام خروج
+        input.addEventListener('blur', () => {
+            input.value = input.value.replace(/^-+|-+$/g, '');
+            if (input.value === '') isManual = false;
+        });
+
+        // تولید خودکار اسلاگ از روی فیلد مبدأ (data-slug-source یا عنوان)
+        const sourceSel = input.dataset.slugSource;
+        let source = null;
+
+        if (sourceSel) {
+            source = document.querySelector(sourceSel);
+        } else {
+            const form = input.closest('form');
+            const candidates = [
+                'input[name="title"]',
+                'input[name="name[en]"]',
+                'input[name="name[fa]"]',
+            ];
+            for (const sel of candidates) {
+                source = (form || document).querySelector(sel);
+                if (source) break;
+            }
+        }
+
+        if (source) {
+            const sync = () => {
+                if (!isManual && source.value) {
+                    // حذف خط تیره‌های اضافی ابتدا و انتها هنگام تولید خودکار
+                    input.value = window.SlugHelper.slugify(source.value).replace(/^-+|-+$/g, '');
+                }
+            };
+            source.addEventListener('input', sync);
+            sync(); // اگر اسلاگ خالی بود، از مقدار فعلی مبدأ پر کن
+        }
+
+        // اگر فیلد خالی شد، دوباره حالت خودکار فعال شود
+        input.addEventListener('focus', () => {
+            isManual = input.value !== '';
+        });
+    },
+
+    /**
+     * راه‌اندازی همه فیلدهای اسلاگ در یک محدوده
+     */
+    initAll(scope = document) {
+        scope.querySelectorAll('input[data-auto-slug]').forEach((el) => window.SlugHelper.init(el));
+    },
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.SlugHelper.initAll();
+});

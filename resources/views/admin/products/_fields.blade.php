@@ -60,8 +60,8 @@
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">آدرس (Slug)</label>
             <div class="relative">
                 <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400 text-sm">/p/</span>
-                <!-- کلاس data-auto-slug برای اتصال به JS اختصاصی شما -->
-                <input type="text" name="slug" value="{{ $oldVal('slug') }}" class="w-full pr-16 pl-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 ltr:text-left" placeholder="samsung-galaxy" dir="ltr" data-auto-slug>
+                <!-- کلاس data-auto-slug برای اتصال به JS همگانی SlugHelper -->
+                <input type="text" name="slug" value="{{ $oldVal('slug') }}" class="w-full pr-16 pl-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 ltr:text-left" placeholder="samsung-galaxy" dir="ltr" data-auto-slug data-slug-source="input[name='name[en]']">
             </div>
             @error('slug') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>

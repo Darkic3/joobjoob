@@ -24,7 +24,7 @@
             <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ url('/') }}/</span>
             <input type="text" name="url" value="{{ old('url', $category->url ?? '') }}"
                    class="input-custom flex-1 @error('url') border-red-500 @enderror"
-                   placeholder="technology" dir="ltr">
+                   placeholder="technology" dir="ltr" data-auto-slug data-slug-source="input[name='title']">
         </div>
         @error('url')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
