@@ -64,25 +64,67 @@ class ProductService
     }
 
     /**
-     * دریافت لیست صفحه‌بندی شده محصولات با قابلیت فیلتر
+     * دریافت لیست صفحه‌بندی شده محصولات با قابلیت فیلتر پیشرفته
      */
     public function getPaginatedProducts(array $filters, int $perPage = 15)
     {
-        return Product::query()
-            ->with(['category', 'images']) // Eager Loading برای جلوگیری از N+1
-            ->when(!empty($filters['search']), function ($q) use ($filters) {
-                $search = $filters['search'];
-                // جستجو در نام فارسی، انگلیسی و شناسه کالا (SKU)
-                $q->where(function ($query) use ($search) {
-                    $query->where('name->fa', 'like', "%{$search}%")
-                        ->orWhere('name->en', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%");
-                });
-            })
-            ->when(!empty($filters['category']), fn($q) => $q->where('product_category_id', $filters['category']))
-            ->when(isset($filters['status']) && $filters['status'] !== '', fn($q) => $q->where('status', $filters['status']))
-            ->latest()
-            ->paginate($perPage);
+        $query = Product::query()
+            ->with(['category', 'images']); // Eager Loading برای جلوگیری از N+1
+
+        // جستجو در نام فارسی/انگلیسی، برند، اسلاگ و شناسه کالا (SKU)
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name->fa', 'like', "%{$search}%")
+                    ->orWhere('name->en', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('brand', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        // فیلتر دسته‌بندی
+        $query->when(!empty($filters['category']), fn($q) => $q->where('product_category_id', $filters['category']));
+
+        // فیلتر وضعیت انتشار
+        $query->when(isset($filters['status']) && $filters['status'] !== '', fn($q) => $q->where('status', $filters['status']));
+
+        // فیلتر موجودی انبار
+        $query->when(($filters['availability'] ?? '') === 'in_stock', fn($q) => $q->where('stock', '>', 0));
+        $query->when(($filters['availability'] ?? '') === 'out_of_stock', fn($q) => $q->where('stock', '<=', 0));
+
+        // فیلتر بازه قیمت
+        $query->when(isset($filters['price_min']) && $filters['price_min'] !== '', fn($q) => $q->where('price', '>=', (int) $filters['price_min']));
+        $query->when(isset($filters['price_max']) && $filters['price_max'] !== '', fn($q) => $q->where('price', '<=', (int) $filters['price_max']));
+
+        // فیلتر محصولات ویژه و پرفروش
+        $query->when(!empty($filters['featured']), fn($q) => $q->where('is_featured', true));
+        $query->when(!empty($filters['best_seller']), fn($q) => $q->where('is_best_seller', true));
+
+        // مرتب‌سازی
+        $sort = $filters['sort'] ?? 'newest';
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name->en');
+                break;
+            case 'name_desc':
+                $query->orderByDesc('name->en');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            default: // newest
+                $query->latest();
+                break;
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**
