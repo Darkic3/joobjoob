@@ -22,7 +22,7 @@
     ];
 @endphp
 
-<div x-data="productAssociationsPicker(@json($payload))" x-init="init()" class="space-y-6">
+<div x-data="productAssociationsPicker(@js($payload))" class="space-y-6">
 
     {{-- راهنما --}}
     <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4 flex gap-3">

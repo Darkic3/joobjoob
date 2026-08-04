@@ -8,7 +8,7 @@
     ['حسین از شیراز', '۵ دقیقه پیش «هدفون بی‌سیم» را خرید'],
 ]])
 
-<div id="social-toast" class="fixed bottom-5 start-5 z-50 hidden toast-enter" data-items='@json($items)'>
+<div id="social-toast" class="fixed bottom-5 start-5 z-50 hidden toast-enter" data-items='{!! htmlspecialchars(json_encode($items), ENT_QUOTES, 'UTF-8') !!}'>
     <div class="neu-flat-sm px-4 py-3 flex items-center gap-3 max-w-xs">
         <span class="neu-icon-circle w-9 h-9 grid place-items-center text-sm shrink-0">🛍️</span>
         <div class="text-xs">

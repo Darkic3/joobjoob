@@ -25,16 +25,15 @@
             'title' => $s->trans('title'),
         ])->values(),
         'selected'  => array_map(fn($ids) => array_map('intval', $ids), (array) $selectedSpecs),
-        'textValues'=> array_map('strval', (array) $textSpecValues),
+        'textValues'=> (object) array_map('strval', (array) $textSpecValues),
         'variants'  => $existingVariants,
         'properties'=> $existingProperties,
     ];
 @endphp
 
 <div
-    x-data="productSpecBuilder(@json($payload))"
+    x-data="productSpecBuilder(@js($payload))"
     class="space-y-8"
-    x-init="init()"
 >
 
     {{-- راهنما --}}

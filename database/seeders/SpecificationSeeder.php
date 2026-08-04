@@ -33,17 +33,6 @@ class SpecificationSeeder extends Seeder
             ]
         );
 
-        $material = Specification::updateOrCreate(
-            ['title->fa' => 'جنس', 'parent_id' => null],
-            [
-                'title' => ['fa' => 'جنس', 'en' => 'Material'],
-                'type' => 'text',
-                'active' => true,
-                'is_filter' => false,
-                'is_color' => false,
-            ]
-        );
-
         // مقادیر رنگ
         $colorValues = [
             ['fa' => 'مشکی', 'en' => 'Black', 'code' => '#1F2937'],
@@ -88,15 +77,7 @@ class SpecificationSeeder extends Seeder
             );
         }
 
-        // مشخصه نوشتاری جنس (مقدارهای نمونه به عنوان child برای type=text تعریف نمی‌شوند)
-        Specification::updateOrCreate(
-            ['title->fa' => 'کشور سازنده', 'parent_id' => null],
-            [
-                'title' => ['fa' => 'کشور سازنده', 'en' => 'Country'],
-                'type' => 'text',
-                'active' => true,
-            ]
-        );
+        // مشخصه‌های نوشتاری (text) عمداً نمونه‌ای تعریف نمی‌شوند — ادمین در صورت نیاز خودش می‌سازد.
 
         $this->command?->info('مشخصات نمونه ساخته شد.');
     }
