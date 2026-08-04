@@ -12,7 +12,7 @@
 
     // اطلاعات پایه
     $name = $product->trans('name');
-    $imageUrl = $product->images->first()?->url ?? 'https://picsum.photos/seed/fallback/300/300';
+    $imageUrl = $product->main_image_url ?? 'https://picsum.photos/seed/fallback/300/300';
 //    dd($product , $product->images , $imageUrl);
     $url = route('products.show', $product->slug);
 

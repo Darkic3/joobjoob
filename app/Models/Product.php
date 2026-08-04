@@ -13,7 +13,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'product_category_id', 'name', 'slug', 'short_description', 'description',
+        'product_category_id', 'name', 'slug', 'main_image', 'short_description', 'description',
         'sku', 'brand', 'price', 'discount_price', 'stock', 'weight',
         'is_active', 'is_featured', 'is_best_seller', 'colors', 'sizes', 'deal_ends_at',
     ];
@@ -46,6 +46,41 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * تصویر اصلی محصول — یا از ستون main_image یا اولین تصویر با is_primary
+     */
+    public function getMainImageAttribute(?string $value): ?string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        // اگر ستون خالی بود از روی رابطه استنتاج می‌کنیم (سازگاری با داده قبلی)
+        $primary = $this->relationLoaded('images')
+            ? $this->images->firstWhere('is_primary', true)
+            : $this->images()->where('is_primary', true)->first();
+
+        return $primary?->path;
+    }
+
+    /**
+     * URL کامل تصویر اصلی (در صورت نبودن، از اولین تصویر گالری)
+     */
+    public function getMainImageUrlAttribute(): ?string
+    {
+        if ($this->main_image) {
+            return asset(config('paths.upload', 'uploads') . '/products/' . $this->main_image);
+        }
+
+        // اگر رابطه لود شده باشد از حافظه استفاده کن (بدون کوئری اضافه)
+        if ($this->relationLoaded('images')) {
+            $primary = $this->images->firstWhere('is_primary', true) ?? $this->images->first();
+            return $primary?->url;
+        }
+
+        return $this->images()->orderBy('sort_order')->first()?->url;
     }
 
     // ⚠️ توجه: فقط یک متد reviews وجود دارد که شامل اسکوپ approved است

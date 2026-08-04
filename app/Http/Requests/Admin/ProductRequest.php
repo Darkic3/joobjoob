@@ -69,9 +69,17 @@ class ProductRequest extends FormRequest
             'sizes'                 => 'nullable|array',
             'deal_ends_at'          => 'nullable|date|after:now',
 
-            // اعتبارسنجی آرایه‌ای از فایل‌های آپلودی
+            // اعتبارسنجی آرایه‌ای از فایل‌های آپلودی (تصاویر جدید)
             'images'                => 'nullable|array',
             'images.*'              => 'image|mimes:jpg,jpeg,png,webp|max:3072', // حداکثر 3 مگابایت
+
+            // حذف تصاویر موجود
+            'delete_images'         => 'nullable|array',
+            'delete_images.*'       => 'integer',
+
+            // تعیین تصویر اصلی
+            'main_image_id'         => 'nullable|integer',
+            'main_new_index'        => 'nullable|integer',
         ];
     }
 

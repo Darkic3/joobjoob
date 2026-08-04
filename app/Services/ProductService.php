@@ -6,49 +6,63 @@ use App\DTOs\ProductDTO;
 use App\Helpers\ImageHandler;
 use App\Models\Product;
 use App\Models\ProductImage;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
     protected const UPLOAD_FOLDER = 'products';
 
+    // ابعاد رسیز شده برای هر تصویر (ImageResizer با cover-crop)
+    protected const IMAGE_SIZES = [
+        'thumb'  => [300, 300],
+        'medium' => [800, 800],
+        'large'  => [1200, 1200],
+    ];
+
     /**
      * ایجاد محصول جدید به همراه تصاویر
      */
     public function store(ProductDTO $dto): Product
     {
-        // استفاده از Transaction برای اطمینان از یکپارچگی داده‌ها (محصول + تصاویر)
         return DB::transaction(function () use ($dto) {
             $data = $this->prepareData($dto);
 
-            // 1. ایجاد خود محصول
             $product = Product::create($data);
 
-            // 2. مدیریت و ذخیره تصاویر
-            $this->handleImages($product, $dto->getImages());
+            // آپلود تصاویر جدید
+            $newImages = $this->appendImages($product, $dto->getImages());
+
+            // تعیین تصویر اصلی
+            $this->setMainImage($product, $dto->getMainImageId(), $dto->getMainNewIndex(), $newImages);
 
             return $product;
         });
     }
 
     /**
-     * به‌روزرسانی محصول و مدیریت تصاویر
+     * به‌روزرسانی محصول + مدیریت گالری
+     * - تصاویر قبلی حذف نمی‌شوند مگر اینکه در delete_images آمده باشند
+     * - تصاویر جدید به گالری اضافه می‌شوند
      */
     public function update(Product $product, ProductDTO $dto): bool
     {
         return DB::transaction(function () use ($product, $dto) {
             $data = $this->prepareData($dto);
 
-            // 3. مدیریت تصاویر در حالت ویرایش
-            // نکته: در این پیاده‌سازی، اگر تصاویر جدیدی ارسال شود، تصاویر قدیمی حذف و تصاویر جدید جایگزین می‌شوند.
-            // اگر می‌خواهید تصاویر جدید به قبلی‌ها اضافه شوند، منطق deleteOldImages را حذف کنید.
-            if (!empty($dto->getImages())) {
-                $this->deleteOldImages($product);
-                $this->handleImages($product, $dto->getImages());
+            $product->update($data);
+
+            // حذف تصاویر انتخابی توسط کاربر
+            if (!empty($dto->getDeleteImages())) {
+                $this->deleteImagesByIds($product, $dto->getDeleteImages());
             }
 
-            return $product->update($data);
+            // افزودن تصاویر جدید (بدون حذف قبلی‌ها)
+            $newImages = $this->appendImages($product, $dto->getImages());
+
+            // تعیین تصویر اصلی
+            $this->setMainImage($product, $dto->getMainImageId(), $dto->getMainNewIndex(), $newImages);
+
+            return true;
         });
     }
 
@@ -59,7 +73,7 @@ class ProductService
     {
         return DB::transaction(function () use ($product) {
             $this->deleteOldImages($product);
-            return $product->delete(); // به لطف SoftDeletes، حذف نرم انجام می‌شود
+            return $product->delete();
         });
     }
 
@@ -155,36 +169,94 @@ class ProductService
     }
 
     /**
-     * مدیریت آپلود چندگانه تصاویر و ایجاد رکوردهای ProductImage
+     * افزودن تصاویر جدید به گالری (بدون حذف تصاویر قبلی)
+     * @return array<int, ProductImage> ایندکس‌شده بر اساس ایندکس فایل ارسالی
      */
-    private function handleImages(Product $product, array $uploadedFiles): void
+    private function appendImages(Product $product, array $uploadedFiles): array
     {
-        foreach ($uploadedFiles as $index => $file) {
-            $imagePath = ImageHandler::handle(self::UPLOAD_FOLDER, $file);
+        $created = [];
+        $startSort = (int) $product->images()->max('sort_order');
 
-            $product->images()->create([
+        foreach ($uploadedFiles as $index => $file) {
+            $imagePath = ImageHandler::handle(self::UPLOAD_FOLDER, $file, self::IMAGE_SIZES);
+
+            if (!$imagePath) {
+                continue;
+            }
+
+            $created[$index] = $product->images()->create([
                 'path'       => $imagePath,
-                'is_primary' => $index === 0, // اولین تصویر به عنوان تصویر اصلی انتخاب می‌شود
-                'sort_order' => $index,
+                'is_primary' => false,
+                'sort_order' => $startSort + $index + 1,
             ]);
+        }
+
+        return $created;
+    }
+
+    /**
+     * حذف فیزیکی و رکوردی چند تصویر مشخص
+     */
+    private function deleteImagesByIds(Product $product, array $ids): void
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $images = $product->images()->whereIn('id', $ids)->get();
+
+        foreach ($images as $image) {
+            ImageHandler::delete(self::UPLOAD_FOLDER, $image->path, self::IMAGE_SIZES);
+            $image->delete();
         }
     }
 
     /**
-     * حذف فیزیکی تمام تصاویر مرتبط با یک محصول
+     * تعیین تصویر اصلی محصول
+     * اولویت: main_image_id (تصویر موجود) → main_new_index (تصویر جدید) → اولین تصویر گالری
+     */
+    private function setMainImage(Product $product, ?int $mainImageId, ?int $mainNewIndex, array $newImages): void
+    {
+        $target = null;
+
+        // ۱) تصویر اصلی از بین تصاویر موجود
+        if ($mainImageId) {
+            $target = $product->images()->whereKey($mainImageId)->first();
+        }
+
+        // ۲) تصویر اصلی از بین تصاویر جدید ارسالی
+        if (!$target && $mainNewIndex !== null && isset($newImages[$mainNewIndex])) {
+            $target = $newImages[$mainNewIndex];
+        }
+
+        // ۳) در غیر این صورت اولین تصویر گالری
+        if (!$target) {
+            $target = $product->images()->orderBy('sort_order')->first();
+        }
+
+        if (!$target) {
+            // هیچ تصویری وجود ندارد → تصویر اصلی پاک می‌شود
+            $product->update(['main_image' => null]);
+            return;
+        }
+
+        // فقط یک تصویر اصلی باشد
+        $product->images()->update(['is_primary' => false]);
+        $target->update(['is_primary' => true]);
+
+        // ذخیره در ستون main_image جدول products
+        $product->update(['main_image' => $target->path]);
+    }
+
+    /**
+     * حذف فیزیکی تمام تصاویر مرتبط با یک محصول (هنگام حذف محصول)
      */
     private function deleteOldImages(Product $product): void
     {
-        $baseUpload = config('paths.upload', 'uploads');
-
         foreach ($product->images as $image) {
-            $fullPath = public_path("{$baseUpload}/" . self::UPLOAD_FOLDER . "/{$image->path}");
-
-            if (File::exists($fullPath)) {
-                File::delete($fullPath);
-            }
-
-            // حذف رکورد تصویر از دیتابیس
+            ImageHandler::delete(self::UPLOAD_FOLDER, $image->path, self::IMAGE_SIZES);
             $image->delete();
         }
     }

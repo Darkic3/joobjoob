@@ -182,13 +182,23 @@
     <!-- تب ۴: گالری تصاویر -->
     <div x-show="tab === 'images'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
 
-        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex gap-3">
-            <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            <div class="text-sm text-amber-800 dark:text-amber-200">
-                <strong>توجه:</strong> با آپلود تصاویر جدید، تمام تصاویر قبلی این محصول حذف و تصاویر جدید جایگزین خواهند شد. اولین تصویر آپلود شده به عنوان تصویر اصلی تنظیم می‌شود.
+        {{-- کامپوننت کراپر همگانی (یک بار در صفحه) --}}
+        <x-admin.image-cropper />
+
+        {{-- اینپوت‌های مخفی مدیریت گالری --}}
+        <input type="hidden" name="main_image_id" id="main-image-id" value="{{ $isEdit ? ($product->images->firstWhere('is_primary', true)?->id ?? '') : '' }}">
+        <input type="hidden" name="main_new_index" id="main-new-index" value="">
+        <div id="delete-images-container"></div>
+
+        {{-- راهنما --}}
+        <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4 flex gap-3">
+            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="text-sm text-indigo-800 dark:text-indigo-200">
+                <strong>راهنما:</strong> افزودن تصویر جدید هیچ تصویری را حذف نمی‌کند. با کلیک روی <span class="text-amber-500 font-bold">⭐</span> تصویر اصلی را انتخاب کنید و با دکمه <span class="text-rose-500 font-bold">✕</span> هر تصویری را حذف کنید.
             </div>
         </div>
 
+        {{-- دراپ‌زون --}}
         <div id="dropzone" class="dropzone-area border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-2xl p-8 text-center hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 transition-all cursor-pointer">
             <input type="file" name="images[]" id="image-input" multiple accept="image/png, image/jpeg, image/webp" class="hidden">
             <label for="image-input" class="cursor-pointer flex flex-col items-center justify-center">
@@ -196,27 +206,42 @@
                     <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                 </div>
                 <p class="text-gray-700 dark:text-gray-200 font-semibold">تصاویر را اینجا رها کنید یا کلیک کنید</p>
-                <p class="text-gray-400 text-sm mt-1">فقط فایل‌های PNG, JPG, WEBP (حداکثر 3MB)</p>
+                <p class="text-gray-400 text-sm mt-1">هر تصویر ابتدا برای برش باز می‌شود — PNG, JPG, WEBP (حداکثر 3MB)</p>
             </label>
         </div>
 
-        <div id="image-preview" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        {{-- پیش‌نمایش تصاویر جدید (کراپ شده) --}}
+        <div>
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                تصاویر جدید
+                <span class="text-xs font-normal text-gray-400">(هنوز ذخیره نشده‌اند)</span>
+            </h3>
+            <div id="gallery-pending" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </div>
 
+        {{-- تصاویر فعلی محصول --}}
         @if($isEdit && $product->images->count() > 0)
             <div class="pt-6 border-t border-gray-100 dark:border-gray-700">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">تصاویر فعلی محصول</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                    تصاویر فعلی محصول
+                    <span class="text-xs font-normal text-gray-400">(برای تعویض تصویر اصلی روی ⭐ کلیک کنید)</span>
+                </h3>
+                <div id="gallery-existing" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     @foreach($product->images as $image)
-                        <div class="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square shadow-sm bg-gray-100 dark:bg-gray-800">
-                            <img src="{{ $image->url }}" class="w-full h-full object-cover">
-                            @if($image->is_primary)
-                                <span class="absolute top-2 right-2 bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">اصلی</span>
-                            @endif
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                <button type="button" class="text-rose-400 hover:text-rose-300 text-xs flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg backdrop-blur-sm" onclick="deleteImage({{ $image->id }})">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    حذف
-                                </button>
+                        <div class="gallery-tile relative group rounded-xl overflow-hidden border-2 aspect-square shadow-sm bg-gray-100 dark:bg-gray-800 transition-all {{ $image->is_primary ? 'border-amber-400' : 'border-gray-200 dark:border-gray-700' }}" data-image-id="{{ $image->id }}">
+                            <img src="{{ $image->url }}" class="w-full h-full object-cover" alt="تصویر محصول">
+                            <span class="gallery-main-badge absolute top-2 left-2 bg-amber-400 text-amber-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm {{ $image->is_primary ? '' : 'hidden' }}">⭐ اصلی</span>
+                            {{-- ستاره: انتخاب تصویر اصلی --}}
+                            <button type="button" class="gallery-star absolute bottom-2 left-2 w-7 h-7 rounded-full bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm {{ $image->is_primary ? 'text-amber-500' : 'text-gray-500 hover:text-amber-500' }} flex items-center justify-center transition-all" title="انتخاب به عنوان تصویر اصلی">
+                                <svg class="w-4 h-4" fill="{{ $image->is_primary ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                            </button>
+                            {{-- دکمه حذف (بالا سمت راست) --}}
+                            <button type="button" class="gallery-delete absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-sm opacity-60 group-hover:opacity-100 transition-all" title="حذف تصویر">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                            {{-- پوشش هنگام علامت‌گذاری برای حذف --}}
+                            <div class="gallery-deleting-overlay absolute inset-0 bg-rose-500/20 backdrop-blur-[1px] items-center justify-center hidden">
+                                <span class="text-[10px] font-bold bg-rose-600 text-white px-2 py-1 rounded-full shadow-sm">در انتظار حذف</span>
                             </div>
                         </div>
                     @endforeach

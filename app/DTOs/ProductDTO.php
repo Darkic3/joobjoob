@@ -25,7 +25,10 @@ readonly class ProductDTO
         private ?array          $colors,
         private ?array          $sizes,
         private ?string         $dealEndsAt,
-        private array           $images, // آرایه‌ای از UploadedFile
+        private array           $images,      // آرایه‌ای از UploadedFile (تصاویر جدید)
+        private array           $deleteImages, // شناسه‌های تصاویر موجود که باید حذف شوند
+        private ?int            $mainImageId, // شناسه تصویر اصلی (موجود)
+        private ?int            $mainNewIndex, // ایندکس تصویر اصلی در میان تصاویر جدید
     ) {}
 
     public static function fromRequest(ProductRequest $request): self
@@ -49,6 +52,9 @@ readonly class ProductDTO
             sizes: $request->validated('sizes'),
             dealEndsAt: $request->validated('deal_ends_at'),
             images: $request->file('images') ?? [],
+            deleteImages: array_values(array_filter(array_map('intval', (array) $request->input('delete_images', [])))),
+            mainImageId: $request->input('main_image_id') ? (int) $request->input('main_image_id') : null,
+            mainNewIndex: $request->input('main_new_index') !== '' && $request->input('main_new_index') !== null ? (int) $request->input('main_new_index') : null,
         );
     }
 
@@ -71,4 +77,7 @@ readonly class ProductDTO
     public function getSizes(): ?array { return $this->sizes; }
     public function getDealEndsAt(): ?string { return $this->dealEndsAt; }
     public function getImages(): array { return $this->images; }
+    public function getDeleteImages(): array { return $this->deleteImages; }
+    public function getMainImageId(): ?int { return $this->mainImageId; }
+    public function getMainNewIndex(): ?int { return $this->mainNewIndex; }
 }

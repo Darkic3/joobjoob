@@ -8,7 +8,7 @@
         {{-- ۱. گالری تصاویر --}}
         <div>
             @php
-                $mainImage = $product->images->first()?->url ?? 'https://picsum.photos/seed/' . $product->slug . '/600/600';
+                $mainImage = $product->main_image_url ?? 'https://picsum.photos/seed/' . $product->slug . '/600/600';
             @endphp
 
             <div class="neu-flat-lg p-4 mb-4">
