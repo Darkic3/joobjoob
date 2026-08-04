@@ -67,11 +67,11 @@
                         </label>
 
                         @foreach($brands as $brand)
-                            @php $isActive = request('brand') === $brand; @endphp
+                            @php $isActive = request('brand') === $brand->url; @endphp
                             <label class="cursor-pointer">
-                                <input type="radio" name="brand" value="{{ $brand }}" class="hidden" {{ $isActive ? 'checked' : '' }}>
+                                <input type="radio" name="brand" value="{{ $brand->url }}" class="hidden" {{ $isActive ? 'checked' : '' }}>
                                 <span class="chip px-3 py-1.5 text-[11px] block transition-all {{ $isActive ? 'active' : '' }}">
-                                    {{ $brand }}
+                                    {{ $brand->trans('title') }}
                                 </span>
                             </label>
                         @endforeach

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\DTOs\ProductDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductRequest;
+use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Specification;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,20 +21,28 @@ class ProductController extends Controller
     {
         // دریافت دسته‌بندی‌های فعال برای استفاده در فیلترهای صفحه ایندکس
         $categories = ProductCategory::where('is_active', true)->get();
+        $brands = Brand::where('active', true)->orderBy('id')->get();
 
         // دریافت محصولات صفحه‌بندی شده با حفظ فیلترها
         $products = $this->productService->getPaginatedProducts($request->all());
         $products->appends($request->query());
 
-        return view('admin.products.index', compact('products', 'categories'));
+        return view('admin.products.index', compact('products', 'categories', 'brands'));
     }
 
     public function create(): View
     {
-        // دریافت دسته‌بندی‌ها برای نمایش در فرم ایجاد (مثلاً به صورت درختی یا لیست ساده)
         $categories = ProductCategory::where('is_active', true)->orderByDesc('id')->get();
+        $brands = Brand::where('active', true)->orderBy('id')->get();
 
-        return view('admin.products.create', compact('categories'));
+        // مشخصه‌های والد (گروه‌ها) به همراه فرزندان — برای انتخابگر واریانت
+        $specifications = Specification::whereNull('parent_id')->where('active', true)->with('children')->orderBy('id')->get();
+        $textSpecifications = Specification::where('type', 'text')->whereNull('parent_id')->where('active', true)->orderBy('id')->get();
+
+        // همه محصولات برای انتخابگر محصولات مرتبط/مکمل
+        $products = Product::where('is_active', true)->orderBy('id')->get(['id', 'name', 'slug']);
+
+        return view('admin.products.create', compact('categories', 'brands', 'specifications', 'textSpecifications', 'products'));
     }
 
     public function store(ProductRequest $request)
@@ -49,11 +59,26 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $product->load('images');
+        $product->load([
+            'images',
+            'brand',
+            'productSpecifications.specification',
+            'productSpecifications.children.specification',
+            'variants.specifications',
+            'properties',
+            'related',
+            'complement',
+        ]);
 
         $categories = ProductCategory::where('is_active', true)->orderByDesc('id')->get();
+        $brands = Brand::where('active', true)->orderBy('id')->get();
 
-        return view('admin.products.edit', compact('product', 'categories'));
+        $specifications = Specification::whereNull('parent_id')->where('active', true)->with('children')->orderBy('id')->get();
+        $textSpecifications = Specification::where('type', 'text')->whereNull('parent_id')->where('active', true)->orderBy('id')->get();
+
+        $products = Product::where('is_active', true)->orderBy('id')->get(['id', 'name', 'slug']);
+
+        return view('admin.products.edit', compact('product', 'categories', 'brands', 'specifications', 'textSpecifications', 'products'));
     }
 
     public function update(ProductRequest $request, Product $product)

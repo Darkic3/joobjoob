@@ -17,6 +17,61 @@
         }
         return $default;
     };
+
+    // ========== داده‌های مشخصات و تنوع برای سازنده واریانت ==========
+    // مشخصه‌های والد (گروه‌ها) با فرزندان
+    $specGroups = $specifications ?? collect();
+
+    // مقادیر انتخاب‌شده فعلی محصول: [parent_id => [child_id, ...]]
+    $selectedSpecs = [];
+    $textSpecValues = [];
+
+    if ($isEdit) {
+        foreach ($product->productSpecifications as $ps) {
+            // ردیف والد (گروه) — فرزندان آن را می‌گیریم
+            if ($ps->value === null && $ps->parent_id === null) {
+                $selectedSpecs[$ps->specification_id] = $ps->children->pluck('specification_id')->map(fn($id) => (int) $id)->all();
+            }
+            // مقادیر نوشتاری
+            if ($ps->value !== null) {
+                $textSpecValues[$ps->specification_id] = $ps->value;
+            }
+        }
+    }
+
+    // واریانت‌های موجود: [{id, spec_ids[], price, discount_price, stock, weight}]
+    $existingVariants = [];
+    if ($isEdit) {
+        foreach ($product->variants as $v) {
+            $existingVariants[] = [
+                'id'             => $v->id,
+                'spec_ids'       => $v->specifications->pluck('id')->map(fn($id) => (int) $id)->sort()->values()->all(),
+                'price'          => (int) $v->price,
+                'discount_price' => (int) $v->discounted_price,
+                'stock'          => (int) $v->stock,
+                'weight'         => (int) $v->weight,
+            ];
+        }
+    }
+
+    // ویژگی‌های آزاد فعلی
+    $existingProperties = [];
+    if ($isEdit) {
+        foreach ($product->properties as $prop) {
+            $existingProperties[] = [
+                'id'    => $prop->id,
+                'title' => $prop->trans('title') ?? '',
+                'value' => $prop->value,
+            ];
+        }
+    }
+
+    // محصولات مرتبط و مکمل فعلی
+    $relatedIds = $isEdit ? $product->related->pluck('id')->map(fn($id) => (int) $id)->all() : [];
+    $complementIds = $isEdit ? $product->complement->pluck('id')->map(fn($id) => (int) $id)->all() : [];
+
+    // لیست محصولات برای انتخابگر مرتبط/مکمل (از کنترلر با نام products می‌آید)
+    $allProducts = $products ?? collect();
 @endphp
 
 <div x-data="{ tab: 'general' }" class="space-y-6">
@@ -31,9 +86,19 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             قیمت و موجودی
         </button>
-        <button type="button" @click="tab='attributes'" :class="tab === 'attributes' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all">
+        <button type="button" @click="tab='specs'" :class="tab === 'specs' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-            ویژگی‌ها و تنظیمات
+            مشخصات و تنوع
+        </button>
+        <button type="button" @click="tab='related'" :class="tab === 'related' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m10.656-1.5l1.5-1.5a4 4 0 10-5.656-5.656l-3 3a4 4 0 000 5.656"></path></svg>
+            مرتبط و مکمل
+        </button>
+        <button type="button" @click="tab='attributes'" :class="tab === 'attributes' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            تنظیمات
         </button>
         <button type="button" @click="tab='images'" :class="tab === 'images' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -77,6 +142,17 @@
             @error('product_category_id') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
+            <select name="brand_id" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                <option value="">بدون برند</option>
+                @foreach($brands ?? [] as $brand)
+                    <option value="{{ $brand->id }}" @if($oldVal('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
+                @endforeach
+            </select>
+            @error('brand_id') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div class="lg:col-span-3">
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">توضیحات کوتاه</label>
             <textarea name="short_description[fa]" rows="2" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="یک توضیح مختصر برای پیش‌نمایش محصول...">{{ $oldVal('short_description.fa') }}</textarea>
@@ -109,6 +185,31 @@
             @error('deal_ends_at') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
+        <div class="lg:col-span-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+            <div>
+                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">تایمر تخفیف بازه‌ای</span>
+                <span class="block text-xs text-gray-400 mt-0.5">نمایش پیشنهاد ویژه فقط در بازه زمانی مشخص</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="hidden" name="timer_active" value="0">
+                <input type="checkbox" name="timer_active" value="1" class="sr-only peer" @if($oldVal('timer_active')) checked @endif>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:ring-2 peer-checked:ring-indigo-500 dark:bg-gray-600 peer-checked:bg-indigo-600 transition-all"></div>
+                <div class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:-translate-x-5 dark:bg-gray-300"></div>
+            </label>
+        </div>
+
+        <div class="lg:col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">شروع تایمر</label>
+            <input type="datetime-local" name="start_timer" value="{{ $oldVal('start_timer') ? \Carbon\Carbon::parse($oldVal('start_timer'))->format('Y-m-d\TH:i') : '' }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+            @error('start_timer') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="lg:col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">پایان تایمر</label>
+            <input type="datetime-local" name="end_timer" value="{{ $oldVal('end_timer') ? \Carbon\Carbon::parse($oldVal('end_timer'))->format('Y-m-d\TH:i') : '' }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+            @error('end_timer') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">موجودی انبار <span class="text-rose-500">*</span></label>
             <input type="number" name="stock" value="{{ $oldVal('stock', 0) }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="50" required>
@@ -127,22 +228,30 @@
         </div>
     </div>
 
-    <!-- تب ۳: ویژگی‌ها و تنظیمات -->
+    <!-- تب ۳: مشخصات و تنوع -->
+    <div x-show="tab === 'specs'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
+        <x-admin.product-spec-builder
+            :spec-groups="$specGroups"
+            :text-specifications="$textSpecifications ?? collect()"
+            :selected-specs="$selectedSpecs"
+            :text-spec-values="$textSpecValues"
+            :existing-variants="$existingVariants"
+            :existing-properties="$existingProperties"
+        />
+    </div>
+
+    <!-- تب ۴: محصولات مرتبط و مکمل -->
+    <div x-show="tab === 'related'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
+        <x-admin.product-associations-picker
+            :products="$products ?? collect()"
+            :related-ids="$relatedIds"
+            :complement-ids="$complementIds"
+            :current-product-id="$isEdit ? $product->id : null"
+        />
+    </div>
+
+    <!-- تب ۵: تنظیمات -->
     <div x-show="tab === 'attributes'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">رنگ‌ها</label>
-                <input type="text" name="colors" value="{{ is_array($oldVal('colors')) ? implode(', ', $oldVal('colors')) : $oldVal('colors') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="قرمز, آبی, مشکی">
-                <p class="text-xs text-gray-400 mt-1.5">رنگ‌ها را با کاما (,) از هم جدا کنید.</p>
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">سایزها</label>
-                <input type="text" name="sizes" value="{{ is_array($oldVal('sizes')) ? implode(', ', $oldVal('sizes')) : $oldVal('sizes') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="S, M, L, XL">
-                <p class="text-xs text-gray-400 mt-1.5">سایزها را با کاما (,) از هم جدا کنید.</p>
-            </div>
-        </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
             <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">محصول ویژه</span>
@@ -179,7 +288,7 @@
         </div>
     </div>
 
-    <!-- تب ۴: گالری تصاویر -->
+    <!-- تب ۶: گالری تصاویر -->
     <div x-show="tab === 'images'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
 
         {{-- کامپوننت کراپر همگانی (یک بار در صفحه) --}}

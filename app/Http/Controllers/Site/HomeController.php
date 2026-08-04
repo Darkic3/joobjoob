@@ -19,7 +19,17 @@ class HomeController extends Controller
     public function index()
     {
         $categories = ProductCategory::whereNull('parent_id')->where('is_active', true)->withCount('products')->take(8)->get();
-        $deals = Product::with('images')->where('is_active', true)->whereNotNull('deal_ends_at')->where('deal_ends_at', '>', now())->take(4)->get()
+        // محصولات پیشنهاد ویژه: تخفیف‌دار با تایمر فعال و در بازه زمانی معتبر
+        $deals = Product::with('images')
+            ->where('is_active', true)
+            ->where('discount_price', '>', 0)
+            ->where(function ($q) {
+                $q->whereNull('end_timer')->whereNotNull('deal_ends_at')->where('deal_ends_at', '>', now())
+                    ->orWhere(function ($t) {
+                        $t->whereNotNull('end_timer')->where('end_timer', '>', now());
+                    });
+            })
+            ->take(4)->get()
             ->map(function ($product) {
                 // محاسبه درصد فروش (فرض: اگر sold_count در دیتابیس دارید از آن استفاده کنید)
                 // در اینجا یک فرمول تقریبی بر اساس موجودی فعلی و فرض فروش ۵۰ عدد استفاده شده است
@@ -44,7 +54,12 @@ class HomeController extends Controller
         Artisan::call('db:seed', [
             '--class' => \Database\Seeders\ProductCategorySeeder::class
         ]);
-
+        Artisan::call('db:seed', [
+            '--class' => \Database\Seeders\BrandSeeder::class
+        ]);
+        Artisan::call('db:seed', [
+            '--class' => \Database\Seeders\SpecificationSeeder::class
+        ]);
         Artisan::call('db:seed', [
             '--class' => \Database\Seeders\ProductSeeder::class
         ]);

@@ -6,6 +6,9 @@ use App\DTOs\ProductDTO;
 use App\Helpers\ImageHandler;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductSpecification;
+use App\Models\ProductVariant;
+use App\Models\Property;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
@@ -20,7 +23,7 @@ class ProductService
     ];
 
     /**
-     * ایجاد محصول جدید به همراه تصاویر
+     * ایجاد محصول جدید به همراه تصاویر، مشخصات، واریانت‌ها و ویژگی‌ها
      */
     public function store(ProductDTO $dto): Product
     {
@@ -35,14 +38,18 @@ class ProductService
             // تعیین تصویر اصلی
             $this->setMainImage($product, $dto->getMainImageId(), $dto->getMainNewIndex(), $newImages);
 
+            // مشخصات، واریانت‌ها، ویژگی‌ها و ارتباطات
+            $this->syncSpecifications($product, $dto);
+            $this->syncVariants($product, $dto);
+            $this->syncProperties($product, $dto);
+            $this->syncAssociations($product, $dto);
+
             return $product;
         });
     }
 
     /**
-     * به‌روزرسانی محصول + مدیریت گالری
-     * - تصاویر قبلی حذف نمی‌شوند مگر اینکه در delete_images آمده باشند
-     * - تصاویر جدید به گالری اضافه می‌شوند
+     * به‌روزرسانی محصول + مدیریت گالری، مشخصات، واریانت‌ها و ویژگی‌ها
      */
     public function update(Product $product, ProductDTO $dto): bool
     {
@@ -61,6 +68,12 @@ class ProductService
 
             // تعیین تصویر اصلی
             $this->setMainImage($product, $dto->getMainImageId(), $dto->getMainNewIndex(), $newImages);
+
+            // مشخصات، واریانت‌ها، ویژگی‌ها و ارتباطات
+            $this->syncSpecifications($product, $dto);
+            $this->syncVariants($product, $dto);
+            $this->syncProperties($product, $dto);
+            $this->syncAssociations($product, $dto);
 
             return true;
         });
@@ -83,7 +96,7 @@ class ProductService
     public function getPaginatedProducts(array $filters, int $perPage = 15)
     {
         $query = Product::query()
-            ->with(['category', 'images']); // Eager Loading برای جلوگیری از N+1
+            ->with(['category', 'images', 'brand']); // Eager Loading برای جلوگیری از N+1
 
         // جستجو در نام فارسی/انگلیسی، برند، اسلاگ و شناسه کالا (SKU)
         if (!empty($filters['search'])) {
@@ -92,13 +105,16 @@ class ProductService
                 $q->where('name->fa', 'like', "%{$search}%")
                     ->orWhere('name->en', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhere('brand', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+                    ->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhereHas('brand', fn ($b) => $b->where('title->fa', 'like', "%{$search}%"));
             });
         }
 
         // فیلتر دسته‌بندی
         $query->when(!empty($filters['category']), fn($q) => $q->where('product_category_id', $filters['category']));
+
+        // فیلتر برند
+        $query->when(!empty($filters['brand_id']), fn($q) => $q->where('brand_id', $filters['brand_id']));
 
         // فیلتر وضعیت نمایش (فعال/غیرفعال)
         $query->when(($filters['status'] ?? '') === '1', fn($q) => $q->where('is_active', true));
@@ -108,9 +124,9 @@ class ProductService
         $query->when(($filters['availability'] ?? '') === 'in_stock', fn($q) => $q->where('stock', '>', 0));
         $query->when(($filters['availability'] ?? '') === 'out_of_stock', fn($q) => $q->where('stock', '<=', 0));
 
-        // فیلتر بازه قیمت
-        $query->when(isset($filters['price_min']) && $filters['price_min'] !== '', fn($q) => $q->where('price', '>=', (int) $filters['price_min']));
-        $query->when(isset($filters['price_max']) && $filters['price_max'] !== '', fn($q) => $q->where('price', '<=', (int) $filters['price_max']));
+        // فیلتر بازه قیمت (بر اساس final_price طبق گزارش)
+        $query->when(isset($filters['price_min']) && $filters['price_min'] !== '', fn($q) => $q->where('final_price', '>=', (int) $filters['price_min']));
+        $query->when(isset($filters['price_max']) && $filters['price_max'] !== '', fn($q) => $q->where('final_price', '<=', (int) $filters['price_max']));
 
         // فیلتر محصولات ویژه و پرفروش
         $query->when(!empty($filters['featured']), fn($q) => $q->where('is_featured', true));
@@ -120,10 +136,10 @@ class ProductService
         $sort = $filters['sort'] ?? 'newest';
         switch ($sort) {
             case 'price_asc':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('final_price', 'asc');
                 break;
             case 'price_desc':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('final_price', 'desc');
                 break;
             case 'name_asc':
                 $query->orderBy('name->en');
@@ -147,26 +163,212 @@ class ProductService
      */
     private function prepareData(ProductDTO $dto): array
     {
+        $finalPrice = $dto->getDiscountPrice() && $dto->getDiscountPrice() > 0
+            ? $dto->getDiscountPrice()
+            : $dto->getPrice();
+
         return [
             'product_category_id' => $dto->getProductCategoryId(),
+            'brand_id'            => $dto->getBrandId(),
             'name'                => $dto->getName(),
             'slug'                => $dto->getSlug(),
             'short_description'   => $dto->getShortDescription(),
             'description'         => $dto->getDescription(),
             'sku'                 => $dto->getSku(),
-            'brand'               => $dto->getBrand(),
             'price'               => $dto->getPrice(),
             'discount_price'      => $dto->getDiscountPrice(),
+            'final_price'         => $finalPrice,
             'stock'               => $dto->getStock(),
             'weight'              => $dto->getWeight(),
             'is_active'           => $dto->getIsActive(),
             'is_featured'         => $dto->getIsFeatured(),
             'is_best_seller'      => $dto->getIsBestSeller(),
-            'colors'              => $dto->getColors(),
-            'sizes'               => $dto->getSizes(),
             'deal_ends_at'        => $dto->getDealEndsAt(),
+            'timer_active'        => $dto->getTimerActive(),
+            'start_timer'         => $dto->getStartTimer(),
+            'end_timer'           => $dto->getEndTimer(),
         ];
     }
+
+    // ==========================================
+    // مشخصات (Specifications)
+    // ==========================================
+
+    /**
+     * همگام‌سازی مشخصات محصول
+     * - مشخصه‌های انتخابی (select): ردیف والد (value=NULL) + ردیف فرزند برای هر مقدار
+     * - مقادیر نوشتاری (text): ردیف با value=متن
+     */
+    private function syncSpecifications(Product $product, ProductDTO $dto): void
+    {
+        // حذف نرم ردیف‌های قبلی
+        ProductSpecification::where('product_id', $product->id)->delete();
+
+        $rows = [];
+
+        // مشخصه‌های انتخابی: [parent_id => [child_id, ...]]
+        foreach ($dto->getSpecs() as $parentId => $childIds) {
+            $rows[] = [
+                'specification_id' => $parentId,
+                'value'            => null,
+                'parent_id'        => null,
+            ];
+        }
+
+        // مقادیر نوشتاری: [specification_id => value]
+        foreach ($dto->getTextSpecs() as $specId => $value) {
+            $rows[] = [
+                'specification_id' => $specId,
+                'value'            => $value,
+                'parent_id'        => null,
+            ];
+        }
+
+        // ساخت ردیف‌های والد و نگه‌داشتن نگاشت specification_id → ردیف
+        $parentRows = [];
+        foreach ($rows as $row) {
+            $ps = ProductSpecification::create(array_merge($row, ['product_id' => $product->id]));
+            if ($row['value'] === null) {
+                $parentRows[$row['specification_id']] = $ps->id;
+            }
+        }
+
+        // ردیف‌های فرزند (مقادیر انتخابی) — به ردیف والد خود متصل می‌شوند
+        foreach ($dto->getSpecs() as $parentId => $childIds) {
+            $parentRowId = $parentRows[$parentId] ?? null;
+            if (!$parentRowId) {
+                continue;
+            }
+
+            foreach ($childIds as $childId) {
+                ProductSpecification::create([
+                    'product_id'       => $product->id,
+                    'specification_id' => $childId,
+                    'value'            => null,
+                    'parent_id'        => $parentRowId,
+                ]);
+            }
+        }
+    }
+
+    // ==========================================
+    // واریانت‌ها (Variants) — با تجمیع قیمت/موجودی
+    // ==========================================
+
+    /**
+     * همگام‌سازی واریانت‌ها و تجمیع قیمت/موجودی روی محصول
+     * طبق گزارش: stock محصول = جمع stock واریانت‌ها،
+     * price محصول = قیمت ارزان‌ترین واریانتِ موجود
+     */
+    private function syncVariants(Product $product, ProductDTO $dto): void
+    {
+        $submitted = $dto->getVariants();
+
+        // حذف واریانت‌هایی که دیگر در فرم نیستند
+        $submittedIds = array_values(array_filter(array_column($submitted, 'id')));
+        $variantsQuery = $product->variants();
+        if ($submittedIds) {
+            $variantsQuery->whereNotIn('id', $submittedIds);
+        }
+        $variantsQuery->get()->each->delete();
+
+        foreach ($submitted as $variantData) {
+            $finalPrice = !empty($variantData['discount_price']) && $variantData['discount_price'] > 0
+                ? $variantData['discount_price']
+                : $variantData['price'];
+
+            $variant = ProductVariant::updateOrCreate(
+                ['id' => $variantData['id'] ?? null, 'product_id' => $product->id],
+                [
+                    'price'           => $variantData['price'],
+                    'discounted_price'=> $variantData['discount_price'],
+                    'final_price'     => $finalPrice,
+                    'stock'           => $variantData['stock'],
+                    'weight'          => $variantData['weight'] ?: 100,
+                ]
+            );
+
+            $variant->specifications()->sync($variantData['spec_ids']);
+        }
+
+        // تجمیع روی محصول اگر واریانت دارد
+        $this->aggregateVariantPrices($product);
+    }
+
+    /**
+     * تجمیع قیمت/موجودی واریانت‌ها روی محصول (بند ۴.۳ گزارش)
+     * موجودی = جمع موجودی همه واریانت‌ها، قیمت = ارزان‌ترین واریانتِ موجود
+     */
+    private function aggregateVariantPrices(Product $product): void
+    {
+        if (!$product->variants()->exists()) {
+            return;
+        }
+
+        $sumStock = $product->variants()->sum('stock');
+
+        $minVariant = $product->variants()
+            ->where('stock', '>', 0)
+            ->where('final_price', '>', 0)
+            ->orderBy('final_price', 'asc')
+            ->first();
+
+        if ($minVariant) {
+            $product->update([
+                'price'           => $minVariant->price,
+                'discounted_price'=> $minVariant->discounted_price,
+                'final_price'     => $minVariant->final_price,
+                'stock'           => $sumStock,
+            ]);
+        } else {
+            // هیچ واریانتِ موجود و قیمت‌داری نیست — فقط موجودی را جمع کن
+            // قیمت اصلی محصول حفظ می‌شود تا بعداً با حذف واریانت‌ها از بین نرود
+            $product->update(['stock' => $sumStock]);
+        }
+    }
+
+    // ==========================================
+    // ویژگی‌های آزاد (Properties)
+    // ==========================================
+
+    private function syncProperties(Product $product, ProductDTO $dto): void
+    {
+        Property::where('product_id', $product->id)->delete();
+
+        foreach ($dto->getProperties() as $index => $property) {
+            Property::create([
+                'product_id' => $product->id,
+                'title'      => $property['title'],
+                'value'      => $property['value'],
+                'sort_order' => $index,
+            ]);
+        }
+    }
+
+    // ==========================================
+    // محصولات مرتبط و مکمل (Associations)
+    // ==========================================
+
+    private function syncAssociations(Product $product, ProductDTO $dto): void
+    {
+        $product->associations()->delete();
+
+        $associations = [];
+        foreach ($dto->getRelatedIds() as $relatedId) {
+            $associations[] = ['related_product_id' => $relatedId, 'type' => 'related'];
+        }
+        foreach ($dto->getComplementIds() as $complementId) {
+            $associations[] = ['related_product_id' => $complementId, 'type' => 'complement'];
+        }
+
+        foreach ($associations as $assoc) {
+            $product->associations()->create($assoc);
+        }
+    }
+
+    // ==========================================
+    // تصاویر (Images)
+    // ==========================================
 
     /**
      * افزودن تصاویر جدید به گالری (بدون حذف تصاویر قبلی)

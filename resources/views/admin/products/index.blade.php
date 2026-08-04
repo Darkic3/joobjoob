@@ -13,6 +13,10 @@
             $catName = $categories->firstWhere('id', (int) request('category'))?->trans('name') ?? 'دسته انتخاب‌شده';
             $activeFilters[] = ['label' => 'دسته: ' . $catName, 'url' => route('admin.products.index', request()->except(['page', 'category']))];
         }
+        if (request('brand_id')) {
+            $brandName = $brands->firstWhere('id', (int) request('brand_id'))?->trans('title') ?? 'برند انتخاب‌شده';
+            $activeFilters[] = ['label' => 'برند: ' . $brandName, 'url' => route('admin.products.index', request()->except(['page', 'brand_id']))];
+        }
         if (request('status') !== '' && request('status') !== null) $activeFilters[] = ['label' => 'وضعیت: ' . (request('status') == '1' ? 'فعال' : 'غیرفعال'), 'url' => route('admin.products.index', request()->except(['page', 'status']))];
         if (request('sort') && request('sort') !== 'newest') $activeFilters[] = ['label' => 'مرتب‌سازی: ' . ($sortLabels[request('sort')] ?? request('sort')), 'url' => route('admin.products.index', request()->except(['page', 'sort']))];
         if (request('availability')) $activeFilters[] = ['label' => 'موجودی: ' . ($availabilityLabels[request('availability')] ?? request('availability')), 'url' => route('admin.products.index', request()->except(['page', 'availability']))];
@@ -66,8 +70,8 @@
             </div>
 
             <form method="GET" action="{{ route('admin.products.index') }}" class="p-5 sm:p-6 space-y-4" id="product-filter-form">
-                {{-- ردیف اول: جستجو، دسته‌بندی، وضعیت --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {{-- ردیف اول: جستجو، دسته‌بندی، برند، وضعیت --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="lg:col-span-2">
                         <label for="filter-search" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">جستجو</label>
                         <div class="relative">
@@ -90,6 +94,15 @@
                             <option value="">همه دسته‌ها</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" @if(request('category') == $category->id) selected @endif>{{ $category->trans('name') }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-brand" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
+                        <select name="brand_id" id="filter-brand" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                            <option value="">همه برندها</option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}" @if(request('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -203,9 +216,14 @@
                                     </div>
                                     <div class="mr-4">
                                         <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $product->trans('name') ?? '-' }}</div>
-                                        @if($product->sku)
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ $product->sku }}</div>
-                                        @endif
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            @if($product->brand)
+                                                <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">{{ $product->brand->trans('title') }}</span>
+                                            @endif
+                                            @if($product->sku)
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ $product->sku }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>

@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TrustBadgeController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\SpecificationController;
 
 //middleware(['adminPermission', 'log.admin'])->
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -17,6 +19,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('trust-badges', TrustBadgeController::class);
     Route::resource('products', ProductController::class);
     Route::resource('product-categories', ProductCategoryController::class);
+    Route::resource('brands', BrandController::class);
+    Route::resource('specifications', SpecificationController::class);
 });
 
 

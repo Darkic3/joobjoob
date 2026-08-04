@@ -5,6 +5,163 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 window.Alpine = Alpine;
+
+/* ==========================================
+   سازنده واریانت محصول (Product Spec Builder)
+   ترکیب مقادیر انتخاب‌شده مشخصات → جدول تنوع‌ها
+   ========================================== */
+window.productSpecBuilder = function (payload) {
+    return {
+        groups: payload.groups || [],
+        textSpecs: payload.textSpecs || [],
+        selected: payload.selected || {},
+        textValues: payload.textValues || {},
+        properties: payload.properties || [],
+        variants: [],
+
+        init() {
+            this.initTextValues();
+            this.rebuildVariants();
+        },
+
+        isSelected(groupId, childId) {
+            return (this.selected[groupId] || []).includes(childId);
+        },
+
+        toggle(groupId, childId) {
+            const arr = this.selected[groupId] || [];
+            const idx = arr.indexOf(childId);
+            if (idx >= 0) {
+                arr.splice(idx, 1);
+            } else {
+                arr.push(childId);
+            }
+            this.selected[groupId] = arr;
+            this.rebuildVariants();
+        },
+
+        // ساخت ضرب دکارتی مقادیر انتخاب‌شده
+        buildCombos() {
+            const groupsWithSelection = this.groups
+                .map(g => ({ g, ids: (this.selected[g.id] || []) }))
+                .filter(x => x.ids.length > 0);
+
+            if (groupsWithSelection.length === 0) return [];
+
+            // حفظ ترتیب اصلی گروه‌ها
+            const ordered = this.groups
+                .map(g => ({ g, ids: (this.selected[g.id] || []) }))
+                .filter(x => x.ids.length > 0);
+
+            let combos = [[]];
+            for (const { g, ids } of ordered) {
+                const next = [];
+                for (const combo of combos) {
+                    for (const id of ids) {
+                        const child = g.children.find(c => c.id === id);
+                        next.push([...combo, { groupId: g.id, childId: id, label: child ? child.title : '—' }]);
+                    }
+                }
+                combos = next;
+            }
+
+            return combos.map(combo => {
+                const specIds = combo.map(c => c.childId).sort((a, b) => a - b);
+                return {
+                    key: specIds.join('-'),
+                    spec_ids: specIds,
+                    label: combo.map(c => c.label).join(' / '),
+                };
+            });
+        },
+
+        rebuildVariants() {
+            // حفظ مقادیر واردشده قبلی برای هر ترکیب
+            const prevValues = {};
+            this.variants.forEach(v => { prevValues[v.key] = v; });
+
+            const existingByKey = {};
+            (payload.variants || []).forEach(v => {
+                const sorted = [...v.spec_ids].sort((a, b) => a - b);
+                existingByKey[sorted.join('-')] = v;
+            });
+
+            const combos = this.buildCombos();
+            this.variants = combos.map(combo => {
+                const existing = existingByKey[combo.key];
+                const prev = prevValues[combo.key];
+
+                return {
+                    key: combo.key,
+                    label: combo.label,
+                    spec_ids: combo.spec_ids,
+                    id: prev && prev.id !== '' ? prev.id : (existing ? existing.id : ''),
+                    price: prev && prev.price !== '' ? prev.price : (existing ? existing.price : ''),
+                    discount_price: prev && prev.discount_price !== '' ? prev.discount_price : (existing ? existing.discount_price : ''),
+                    stock: prev && prev.stock !== '' ? prev.stock : (existing ? existing.stock : ''),
+                    weight: prev && prev.weight !== '' ? prev.weight : (existing ? existing.weight : 100),
+                };
+            });
+        },
+
+        addProperty() {
+            this.properties.push({ id: '', title: '', value: '' });
+        },
+
+        initTextValues() {
+            // اطمینان از وجود مقدار اولیه برای همه مشخصه‌های نوشتاری
+            this.textSpecs.forEach(spec => {
+                if (!(spec.id in this.textValues)) {
+                    this.textValues[spec.id] = '';
+                }
+            });
+        },
+    };
+};
+
+/* ==========================================
+   انتخابگر محصولات مرتبط/مکمل
+   ========================================== */
+window.productAssociationsPicker = function (payload) {
+    return {
+        products: payload.products || [],
+        relatedIds: payload.relatedIds || [],
+        complementIds: payload.complementIds || [],
+        search: '',
+
+        init() {},
+
+        get filteredProducts() {
+            const q = this.search.trim().toLowerCase();
+            if (!q) return this.products;
+            return this.products.filter(p => p.label.toLowerCase().includes(q));
+        },
+
+        isRelated(id) { return this.relatedIds.includes(id); },
+        isComplement(id) { return this.complementIds.includes(id); },
+
+        toggleRelated(id) {
+            const idx = this.relatedIds.indexOf(id);
+            if (idx >= 0) this.relatedIds.splice(idx, 1);
+            else this.relatedIds.push(id);
+        },
+
+        toggleComplement(id) {
+            const idx = this.complementIds.indexOf(id);
+            if (idx >= 0) this.complementIds.splice(idx, 1);
+            else this.complementIds.push(id);
+        },
+
+        get selectedRelated() {
+            return this.products.filter(p => this.relatedIds.includes(p.id));
+        },
+
+        get selectedComplement() {
+            return this.products.filter(p => this.complementIds.includes(p.id));
+        },
+    };
+};
+
 Alpine.start();
 
 document.querySelectorAll('[data-countdown]').forEach(timer => {
