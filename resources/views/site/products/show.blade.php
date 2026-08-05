@@ -276,7 +276,7 @@
                     data-tab="description">{{ __('messages.description') }}</button>
             @if(count($specGroups) > 0 || count($textValues) > 0)
                 <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold"
-                        data-tab="specs">مشخصات فنی
+                        data-tab="specs">{{ __('messages.specifications') }}
                 </button>
             @endif
             <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold"
