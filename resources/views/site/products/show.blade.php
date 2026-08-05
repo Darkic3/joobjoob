@@ -407,6 +407,12 @@
         const PRODUCT_VARIANTS = @json($variantsData);
         const PRODUCT_MAIN_SPECS = @json($mainSpecs);
 
+        // قالب‌بندی قیمت بر اساس زبان سایت (fa/ar → ارقام فارسی، سایر → انگلیسی)
+        function formatPrice(n) {
+            const useFa = window.localizeDigits && window.localizeDigits.isPersian();
+            return new Intl.NumberFormat(useFa ? 'fa-IR' : 'en-US').format(n);
+        }
+
         // ===== انتخابگر واریانت =====
         const selections = {}; // groupId -> specId
         let selectedVariant = null;
@@ -480,10 +486,10 @@
                 const priceEl = document.getElementById('display-final-price');
                 const oldEl = document.getElementById('display-old-price');
                 const percentEl = document.getElementById('display-percent');
-                if (priceEl) priceEl.textContent = new Intl.NumberFormat('fa-IR').format(selectedVariant.final_price);
+                if (priceEl) priceEl.textContent = formatPrice(selectedVariant.final_price);
                 if (oldEl) {
                     if (selectedVariant.discount_price > 0) {
-                        oldEl.textContent = new Intl.NumberFormat('fa-IR').format(selectedVariant.price);
+                        oldEl.textContent = formatPrice(selectedVariant.price);
                         oldEl.classList.remove('hidden');
                     } else {
                         oldEl.classList.add('hidden');
