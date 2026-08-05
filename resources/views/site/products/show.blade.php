@@ -78,7 +78,8 @@
     <p class="text-xs mb-5" style="color: var(--text-secondary);">
         <a href="{{ route('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
         <span class="mx-1">/</span>
-        <a href="{{ route('products.index') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
+        <a href="{{ route('products.index') }}"
+           class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
         @if($product->category)
             <span class="mx-1">/</span>
             <span style="color: var(--text-primary);">{{ $product->category->trans('name') }}</span>
@@ -118,7 +119,9 @@
                     <a href="{{ route('products.index', ['brand' => $product->brand->url]) }}"
                        class="inline-flex items-center gap-2 neu-flat-sm px-4 py-2 rounded-xl text-sm font-bold hover:text-[var(--accent)] transition-colors">
                         @if($product->brand->image)
-                            <img src="{{ asset(config('paths.upload', 'uploads') . '/brands/' . $product->brand->image) }}" class="w-6 h-6 object-contain" alt="{{ $product->brand->trans('title') }}">
+                            <img
+                                src="{{ asset(config('paths.upload', 'uploads') . '/brands/' . $product->brand->image) }}"
+                                class="w-6 h-6 object-contain" alt="{{ $product->brand->trans('title') }}">
                         @endif
                         {{ $product->brand->trans('title') }}
                     </a>
@@ -139,7 +142,8 @@
                     <div data-spec-group="{{ $group['id'] }}">
                         <label class="text-sm font-semibold block mb-3">
                             {{ $group['title'] }}
-                            <span class="text-xs font-normal" style="color: var(--text-secondary);" data-selected-label></span>
+                            <span class="text-xs font-normal" style="color: var(--text-secondary);"
+                                  data-selected-label></span>
                         </label>
                         <div class="flex flex-wrap gap-2.5">
                             @foreach($group['children'] as $child)
@@ -174,14 +178,17 @@
                     {{-- قیمت از ارزان‌ترین واریانت --}}
                     @if($minVariant)
                         <div class="flex items-center gap-3" data-price-view>
-                            <span class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr" id="display-final-price">
+                            <span class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr"
+                                  id="display-final-price">
                                 {{ number_format($minVariant->final_price) }}
                             </span>
                             @if($minVariant->discounted_price > 0 && $minVariant->discounted_price < $minVariant->price)
-                                <span class="text-lg line-through" style="color: var(--text-secondary);" dir="ltr" id="display-old-price">
+                                <span class="text-lg line-through" style="color: var(--text-secondary);" dir="ltr"
+                                      id="display-old-price">
                                     {{ number_format($minVariant->price) }}
                                 </span>
-                                <span class="text-xs font-bold bg-red-500 text-white px-2 py-1 rounded-full" id="display-percent">
+                                <span class="text-xs font-bold bg-red-500 text-white px-2 py-1 rounded-full"
+                                      id="display-percent">
                                     {{ $minVariant->percent }}٪-
                                 </span>
                             @endif
@@ -215,9 +222,9 @@
 
             {{-- توضیحات --}}
             <p class="mb-8 leading-relaxed text-sm" style="color: var(--text-secondary);">
-                {{ $product->trans('description') ?: $product->trans('short_description') ?: __('messages.no_description') }}
+                {{ $product->trans('short_description')  ?: __('messages.no_description') }}
             </p>
-
+            {{--            ?: $product->trans('description')--}}
             {{-- فرم افزودن به سبد خرید --}}
             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="space-y-6 mt-auto">
                 @csrf
@@ -226,24 +233,37 @@
                 {{-- تعداد و دکمه خرید --}}
                 <div class="flex items-center gap-4 pt-4 border-t border-[var(--shadow-light)]">
                     <div class="neu-flat-sm flex items-center rounded-lg overflow-hidden">
-                        <button type="button" onclick="decrementQty()" class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">-</button>
+                        <button type="button" onclick="decrementQty()"
+                                class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">
+                            -
+                        </button>
                         <input type="number" id="qty-input" name="qty" value="1" min="1" max="{{ $product->stock }}"
-                               class="w-16 h-10 text-center bg-transparent border-none focus:ring-0 text-sm font-bold" readonly>
-                        <button type="button" onclick="incrementQty({{ max(1, $product->stock) }})" class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">+</button>
+                               class="w-16 h-10 text-center bg-transparent border-none focus:ring-0 text-sm font-bold"
+                               readonly>
+                        <button type="button" onclick="incrementQty({{ max(1, $product->stock) }})"
+                                class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">
+                            +
+                        </button>
                     </div>
 
                     <button type="submit" id="add-to-cart-btn"
                             class="neu-btn neu-btn-primary flex-1 py-3 font-bold text-sm flex items-center justify-center gap-2"
                         @disabled($product->stock === 0)>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
                         {{ __('messages.add_to_cart') }}
                     </button>
                 </div>
 
                 {{-- وضعیت موجودی --}}
-                <p class="text-sm font-semibold flex items-center gap-2" id="stock-status" style="color: {{ $product->stock > 0 ? 'var(--success)' : 'var(--danger)' }}">
-                    <span class="w-2 h-2 rounded-full" style="background-color: {{ $product->stock > 0 ? 'var(--success)' : 'var(--danger)' }}"></span>
-                    <span id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock') . " ({$product->stock} عدد)" : __('messages.out_of_stock') }}</span>
+                <p class="text-sm font-semibold flex items-center gap-2" id="stock-status"
+                   style="color: {{ $product->stock > 0 ? 'var(--success)' : 'var(--danger)' }}">
+                    <span class="w-2 h-2 rounded-full"
+                          style="background-color: {{ $product->stock > 0 ? 'var(--success)' : 'var(--danger)' }}"></span>
+                    <span
+                        id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock') . " ({$product->stock} عدد)" : __('messages.out_of_stock') }}</span>
                 </p>
             </form>
         </div>
@@ -252,11 +272,15 @@
     {{-- ۳. تب‌ها: توضیحات / مشخصات / نظرات --}}
     <section class="mb-14 reveal-on-scroll">
         <div class="flex flex-wrap gap-2 mb-6" id="detail-tabs">
-            <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold active" data-tab="description">{{ __('messages.description') }}</button>
+            <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold active"
+                    data-tab="description">{{ __('messages.description') }}</button>
             @if(count($specGroups) > 0 || count($textValues) > 0)
-                <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold" data-tab="specs">مشخصات فنی</button>
+                <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold"
+                        data-tab="specs">مشخصات فنی
+                </button>
             @endif
-            <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold" data-tab="reviews">{{ __('messages.reviews') }}</button>
+            <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold"
+                    data-tab="reviews">{{ __('messages.reviews') }}</button>
         </div>
 
         {{-- توضیحات --}}
@@ -303,12 +327,15 @@
                     <div class="neu-card p-5 flex flex-col h-full">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
-                                <span class="w-10 h-10 rounded-full neu-flat flex items-center justify-center text-sm font-bold" style="color: var(--accent);">
+                                <span
+                                    class="w-10 h-10 rounded-full neu-flat flex items-center justify-center text-sm font-bold"
+                                    style="color: var(--accent);">
                                     {{ mb_substr($review->user->name ?? 'U', 0, 1) }}
                                 </span>
                                 <div>
                                     <p class="text-sm font-bold">{{ $review->user->name ?? __('messages.user') }}</p>
-                                    <p class="text-[10px]" style="color: var(--text-secondary);">{{ jdate_format('d F Y', strtotime($review->created_at)) }}</p>
+                                    <p class="text-[10px]"
+                                       style="color: var(--text-secondary);">{{ jdate_format('d F Y', strtotime($review->created_at)) }}</p>
                                 </div>
                             </div>
                             <span class="text-[var(--gold)] text-sm tracking-wider">
@@ -335,7 +362,7 @@
             <h2 class="text-xl font-extrabold mb-6">پیشنهاد مکمل</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($complement as $item)
-                    <x-product-card :product="$item" />
+                    <x-product-card :product="$item"/>
                 @endforeach
             </div>
         </section>
@@ -347,7 +374,7 @@
             <h2 class="text-xl font-extrabold mb-6">{{ __('messages.related_products') }}</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($related as $item)
-                    <x-product-card :product="$item" />
+                    <x-product-card :product="$item"/>
                 @endforeach
             </div>
         </section>
@@ -355,13 +382,13 @@
 
     {{-- ۶. اسکیمای JSON-LD --}}
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": "{{ $product->trans('name') }}",
+        {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": "{{ $product->trans('name') }}",
         "image": "{{ $mainImage }}",
         @if($product->brand)
-        "brand": { "@type": "Brand", "name": "{{ $product->brand->trans('title') }}" },
+            "brand": { "@type": "Brand", "name": "{{ $product->brand->trans('title') }}" },
         @endif
         "offers": {
             "@type": "Offer",
@@ -439,7 +466,10 @@
                     const has = PRODUCT_VARIANTS.some(v =>
                         v.spec_ids.includes(specId) && v.spec_ids.includes(otherSpec)
                     );
-                    if (!has) { compatible = false; break; }
+                    if (!has) {
+                        compatible = false;
+                        break;
+                    }
                 }
                 btn.classList.toggle('variant-disabled', !compatible);
             });
@@ -517,6 +547,7 @@
             const m = selectedVariant ? selectedVariant.stock : max;
             if (val < m) input.value = val + 1;
         }
+
         function decrementQty() {
             const input = document.getElementById('qty-input');
             const val = parseInt(input.value);
@@ -540,10 +571,12 @@
             color: var(--accent);
             font-weight: 700;
         }
+
         .variant-option.variant-disabled {
             opacity: 0.35;
             pointer-events: none;
         }
+
         .detail-tab.active {
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             color: var(--accent);
