@@ -48,6 +48,8 @@ return [
     'dark_mode' => 'Dark Mode',
     'deal_ends_in' => 'Deal ends in',
 
+    'specifications' => 'Specifications',
+    'description' => 'Description',
     'login' => 'login',
     'register' => 'register',
     'footer_desc' => 'footer_description',

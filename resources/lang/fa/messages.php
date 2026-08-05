@@ -53,6 +53,8 @@ return [
     'verified_purchase' => 'تایید شده',
     'dont_miss_out' => 'از دستش نده',
 
+    'specifications' => 'مشخصات فنی',
+    'description' => 'توضیحات',
     'reset' => 'حذف فیلترها',
     'all' => 'همه',
     'login' => 'ورود',
