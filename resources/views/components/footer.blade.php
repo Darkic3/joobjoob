@@ -35,6 +35,6 @@
     </div>
 
     <p class="text-center text-sm mt-8" style="color: var(--text-secondary);">
-        &copy; {{ date('Y') }} {{ __('messages.site_name') }}
+        &copy; {{ jdate_format('Y') }} {{ __('messages.site_name') }}
     </p>
 </footer>

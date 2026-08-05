@@ -6,7 +6,7 @@
     @foreach($orders as $order)
         <div class="neu-card flex justify-between items-center text-sm">
             <span>#{{ $order->id }}</span>
-            <span>{{ $order->created_at->format('Y-m-d') }}</span>
+            <span>{{ jdate_format('Y/m/d', strtotime($order->created_at)) }}</span>
             <span>{{ number_format($order->total) }}</span>
             <span class="neu-badge neu-badge-success">{{ $order->status }}</span>
         </div>

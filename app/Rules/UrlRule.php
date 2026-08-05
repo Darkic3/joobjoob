@@ -8,7 +8,8 @@ class UrlRule implements Rule
 {
     public function __construct(
         protected string $modelClass,
-        protected ?int $exceptId = null
+        protected ?int $exceptId = null,
+        protected string $column = 'slug'
     ) {}
 
     public function passes($attribute, $value): bool
@@ -20,7 +21,7 @@ class UrlRule implements Rule
         $model = new $this->modelClass;
 
         $query = $model->newQuery()
-            ->where('slug', $value)
+            ->where($this->column, $value)
             ->whereNull('deleted_at');
 
         if ($this->exceptId) {

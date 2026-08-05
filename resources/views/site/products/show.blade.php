@@ -308,7 +308,7 @@
                                 </span>
                                 <div>
                                     <p class="text-sm font-bold">{{ $review->user->name ?? __('messages.user') }}</p>
-                                    <p class="text-[10px]" style="color: var(--text-secondary);">{{ $review->created_at->diffForHumans() }}</p>
+                                    <p class="text-[10px]" style="color: var(--text-secondary);">{{ jdate_format('d F Y', strtotime($review->created_at)) }}</p>
                                 </div>
                             </div>
                             <span class="text-[var(--gold)] text-sm tracking-wider">

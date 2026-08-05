@@ -34,7 +34,7 @@ class BrandRequest extends FormRequest
             'title'              => 'required|array',
             'title.fa'           => 'required|string|max:255',
             'title.en'           => 'nullable|string|max:255',
-            'url'                => ['required', 'string', 'max:255', new UrlRule(Brand::class, $id)],
+            'url'                => ['required', 'string', 'max:255', new UrlRule(Brand::class, $id, 'url')],
             'description'        => 'nullable|array',
             'description.fa'     => 'nullable|string',
             'description.en'     => 'nullable|string',

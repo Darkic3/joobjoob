@@ -19,8 +19,14 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-    {{--    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>--}}
+    {{-- CKEditor محلی پروژه --}}
+    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>
+    {{-- جلالی: کتابخانه تبدیل تاریخ + پیکر شمسی --}}
+    <script src="{{ asset('assets/admin/js/jalali.js') }}"></script>
+    <script src="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.js') }}"></script>
+    <!-- Jalali Datepicker -->
+    <link rel="stylesheet" href="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.css') }}">
+
     @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
     @stack('styles')
 </head>

@@ -180,9 +180,7 @@
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">تاریخ پایان تخفیف</label>
-            <input type="datetime-local" name="deal_ends_at" value="{{ $oldVal('deal_ends_at') ? \Carbon\Carbon::parse($oldVal('deal_ends_at'))->format('Y-m-d\TH:i') : '' }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-            @error('deal_ends_at') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <x-admin.jalali-datetime name="deal_ends_at" :value="$oldVal('deal_ends_at')" label="تاریخ پایان تخفیف" />
         </div>
 
         <div class="lg:col-span-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
@@ -199,15 +197,11 @@
         </div>
 
         <div class="lg:col-span-1">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">شروع تایمر</label>
-            <input type="datetime-local" name="start_timer" value="{{ $oldVal('start_timer') ? \Carbon\Carbon::parse($oldVal('start_timer'))->format('Y-m-d\TH:i') : '' }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-            @error('start_timer') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <x-admin.jalali-datetime name="start_timer" :value="$oldVal('start_timer')" label="شروع تایمر" />
         </div>
 
         <div class="lg:col-span-1">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">پایان تایمر</label>
-            <input type="datetime-local" name="end_timer" value="{{ $oldVal('end_timer') ? \Carbon\Carbon::parse($oldVal('end_timer'))->format('Y-m-d\TH:i') : '' }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
-            @error('end_timer') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <x-admin.jalali-datetime name="end_timer" :value="$oldVal('end_timer')" label="پایان تایمر" />
         </div>
 
         <div>
