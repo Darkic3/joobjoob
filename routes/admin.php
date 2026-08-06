@@ -33,7 +33,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('hero-slides', HeroSlideController::class);
         Route::resource('trust-badges', TrustBadgeController::class);
         Route::resource('products', ProductController::class);
-        Route::resource('product-categories', ProductCategoryController::class);
+        // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
+        Route::resource('product-categories', ProductCategoryController::class)->except('show');
         Route::resource('brands', BrandController::class);
         Route::resource('specifications', SpecificationController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ هم کلید show ندارد

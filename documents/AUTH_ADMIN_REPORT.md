@@ -764,7 +764,7 @@ curl -i http://site.test/admin/roles              # → 302 به لاگین
 
 | # | کار | فایل | وضعیت |
 |---|---|---|---|
-| 29 | تست‌های Feature: `AdminAuthTest` + `AdminPermissionTest` + `RoleCrudTest` + `UserCrudTest` | `tests/Feature/*` | ✅ ۳۵ تست پاس (۱۴۵ assertion) |
+| 29 | تست‌های Feature: `AdminAuthTest` + `AdminPermissionTest` + `RoleCrudTest` + `UserCrudTest` + `ProductCategoryCrudTest` | `tests/Feature/*` | ✅ ۴۳ تست پاس (۱۷۰ assertion) |
 | 30 | `php artisan test` + `vendor/bin/pint` روی فایل‌های جدید | — | ✅ همه سبز |
 | 31 | تست کامل در مرورگر (لاگین، محدودیت، خروج) | — | ✅ همه سبز |
 | 32 | ریویو کد + به‌روزرسانی سند (تیک زدن چک‌لیست‌ها) | `documents/AUTH_ADMIN_REPORT.md` | ✅ |
@@ -774,7 +774,13 @@ curl -i http://site.test/admin/roles              # → 302 به لاگین
 > اجرا شد: گارد کامل رابط کاربری — سایدبار (دسکتاپ + موبایل) هر لینک را فقط با پرمیشن مربوطه نمایش می‌دهد، گروه‌های زیرمنو در صورت نبود هیچ دسترسی‌ای کلاً حذف می‌شوند، دکمه‌های «افزودن» در تمام indexها گارد شدند، داشبورد لینک‌ها و بخش‌هایش را شرطی کرد، و صفحه لاگین کاربرِ لاگین‌شده را به داشبورد می‌فرستد.
 > تأیید زنده با curl: مهمان روی ۷ روت اصلی → همه 302 لاگین ✓ | کاربر محدود (فقط `products.index`): سایدبار فقط محصولات/داشبورد دارد، دکمه «افزودن محصول» نیست، مستقیم روی `/admin/blogs` → 403 ✓
 > 🛠️ از ریویو: کاربر محدود می‌توانست با `users.create` نقش سیستمی `main` (همه دسترسی‌ها) به کاربر جدید بدهد — در `store` و `update` نقش‌های `is_system` برای غیر سوپرادمین فیلتر شد (تست: `test_non_super_admin_cannot_assign_system_role`).
-> ⚠️ یافته جانبی: `ProductCategoryController` خالی است (بدون متد) — روت `admin.product-categories.*` فعلاً خطا می‌دهد و باید کامل شود (دکمه سایدبارش گارد دارد ولی صفحه‌ای ندارد).
+
+### تکمیل CRUD دسته‌بندی محصولات ✅ انجام شد
+
+> کنترلر خالی `ProductCategoryController` کامل شد: index (جستجو/فیلتر/صفحه‌بندی)، create/store/edit/update (نام ترجمه‌پذیر fa/en، اسلاگ خودکار از نام فارسی با `data-auto-slug`، والد، آیکون، تصویر، توضیحات و متاهای چندزبانه، toggle فعال/غیرفعال) و destroy.
+> ⚠️ **گارد حذف حیاتی:** ستون `product_category_id` محصولات `cascadeOnDelete` دارد — حذف دسته = حذف همه محصولاتش! `destroy` وقتی دسته محصول یا زیردسته دارد، رد می‌شود (پیام خطا).
+> 🎯 روت `admin.product-categories.show` با `->except('show')` حذف شد (کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد — همان تله 403 نقش‌ها).
+> تست‌ها: `tests/Feature/ProductCategoryCrudTest.php` — ۸ تست (پرمیشن، ساخت، اعتبارسنجی زبان، اسلاگ تکراری، آپدیت، گارد حذف محصول/زیردسته، حذف دسته خالی).
 
 ✅ گیت نهایی: همه تست‌ها سبز + سناریوی دستی تأیید + سند به‌روز
 
