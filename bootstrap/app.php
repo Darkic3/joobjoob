@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'log.admin' => \App\Http\Middleware\LogAdminRequests::class,
         ]);
 
-        $middleware->prepend([
+        $middleware->web([
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SetTheme::class,
         ]);
