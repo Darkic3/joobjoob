@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
     protected $fillable = [
-        'key', 'value', 'type', 'group', 'label', 'options', 'sort'
+        'key', 'value', 'type', 'group', 'label', 'options', 'sort',
     ];
 
     protected function casts(): array
@@ -21,7 +21,9 @@ class Setting extends Model
     public static function getValue(string $key, mixed $default = null): mixed
     {
         $setting = static::where('key', $key)->first();
-        if (!$setting) return $default;
+        if (! $setting) {
+            return $default;
+        }
 
         return match ($setting->type) {
             'json' => json_decode($setting->value, true),

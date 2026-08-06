@@ -8,7 +8,7 @@
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center gap-4">
 
         <a href="{{ route('home') }}" class="neu-flat-sm px-4 py-2 font-black text-lg shrink-0" style="color:var(--accent);">
-            {{ __('messages.site_name') }}
+            {{ setting('site_name', __('messages.site_name')) }}
         </a>
 
         <nav class="hidden lg:flex items-center gap-1 ms-2">

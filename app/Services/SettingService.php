@@ -67,12 +67,16 @@ class SettingService
             $configFields = $this->fieldsForGroup($group);
 
             foreach ($configFields as $key => $field) {
+                $isFileType = in_array($field['type'] ?? 'text', ['file', 'video'], true);
                 $value = $data[$key] ?? null;
                 $file = $files[$key] ?? null;
 
                 // اگر فایل آپلود شده باشد
                 if ($file instanceof UploadedFile) {
                     $value = $this->handleFileUpload($key, $file, $field['type']);
+                } elseif ($isFileType) {
+                    // فیلد فایل بدون آپلود جدید → مقدار قبلی حفظ شود (از بین نرود)
+                    $value = Setting::where('key', $key)->value('value');
                 }
 
                 // ذخیره در دیتابیس
