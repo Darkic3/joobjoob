@@ -7,11 +7,15 @@
      class="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" x-cloak></div>
 
 {{-- Sidebar Drawer --}}
-<aside x-show="mobileSidebar" x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
+<aside x-show="mobileSidebar" x-cloak
+       x-data="{ isRtl: document.documentElement.getAttribute('dir') === 'rtl' }"
+       x-transition:enter="transition ease-out duration-300"
+       :x-transition:enter-start="isRtl ? 'translate-x-full' : '-translate-x-full'"
+       x-transition:enter-end="translate-x-0"
        x-transition:leave="transition ease-in duration-200"
-       x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-       class="fixed inset-y-0 right-0 w-72 bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col shadow-lg" x-cloak>
+       x-transition:leave-start="translate-x-0"
+       :x-transition:leave-end="isRtl ? 'translate-x-full' : '-translate-x-full'"
+       class="fixed inset-y-0 start-0 w-72 bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col shadow-lg">
 
     <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 dark:border-gray-700">
         <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-2.5">

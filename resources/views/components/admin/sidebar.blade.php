@@ -1,5 +1,5 @@
 <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
-       class="hidden lg:flex flex-col bg-white dark:bg-gray-800 border-s border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out fixed inset-y-0 right-0 z-30 shadow-sm">
+       class="hidden lg:flex flex-col bg-white dark:bg-gray-800 border-s border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out fixed inset-y-0 start-0 z-30 shadow-sm">
 
     {{-- Sidebar Header --}}
     <div class="flex items-center h-16 border-b border-gray-100 dark:border-gray-700 transition-all duration-300"
@@ -42,8 +42,8 @@
         </div>
 
         {{-- Hero-Slide --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.hero-slides.*') ? 'true' : 'false' }} }">
-            <button @click="open = !open"
+        <div x-data="{ open: {{ request()->routeIs('admin.hero-slides.*') ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
+            <button @click="if (!sidebarOpen) { sidebarOpen = true; open = true; } else { open = !open; }"
                     class="sidebar-link w-full {{ request()->routeIs('admin.hero-slides.*') ? 'sidebar-link-active' : '' }}">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -83,8 +83,8 @@
         {{-- ========================================== --}}
         {{-- مدیریت محصولات --}}
         {{-- ========================================== --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.products.*') ? 'true' : 'false' }} }">
-            <button @click="open = !open"
+        <div x-data="{ open: {{ request()->routeIs('admin.products.*') ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
+            <button @click="if (!sidebarOpen) { sidebarOpen = true; open = true; } else { open = !open; }"
                     class="sidebar-link w-full {{ request()->routeIs('admin.products.*') ? 'sidebar-link-active' : '' }}">
                 {{-- آیکون جعبه/محصول --}}
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,8 +143,8 @@
         {{-- ========================================== --}}
         {{-- مدیریت دسته‌بندی محصولات --}}
         {{-- ========================================== --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.product-categories.*') ? 'true' : 'false' }} }">
-            <button @click="open = !open"
+        <div x-data="{ open: {{ request()->routeIs('admin.product-categories.*') ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
+            <button @click="if (!sidebarOpen) { sidebarOpen = true; open = true; } else { open = !open; }"
                     class="sidebar-link w-full {{ request()->routeIs('admin.product-categories.*') ? 'sidebar-link-active' : '' }}">
                 {{-- آیکون تگ/دسته‌بندی --}}
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,8 +183,8 @@
         </div>
 
         {{-- Blog --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') ? 'true' : 'false' }} }">
-            <button @click="open = !open"
+        <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
+            <button @click="if (!sidebarOpen) { sidebarOpen = true; open = true; } else { open = !open; }"
                     class="sidebar-link w-full {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') ? 'sidebar-link-active' : '' }}">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
@@ -222,8 +222,8 @@
         </div>
 
         {{-- Trust Badges --}}
-        <div x-data="{ open: {{ request()->routeIs('admin.trust-badges.*') ? 'true' : 'false' }} }">
-            <button @click="open = !open"
+        <div x-data="{ open: {{ request()->routeIs('admin.trust-badges.*') ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
+            <button @click="if (!sidebarOpen) { sidebarOpen = true; open = true; } else { open = !open; }"
                     class="sidebar-link w-full {{ request()->routeIs('admin.trust-badges.*') ? 'sidebar-link-active' : '' }}">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>

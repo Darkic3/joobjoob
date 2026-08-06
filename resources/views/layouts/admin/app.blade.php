@@ -40,7 +40,7 @@
 <x-admin.toast/>
 
 <div x-data="{ sidebarOpen: true, mobileSidebar: false }"
-     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
+     @toggle-sidebar.window="sidebarOpen = !sidebarOpen; if (!sidebarOpen) $dispatch('sidebar-closed')"
      @toggle-mobile.window="mobileSidebar = true"
      @close-mobile.window="mobileSidebar = false"
      class="flex min-h-screen">
@@ -48,7 +48,7 @@
     <x-admin.sidebar/>
 
     <div class="flex-1 flex flex-col min-h-screen transition-all duration-300"
-         :class="{ 'lg:mr-20': !sidebarOpen, 'lg:mr-64': sidebarOpen }">
+         :class="{ 'lg:ms-20': !sidebarOpen, 'lg:ms-64': sidebarOpen }">
 
         <x-admin.header/>
 

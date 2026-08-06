@@ -51,7 +51,7 @@
                      x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50">
+                     class="absolute end-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50">
                     @foreach($locales as $code => $label)
                         <a href="{{ request()->fullUrlWithQuery(['lang' => $code]) }}"
                            class="flex items-center justify-between px-4 py-2 text-sm transition-colors {{ $currentLocale === $code ? 'text-primary-600 dark:text-primary-400 font-bold bg-primary-50 dark:bg-primary-900/20' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
@@ -88,7 +88,7 @@
                      x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
+                     class="absolute end-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
                     <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
                         <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ __('admin.layout.notifications') }}</p>
                     </div>
@@ -119,7 +119,7 @@
                      x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
+                     class="absolute end-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
                     <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ $user->name ?? __('admin.layout.unknown') }} {{ $user->family ?? '' }}</p>
                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ $user->email ?? '' }}</p>
