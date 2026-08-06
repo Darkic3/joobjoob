@@ -248,3 +248,92 @@
 .dark .bg-white.dark\:bg-gray-300 {
     background-color: rgb(209 213 219 / 1) !important; /* = gray-300 */
 }
+
+/* 5. هماهنگ‌سازی کامپوننت‌های بوت‌استرپ در دارک مود
+   کارت، هدر صفحه، تب‌ها و دکمه‌های ذخیره/انصراف (btn-light) با تم دارک هماهنگ می‌شوند */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+    color: rgb(243 244 246 / 1); /* = gray-100 */
+}
+
+.dark .card,
+.dark .card .card-body {
+    background-color: rgb(31 41 55 / 1) !important; /* = gray-800 */
+    border-color: rgb(55 65 81 / 1) !important;     /* = gray-700 */
+    color: rgb(229 231 235 / 1);                    /* = gray-100 */
+}
+
+.dark .bg-light {
+    background-color: rgb(31 41 55 / 1) !important; /* = gray-800 */
+}
+
+.dark .card-footer.bg-light {
+    background-color: rgb(31 41 55 / 1) !important; /* = gray-800 */
+    border-top-color: rgb(55 65 81 / 1) !important; /* = gray-700 */
+}
+
+.dark .form-control,
+.dark .form-select {
+    background-color: rgb(55 65 81 / 1);  /* = gray-700 */
+    border-color: rgb(75 85 99 / 1);      /* = gray-600 */
+    color: rgb(229 231 235 / 1);          /* = gray-100 */
+}
+
+.dark .form-control:focus,
+.dark .form-select:focus {
+    background-color: rgb(55 65 81 / 1);
+    border-color: rgb(96 165 250 / 1);    /* = blue-400 */
+    color: rgb(229 231 235 / 1);
+    box-shadow: 0 0 0 0.25rem rgba(96, 165, 250, 0.25);
+}
+
+.dark .form-control::placeholder {
+    color: rgb(156 163 175 / 1); /* = gray-400 */
+}
+
+.dark .form-label {
+    color: rgb(229 231 235 / 1); /* = gray-100 */
+}
+
+.dark .text-muted {
+    color: rgb(156 163 175 / 1) !important; /* = gray-400 */
+}
+
+.dark .alert-light {
+    background-color: rgb(31 41 55 / 1);
+    border-color: rgb(75 85 99 / 1);
+    color: rgb(209 213 219 / 1);
+}
+
+/* تب‌های تنظیمات */
+.dark .nav-tabs .nav-link {
+    color: rgb(156 163 175 / 1); /* = gray-400 */
+    border-bottom-color: transparent;
+}
+
+.dark .nav-tabs .nav-link:hover:not(.active) {
+    color: rgb(96 165 250 / 1);              /* = blue-400 */
+    border-bottom-color: rgb(55 65 81 / 1);  /* = gray-700 */
+}
+
+.dark .nav-tabs .nav-link.active {
+    color: rgb(96 165 250 / 1);              /* = blue-400 */
+    background-color: transparent;
+    border-bottom-color: rgb(96 165 250 / 1);
+}
+
+/* دکمه‌های انصراف (btn-light) در دارک مود */
+.dark .btn-light {
+    background-color: rgb(55 65 81 / 1) !important; /* = gray-700 */
+    border-color: rgb(75 85 99 / 1) !important;     /* = gray-600 */
+    color: rgb(229 231 235 / 1) !important;         /* = gray-100 */
+}
+
+.dark .btn-light:hover {
+    background-color: rgb(75 85 99 / 1) !important; /* = gray-600 */
+    color: rgb(255 255 255 / 1) !important;
+}
