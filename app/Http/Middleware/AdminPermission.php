@@ -4,36 +4,40 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * محافظ RBAC پنل ادمین — طبق بلوپرینت documents/AUTH_ADMIN_REPORT.md
+ *
+ * ترتیب منطق:
+ *  ۱) لاگین نیست → ریدایرکت به لاگین (یا 401 برای AJAX)
+ *  ۲) سوپرادمین (is_admin) → عبور بدون چک (هرگز قفل نمی‌شود)
+ *  ۳) روت‌های لیست سفید (فقط احراز هویت) → عبور
+ *  ۴) در غیر این صورت → وجود نام روت در دسترسی‌های نقش‌های کاربر (با کش)
+ */
 class AdminPermission
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Admin permission check disabled - handle later
-        // if (Auth::check() && Auth::user()->is_admin == 1) {
-        //
-        //     $user = Auth::user();
-        //     $currentRoute = Route::currentRouteName();
-        //
-        //     if ($currentRoute == 'admin.dashboard.index') {
-        //         return $next($request);
-        //     }
-        //
-        //     if ($user->hasAccess($currentRoute)) {
-        //         return $next($request);
-        //     }
-        //
-        //     if ($request->ajax()) {
-        //         return response('Unauthorized.', 401);
-        //     }
-        //     return redirect()->route('admin.dashboard.index')
-        //         ->with('error', 'شما به این بخش دسترسی ندارید.');
-        //
-        // }
-        // return redirect()->route('admin.login');
+        $user = $request->user();
+
+        if (! $user) {
+            return $request->expectsJson()
+                ? response()->json(['message' => __('admin.login.restricted')], 401)
+                : redirect()->guest(route('admin.login'));
+        }
+
+        if ($user->is_admin) {
+            return $next($request);
+        }
+
+        $routeName = $request->route()?->getName();
+
+        if ($routeName && in_array($routeName, config('permissions.free', []), true)) {
+            return $next($request);
+        }
+
+        abort_unless($routeName && $user->canAccess($routeName), 403);
 
         return $next($request);
     }

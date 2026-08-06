@@ -29,6 +29,12 @@ return [
         'change_lang'    => 'Dili değiştir',
     ],
 
+    'errors' => [
+        'too_many_attempts'      => 'Çok fazla başarısız deneme',
+        'too_many_attempts_desc' => 'Lütfen bir an bekleyip tekrar deneyin. Bu sınır hesabınızı korumak içindir.',
+        'back_to_login'          => 'Giriş Sayfasına Dön',
+    ],
+
     'layout' => [
         'panel'          => 'Yönetim Paneli',
         'view_site'      => 'Siteyi Görüntüle',

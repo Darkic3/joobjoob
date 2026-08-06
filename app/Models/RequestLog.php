@@ -16,6 +16,10 @@ class RequestLog extends Model
         'payload',
     ];
 
+    protected $casts = [
+        'payload' => 'array',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

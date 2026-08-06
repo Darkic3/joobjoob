@@ -3,7 +3,6 @@
 // Yönetim paneli izin başlıkları — Türkçe
 return [
     'groups' => [
-        'dashboard'         => 'Kontrol Paneli',
         'products'          => 'Ürünler',
         'product-categories' => 'Ürün Kategorileri',
         'brands'            => 'Markalar',
@@ -20,9 +19,6 @@ return [
     ],
 
     'access' => [
-        'dashboard' => [
-            'index' => 'Kontrol panelini görüntüle',
-        ],
         'products' => [
             'index'  => 'Ürünleri görüntüle',
             'create' => 'Ürün ekle',

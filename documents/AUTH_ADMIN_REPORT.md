@@ -262,18 +262,18 @@ trait HasAdminPermissions
 return [
 
     // روت‌هایی که فقط «احراز هویت» می‌خواهند، نه دسترسی خاص
-    // (مثلاً آپلود CKEditor که هر ادمین لاگین‌شده باید بتواند استفاده کند)
+    // (آپلود CKEditor، خروج و داشبورد — هر ادمین لاگین‌شده باید به آن‌ها دسترسی داشته باشد؛
+    //  داشبورد صرفاً نمای کلی است و قدرت تخریبی ندارد)
     'free' => [
         'admin.ckeditor.upload',
+        'admin.logout',
+        'admin.dashboard.index',
     ],
 
     'permissions' => [
 
-        'dashboard' => [
-            'title'  => 'permissions.groups.dashboard',
-            'access' => ['index' => 'permissions.access.dashboard.index'],
-        ],
-
+        // ⚠️ گروه dashboard عمداً در درخت نیست — چون admin.dashboard.index در لیست free است
+        // و هر ادمینِ لاگین‌شده آن را می‌بیند (نمای کلی، بدون قدرت تخریبی).
         // ⚠️ کلید هر گروه باید دقیقاً بخش نام روت واقعی باشد (جمع، مثل Route::resource)
         'products' => [
             'title'  => 'permissions.groups.products',
@@ -680,7 +680,12 @@ curl -i http://site.test/admin/roles              # → 302 به لاگین
 
 ✅ گیت: `config('permissions.permissions')` بدون خطا + `php -l` همه فایل‌ها
 
-### فاز ۳ — میدلور، لاگین و روت‌ها (۴۰ → ۶۵٪) ☐
+### فاز ۳ — میدلور، لاگین و روت‌ها (۴۰ → ۶۵٪) ✅ انجام شده
+
+> اجرا شد: میدلور `AdminPermission` فعال (بای‌پس سوپرادمین + لیست free + abort 403)، کنترلر `AdminAuthController` (throttle:5,1 + چک ادمین واقعی + regenerate)، همه روت‌های ادمین زیر `['auth','adminPermission','log.admin']`، داشبورد به `/admin/dashboard` منتقل شد، خروج سایدبار → فرم POST، `redirectGuestsTo` برای مهمان‌ها، حذف json_encode دستی در `LogAdminRequests` + کست `payload` در مدل.
+> نکته: `admin.logout` و `admin.dashboard.index` به لیست free اضافه شدند (هر ادمین لاگین‌شده باید بتواند خارج شود و داشبورد را ببیند — داشبورد صرفاً نمای کلی است).
+> تأیید زنده با curl: مهمان → 302 لاگین | رمز غلط → 302 | کاربر بدون نقش → 302 | ادمین → داشبورد 200 | کاربر محدود → products 200 / blogs 403 / brands 403 | خروج → 302 لاگین و دسترسی مجدد مسدود.
+> 🎨 از ریویو: گروه `dashboard` از درخت حذف شد (چون در free است، چک‌باکس بی‌اثر می‌ساخت) + صفحه `429` سفارشی (به‌جای صفحه خالی Too Many Requests) + رفع لینک مرده `/dashboard` در welcome.
 
 | # | کار | فایل | جزئیات کلیدی |
 |---|---|---|---|

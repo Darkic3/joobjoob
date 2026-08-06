@@ -7,16 +7,17 @@
 return [
 
     // روت‌هایی که فقط «احراز هویت» می‌خواهند، نه دسترسی خاص
+    // (خروج و داشبورد برای هر ادمینِ لاگین‌شده آزادند — داشبورد صرفاً نمای کلی است)
     'free' => [
         'admin.ckeditor.upload',
+        'admin.logout',
+        'admin.dashboard.index',
     ],
 
     'permissions' => [
 
-        'dashboard' => [
-            'title'  => 'permissions.groups.dashboard',
-            'access' => ['index' => 'permissions.access.dashboard.index'],
-        ],
+        // ⚠️ گروه dashboard عمداً در درخت نیست — چون admin.dashboard.index در لیست free است
+        // و هر ادمینِ لاگین‌شده به آن دسترسی دارد (نمای کلی، بدون قدرت تخریبی).
 
         'products' => [
             'title'  => 'permissions.groups.products',

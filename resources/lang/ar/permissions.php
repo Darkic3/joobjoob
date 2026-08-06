@@ -3,7 +3,6 @@
 // عناوين صلاحيات لوحة التحكم — العربية
 return [
     'groups' => [
-        'dashboard'         => 'لوحة المعلومات',
         'products'          => 'المنتجات',
         'product-categories' => 'فئات المنتجات',
         'brands'            => 'العلامات التجارية',
@@ -20,9 +19,6 @@ return [
     ],
 
     'access' => [
-        'dashboard' => [
-            'index' => 'عرض لوحة المعلومات',
-        ],
         'products' => [
             'index'  => 'عرض المنتجات',
             'create' => 'إضافة منتج',

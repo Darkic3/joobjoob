@@ -3,7 +3,6 @@
 // Admin permission titles — English
 return [
     'groups' => [
-        'dashboard'         => 'Dashboard',
         'products'          => 'Products',
         'product-categories' => 'Product Categories',
         'brands'            => 'Brands',
@@ -20,9 +19,6 @@ return [
     ],
 
     'access' => [
-        'dashboard' => [
-            'index' => 'View dashboard',
-        ],
         'products' => [
             'index'  => 'View products',
             'create' => 'Add product',

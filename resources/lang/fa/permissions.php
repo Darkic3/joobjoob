@@ -3,7 +3,6 @@
 // عناوین دسترسی‌های پنل ادمین — فارسی
 return [
     'groups' => [
-        'dashboard'         => 'داشبورد',
         'products'          => 'محصولات',
         'product-categories' => 'دسته‌بندی محصولات',
         'brands'            => 'برندها',
@@ -20,9 +19,6 @@ return [
     ],
 
     'access' => [
-        'dashboard' => [
-            'index' => 'مشاهده داشبورد',
-        ],
         'products' => [
             'index'  => 'مشاهده محصولات',
             'create' => 'افزودن محصول',

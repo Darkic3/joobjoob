@@ -29,6 +29,12 @@ return [
         'change_lang'    => 'Change language',
     ],
 
+    'errors' => [
+        'too_many_attempts'      => 'Too many failed attempts',
+        'too_many_attempts_desc' => 'Please wait a moment and try again. This limit protects your account.',
+        'back_to_login'          => 'Back to Login',
+    ],
+
     'layout' => [
         'panel'          => 'Admin Panel',
         'view_site'      => 'View Site',

@@ -133,8 +133,8 @@
 </head>
 
 @php
-    // فعلاً فقط طراحی — تا وقتی روتر لاگین تعریف نشده، آدرس پیش‌فرض استفاده می‌شود
-    $loginAction = Route::has('admin.logger') ? route('admin.logger') : url('/admin/login');
+    // لاگین واقعی — POST /admin/login (admin.login.submit)
+    $loginAction = route('admin.login.submit');
     $resetAction = Route::has('admin.password.email') ? route('admin.password.email') : null;
     $errorsBag   = $errors ?? null;
     $hasError    = session('error') || ($errorsBag && $errorsBag->any());
