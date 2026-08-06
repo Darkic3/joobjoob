@@ -95,7 +95,7 @@ users.is_admin (boolean)  ← سوپرادمین: بدون هیچ چکی از ه
 |---|---|
 | `resources/views/admin/auth/login.blade.php` | صفحه لاگین — **الگوی مرجع**: برندینگ و کلاس‌های CSS مخصوص Shopora را با پروژه خودتان تطبیق دهید (فرم باید به `route('admin.login.submit')` پست کند) |
 | `resources/views/admin/roles/{index,create,edit,_form}.blade.php` | CRUD نقش با چک‌باکس درختی |
-| `resources/views/admin/users/{index,edit}.blade.php` | مدیریت کاربران |
+| `resources/views/admin/users/{index,create,edit}.blade.php` | مدیریت کاربران (لیست / افزودن / ویرایش) |
 | `resources/views/components/admin/sidebar.blade.php` + `mobile-sidebar.blade.php` | ⚠️ **فقط الگو** — منوی «نقش‌ها» و «کاربران» را بردارید و با روت‌های پروژه خودتان تطبیق دهید (سایدبار Shopora به روت‌هایی مثل hero-slides ارجاع می‌دهد که در پروژه جدید وجود ندارند) |
 
 ### 🌐 ترجمه‌ها (۸ فایل)

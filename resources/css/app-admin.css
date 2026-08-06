@@ -107,11 +107,11 @@
 
     .sidebar-link-active::before {
         content: '';
-        @apply absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-600 dark:bg-primary-400 rounded-l-full;
+        @apply absolute start-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-600 dark:bg-primary-400 rounded-s-full;
     }
 
     .sidebar-submenu {
-        @apply mt-1 ms-4 ps-3 border-r-2 border-gray-100 dark:border-gray-700 space-y-1;
+        @apply mt-1 ms-4 ps-3 border-s-2 border-gray-100 dark:border-gray-700 space-y-1;
     }
 
     .stat-card {

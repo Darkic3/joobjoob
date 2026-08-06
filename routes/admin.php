@@ -39,9 +39,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ هم کلید show ندارد
         // (اگر روت show می‌ماند، نقش main هم به آن دسترسی نداشت → تله 403)
         Route::resource('roles', RoleController::class)->except('show');
-        // مدیریت کاربران: فقط index/edit/update — ساخت کاربر از سمت فروشگاه است
-        // و حذف کاربران به عهده‌ی فلوهای آینده (deactivate) است
-        Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+        // مدیریت کاربران: index/edit/update + create/store (ساخت کاربر از پنل ادمین)
+        // حذف کاربران به عهده‌ی فلوهای آینده (deactivate) است
+        Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 
         Route::get('settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');

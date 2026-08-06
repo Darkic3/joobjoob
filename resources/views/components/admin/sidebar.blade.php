@@ -62,10 +62,10 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.products') }}</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-start">{{ __('admin.sidebar.products') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
-                     :class="open ? '-rotate-90' : ''"
+                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                     :class="open ? '-rotate-90' : 'ltr:rotate-180'"
                      class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -118,10 +118,10 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.blog') }}</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-start">{{ __('admin.sidebar.blog') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
-                     :class="open ? '-rotate-90' : ''"
+                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                     :class="open ? '-rotate-90' : 'ltr:rotate-180'"
                      class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>

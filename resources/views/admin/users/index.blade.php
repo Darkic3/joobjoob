@@ -11,6 +11,12 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">مدیریت کاربران</h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">نقش‌ها و وضعیت دسترسی هر کاربر را مدیریت کنید.</p>
             </div>
+            @if(auth()->user()->canAccess('admin.users.create'))
+                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    افزودن کاربر
+                </a>
+            @endif
         </div>
 
         {{-- جستجو و فیلتر --}}

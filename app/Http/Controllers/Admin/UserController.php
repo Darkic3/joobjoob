@@ -36,6 +36,44 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
+    public function create(): View
+    {
+        $roles = Role::orderBy('is_system', 'desc')->orderBy('name')->get();
+
+        return view('admin.users.create', compact('roles'));
+    }
+
+    public function store(UserRequest $request): RedirectResponse
+    {
+        $isSuperAdmin = auth()->user()->is_admin;
+
+        $data = $request->safe()->except(['password', 'roles', 'is_admin', 'is_active']);
+        $data['password'] = $request->string('password');
+
+        // 🔒 فقط سوپرادمین می‌تواند ادمین بسازد؛ کاربر با دسترسی users.create
+        // فقط کاربر عادی و فعال می‌سازد (هرگز نمی‌تواند is_admin/is_active را جعل کند)
+        $data['is_admin'] = $isSuperAdmin && $request->boolean('is_admin');
+        $data['is_active'] = $isSuperAdmin ? $request->boolean('is_active', true) : true;
+
+        $user = User::create($data);
+
+        // 🔒 غیر سوپرادمین نمی‌تواند نقش سیستمی (مثل main با همه دسترسی‌ها) بدهد
+        // — وگرنه با users.create می‌توانست بدون سلب مقام، دسترسی کامل بسازد
+        $roleIds = $request->input('roles', []);
+        if (! $isSuperAdmin) {
+            $roleIds = Role::whereIn('id', $roleIds)->where('is_system', false)->pluck('id')->all();
+        }
+        $user->roles()->sync($roleIds);
+
+        // مسیر بازگشت بر اساس دسترسی سازنده — تا اگر دسترسی edit ندارد به 403 نخورد
+        $canEdit = $isSuperAdmin || auth()->user()->canAccess('admin.users.edit');
+        $redirectTarget = $canEdit ? 'admin.users.edit'
+            : (auth()->user()->canAccess('admin.users.index') ? 'admin.users.index' : 'admin.dashboard.index');
+
+        return redirect()->route($redirectTarget, $canEdit ? [$user] : [])
+            ->with('success', 'کاربر با موفقیت ساخته شد.');
+    }
+
     public function edit(User $user): View
     {
         // هر کاربری که خودش سوپرادمین نیست نمی‌تواند سوپرادمین‌ها را ببیند/ویرایش کند
@@ -83,7 +121,13 @@ class UserController extends Controller
         }
 
         $user->update($data);
-        $user->roles()->sync($request->input('roles', []));
+
+        // 🔒 غیر سوپرادمین نمی‌تواند نقش سیستمی (main) به کاربر بدهد — جلوگیری از ارتقاء دسترسی
+        $roleIds = $request->input('roles', []);
+        if (! $canChangeAdminFlag) {
+            $roleIds = Role::whereIn('id', $roleIds)->where('is_system', false)->pluck('id')->all();
+        }
+        $user->roles()->sync($roleIds);
 
         // دسترسی‌های این کاربر (و همه کاربران با نقش‌هایش) فوراً تازه شوند
         User::bumpPermissionsVersion();
