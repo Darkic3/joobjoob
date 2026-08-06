@@ -1,11 +1,16 @@
+@php
+    // زبان و جهت فعال (توسط SetLocale به همه ویوها share می‌شود)
+    $currentLocale = $currentLocale ?? app()->getLocale();
+    $direction = $direction ?? (in_array($currentLocale, config('app.rtl_locales', ['fa', 'ar'])) ? 'rtl' : 'ltr');
+@endphp
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('tab-name', 'پنل مدیریت')</title>
+    <title>@yield('tab-name', __('admin.layout.panel'))</title>
     {{--    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">--}}
 
     <!-- Bootstrap 5 -->

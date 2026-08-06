@@ -33,12 +33,12 @@
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/>
             </svg>
-            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">داشبورد</span>
+            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.dashboard') }}</span>
         </a>
 
         {{-- Divider: مدیریت محتوا --}}
         <div x-show="sidebarOpen" class="pt-4 pb-1">
-            <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">مدیریت محتوا</p>
+            <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('admin.sidebar.content_mgmt') }}</p>
         </div>
 
         {{-- Hero-Slide --}}
@@ -48,7 +48,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">اسلایدر اصلی</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.hero_slider') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -65,7 +65,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                لیست اسلایدها
+                {{ __('admin.sidebar.slides_list') }}
             </span>
                 </a>
                 <a href="{{ route('admin.hero-slides.create') }}"
@@ -74,7 +74,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                افزودن اسلاید
+                {{ __('admin.sidebar.add_slide') }}
             </span>
                 </a>
             </div>
@@ -90,7 +90,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">محصولات</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.products') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -107,7 +107,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                لیست محصولات
+                {{ __('admin.sidebar.products_list') }}
             </span>
                 </a>
                 <a href="{{ route('admin.products.create') }}"
@@ -116,7 +116,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                افزودن محصول
+                {{ __('admin.sidebar.add_product') }}
             </span>
                 </a>
                 <a href="{{ route('admin.brands.index') }}"
@@ -125,7 +125,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
-                برندها
+                {{ __('admin.sidebar.brands') }}
             </span>
                 </a>
                 <a href="{{ route('admin.specifications.index') }}"
@@ -134,7 +134,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
-                مشخصات (ویژگی‌ها)
+                {{ __('admin.sidebar.specs') }}
             </span>
                 </a>
             </div>
@@ -150,7 +150,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">دسته‌بندی محصولات</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.product_categories') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -167,7 +167,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                لیست دسته‌بندی‌ها
+                {{ __('admin.sidebar.categories_list') }}
             </span>
                 </a>
                 <a href="{{ route('admin.product-categories.create') }}"
@@ -176,7 +176,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                افزودن دسته‌بندی
+                {{ __('admin.sidebar.add_category') }}
             </span>
                 </a>
             </div>
@@ -189,7 +189,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">وبلاگ</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.blog') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -206,7 +206,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        مقالات
+                        {{ __('admin.sidebar.articles') }}
                     </span>
                 </a>
                 <a href="{{ route('admin.blog-categories.index') }}"
@@ -215,7 +215,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
-                        دسته‌بندی‌ها
+                        {{ __('admin.sidebar.blog_categories') }}
                     </span>
                 </a>
             </div>
@@ -228,7 +228,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">نشان‌های اعتماد</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap flex-1 text-right">{{ __('admin.sidebar.trust_badges') }}</span>
                 <svg x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
                      :class="open ? '-rotate-90' : ''"
@@ -245,7 +245,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                         </svg>
-                        مدیریت نشان‌ها
+                        {{ __('admin.sidebar.manage_badges') }}
                     </span>
                 </a>
             </div>
@@ -253,7 +253,7 @@
 
         {{-- Divider: تنظیمات --}}
         <div x-show="sidebarOpen" class="pt-4 pb-1">
-            <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">تنظیمات</p>
+            <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('admin.sidebar.settings') }}</p>
         </div>
 
         {{-- تنظیمات سایت --}}
@@ -263,7 +263,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
-            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">تنظیمات</span>
+            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.settings') }}</span>
         </a>
 
         {{-- خروج از حساب --}}
@@ -272,7 +272,7 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
-                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">خروج از حساب</span>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.logout') }}</span>
             </a>
         </div>
     </nav>
