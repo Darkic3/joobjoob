@@ -1,630 +1,643 @@
-# گزارش کامل سیستم احراز هویت و سطح دسترسی (Auth & RBAC) — پروژه common-template
+# گزارش طراحی و پیاده‌سازی RBAC — نسخه بهینه (بلوپرینت قابل استفاده مجدد)
 
-> این گزارش حاصل بررسی کامل کد احراز هویت و مجوزدهی پروژه است: `config/auth.php`، `config/jwt.php`، میدلورهای `AdminPermission` / `ApiPermission` / `PanelPermission` / `MainMiddleware`، ماژول `User` (Entities, Controllers, Services, Migrations, Seeders, Config/site.php) و روتهای پنل و API.
-> هدف: درک کامل دیزاین و انتقال آن به یک پروژه فروشگاهی جدید (غیرماژولار) همراه با اجتناب از اشکالات امنیتی موجود.
-
----
-
-## ۱) نمای کلی معماری — دو دنیای جدا برای مدیریت
-
-سیستم در این پروژه **سه جریان احراز هویت مستقل** دارد:
-
-| جریان | مسیر | گارد | مکانیزم | مخاطب |
-|---|---|---|---|---|
-| پنل مدیریت (وب) | `/admin/*` | `web` (session) | ایمیل + رمز عبور → سشن | ادمینها |
-| API مدیریت (پنل جدید) | `/api/admin/*` | `admin_jwt` (JWT) | ایمیل + رمز عبور → توکن JWT | پنل ادمین Vue / اپ |
-| پنل مشتری (سایت) | `/panel/*` و `/checkout/*` | `web` (session) | **موبایل + کد OTP پیامکی** | کاربران سایت |
-
-نکته کلیدی: **یک جدول واحد `users`** هم مشتریها و هم ادمینها را نگه میدارد. تمایز «ادمین بودن» نه با ستون جدا، بلکه با وجود یک ردیف در جدول `user_types` با `type = 'Admin'` انجام میشود.
-
-```
-┌─────────────────────────────┐
-│          users              │  ← یک مدل برای همه (User / ApiUser)
-├─────────────────────────────┤
-│ id, full_name, mobile,      │
-│ email, password, avatar,    │
-│ confirm_code, birthday,     │
-│ show_in_first_page,         │
-│ deleted_at (SoftDeletes)    │
-└─────────────────────────────┘
-        │ 1                 │ 1
-        │                   │
-┌───────▼────────┐   ┌──────▼─────────────┐
-│  role_user     │   │    user_types      │
-│  (pivot)       │   ├────────────────────┤
-│ user_id        │   │ user_id, type      │
-│ role_id        │   │ type: Teacher|     │
-└───────┬────────┘   │       Student|Admin│
-        │            └────────────────────┘
-┌───────▼────────┐
-│     roles      │
-├────────────────┤
-│ name           │
-│ permission     │ ← text: serialize() آرایه نام روتها
-└────────────────┘
-```
+> این سند، **بلوپرینت نهایی** سیستم احراز هویت و سطح دسترسی پنل ادمین است که ابتدا روی پروژه فروشگاهی **Shopora** پیاده می‌شود و بعداً برای هر سایت Laravel دیگری با کمترین تغییر قابل انتقال است.
+>
+> این نسخه، بازسازی بهینه‌ی یک دیزاین قدیمی‌تر (RBAC مبتنی بر `serialize()` نام روت داخل جدول `roles`) است. دلایل هر تصمیم و تفاوت‌ها در بخش ۲ آمده است.
+>
+> وضعیت: **طراحی آماده، منتظر پیاده‌سازی.** سیدر `AdminOwnerSeeder` هم‌اکنون موجود است و به محض اجرای میگریشن‌ها، ادمین اصلی را می‌سازد.
 
 ---
 
-## ۲) پیکربندی گاردها (config/auth.php)
+## فهرست
 
-```php
-'guards' => [
-    'web' => [
-        'driver'   => 'session',
-        'provider' => 'users',
-    ],
-    'admin_jwt' => [
-        'driver'   => 'jwt',
-        'provider' => 'api_users',
-    ],
-],
-'providers' => [
-    'users'     => ['driver' => 'eloquent', 'model' => User::class],
-    'api_users' => ['driver' => 'eloquent', 'model' => ApiUser::class],
-],
-```
-
-- گارد پیشفرض `web` با درایور session — برای پنل وب و مشتریها.
-- گارد `admin_jwt` با درایور JWT (پکیج **tymon/jwt-auth**) — برای API ادمین.
-- **`ApiUser`** کلاس جداگانه نیست؛ فقط `User` را extends کرده و اینترفیس `JWTSubject` را پیاده میکند (`getJWTIdentifier` → id، `getJWTCustomClaims` → []). هر دو روی **جدول `users`** کار میکنند. (در پروژه مقصد میتوانید از همین الگو استفاده کنید: یک کلاس `ApiUser extends User implements JWTSubject`.)
-
-### جزئیات JWT (config/jwt.php)
-- الگوریتم: HS256 (کلید یکسان برای امضا/تأیید)
-- `ttl`: 60×24 = **۱۴۴۰ دقیقه (۲۴ ساعت)**
-- `refresh_ttl`: 20160 = **۱۴ روز**
-- `blacklist_enabled`: true (توکنهای logout/refresh شده باطل میشوند)
-- `required_claims`: iss, iat, exp, nbf, sub, jti
-- `lock_subject`: true
+1. [خلاصه اجرایی](#۱-خلاصه-اجرایی)
+2. [چرا این نسخه؟ (مقایسه با دیزاین قدیمی)](#۲-چرا-این-نسخه-مقایسه-با-دیزاین-قدیمی)
+3. [نمای کلی معماری](#۳-نمای-کلی-معماری)
+4. [دیتابیس — میگریشن‌ها](#۴-دیتابیس--میگریشنها)
+5. [مدل‌ها](#۵-مدلها)
+6. [کانفیگ درختی دسترسی‌ها](#۶-کانفیگ-درختی-دسترسیها)
+7. [میدلور AdminPermission](#۷-میدلور-adminpermission)
+8. [جریان لاگین ادمین](#۸-جریان-لاگین-ادمین)
+9. [روت‌های ادمین (ساختار نهایی)](#۹-روتهای-ادمین-ساختار-نهایی)
+10. [UI مدیریت نقش‌ها و کاربران](#۱۰-ui-مدیریت-نقشها-و-کاربران)
+11. [سیدرها (AdminOwnerSeeder)](#۱۱-سیدرها-adminownerseeder)
+12. [چک‌لیست امنیتی — باید و نباید](#۱۲-چکلیست-امنیتی--باید-و-نباید)
+13. [راهنمای انتقال به سایت دیگر (Porting Guide)](#۱۳-راهنمای-انتقال-به-سایت-دیگر-porting-guide)
+14. [مسیر آینده (گام‌های بعدی)](#۱۴-مسیر-آینده-گامهای-بعدی)
 
 ---
 
-## ۳) جریان ورود ادمین — وب (session)
+## ۱) خلاصه اجرایی
 
-**فایل:** `Modules/User/Http/Controllers/AuthController.php`
+- **اصل طراحی:** «کلید دسترسی = نام روت» (`admin.products.edit`). این ساده‌ترین، خواناترین و دقیقاً سازگار با پنل‌های Laravel است.
+- **دانه‌بندی:** سطح اکشن (مشاهده/افزودن/ویرایش/حذف برای هر ماژول، جدا از هم).
+- **چهار جدول:** `roles`، `permissions`، `permission_role`، `role_user` + یک ستون `is_admin` روی `users`.
+- **سوپرادمین:** ستون `users.is_admin = 1` → بدون هیچ چکی از همه‌چیز عبور می‌کند. **هیچ‌وقت** به دسترسی‌ها گره نمی‌خورد (هرگز خودتان را قفل نمی‌کنید).
+- **منبع واحد حقیقت:** کانفیگ درختی `config/permissions.php` — هم UI چک‌باکس‌ها را می‌سازد، هم نقش `main` (دسترسی کامل) را seed می‌کند، هم نام روت‌ها از آن استخراج می‌شوند.
+- **بدون پکیج خارجی** برای هسته (در بخش ۱۴، گزینه ارتقا به Spatie بررسی شده).
+- **بدون JWT** در نسخه فعلی (پنل Vue نداریم). مسیر اضافه‌کردن بعداً در بخش ۱۴ مستند شده.
+- **امنیت:** throttle روی لاگین، چک «ادمین واقعی» در خود لاگین، کش دسترسی‌ها با invalidation، روت‌های آزاد فقط لیست سفید صریح.
+- **چندزبانه:** عناوین دسترسی‌ها از فایل‌های `lang/*/permissions.php` خوانده می‌شوند.
 
-```php
-public function postLogin(Request $request)
-{
-    $check = Auth::attempt([
-        'email'      => $input['email'],
-        'password'   => NumberHelper::persian2LatinDigit($input['password']),
-        'deleted_at' => null,   // کاربران حذفشده (SoftDelete) نمیتوانند وارد شوند
-    ]);
-    if ($check) {
-        return redirect('/admin')->with('success', 'خوش آمدید.');
-    }
-    return redirect('/admin/login')->with('error', 'ایمیل یا رمزعبور صحیح نیست.');
-}
+---
+
+## ۲) چرا این نسخه؟ (مقایسه با دیزاین قدیمی)
+
+دیزاین قدیمی: جدول `roles` با ستون `permission` (TEXT) که `serialize()` آرایه‌ای از نام روت‌ها بود + جدول `user_types` برای تشخیص ادمین + پنل JWT جدا.
+
+| موضوع | دیزاین قدیمی | نسخه بهینه | دلیل |
+|---|---|---|---|
+| ذخیره دسترسی‌ها | آرایه serialize داخل ستون roles | **جدول `permissions` + پایوت `permission_role`** | قابل query، ممیزی («کدام نقش‌ها حذف محصول دارند؟»)، FK واقعی، بدون پوسیدگی فرمت |
+| تفکیک ادمین | جدول `user_types` (enum) | **ستون `is_admin` بولی** | یک بعد کمتر؛ ساده‌تر؛ سوپرادمین از قبل توی مدل موجود بود |
+| پنل API | گارد `admin_jwt` (tymon/jwt-auth) | **حذف (فعلاً)** | پنل Vue/API وجود ندارد؛ اضافه‌کردن آن مستند شده است |
+| تعداد گروه‌ها | ۵۲ گروه (دوره، گالری، جلسه…) | **~۱۴ گروه واقعی پروژه** | بدون سربار ماژول‌های ناموجود |
+| کش دسترسی‌ها | بدون کش (unserialize در هر ریکوئست) | **Cache با invalidation روی تغییر نقش** | عملکرد بهتر |
+| نقش full-access | کلید بی‌اثر `fullAccess` + hardcode داشبورد | **نقش سیستمی `main` (is_system=1)** + سوپرادمین | معنادار و قابل اجرا |
+| لاگین | فقط `Auth::attempt` بدون چک ادمین، بدون throttle | **چک نقش/ادمین + throttle + بررسی is_active** | امن و بدون لو دادن اطلاعات |
+| عنوان دسترسی‌ها | فارسی هاردکد در کانفیگ | **کلید ترجمه از lang/** | چندزبانه (مطابق پنل چندزبانه پروژه) |
+
+> ⚠️ باگ‌های امنیتی دیزاین قدیمی (بک‌دور `/login_admin/{token}`، `JWT_SECRET` هاردکد، `str_contains` معکوس، OTP بدون انقضا و…) در بخش ۱۲ به‌عنوان «نبایدها» فهرست شده‌اند.
+
+---
+
+## ۳) نمای کلی معماری
+
+```
+┌─────────────────────────────────────────────┐
+│                  users                       │  ← یک مدل برای همه
+│  id, name, mobile, email, password, is_active│
+│  is_admin (boolean) ← سوپرادمین بای‌پس       │
+│  deleted_at (SoftDeletes)                    │
+└──────────────┬──────────────────────────────┘
+               │ 1                N
+┌──────────────▼────────┐   ┌──────────────────┐
+│       role_user       │   │     roles        │
+│   user_id, role_id    │──▶│ id, name,        │
+└──────────────┬────────┘   │ is_system (main) │
+               │ 1          └────────┬─────────┘
+               │                N    │
+┌──────────────▼────────┐   ┌────────▼─────────┐
+│   permission_role     │   │   permissions    │
+│  role_id, perm_id     │◀──│ id, name (روت),  │
+└───────────────────────┘   │ group, label_key │
+                            └──────────────────┘
 ```
 
-- **روت:** `POST /admin/post-login` (نام روت: بدون نام؛ `GET /admin/login` → `admin.login`)
-- ورود صرفاً بر اساس **ایمیل + رمز** است. بررسی اینکه کاربر «ادمین» باشد در اینجا انجام **نمیشود** — فقط `Auth::attempt` روی جدول users. (یعنی هر کاربر معمولی هم اگر ایمیل/رمز داشته باشد میتواند سشن بگیرد؛ اما دسترسی به صفحهها توسط میدلور `AdminPermission` که «نقشها» را چک میکند، محدود میشود — در بخش ۵.)
-- خروج: `Session::flush()` + `Auth::logout()` → ریدایرکت به `admin/login`
-- **بازیابی رمز ادمین اصلی:** روت `GET /admin/change-password` با `throttle:3,1` — اولین کاربرِ دارای `UserType('Admin')` را پیدا میکند، یک رمز ۷ رقمی رندوم میسازد، `bcrypt` میکند و آن را **به شماره موبایلی که از API خارجی rahweb.com گرفته میشود پیامک میکند** (با `Http::withoutVerifying()` — بدون بررسی SSL!). اگر سایت منبع 404/500 بدهد، خطا برمیگرداند.
+- **گارد:** فقط `web` (session). همه‌چیز روی یک جدول `users`.
+- **دو سطح مجوز:**
+  1. `is_admin = 1` → سوپرادمین، عبور بدون چک.
+  2. در غیر این صورت → جمع همه دسترسی‌های همه نقش‌های کاربر، چک عضویت نام روت جاری.
+- **جریان درخواست:** `web` → `SetLocale`/`SetTheme` (گلوبال) → `auth` → `adminPermission` → `log.admin` → کنترلر.
 
-### روتهای وب ادمین (`Modules/User/Routes/web.php`)
+---
+
+## ۴) دیتابیس — میگریشن‌ها
+
+> نام فایل‌ها با تاریخ اجرای واقعی جلو می‌روند. این‌ها را به‌ترتیب اجرا کنید.
+
+### ۴.۱) افزودن ستون سوپرادمین به users
+
 ```php
-Route::prefix('admin')->group(function () {
-    Route::get('/login', 'login')->name('admin.login');
-    Route::get('/logout', 'logout')->name('admin.logout');
-    Route::post('/post-login', 'postLogin');
-    Route::get('/change-password', 'changePassword')
-        ->middleware('throttle:3,1')->name('admin.change-password');
+// database/migrations/2026_08_06_000001_add_is_admin_to_users_table.php
+Schema::table('users', function (Blueprint $table) {
+    $table->boolean('is_admin')->default(false)->after('is_active');
 });
 ```
-پنل ادمین (`/admin/...` برای ماژولها) با میدلور **`AdminPermission`** محافظت میشود (در فایل روت هر ماژول: `Route::middleware('AdminPermission')->prefix('admin')...`).
 
----
-
-## ۴) جریان ورود ادمین — API (JWT)
-
-**فایل:** `Modules/User/Http/Controllers/Api/AdminAuthController.php` + `Services/Api/AdminAuthService.php`
+### ۴.۲) جدول roles
 
 ```php
-public function login(array $credentials)
-{
-    if (! $token = auth('admin_jwt')->attempt($credentials)) {
-        return ['error' => 'ایمیل یا رمز اشتباهه', 'status' => 401];
-    }
-    $user = auth('admin_jwt')->user();
-    // شرط اضافه: کاربر باید حداقل یک نقش داشته باشد
-    if (! $user->roles()->exists()) {
-        return ['error' => 'حساب شما دسترسی لازم را ندارد', 'status' => 403];
-    }
-    return $this->respondWithToken($token);
-}
-```
-
-- **روتها** (`Modules/User/Routes/api.php`):
-  - `POST /api/admin/login` → name: `auth.login` (بدون محافظ — در map به `free`)
-  - `GET /api/admin/me` → name: `auth.me` (محافظت: `auth:admin_jwt` + `api-permission`)
-  - `POST /api/admin/logout` → `auth.logout`
-  - `POST /api/admin/refresh` → `auth.refresh`
-- پاسخ: `{ access_token, token_type: 'bearer', expires_in: ttl*60 }`
-- **مهم:** شرط ورود موفق به API فقط داشتن حداقل یک نقش است — نه لزوماً UserType('Admin'). (در `ApiPermission` است که نوع Admin هم چک میشود.)
-
-### نحوه محافظت روتهای API ادمین (نمونه Product/Routes/api.php)
-```php
-Route::prefix('admin/')->name("api.admin.")->middleware(['auth:admin_jwt', 'api-permission'])->group(function () {
-    Route::prefix('product/')->controller(ApiProductController::class)->name('product.')->group(function () {
-        Route::get('/', 'index')->name("index");
-        Route::post('/add', 'store')->name("store");
-        ...
-    });
+Schema::create('roles', function (Blueprint $table) {
+    $table->id();
+    $table->string('name')->unique();              // main, content-manager, support
+    $table->boolean('is_system')->default(false);  // نقش سیستمی (main) قابل حذف نیست
+    $table->timestamps();
 });
 ```
-نام روت API = `api.admin.product.index` و `ApiPermission` با `str_replace('api.admin.', '', ...)` آن را به `product.index` تبدیل میکند تا در map پیدا کند.
+
+### ۴.۳) جدول permissions (کاتالوگ دسترسی‌ها)
+
+```php
+Schema::create('permissions', function (Blueprint $table) {
+    $table->id();
+    $table->string('name')->unique();            // admin.products.edit
+    $table->string('group')->index();            // product (برای گروه‌بندی UI)
+    $table->string('label_key')->nullable();     // permissions.access.product.edit
+    $table->timestamps();
+});
+```
+
+### ۴.۴) جدول واسط permission_role
+
+```php
+Schema::create('permission_role', function (Blueprint $table) {
+    $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('permission_id')->constrained()->cascadeOnDelete();
+    $table->primary(['role_id', 'permission_id']);
+});
+```
+
+### ۴.۵) جدول واسط role_user
+
+```php
+Schema::create('role_user', function (Blueprint $table) {
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+    $table->primary(['user_id', 'role_id']);
+});
+```
 
 ---
 
-## ۵) قلب سیستم: RBAC مبتنی بر «نام روت» (Route-Name Based Permissions)
+## ۵) مدل‌ها
 
-این مهم‌ترین ایده دیزاین است که برای انتقال باید کاملاً درک شود:
-
-### اصل طراحی
-> **کلید دسترسی = نام روت** (مثلاً `admin.product.index`).
-> در جدول `roles` یک ستون `permission` از نوع TEXT وجود دارد که یک **آرایه‌ی serialize شده از نام روت‌ها** را نگه می‌دارد.
-> وقتی درخواستی به یک روت پنل می‌رسد، میدلور نام روت جاری را با اعضای این آرایه مقایسه می‌کند؛ اگر موجود بود → اجازه، وگرنه → رد.
+### ۵.۱) Role
 
 ```php
-// Entities/Role.php — کل مدل!
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 class Role extends Model
 {
-    protected $table = 'roles';
-    protected $fillable = ['name', 'permission'];
-}
-```
+    protected $fillable = ['name', 'is_system'];
 
-### ساختار جدول roles
-| ستون | نوع | توضیح |
-|---|---|---|
-| id | bigIncrements | |
-| name | string nullable | نام نقش (مثل `main`، `content-manager`) |
-| permission | text nullable | `serialize(['admin.dashboard', 'admin.product.index', ...])` |
-| deleted_at | softDeletes | |
+    protected $casts = ['is_system' => 'boolean'];
 
-### دو موجودیت پشتیبان
-```php
-// User
-public function roles() { return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id'); }
-public function userTypes() { return $this->hasMany(UserType::class); }
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
 
-// سینک کردن نوع‌های کاربر (Admin/Student/Teacher)
-public function syncUserTypes($types)
-{
-    $this->userTypes()->whereNotIn('type', $types)->delete();
-    foreach ($types as $row) {
-        if (!$this->userTypes()->where('type', $row)->first()) {
-            $this->userTypes()->create(['type' => $row]);
-        }
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
     }
 }
 ```
 
-### اسکیمای جدول‌ها (برای کپی در یک مایگریشن واحد)
+### ۵.۲) Permission
+
 ```php
-// users
-$table->id();
-$table->string('full_name')->nullable();
-$table->string('mobile')->nullable();
-$table->string('email')->nullable();
-$table->string('confirm_code')->nullable();   // کد OTP سایت
-$table->text('password')->nullable();
-$table->string('avatar')->nullable();
-$table->integer('show_in_first_page')->nullable();
-$table->integer('mobile_confirm')->nullable();
-$table->string('birthday')->nullable();
-$table->softDeletes();
-$table->timestamps();
+<?php
 
-// roles
-$table->bigIncrements('id');
-$table->string('name')->nullable();
-$table->text('permission')->nullable();
-$table->softDeletes();
-$table->timestamps();
+namespace App\Models;
 
-// role_user (pivot)
-$table->bigIncrements('id');
-$table->integer('user_id')->nullable();
-$table->integer('role_id')->nullable();
+use Illuminate\Database\Eloquent\Model;
 
-// user_types
-$table->id();
-$table->integer('user_id')->nullable();
-$table->enum('type', ['Teacher', 'Student', 'Admin'])->nullable()->default('Student');
-$table->timestamps();
-```
-
-### مدیریت موجودیت‌ها (UserService)
-```php
-public function create(UserDTO $userDto): void
+class Permission extends Model
 {
-    ...
-    $user->roles()->attach($userDto->getRoles());
-    $user->syncUserTypes($userDto->getUserTypes());
-}
-public function update(int $id, UserDTO $userDto): void
-{
-    ...
-    $user->roles()->sync($userDto->getRoles());
-    $user->syncUserTypes($userDto->getUserTypes());
+    protected $fillable = ['name', 'group', 'label_key'];
 }
 ```
-- حذف کاربر: `UserObserver::deleted()` → `$item->roles()->detach()` (پاکسازی نقش‌ها)
-- محافظت از حذف آخرین ادمین (در `UserController::destroy`): اگر فقط **یک** کاربر دارای `UserType('Admin')` باقی مانده باشد، حذف آن مجاز نیست.
+
+### ۵.۳) User — ترِیت HasAdminPermissions
+
+```php
+<?php
+
+namespace App\Models\Traits;
+
+use Illuminate\Support\Facades\Cache;
+
+trait HasAdminPermissions
+{
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    /** نام همه دسترسی‌های همه نقش‌های کاربر (کش‌شده) */
+    public function permissionNames(): array
+    {
+        return Cache::remember(
+            "admin.permissions.{$this->id}",
+            now()->addHour(),
+            fn () => $this->roles
+                ->loadMissing('permissions')
+                ->flatMap(fn ($role) => $role->permissions)
+                ->pluck('name')
+                ->unique()
+                ->values()
+                ->all()
+        );
+    }
+
+    /** آیا به این روت دسترسی دارد؟ سوپرادمین همیشه true */
+    public function canAccess(string $routeName): bool
+    {
+        if ($this->is_admin) {
+            return true;
+        }
+
+        return in_array($routeName, $this->permissionNames(), true);
+    }
+
+    /** بعد از هر تغییر نقش/دسترسی، کش را پاک کن */
+    public function forgetPermissionCache(): void
+    {
+        Cache::forget("admin.permissions.{$this->id}");
+    }
+}
+```
+
+> در `User` مدل: `use HasAdminPermissions;` — متد قدیمی `hasAccess(string $routeName)` با `canAccess()` جایگزین می‌شود.
 
 ---
 
-## ۶) میدلورهای مجوزدهی — سه لایه
+## ۶) کانفیگ درختی دسترسی‌ها
 
-### ۶.۱ `AdminPermission` (وب — سشن) — میدلور اصلی پنل قدیمی
+**منبع واحد حقیقت.** فایل `config/permissions.php`:
+
 ```php
-class AdminPermission
-{
-    public function handle($request, Closure $next)
-    {
-        $segments = $request->segments();
-        if ($this->auth->check()) {                              // سشن معتبر؟
-            $admin = UserType::where('user_id', $this->auth->user()->id)
-                             ->where('type', 'Admin')->first();  // آیا ادمین است؟
-            if ($admin) {
-                $roles = [];
-                $user = User::find($this->auth->user()->id);
-                foreach ($user->roles as $role) {                // همه نقش‌ها
-                    $permission = unserialize($role->permission); // آرایه نام روت‌ها
-                    if ($permission) $roles = array_merge($roles, $permission);
-                }
-                if ($segments[0] == config('site.admin')) {      // URL با /admin شروع شود
-                    if (in_array(Route::currentRouteName(), $roles)) {
-                        return $next($request);                  // ✅ اجازه
-                    }
-                }
-            }
-        }
-        // ❌ رد: AJAX → 401 | وگرنه → ریدایرکت
-        if ($request->ajax()) {
-            return response('Unauthorized.', 401);
-        } elseif (!str_contains('api', Route::currentRouteName())) {
-            if (Auth::check() and $admin) {
-                return redirect('/admin')->with('error', 'شما به این بخش دسترسی ندارید.');
-            }
-            return redirect('/admin/login')->with('error', 'شما به این بخش دسترسی ندارید.');
-        }
-    }
-}
-```
-منطق به زبان ساده:
-1. آیا لاگین است؟ (گارد پیش‌فرض = session `web`)
-2. آیا ردیف `UserType('Admin')` دارد؟ (نه → رد)
-3. همه نام روت‌های نقش‌هایش را جمع کن
-4. اگر `Route::currentRouteName()` در آن مجموعه باشد → اجازه، وگرنه رد/ریدایرکت.
+<?php
 
-### ۶.۲ `ApiPermission` (API — JWT) — میدلور پنل جدید
-```php
-class ApiPermission
-{
-    public function handle($request, Closure $next)
-    {
-        $user = auth('admin_jwt')->user();
-        if ($user) {
-            $admin = UserType::where('user_id', $user->id)->where('type', 'Admin')->first();
-            if ($admin) {
-                $roles = [];
-                foreach ($user->roles as $role) {
-                    $permission = unserialize($role->permission);
-                    if ($permission) $roles = array_merge($roles, $permission);
-                }
-                $api_list = \Config::get('site.api_permissions');      // map: روت API → کلید پنل
-                $currentRoute = str_replace('api.admin.', '', Route::currentRouteName());
-                $permissionRouteName = @$api_list[$currentRoute];
-                if (in_array($permissionRouteName, $roles) || $permissionRouteName == 'free') {
-                    return $next($request);
-                }
-            }
-        }
-        return response()->json(['error' => 'شما به این بخش دسترسی ندارید.'], 403);
-    }
-}
-```
-**تفاوت مهم با نسخه وب:** نام روت API (مثل `api.admin.product.index`) مستقیماً با نام روت پنل (مثل `admin.product.index`) یکی نیست؛ پس یک **جدول نگاشت** در کانفیگ وجود دارد:
-```php
-// config('site.api_permissions')
-'product.index'  => 'admin.product.index',
-'product.store'  => 'admin.product.create',
-'product.update' => 'admin.product.edit',
-'product.show'   => 'admin.product.index',
-'auth.me'        => 'free',   // اندپوینت‌های آزاد
-'auth.refresh'   => 'free',
-'auth.logout'    => 'free',
-```
-اگر مقدار map شده `free` باشد → بدون بررسی اجازه داده می‌شود.
+// درخت دسترسی‌های پنل ادمین
+// کلید نهایی هر دسترسی = "admin.{group}.{access}" (نام روت واقعی)
+// مقدار هر دسترسی = کلید ترجمه (lang/*/permissions.php)
+return [
 
-### ۶.۳ `PanelPermission` (سشن) — میدلور پنل مشتری
-```php
-// ثبت‌شده در Kernel با نام 'panel'
-public function handle($request, Closure $next)
-{
-    if (!$this->auth->check()) {
-        return redirect('/panel/login?url=' . $request->path());
-    }
-    return $next($request);
-}
-```
-فقط «لاگین است؟» را چک می‌کند — **هیچ مجوز نقش‌محوری ندارد**. محافظ `/panel/*` و `/checkout/*` برای مشتری‌ها.
+    // روت‌هایی که فقط «احراز هویت» می‌خواهند، نه دسترسی خاص
+    // (مثلاً آپلود CKEditor که هر ادمین لاگین‌شده باید بتواند استفاده کند)
+    'free' => [
+        'admin.ckeditor.upload',
+    ],
 
-### ۶.۴ `MainMiddleware` (گلوبال)
-به هر ریکوئست یک `session()->put('custom_data', $site_name . time())` اضافه می‌کند (کاربرد نامشخص/الگوریتمی). هیچ ربطی به auth ندارد.
+    'permissions' => [
 
----
+        'dashboard' => [
+            'title'  => 'permissions.groups.dashboard',
+            'access' => ['index' => 'permissions.access.dashboard.index'],
+        ],
 
-## ۷) کانفیگ درایور مجوزها: `config('site')`
+        // ⚠️ کلید هر گروه باید دقیقاً بخش نام روت واقعی باشد (جمع، مثل Route::resource)
+        'products' => [
+            'title'  => 'permissions.groups.products',
+            'access' => [
+                'index'   => 'permissions.access.products.index',
+                'create'  => 'permissions.access.products.create',
+                'store'   => 'permissions.access.products.create',   // همان لیبل → UI dedupe می‌کند
+                'edit'    => 'permissions.access.products.edit',
+                'update'  => 'permissions.access.products.edit',
+                'destroy' => 'permissions.access.products.delete',
+            ],
+        ],
 
-کانفیگ از فایل `Modules/User/Config/site.php` در `UserServiceProvider` با `mergeConfigFrom(..., 'site')` لود می‌شود:
-```php
-'admin' => 'admin',          // پیشوند URL پنل (استفاده در AdminPermission)
-'panel' => 'panel',
+        'product-categories' => [ /* مثل products → admin.product-categories.* */ ],
+        'brands'             => [ /* مثل products → admin.brands.* */ ],
+        'specifications'     => [ /* مثل products → admin.specifications.* */ ],
+
+        'blogs'          => [ /* مثل products → admin.blogs.* */ ],
+        'blog-categories' => [ /* مثل products → admin.blog-categories.* */ ],
+
+        'hero-slides'  => [ /* مثل products → admin.hero-slides.* */ ],
+        'trust-badges' => [ /* مثل products → admin.trust-badges.* */ ],
+
+        'settings' => [
+            'title'  => 'permissions.groups.settings',
+            'access' => [
+                'edit'   => 'permissions.access.settings.edit',
+                'update' => 'permissions.access.settings.edit',
+            ],
+        ],
+
+        // ⏳ گروه‌های آینده (از الان در درخت، تا نقش main خودکار پوشش دهد)
+        'users'  => ['title' => 'permissions.groups.users',  'access' => [/* index, create, edit, destroy */]],
+        'roles'  => ['title' => 'permissions.groups.roles',  'access' => [/* index, create, edit, destroy */]],
+        'orders' => ['title' => 'permissions.groups.orders', 'access' => [/* index, show */]],
+        'reviews'=> ['title' => 'permissions.groups.reviews','access' => [/* index, destroy */]],
+    ],
+];
 ```
 
-### `site.permissions` — درخت دسترسی (۵۲ گروه)
-این ساختار هم **موتور تولید UI چک‌باکس‌ها** است هم **منبع نقش full-access**:
+**قوانین کانفیگ:**
+- نام روت واقعی در `routes/admin.php` باید دقیقاً برابر `admin.{group}.{access}` باشد — پس **کلید گروه باید همان بخش نام روت باشد** (برای `Route::resource('products', ...)` کلید گروه = `products`، نه `product`).
+- هر روت ادمین خارج از این الگو را صریحاً به `free` اضافه کنید (فقط اگر احراز هویت برایش کافی است) یا یک گروه مناسب برایش بسازید.
+- `store`/`update` لیبل مشترک با `create`/`edit` دارند؛ **UI باید بر اساس `label_key` dedupe کند** (چک‌باکس‌های `create` و `store` با هم toggle می‌شوند).
+- `store`/`update` معمولاً با `create`/`edit` یک دسترسی مشترک دارند (تا ادمین مجبور نباشد دو چک‌باکس جدا تیک بزند).
+- افزودن گروه جدید = فقط یک بلوک به کانفیگ + یک بلاک به فایل‌های ترجمه. نقش `main` با سیدر خودکار به‌روز می‌شود.
+
+### ۶.۱) کانفیگ اعتبارنامه ادمین اصلی — `config/admin.php`
+
 ```php
-'permissions' => [
-    'dashboard' => ['title' => 'داشبورد پنل'],
-    'product' => [
-        'title' => 'محصولات',
-        'access' => [
+<?php
+
+// اعتبارنامه ادمین اصلی (سیدر AdminOwnerSeeder از همین‌جا می‌خواند)
+return [
+    'owner' => [
+        'name'     => env('ADMIN_OWNER_NAME', 'مدیر اصلی'),
+        'email'    => env('ADMIN_OWNER_EMAIL', 'admin@shopora.test'),
+        'mobile'   => env('ADMIN_OWNER_MOBILE', '09120000000'),
+        'password' => env('ADMIN_OWNER_PASSWORD'), // null → رمز تصادفی یک‌باره
+    ],
+];
+```
+
+> ⚠️ سیدر هرگز مستقیم `env()` نمی‌خواند (بعد از `php artisan config:cache` مقدار `env()` خارج از فایل‌های کانفیگ null است) — همیشه از `config('admin.owner.*')`.
+
+**فایل ترجمه** `resources/lang/{fa,en,ar,tr}/permissions.php`:
+
+```php
+return [
+    // کلیدها باید با کلیدهای گروه کانفیگ یکی باشند (جمع)
+    'groups' => [
+        'dashboard' => 'داشبورد',
+        'products'  => 'محصولات',
+        // ...
+    ],
+    'access' => [
+        'dashboard' => ['index' => 'مشاهده داشبورد'],
+        'products'  => [
             'index'  => 'مشاهده محصولات',
-            'create' => 'اضافه کردن محصول',
+            'create' => 'افزودن محصول',
             'edit'   => 'ویرایش محصول',
             'delete' => 'حذف محصول',
         ],
+        // ...
     ],
-    'product-category' => [ ... ],
-    'brand' => [ ... ],
-    'order' => [ ... ],
-    // ... مجموعاً ۵۲ گروه
-],
+];
 ```
-نام کلید دسترسی نهایی = `admin.{key}.{accessKey}` → مثلاً `admin.product.create`.
-
-### گروه‌های موجود (فهرست کلیدها)
-`dashboard, admin, common, user, basket, setting, setting-partial, theme, comment, contact, permission, api, service, seo, redirect, canonical, blog, blog-category, gallery-category, gallery, worksample, fee, certificate, package, banner, highlight, branch, social, course, course-category, session, session-file, product-category, product, brand, tag, specification, specification-value, slogan, page, sitemap, product-video-faq, product-image, product-variant, product-property-spf-tag, order, bank, order-shipping-status, shipping-method, discount, state, city, address`
 
 ---
 
-## ۸) UI مدیریت نقش‌ها و دسترسی‌ها (پنل)
+## ۷) میدلور AdminPermission
 
-**روت‌ها** (`Modules/User/Routes/web.php` — با میدلور `AdminPermission`):
-| روت | متد کنترلر | کار |
-|---|---|---|
-| `GET /admin/permission` | `getPermission` | لیست نقش‌ها (paginate 20) |
-| `GET /admin/permission/add` | `getAddPermission` | فرم ساخت نقش |
-| `POST /admin/permission/add` | `postAddPermission` | ساخت نقش |
-| `GET /admin/permission/edit/{id}` | `getEditPermission` | فرم ویرایش نقش |
-| `POST /admin/permission/edit/{id}` | `postEditPermission` | ذخیره ویرایش |
-| `GET /admin/permission/delete/{id}` | `getDeletePermission` | حذف نقش |
+بازنویسی کامل `app/Http/Middleware/AdminPermission.php` (نسخه فعلی کامنت‌شده و بی‌اثر است):
 
-### ذخیره‌سازی (PermissionController)
 ```php
-// ساخت نقش جدید:
-$role->permission = serialize($request['access'] + ['fullAccess' => 0]);
+<?php
 
-// ویرایش:
-$permissions = $request['access'];
-array_push($permissions, "admin.dashboard");   // داشبورد همیشه اضافه می‌شود
-$role->permission = serialize($permissions);
-```
+namespace App\Http\Middleware;
 
-### فرم (Views/user/permission/form.blade.php)
-- یک چک‌باکس «انتخاب همه» (`#select_all`) که همه چک‌باکس‌های فرم را toggle می‌کند.
-- حلقه روی `Config::get('site.permissions')`؛ هر گروه یک کارت (widget) با هدر رنگی و چک‌باکس‌های `name="access[]"` با value = نام روت (`admin.product.index` و…).
-- هنگام ویرایش، مقادیر ذخیره‌شده `unserialize` شده و چک‌باکس‌های متناظر `checked` می‌شوند.
-- گروه `dashboard` به‌صورت جدا (و همیشه مجاز) نمایش داده می‌شود.
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-### مدیریت کاربران (UserController + UserService)
-- `GET/POST /admin/user/create` و `edit` — فرم شامل: نام، ایمیل، موبایل، رمز، آواتار، چک‌باکس‌های `user_types[]` (Teacher/Student/Admin) و `roles[]`.
-- اعتبارسنجی `AdminRequest`: در create، `user_types` **الزامی** است؛ موبایل ۱۱ رقمی و یکتا؛ ایمیل یکتا (با نادیده‌گرفتن soft-deleted).
-- قابلیت `changePassword` برای هر کاربر توسط ادمین.
-- خروجی اکسل کاربران (`UsersExport`).
-
----
-
-## ۹) سیدرها و bootstrap اولیه
-
-### `UserDatabaseSeeder` (راه‌اندازی اولیه)
-```php
-$full_access = ["admin.dashboard"];
-foreach (Config::get('site.permissions') as $key => $permission) {
-    foreach ($permission['access'] as $keyAccess => $access) {
-        $full_access[] = 'admin.' . $key . '.' . $keyAccess;   // ساخت خودکار همه کلیدها
-    }
-}
-DB::table('roles')->insert(['name' => 'main', 'permission' => serialize($full_access)]);
-
-$user = User::create([
-    'full_name' => "ادمین اصلی", 'email' => "admin@gmail.com",
-    'password' => bcrypt('RahWeb2024'),
-]);
-$user->syncUserTypes(['Admin']);
-$user->roles()->attach($role->id);   // نقش full-access
-```
-- نقش `main` (id=1) = **دسترسی کامل** — از روی کانفیگ به‌صورت خودکار تولید می‌شود، پس هر بار که یک گروه/اکشن به `site.permissions` اضافه شود، سیدر آن را هم پوشش می‌دهد.
-- `RoleDatabaseSeeder` همان منطق را با `updateOrInsert(id=1)` انجام می‌دهد (به‌روزرسانی نقش main).
-
-### نکته مهم برای انتقال
-در پروژه مقصد باید «نقش full-access» را به‌عنوان یک مفهوم جدا داشته باشید (مثلاً ستون `is_super_admin` یا نام خاص) — وگرنه افزودن گروه دسترسی جدید مستلزم re-seed کردن نقش‌های موجود است.
-
----
-
-## ۱۰) جریان احراز هویت مشتری (سایت) — برای کامل بودن تصویر
-
-**کنترلر:** `app/Http/Controllers/Auth/AuthController.php` (سطح app)
-```php
-public function login(Request $request)
+class AdminPermission
 {
-    $user = UserService::findByMobile($mobile);
-    $code = rand(1000, 9999);
-    if (!$user) {
-        $user = UserService::createFromSite($request);   // ثبت‌نام خودکار با شماره
-    }
-    $user->update(['confirm_code' => $code]);
-    $kavenegar = new Sms();
-    $result = $kavenegar->sendLookup("verify", ["token" => $code], $user->mobile);
-    return redirect(route("auth.mobile-code", ['mobile' => $mobile, 'url' => request()->get("url")]));
-}
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user();
 
-public function postCode()
+        // ۱) لاگین نیست → هدایت به لاگین (یا 401 برای AJAX)
+        if (! $user) {
+            return $request->expectsJson()
+                ? response()->json(['message' => __('admin.login.restricted')], 401)
+                : redirect()->guest(route('admin.login'));
+        }
+
+        // ۲) سوپرادمین → عبور بدون چک (هرگز قفل نمی‌شود)
+        if ($user->is_admin) {
+            return $next($request);
+        }
+
+        $routeName = $request->route()?->getName();
+
+        // ۳) روت‌های لیست سفید (فقط احراز هویت)
+        if ($routeName && in_array($routeName, config('permissions.free', []), true)) {
+            return $next($request);
+        }
+
+        // ۴) چک دسترسی
+        abort_unless($routeName && $user->canAccess($routeName), 403);
+
+        return $next($request);
+    }
+}
+```
+
+- ثبت alias قبلاً در `bootstrap/app.php` انجام شده: `'adminPermission' => AdminPermission::class`.
+- کش دسترسی‌ها داخل `permissionNames()` است؛ بعد از هر تغییر نقش (`roles()->sync` و…) حتماً `forgetPermissionCache()` صدا زده شود.
+
+---
+
+## ۸) جریان لاگین ادمین
+
+**کنترلر** `app/Http/Controllers/Admin/AdminAuthController.php`:
+
+```php
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class AdminAuthController extends Controller
 {
-    $user = UserService::findByMobileAndCode($mobile, $code);   // confirm_code = کد
-    if ($user) {
-        Auth::loginUsingId($user->id);
-        BasketService::findUserBasketAndUpdateBaskets();        // ادغام سبد مهمان
-        return redirect($url);
+    public function showLogin()
+    {
+        return view('admin.auth.login');
     }
-    return back()->with("error", "کد نادرست است");
+
+    public function postLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
+            $user = Auth::user();
+
+            // چک «ادمین واقعی»: سوپرادمین یا حداقل یک نقش — همان پیام، بدون لو دادن اطلاعات
+            if (! $user->is_admin && ! $user->roles()->exists()) {
+                Auth::logout();
+
+                return back()->withErrors(['email' => __('admin.login.restricted')])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('admin.dashboard.index'));
+        }
+
+        return back()->withErrors(['email' => __('admin.login.failed')])->onlyInput('email'); // کلید «failed» به lang/*/admin.php اضافه شود
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login');
+    }
 }
 ```
-- ورود فقط با **موبایل + کد ۴ رقمی پیامکی** (Kavenegar، قالب `verify`). رمز عبور ندارد.
-- کاربرِ ناشناس با همان شماره به‌صورت خودکار ساخته می‌شود (`confirm_code` در جدول users).
-- کد در ستون `confirm_code` ذخیره می‌شود (بدون انقضا و بدون محدودیت تلاش! — نکته امنیتی در بخش ۱۱).
-- بعد از ورود، سبد خرید مهمان به کاربر لاگین‌شده الحاق می‌شود.
-- روت‌های آن: `GET/POST /panel/login` (throttle:3,1 روی صفحه)، `/panel/check-user-exists`، `/panel/mobile-code`، `/panel/confirm-code`، `/panel/logout`.
+
+**نکات امنیتی:**
+- کلیدهای ترجمه استفاده‌شده: `admin.login.restricted` (موجود) و `admin.login.failed` (جدید — به `lang/{fa,en,ar,tr}/admin.php` اضافه شود).
+- `throttle:5,1` روی POST لاگین (۵ تلاش در دقیقه).
+- پیام یکسان برای «کاربر نیست» و «رمز غلط» و «ادمین نیست» → بدون لو دادن اطلاعات.
+- چک `is_active` داخل attempt → کاربر غیرفعال نمی‌تواند وارد شود.
+- `session()->regenerate()` بعد از ورود (جلوگیری از session fixation).
 
 ---
 
-## ۱۱) اشکالات امنیتی و باگ‌ها — ⚠️ در کپی از آن‌ها اجتناب کنید
+## ۹) روت‌های ادمین (ساختار نهایی)
 
-> در این بخش مواردی که در صورت کپی ناآگاهانه در پروژه جدید هم تکرار می‌شوند، شفاف علامت‌گذاری شده‌اند.
+```php
+// routes/admin.php
+use App\Http\Controllers\Admin\AdminAuthController;
 
-1. **🔴 بک‌دور لاگین:** روت `GET /login_admin/{token}` — اگر `token == env('AUTH_TOKEN')` باشد، مستقیم به‌عنوان اولین ادمین (`UserType('Admin')`) لاگین می‌کند. اگر `AUTH_TOKEN` لو برود یا ضعیف باشد، کل پنل در خطر است. این روت را در پروژه جدید نسازید.
-2. **🔴 JWT_SECRET هاردکد شده در کد:** در `config/jwt.php`: `env('JWT_SECRET', 's08vhUIaEwsEdn5VVTYHXVNi1RMUWXEAUflRRSPlpvyDJfsAbhFCmix3jFVP40b2')` — یک fallback طولانی در ریپازیتوری. اگر `JWT_SECRET` در env نباشد، همه با کلید پیش‌فرض توکن جعل می‌کنند! حتماً در پروژه جدید از `php artisan jwt:secret` و بدون fallback استفاده کنید.
-3. **🔴 بدون throttle روی لاگین ادمین:** `postLogin` وب و `AdminAuthService::login` (API) هیچ محدودیت تلاشی ندارند (فقط صفحه لاگین سایت `throttle:3,1` و change-password دارند). → Brute-force آزاد.
-4. **🟠 روت‌های محافظت‌نشده پنل:** `POST /admin/ckeditor-upload` اصلاً میدلور ندارد؛ برخی روت‌ها `withoutMiddleware('AdminPermission')` دارند. در طراحی «نام روت» هر روتِ بدون میدلور به‌صورت پیش‌فرض باز است — باید لیست سفید/سیاه دقیق داشته باشید.
-5. **🟠 باگ `str_contains` معکوس در AdminPermission:** `!str_contains('api', Route::currentRouteName())` — هاستک/نییدل جابه‌جا شده؛ یعنی عملاً برای همه روت‌ها true است و شاخه ریدایرکت اجرا می‌شود. (در عمل شاید خوش‌شانسانه جواب می‌دهد اما منطق درستی نیست.)
-6. **🟠 متغیر نامشخص `$admin`:** در `AdminPermission` وقتی کاربر لاگین نیست، `$admin` در شاخه elseif تعریف‌نشده است → E_WARNING در PHP 8 و رفتار غیرقابل پیش‌بینی.
-7. **🟠 کد OTP مشتری:** `confirm_code` بدون انقضا (expire) و بدون محدودیت تعداد تلاش ذخیره/بررسی می‌شود؛ کد ۴ رقمی → قابل حدس زدن در ۱۰۰۰۰ حالت.
-8. **🟡 `fullAccess` اضافه می‌شود ولی هیچ‌جا چک نمی‌شود** (فقط در `postAddPermission`): یک کلید بی‌اثر.
-9. **🟡 Dead import:** `AdminAuthService` از `App\Models\ApiUser` (که وجود ندارد) import می‌کند — در عمل استفاده نمی‌شود.
-10. **🟡 بازیابی رمز ادمین با `Http::withoutVerifying()`** به API خارجی rahweb.com و ارسال رمز جدید با پیامک — وابستگی به سرویس خارجی + غیرفعال‌سازی بررسی SSL.
-11. **🟡 لاگین وب ادمین نوع Admin را چک نمی‌کند** — فقط `Auth::attempt`؛ یک کاربر عادی با داشتن ایمیل/رمز (مثلاً کاربر سایت) سشن می‌گیرد و ریدایرکت به `/admin` می‌شود؛ فقط بعداً توسط `AdminPermission` (که UserType را چک می‌کند) رد می‌شود. نه‌تنها ناکارآمد، بلکه اطلاعات «وجود ایمیل/رمز» را لو می‌دهد.
-12. **🟡 `changePassword` ادمین اصلی از راه دور:** اولین Admin را پیدا می‌کند و رمزش را عوض می‌کند بدون هیچ تأیید/۲FA.
+Route::prefix('admin')->name('admin.')->group(function () {
+    // لاگین (عمومی)
+    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'postLogin'])
+        ->name('login.submit')->middleware('throttle:5,1');
+
+    // همه بخش‌های محافظت‌شده
+    Route::middleware(['auth', 'adminPermission', 'log.admin'])->group(function () {
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+        Route::resource('blogs', BlogController::class);
+        Route::resource('blog-categories', BlogCategoryController::class);
+        Route::resource('hero-slides', HeroSlideController::class);
+        Route::resource('trust-badges', TrustBadgeController::class);
+        Route::resource('products', ProductController::class);
+        Route::resource('product-categories', ProductCategoryController::class);
+        Route::resource('brands', BrandController::class);
+        Route::resource('specifications', SpecificationController::class);
+
+        // آینده: Route::resource('users', UserController::class);
+        // آینده: Route::resource('roles', RoleController::class);   ← مدیریت نقش‌ها
+
+        Route::get('/settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
+        Route::put('/settings/{group}', [SettingController::class, 'update'])->name('settings.update');
+
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+        Route::post('/ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
+    });
+});
+```
+
+> ⚠️ **قانون مهم:** در این معماری هر روت بدون میدلور پیش‌فرض **باز** است. هیچ روت ادمینی نباید خارج از گروه محافظت‌شده تعریف شود.
 
 ---
 
-## ۱۲) راهنمای انتقال به پروژه جدید (غیرماژولار)
+## ۱۰) UI مدیریت نقش‌ها و کاربران
 
-### مرحله ۱ — اسکیمای دیتابیس (یک مایگریشن واحد)
-```php
-Schema::create('users', function (Blueprint $t) {
-    $t->id();
-    $t->string('full_name')->nullable();
-    $t->string('mobile')->nullable();
-    $t->string('email')->nullable()->unique();
-    $t->string('password')->nullable();
-    $t->string('confirm_code')->nullable();
-    $t->string('avatar')->nullable();
-    $t->softDeletes();
-    $t->timestamps();
-});
-Schema::create('roles', function (Blueprint $t) {
-    $t->id();
-    $t->string('name');
-    $t->text('permission')->nullable();   // serialize آرایه نام روت‌ها
-    $t->softDeletes();
-    $t->timestamps();
-});
-Schema::create('role_user', function (Blueprint $t) {
-    $t->id();
-    $t->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-    $t->foreignId('role_id')->nullable()->constrained()->cascadeOnDelete();
-});
-Schema::create('user_types', function (Blueprint $t) {
-    $t->id();
-    $t->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-    $t->enum('type', ['Admin', 'Editor', 'Customer'])->default('Customer');
-    $t->timestamps();
-});
-```
-(در پروژه مبدأ از FK واقعی استفاده نشده — اینجا پیشنهاد بهتر شده است.)
+### ۱۰.۱) CRUD نقش‌ها (`admin.roles.*`)
 
-### مرحله ۲ — مدل‌ها
-```php
-// User (Authenticatable + SoftDeletes + Notifiable)
-// + roles() belongsToMany + userTypes() hasMany + syncUserTypes()
+- **index:** جدول نقش‌ها (نام، تعداد کاربر، تعداد دسترسی، سیستم بودن، عملیات).
+- **create/edit:** فرم با درخت چک‌باکس تولیدشده از `config('permissions.permissions')`:
+  - هر گروه یک کارت با هدر رنگی؛ عنوان = `__($group['title'])`.
+  - هر دسترسی یک چک‌باکس `name="permissions[]"` با value = نام روت (`admin.products.edit`) و لیبل = `__($labelKey)`.
+  - دکمه «انتخاب همه» برای کل فرم.
+  - گروه `dashboard` همیشه جدا نمایش داده شود.
+- **destroy:** نقش‌های `is_system` قابل حذف نیستند (فقط سوپرادمین می‌تواند ویرایش کند).
+- **ذخیره:** `$role->permissions()->sync($request->input('permissions', []))` + `forgetPermissionCache()` برای همه کاربران آن نقش.
+- **dedupe UI:** چون `store`/`update` با `create`/`edit` لیبل مشترک دارند، چک‌باکس‌ها را بر اساس `label_key` گروه‌بندی کن تا «افزودن محصول» دوبار نمایش داده نشود؛ تیک زدن هر کدام، هر دو مقدار (مثلاً `create` + `store`) را sync می‌کند.
 
-// Role
-protected $casts = ['permission' => 'array'];   // پیشنهاد: به‌جای serialize دستی
+### ۱۰.۲) مدیریت کاربران (`admin.users.*` — آینده)
 
-// ApiUser extends User implements JWTSubject   // برای گارد admin_jwt
-```
-
-### مرحله ۳ — کانفیگ guard ها (مثل config/auth.php مبدأ)
-- گارد `web` → session + provider users
-- گارد `admin_jwt` → jwt + provider api_users (مدل ApiUser)
-- نصب `tymon/jwt-auth` و انتشار `config/jwt.php`؛ **حتمن** `php artisan jwt:secret` و حذف fallback هاردکد.
-
-### مرحله ۴ — میدلورها (کپی تمیز شده)
-- `AdminPermission` (وب) — نسخه اصلاح‌شده بدون باگ str_contains و بدون undefined `$admin`:
-  ```php
-  public function handle($request, Closure $next)
-  {
-      $user = $request->user();
-      if (!$user || !$user->userTypes()->where('type', 'Admin')->exists()) {
-          return $request->expectsJson()
-              ? response()->json(['error' => 'Unauthorized'], 401)
-              : redirect()->guest('/admin/login');
-      }
-      $permissions = $user->roles->flatMap(fn ($r) => $r->permission ?? []);
-      abort_unless($permissions->contains(Route::currentRouteName()), 403);
-      return $next($request);
-  }
-  ```
-- `ApiPermission` (API) — با map `api_permissions` و مقدار `free`
-- ثبت در Kernel: `'admin-permission'` و `'api-permission'`
-
-### مرحله ۵ — کانفیگ site
-```php
-// config/site.php
-'permissions' => [/* درخت گروه‌ها */],
-'api_permissions' => [/* map روت API → کلید پنل */],
-```
-
-### مرحله ۶ — کنترلرها
-- `AuthController` وب ادمین: login/logout/dashboard + (اختیاری) بازیابی رمز امن
-- `AdminAuthService` API: login (با throttle + بررسی نقش) / me / logout / refresh
-- `PermissionController`: CRUD نقش‌ها با فرم چک‌باکس درختی
-- `UserController`: مدیریت کاربران + `UserObserver::deleted() → roles()->detach()` + محافظت آخرین ادمین
-
-### مرحله ۷ — سیدر
-```php
-// نقش full-access 'main' + ادمین اصلی (با رمز قوی از env، نه هاردکد)
-```
-
-### پیشنهادهای بهبود (در نسخه کپی)
-- 🔹 به‌جای serialize در ستون، جدول `permissions` + جدول `permission_role` واقعی (یا پکیج استاندارد Spatie Permission)
-- 🔹 افزودن `rate-limit` روی همه اندپوینت‌های لاگین
-- 🔹 ۲FA/OTP برای ورود ادمین (الگوی OTP موبایل سایت را می‌توانید به ادمین هم بدهید)
-- 🔹 `email_verified_at` / تأیید ایمیل
-- 🔹 ذخیره توکن‌های JWT در `blacklist` روی logout (قبلاً فعال است)
+- فرم شامل: نام، ایمیل، موبایل، رمز، `is_active`، چک‌باکس `is_admin` (فقط سوپرادمین می‌بیند) و مولتی‌سلکت `roles[]`.
+- ذخیره: `$user->roles()->sync($request->input('roles', []))` + `forgetPermissionCache()`.
+- **محافظت:** نمی‌توان آخرین سوپرادمین فعال را غیرفعال/حذف کرد.
 
 ---
 
-## ۱۳) چک‌لیست نهایی انتقال
+## ۱۱) سیدرها (AdminOwnerSeeder)
 
-- [ ] ساخت ۴ جدول: users / roles / role_user / user_types
-- [ ] کلاس `ApiUser extends User implements JWTSubject` برای گارد JWT
-- [ ] کانفیگ `web` + `admin_jwt` و `jwt:secret` بدون fallback هاردکد
-- [ ] میدلور `AdminPermission` اصلاح‌شده (رفع باگ‌های str_contains و $admin)
-- [ ] میدلور `ApiPermission` با map `api_permissions` (مقادیر `free`)
-- [ ] میدلور `PanelPermission` برای پنل مشتری
-- [ ] کانفیگ `site.permissions` (درخت UI + منبع نقش full-access) و `site.api_permissions`
-- [ ] فرم CRUD نقش با چک‌باکس درختی + «انتخاب همه»
-- [ ] فرم کاربران با `user_types[]` و `roles[]` + اعتبارسنجی یکتایی
-- [ ] `UserObserver::deleted` → detach نقش‌ها + ممانعت از حذف آخرین ادمین
-- [ ] سیدر نقش `main` (full-access) + ادمین اولیه (رمز از env)
-- [ ] throttle روی لاگین ادمین (وب + API)
-- [ ] ❌ نساختن روت بک‌دور `/login_admin/{token}`
-- [ ] ❌ استفاده نکردن از `Http::withoutVerifying()` و API خارجی برای بازیابی رمز
-- [ ] رفع نقص OTP مشتری: انقضا + محدودیت تلاش + (ترجیحاً) کد ۶ رقمی
+> ✅ **این سیدر هم‌اکنون در پروژه ساخته شده:** `database/seeders/AdminOwnerSeeder.php` و در `DatabaseSeeder` ثبت شده.
+> به محض اجرای میگریشن‌ها، `php artisan db:seed` ادمین اصلی را می‌سازد.
+
+**کاری که سیدر انجام می‌دهد (ایدمپوتنت — چند بار اجرا امن است):**
+
+1. **کاتالوگ دسترسی‌ها:** تمام دسترسی‌های درخت کانفیگ را در جدول `permissions` upsert می‌کند.
+2. **نقش `main`:** نقش سیستمی با `is_system = true` و **تمام** دسترسی‌ها.
+3. **ادمین اصلی:** کاربر با `is_admin = true`، نقش `main`، فعال — اعتبارنامه از env:
+   - `ADMIN_OWNER_NAME` (پیش‌فرض: «مدیر اصلی»)
+   - `ADMIN_OWNER_EMAIL` (پیش‌فرض: `admin@shopora.test`)
+   - `ADMIN_OWNER_MOBILE` (پیش‌فرض: `09120000000`) ← ستون mobile اجباری است
+   - `ADMIN_OWNER_PASSWORD` — اگر ست نشود، یک رمز قوی تصادفی می‌سازد و **یک بار** در خروجی سیدر چاپ می‌کند.
+
+**استفاده:**
+
+```bash
+cp .env.example .env   # یا روی .env موجود:
+# ADMIN_OWNER_NAME="مدیر اصلی"
+# ADMIN_OWNER_EMAIL=admin@shopora.test
+# ADMIN_OWNER_MOBILE=09120000000
+# ADMIN_OWNER_PASSWORD=یک_رمز_قوی_اینجا
+
+php artisan migrate
+php artisan db:seed --class=AdminOwnerSeeder
+```
+
+(سیدر از `config('admin.owner.*')` می‌خواند — فایل `config/admin.php` از بخش ۶.۱.)
+
+**نکته:** با `updateOrCreate` روی ایمیل ساخته شده؛ اجرای مجدد سیدر رمز را فقط اگر `ADMIN_OWNER_PASSWORD` ست شده باشد تغییر می‌دهد.
+
+---
+
+## ۱۲) چک‌لیست امنیتی — باید و نباید
+
+### ✅ باید (پیاده‌سازی شده در این طراحی)
+
+- [x] throttle روی لاگین ادمین (وب)
+- [x] چک «ادمین واقعی» در خود لاگین + پیام یکسان برای همه خطاها
+- [x] چک `is_active` هنگام ورود
+- [x] `session()->regenerate()` بعد از ورود
+- [x] سوپرادمین (`is_admin`) جدا از نقش‌ها — هرگز قفل نمی‌شود
+- [x] روت‌های آزاد فقط با لیست سفید صریح (`permissions.free`)
+- [x] کش دسترسی‌ها با invalidation روی تغییر نقش
+- [x] ممانعت از حذف آخرین سوپرادمین و نقش‌های سیستمی
+- [x] حذف کاربر → `role_user` با cascade پاک می‌شود
+- [x] لاگ ادمین (`log.admin`) روی کل گروه محافظت‌شده
+
+### ❌ نباید (باگ‌های دیزاین قدیمی — به‌هیچ‌وجه کپی نشوند)
+
+- [ ] ❌ روت بک‌دور `/login_admin/{token}` با مقایسه به `AUTH_TOKEN`
+- [ ] ❌ کلید/سکرت هاردکد در کد (fallback داخل ریپازیتوری) — همیشه از `env` و بدون fallback
+- [ ] ❌ `serialize()`/`unserialize()` برای ذخیره دسترسی‌ها
+- [ ] ❌ جدول `user_types` موازی با نقش‌ها
+- [ ] ❌ لاگین بدون throttle و بدون چک ادمین
+- [ ] ❌ `Http::withoutVerifying()` و API خارجی برای بازیابی رمز
+- [ ] ❌ کد OTP بدون انقضا و بدون محدودیت تلاش (برای مشتری‌ها) — کد ۶ رقمی + انقضا + محدودیت
+- [ ] ❌ روت ادمین خارج از گروه محافظت‌شده
+
+---
+
+## ۱۳) راهنمای انتقال به سایت دیگر (Porting Guide)
+
+برای استفاده از این سیستم روی هر سایت Laravel دیگری، به ترتیب:
+
+1. **کپی کد:** میگریشن‌های ۴.۲–۴.۵، مدل‌های `Role`/`Permission`، ترِیت `HasAdminPermissions`، میدلور `AdminPermission`، کنترلر `AdminAuthController`، کانفیگ `config/admin.php`، سیدر `AdminOwnerSeeder`.
+2. **سازگار کردن کانفیگ:** در `config/permissions.php` گروه‌ها را با نام روت‌های همان سایت بازنویسی کنید (نام روت نهایی = `admin.{group}.{access}`). روت‌های بدون میدلور را صریحاً به `free` اضافه کنید.
+3. **ترجمه:** فایل‌های `lang/*/permissions.php` را برای زبان‌های همان سایت بسازید.
+4. **روت‌ها:** تمام روت‌های ادمین را داخل گروه `middleware(['auth','adminPermission','log.admin'])` ببرید (بخش ۹).
+5. **لاگین:** صفحه لاگین همان پروژه (طراحی آماده است) را با `postLogin` کنترلر وصل کنید.
+6. **نقش main:** سیدر را اجرا کنید — نقش `main` و ادمین اصلی ساخته می‌شوند.
+7. **UI نقش‌ها:** اگر پروژه جدید نیاز دارد، صفحه CRUD نقش از بخش ۱۰ را بسازید.
+
+**تست سریع بعد از انتقال:**
+```bash
+php artisan migrate
+php artisan db:seed --class=AdminOwnerSeeder
+curl -i http://site.test/admin/dashboard          # → 302 به لاگین
+curl -i http://site.test/admin/roles              # → 302 به لاگین
+```
+
+---
+
+## ۱۴) مسیر آینده (گام‌های بعدی)
+
+به‌ترتیب اولویت:
+
+1. **UI مدیریت نقش‌ها** (`admin.roles.*`) — درخت چک‌باکس از کانفیگ.
+2. **UI مدیریت کاربران** (`admin.users.*`) — نسبت دادن نقش‌ها و `is_admin`.
+3. **Policies برای مدل‌ها** (مکمل، نه جایگزین): مثلاً `ProductPolicy` برای منطق مالکیت/شرایط خاص.
+4. **۲FA / OTP برای ادمین** — الگوی OTP مشتری را با انقضا و محدودیت تلاش به ادمین هم بدهید.
+5. **JWT برای پنل Vue آینده:** اگر پنل جدید جدا شد، گارد `admin_jwt` اضافه کنید (کلاس `ApiUser extends User implements JWTSubject` + `tymon/jwt-auth` + `php artisan jwt:secret` بدون fallback) و میدلور `ApiPermission` با map دسترسی‌ها.
+6. **ارتقا به Spatie Laravel Permission** (اختیاری): اگر تعداد نقش‌ها/دسترسی‌ها رشد کرد، کانفیگ درختی همان منبع می‌ماند و فقط لایه ذخیره‌سازی عوض می‌شود؛ سیدر و UI تقریباً بدون تغییر منتقل می‌شوند.
+
+---
+
+*پایان سند. وضعیت: آماده پیاده‌سازی.*
