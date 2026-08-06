@@ -11,16 +11,16 @@
        x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
        x-transition:leave="transition ease-in duration-200"
        x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-       class="fixed inset-y-0 right-0 w-72 bg-white z-50 lg:hidden flex flex-col shadow-lg" x-cloak>
+       class="fixed inset-y-0 right-0 w-72 bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col shadow-lg" x-cloak>
 
-    <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100">
+    <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 dark:border-gray-700">
         <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-2.5">
             <div class="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-lg">S</span>
             </div>
-            <span class="font-bold text-gray-800">Shopora</span>
+            <span class="font-bold text-gray-800 dark:text-gray-100">Shopora</span>
         </a>
-        <button @click="$dispatch('close-mobile')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100">
+        <button @click="$dispatch('close-mobile')" class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>

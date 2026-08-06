@@ -230,3 +230,21 @@
     transform: scale(1.01);
     transition: all 0.2s ease-in-out;
 }
+
+/* 4. غلبه بر !important بوت‌استرپ در دارک مود
+   بوت‌استرپ کلاس‌های bg-white و border را با !important اعمال می‌کند،
+   بنابراین سایدبار، هدر، کارت‌ها و جدول‌ها (کلاس bg-white) در دارک مود سفید می‌ماندند.
+   این قوانین رنگ بوت‌استرپ را در دارک مود با tailwind هماهنگ می‌کنند. */
+.dark .bg-white {
+    background-color: rgb(31 41 55 / 1) !important; /* = gray-800 */
+}
+
+/* مرزهای خاکستری روشن در دارک مود تیره می‌شوند */
+.dark .border:is(.border-gray-50, .border-gray-100, .border-gray-200, .border-gray-300) {
+    border-color: rgb(55 65 81 / 1) !important; /* = gray-700 */
+}
+
+/* دستگیره سوییچ‌های toggle در دارک مود روشن بمانند */
+.dark .bg-white.dark\:bg-gray-300 {
+    background-color: rgb(209 213 219 / 1) !important; /* = gray-300 */
+}
