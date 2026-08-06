@@ -65,13 +65,13 @@ class UserController extends Controller
         }
         $user->roles()->sync($roleIds);
 
-        // مسیر بازگشت بر اساس دسترسی سازنده — تا اگر دسترسی edit ندارد به 403 نخورد
-        $canEdit = $isSuperAdmin || auth()->user()->canAccess('admin.users.edit');
-        $redirectTarget = $canEdit ? 'admin.users.edit'
-            : (auth()->user()->canAccess('admin.users.index') ? 'admin.users.index' : 'admin.dashboard.index');
+        // مسیر بازگشت: اولویت با لیست کاربران است (طبق تجربه کاربری درخواستی)
+        // — تا اگر دسترسی index ندارد به 403 نخورد، به داشبورد برمی‌گردد.
+        $redirectTarget = $isSuperAdmin || auth()->user()->canAccess('admin.users.index')
+            ? 'admin.users.index'
+            : 'admin.dashboard.index';
 
-        return redirect()->route($redirectTarget, $canEdit ? [$user] : [])
-            ->with('success', 'کاربر با موفقیت ساخته شد.');
+        return redirect()->route($redirectTarget)->with('success', 'کاربر با موفقیت ساخته شد.');
     }
 
     public function edit(User $user): View

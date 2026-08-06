@@ -31,7 +31,7 @@ class RoleController extends Controller
 
         User::bumpPermissionsVersion();
 
-        return redirect()->route('admin.roles.edit', $role)->with('success', 'نقش با موفقیت ساخته شد.');
+        return redirect()->route('admin.roles.index')->with('success', 'نقش با موفقیت ساخته شد.');
     }
 
     public function edit(Role $role): View

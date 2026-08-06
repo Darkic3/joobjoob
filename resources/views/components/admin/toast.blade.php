@@ -19,8 +19,12 @@
                 this.messages.push({ type: 'info', message: {{ json_encode(session('info')) }} });
             @endif
 
-            this.messages.forEach(function (msg, i) {
-                setTimeout(function () { this.messages.splice(i, 1); }.bind(this), 5000);
+            this.messages.forEach(function (msg) {
+                setTimeout(function () {
+                    // به‌جای splice با ایندکس (که با حذف پیام اول، ایندکس‌ها جابه‌جا می‌شوند)
+                    // خود پیام را فیلتر می‌کنیم تا پیام درست حذف شود.
+                    this.messages = this.messages.filter(function (m) { return m !== msg; });
+                }.bind(this), 5000);
             }.bind(this));
         },
         remove(index) { this.messages.splice(index, 1); }
