@@ -24,7 +24,7 @@ trait HasAdminPermissions
      */
     public function permissionNames(): array
     {
-        $version = Cache::remember('admin.permissions.version', now()->addDay(), fn () => 1);
+        $version = Cache::rememberForever('admin.permissions.version', fn () => 1);
 
         return Cache::remember(
             "admin.permissions.v{$version}.{$this->id}",
@@ -74,9 +74,16 @@ trait HasAdminPermissions
     /**
      * بعد از هر تغییر در دسترسی‌های یک نقش یا کاتالوگ دسترسی‌ها صدا بزن:
      * کش همه کاربران یکجا باطل می‌شود.
+     *
+     * مقاوم در برابر کلید ناموجود: درایور database روی کلید ناموجود increment نمی‌کند،
+     * پس اگر کلید نبود، از مقدار ۲ شروع می‌کنیم (مقدار ۱ متعلق به وضعیت قبل است).
      */
     public static function bumpPermissionsVersion(): void
     {
-        Cache::increment('admin.permissions.version');
+        if (Cache::has('admin.permissions.version')) {
+            Cache::increment('admin.permissions.version');
+        } else {
+            Cache::forever('admin.permissions.version', 2);
+        }
     }
 }

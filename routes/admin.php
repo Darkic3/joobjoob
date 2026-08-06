@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\TrustBadgeController;
@@ -34,6 +35,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('product-categories', ProductCategoryController::class);
         Route::resource('brands', BrandController::class);
         Route::resource('specifications', SpecificationController::class);
+        // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ هم کلید show ندارد
+        // (اگر روت show می‌ماند، نقش main هم به آن دسترسی نداشت → تله 403)
+        Route::resource('roles', RoleController::class)->except('show');
 
         Route::get('settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');

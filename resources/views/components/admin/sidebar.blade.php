@@ -266,6 +266,15 @@
             <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.settings') }}</span>
         </a>
 
+        {{-- نقش‌ها و دسترسی‌ها --}}
+        <a href="{{ route('admin.roles.index') }}"
+           class="sidebar-link {{ request()->routeIs('admin.roles.*') ? 'sidebar-link-active' : '' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.roles') }}</span>
+        </a>
+
         {{-- خروج از حساب — فرم POST (csrf) به جای لینک --}}
         <form method="POST" action="{{ route('admin.logout') }}" class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
             @csrf

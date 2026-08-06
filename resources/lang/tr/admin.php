@@ -65,6 +65,7 @@ return [
         'trust_badges'     => 'Güven Rozetleri',
         'manage_badges'    => 'Rozetleri Yönet',
         'settings'         => 'Ayarlar',
+        'roles'            => 'Roller ve İzinler',
         'logout'           => 'Çıkış Yap',
     ],
 

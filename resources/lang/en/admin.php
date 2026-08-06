@@ -65,6 +65,7 @@ return [
         'trust_badges'     => 'Trust Badges',
         'manage_badges'    => 'Manage Badges',
         'settings'         => 'Settings',
+        'roles'            => 'Roles & Permissions',
         'logout'           => 'Logout',
     ],
 
