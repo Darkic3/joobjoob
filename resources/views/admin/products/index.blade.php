@@ -26,7 +26,7 @@
         if (request('best_seller')) $activeFilters[] = ['label' => 'فقط پرفروش‌ها', 'url' => route('admin.products.index', request()->except(['page', 'best_seller']))];
     @endphp
 
-    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
 
         <!-- هدر صفحه -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -77,17 +77,17 @@
                     <div class="lg:col-span-2">
                         <label for="filter-search" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">جستجو</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                            <span class="absolute inset-y-0 start-3 flex items-center pointer-events-none">
                                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </span>
                             <input type="text" name="search" id="filter-search" value="{{ request('search') }}" placeholder="نام محصول، برند، SKU یا اسلاگ..."
-                                   class="input-custom pr-10 pl-14" data-filter-search>
+                                   class="input-custom ps-10 pe-14" data-filter-search>
                             @if(request('search'))
-                                <a href="{{ route('admin.products.index', request()->except(['page', 'search'])) }}" class="absolute inset-y-0 right-9 flex items-center text-gray-400 hover:text-rose-500 transition-colors" title="حذف جستجو">
+                                <a href="{{ route('admin.products.index', request()->except(['page', 'search'])) }}" class="absolute inset-y-0 start-9 flex items-center text-gray-400 hover:text-rose-500 transition-colors" title="حذف جستجو">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </a>
                             @endif
-                            <kbd class="absolute inset-y-0 left-3 my-auto h-6 w-6 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-500 pointer-events-none" title="میانبر صفحه‌کلید: / یا Ctrl+K">/</kbd>
+                            <kbd class="absolute inset-y-0 end-3 my-auto h-6 w-6 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-500 pointer-events-none" title="میانبر صفحه‌کلید: / یا Ctrl+K">/</kbd>
                         </div>
                     </div>
                     <div>
@@ -191,7 +191,7 @@
         <!-- جدول داده‌ها -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-right">
+                <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">محصول</th>
@@ -216,7 +216,7 @@
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="mr-4">
+                                    <div class="ms-4">
                                         <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $product->trans('name') ?? '-' }}</div>
                                         <div class="flex items-center gap-2 mt-0.5">
                                             @if($product->brand)
@@ -275,7 +275,7 @@
                                         <div x-show="open" @click.outside="open = false" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-10">
                                             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" onsubmit="return confirm('آیا از حذف این محصول اطمینان دارید؟')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="w-full text-right block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10">حذف محصول</button>
+                                                <button type="submit" class="w-full text-start block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10">حذف محصول</button>
                                             </form>
                                         </div>
                                     </div>
