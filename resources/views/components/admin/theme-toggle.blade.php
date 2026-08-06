@@ -25,6 +25,7 @@
                 document.documentElement.setAttribute('data-bs-theme', 'light');
                 localStorage.setItem('theme', 'light');
             }
+            if (window.applyAdminThemeToCkeditor) window.applyAdminThemeToCkeditor();
         }
     }"
     @click="toggle()"

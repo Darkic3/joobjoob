@@ -551,3 +551,34 @@ window.SlugHelper = {
 document.addEventListener('DOMContentLoaded', () => {
     window.SlugHelper.initAll();
 });
+
+/* ==========================================
+   دارک مود CKEditor — همگام‌سازی بدنه داخل iframe با تم
+   محتوای CKEditor داخل iframe مستقل است؛ با JS استایل بدنه را تنظیم می‌کنیم.
+   ========================================== */
+window.applyAdminThemeToCkeditor = function () {
+    if (typeof CKEDITOR === 'undefined') return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const bg = isDark ? '#1f2937' : '#ffffff';   // gray-800 / سفید
+    const fg = isDark ? '#e5e7eb' : '#111827';   // gray-100 / خاکستری تیره
+
+    Object.keys(CKEDITOR.instances).forEach(name => {
+        const editor = CKEDITOR.instances[name];
+        try {
+            const body = editor.document && editor.document.getBody();
+            if (body) {
+                body.setStyle('background-color', bg);
+                body.setStyle('color', fg);
+            }
+        } catch (e) {
+            /* editor هنوز آماده نیست */
+        }
+    });
+};
+
+if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.on('instanceReady', () => {
+        window.applyAdminThemeToCkeditor();
+    });
+}

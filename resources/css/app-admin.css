@@ -151,47 +151,6 @@
         z-index: 11111111111 !important;
     }
 
-    /* استایل‌های CKEditor برای Dark Mode */
-    .dark .cke_editor {
-        @apply bg-gray-700 border-gray-600 rounded-xl overflow-hidden;
-    }
-
-    .dark .cke_top {
-        @apply bg-gray-800 border-gray-600;
-    }
-
-    .dark .cke_toolbox {
-        @apply bg-gray-800;
-    }
-
-    .dark .cke_toolgroup {
-        @apply bg-gray-700 border-gray-600;
-    }
-
-    .dark .cke_button {
-        @apply bg-gray-700 hover:bg-gray-600;
-    }
-
-    .dark .cke_combo_button {
-        @apply bg-gray-700 border-gray-600 text-gray-300;
-    }
-
-    .dark .cke_contents {
-        @apply bg-gray-700;
-    }
-
-    .dark .cke_contents iframe {
-        @apply bg-gray-700;
-    }
-
-    .dark .cke_bottom {
-        @apply bg-gray-800 border-gray-600;
-    }
-
-    .dark .cke_resizer {
-        @apply border-gray-600;
-    }
-
     /* استایل پایه برای textarea CKEditor */
     textarea.ckeditor {
         @apply w-full min-h-[200px] bg-white dark:bg-gray-700
@@ -217,11 +176,101 @@
 .dark ::-webkit-scrollbar-thumb { background: #475569; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* 2. پشتیبانی از حالت تاریک برای CKEditor */
-.dark .cke { background: #374151 !important; border-color: #4b5563 !important; }
-.dark .cke_top, .dark .cke_bottom { background: #1f2937 !important; border-color: #4b5563 !important; }
-.dark .cke_contents { background: #374151 !important; }
-.dark .cke_wysiwyg_frame { background: #374151 !important; color: #e5e7eb !important; }
+/* 2. دارک مود CKEditor — تولبار، پنل‌ها و بدنه ویرایشگر */
+.dark .cke {
+    background: #1f2937 !important;   /* gray-800 */
+    border-color: #374151 !important; /* gray-700 */
+}
+
+.dark .cke_top,
+.dark .cke_bottom {
+    background: #111827 !important;   /* gray-900 */
+    border-color: #374151 !important;
+}
+
+.dark .cke_toolbox {
+    background: #111827 !important;
+}
+
+.dark .cke_toolgroup,
+.dark .cke_combo_button {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    border-radius: 6px;
+    box-shadow: none !important;
+}
+
+.dark .cke_button {
+    border-radius: 4px;
+}
+
+.dark .cke_button:hover,
+.dark .cke_button:focus,
+.dark .cke_button:active,
+.dark .cke_combo_button:hover {
+    background: #374151 !important;
+}
+
+.dark .cke_button_on {
+    background: #1d4ed8 !important; /* blue-700 */
+}
+
+.dark .cke_button_icon {
+    filter: invert(1);
+}
+
+.dark .cke_button_label {
+    color: #e5e7eb !important;
+}
+
+.dark .cke_combo_text {
+    color: #e5e7eb !important;
+}
+
+.dark .cke_combo_arrow {
+    border-color: #e5e7eb transparent transparent transparent !important;
+}
+
+.dark .cke_toolbar_separator {
+    background-color: #374151 !important;
+}
+
+.dark .cke_contents {
+    background: #1f2937 !important;
+}
+
+.dark .cke_wysiwyg_frame {
+    background: #1f2937 !important;
+}
+
+.dark .cke_resizer {
+    border-color: transparent #e5e7eb #e5e7eb transparent !important;
+}
+
+.dark .cke_resizer_rtl {
+    border-color: transparent transparent #e5e7eb #e5e7eb !important;
+}
+
+/* پنل‌های کشویی (فرمت، فونت و ...) */
+.dark .cke_panel {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+.dark .cke_panel_grouptitle {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+}
+
+.dark .cke_panel_listItem a {
+    color: #e5e7eb !important;
+}
+
+.dark .cke_panel_listItem a:hover,
+.dark .cke_panel_listItem a:focus,
+.dark .cke_panel_listItem a:active {
+    background: #374151 !important;
+}
 
 /* 3. استایل ناحیه Drag & Drop تصاویر */
 .dropzone-area.dragover {
