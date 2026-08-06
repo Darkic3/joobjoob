@@ -79,7 +79,7 @@
                                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </span>
                             <input type="text" name="search" id="filter-search" value="{{ request('search') }}" placeholder="نام محصول، برند، SKU یا اسلاگ..."
-                                   class="w-full pr-10 pl-14 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" data-filter-search>
+                                   class="input-custom pr-10 pl-14" data-filter-search>
                             @if(request('search'))
                                 <a href="{{ route('admin.products.index', request()->except(['page', 'search'])) }}" class="absolute inset-y-0 right-9 flex items-center text-gray-400 hover:text-rose-500 transition-colors" title="حذف جستجو">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -90,7 +90,7 @@
                     </div>
                     <div>
                         <label for="filter-category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">دسته‌بندی</label>
-                        <select name="category" id="filter-category" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                        <select name="category" id="filter-category" class="input-custom">
                             <option value="">همه دسته‌ها</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" @if(request('category') == $category->id) selected @endif>{{ $category->trans('name') }}</option>
@@ -99,7 +99,7 @@
                     </div>
                     <div>
                         <label for="filter-brand" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
-                        <select name="brand_id" id="filter-brand" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                        <select name="brand_id" id="filter-brand" class="input-custom">
                             <option value="">همه برندها</option>
                             @foreach($brands as $brand)
                                 <option value="{{ $brand->id }}" @if(request('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
@@ -108,7 +108,7 @@
                     </div>
                     <div>
                         <label for="filter-status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وضعیت نمایش</label>
-                        <select name="status" id="filter-status" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                        <select name="status" id="filter-status" class="input-custom">
                             <option value="">همه</option>
                             <option value="1" @if(request('status') == '1') selected @endif>فعال</option>
                             <option value="0" @if(request('status') == '0') selected @endif>غیرفعال</option>
@@ -120,7 +120,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                         <label for="filter-sort" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">مرتب‌سازی</label>
-                        <select name="sort" id="filter-sort" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                        <select name="sort" id="filter-sort" class="input-custom">
                             <option value="newest" @if(request('sort')=='newest' || !request('sort')) selected @endif>جدیدترین</option>
                             <option value="oldest" @if(request('sort')=='oldest') selected @endif>قدیمی‌ترین</option>
                             <option value="price_asc" @if(request('sort')=='price_asc') selected @endif>ارزان‌ترین</option>
@@ -131,7 +131,7 @@
                     </div>
                     <div>
                         <label for="filter-availability" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">موجودی</label>
-                        <select name="availability" id="filter-availability" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                        <select name="availability" id="filter-availability" class="input-custom">
                             <option value="">همه</option>
                             <option value="in_stock" @if(request('availability')=='in_stock') selected @endif>موجود در انبار</option>
                             <option value="out_of_stock" @if(request('availability')=='out_of_stock') selected @endif>ناموجود</option>
@@ -139,11 +139,11 @@
                     </div>
                     <div>
                         <label for="filter-price-min" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداقل قیمت</label>
-                        <input type="number" name="price_min" id="filter-price-min" value="{{ request('price_min') }}" min="0" placeholder="0" dir="ltr" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-left">
+                        <input type="number" name="price_min" id="filter-price-min" value="{{ request('price_min') }}" min="0" placeholder="0" dir="ltr" class="input-custom text-left">
                     </div>
                     <div>
                         <label for="filter-price-max" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداکثر قیمت</label>
-                        <input type="number" name="price_max" id="filter-price-max" value="{{ request('price_max') }}" min="0" placeholder="بدون محدودیت" dir="ltr" class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-left">
+                        <input type="number" name="price_max" id="filter-price-max" value="{{ request('price_max') }}" min="0" placeholder="بدون محدودیت" dir="ltr" class="input-custom text-left">
                     </div>
                 </div>
 

@@ -26,13 +26,13 @@
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام مشخصه (فارسی) <span class="text-rose-500">*</span></label>
-        <input type="text" name="title[fa]" value="{{ $oldVal('title.fa') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="مثال: رنگ یا سایز" required>
+        <input type="text" name="title[fa]" value="{{ $oldVal('title.fa') }}" class="input-custom" placeholder="مثال: رنگ یا سایز" required>
         @error('title.fa') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام انگلیسی</label>
-        <input type="text" name="title[en]" value="{{ $oldVal('title.en') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="Color / Size" dir="ltr">
+        <input type="text" name="title[en]" value="{{ $oldVal('title.en') }}" class="input-custom" placeholder="Color / Size" dir="ltr">
     </div>
 
     {{-- نوع مشخصه --}}
@@ -60,7 +60,7 @@
     {{-- والد (فقط برای مقادیر انتخابی) --}}
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">والد (گروه) <span class="text-xs font-normal text-gray-400">— برای تعریف مقدارِ یک گروه</span></label>
-        <select name="parent_id" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+        <select name="parent_id" class="input-custom">
             <option value="">— گروه نیست (والد) —</option>
             @foreach($parents as $parent)
                 <option value="{{ $parent->id }}" @if($oldVal('parent_id') == $parent->id) selected @endif>{{ $parent->trans('title') }}</option>
@@ -83,7 +83,7 @@
         <div x-show="isColor" x-transition class="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">کد رنگ</span>
             <input type="color" name="color_code" x-model="colorCode" class="w-12 h-9 rounded-lg border-0 cursor-pointer bg-transparent">
-            <input type="text" name="color_code_display" x-model="colorCode" class="flex-1 rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm font-mono" dir="ltr">
+            <input type="text" name="color_code_display" x-model="colorCode" class="input-custom flex-1 font-mono text-sm" dir="ltr">
             <input type="hidden" name="color_code" :value="colorCode">
         </div>
 

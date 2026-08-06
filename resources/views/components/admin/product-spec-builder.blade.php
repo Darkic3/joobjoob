@@ -148,16 +148,16 @@
                                 <span class="font-semibold text-gray-800 dark:text-gray-100" x-text="v.label"></span>
                             </td>
                             <td class="px-4 py-2.5">
-                                <input type="number" x-model="v.price" :name="'variants[' + i + '][price]'" min="0" placeholder="0" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" dir="ltr">
+                                <input type="number" x-model="v.price" :name="'variants[' + i + '][price]'" min="0" placeholder="0" class="input-custom text-sm" dir="ltr">
                             </td>
                             <td class="px-4 py-2.5">
-                                <input type="number" x-model="v.discount_price" :name="'variants[' + i + '][discount_price]'" min="0" placeholder="—" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" dir="ltr">
+                                <input type="number" x-model="v.discount_price" :name="'variants[' + i + '][discount_price]'" min="0" placeholder="—" class="input-custom text-sm" dir="ltr">
                             </td>
                             <td class="px-4 py-2.5">
-                                <input type="number" x-model="v.stock" :name="'variants[' + i + '][stock]'" min="0" placeholder="0" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" dir="ltr">
+                                <input type="number" x-model="v.stock" :name="'variants[' + i + '][stock]'" min="0" placeholder="0" class="input-custom text-sm" dir="ltr">
                             </td>
                             <td class="px-4 py-2.5">
-                                <input type="number" x-model="v.weight" :name="'variants[' + i + '][weight]'" min="0" placeholder="100" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" dir="ltr">
+                                <input type="number" x-model="v.weight" :name="'variants[' + i + '][weight]'" min="0" placeholder="100" class="input-custom text-sm" dir="ltr">
                             </td>
                         </tr>
                     </template>
@@ -177,7 +177,7 @@
             <template x-for="spec in textSpecs" :key="spec.id">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5" x-text="spec.title"></label>
-                    <input type="text" :name="'text_specs[' + spec.id + ']'" x-model="textValues[spec.id]" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="مقدار...">
+                    <input type="text" :name="'text_specs[' + spec.id + ']'" x-model="textValues[spec.id]" class="input-custom" placeholder="مقدار...">
                 </div>
             </template>
         </div>
@@ -207,8 +207,8 @@
             <template x-for="(prop, i) in properties" :key="'p' + i">
                 <div class="grid grid-cols-[1fr_1.5fr_auto] gap-3 items-center bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700 p-3">
                     <input type="hidden" :name="'properties[' + i + '][id]'" :value="prop.id">
-                    <input type="text" x-model="prop.title" :name="'properties[' + i + '][title]'" placeholder="عنوان (مثل: جنس)" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    <input type="text" x-model="prop.value" :name="'properties[' + i + '][value]'" placeholder="مقدار (مثل: چرم طبیعی)" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <input type="text" x-model="prop.title" :name="'properties[' + i + '][title]'" placeholder="عنوان (مثل: جنس)" class="input-custom text-sm">
+                    <input type="text" x-model="prop.value" :name="'properties[' + i + '][value]'" placeholder="مقدار (مثل: چرم طبیعی)" class="input-custom text-sm">
                     <button type="button" @click="properties.splice(i, 1)" class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all" title="حذف">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>

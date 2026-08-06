@@ -53,7 +53,7 @@
                 نام نقش <span class="text-rose-500">*</span>
             </label>
             <input type="text" name="name" value="{{ $isEdit ? old('name', $role->name) : old('name') }}"
-                   class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all"
+                   class="input-custom text-sm"
                    placeholder="مثال: content-manager" dir="ltr" required>
             @error('name') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
@@ -67,7 +67,7 @@
                 </span>
             </label>
             <input type="text" x-model="search" placeholder="مثلاً: محصول، حذف، تنظیمات..."
-                   class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all"
+                   class="input-custom text-sm"
                    @keydown.esc.window="search = ''">
         </div>
 

@@ -23,25 +23,25 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام <span class="text-rose-500">*</span></label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                           class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" required>
+                           class="input-custom" required>
                     @error('name') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">شماره موبایل <span class="text-rose-500">*</span></label>
                     <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" dir="ltr"
-                           class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-right" required>
+                           class="input-custom text-right" required>
                     @error('mobile') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">ایمیل</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" dir="ltr"
-                           class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-right">
+                           class="input-custom text-right">
                     @error('email') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">رمز عبور جدید <span class="text-xs text-gray-400 font-normal">(خالی = بدون تغییر)</span></label>
                     <input type="password" name="password" dir="ltr" autocomplete="new-password"
-                           class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-right">
+                           class="input-custom text-right">
                     @error('password') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>

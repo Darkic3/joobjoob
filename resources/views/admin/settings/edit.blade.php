@@ -120,14 +120,14 @@
                                                                 {{-- تکست ایریا --}}
                                                             @elseif($type === 'textarea' || $type === 'ckeditor')
                                                                 <textarea name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                          class="form-control rounded-3 @if ($ckeditor) ckeditor @endif"
+                                                                          class="input-custom @if ($ckeditor) ckeditor @endif"
                                                                           rows="5"
                                                                           @if ($isRequired) required @endif>{{ $value }}</textarea>
 
                                                                 {{-- اینپوت متنی --}}
                                                             @else
                                                                 <input type="{{ $type }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                       value="{{ $value }}" class="form-control rounded-3"
+                                                                       value="{{ $value }}" class="input-custom"
                                                                        @if ($isRequired) required @endif>
                                                                 @endif
                                                                 </div>

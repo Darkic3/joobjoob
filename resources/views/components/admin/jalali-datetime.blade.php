@@ -44,7 +44,7 @@
            placeholder="{{ $placeholder }}"
            autocomplete="off"
            dir="ltr"
-           class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-left">
+           class="input-custom text-left">
 
     <p class="text-[10px] text-gray-400 mt-1">تاریخ شمسی — به‌صورت خودکار به میلادی برای ذخیره تبدیل می‌شود.</p>
 

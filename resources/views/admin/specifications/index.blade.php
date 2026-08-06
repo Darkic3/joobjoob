@@ -21,14 +21,14 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4 mb-6">
             <form action="{{ route('admin.specifications.index') }}" method="GET" class="flex flex-wrap gap-3">
                 <div class="flex-1 min-w-[200px]">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="جستجو در نام مشخصه..." class="w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="جستجو در نام مشخصه..." class="input-custom">
                 </div>
-                <select name="type" class="px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 w-auto min-w-[140px]">
+                <select name="type" class="input-custom w-auto min-w-[140px]">
                     <option value="">همه انواع</option>
                     <option value="select" {{ request('type') === 'select' ? 'selected' : '' }}>انتخابی (گروه/مقدار)</option>
                     <option value="text" {{ request('type') === 'text' ? 'selected' : '' }}>نوشتاری</option>
                 </select>
-                <select name="status" class="px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 w-auto min-w-[120px]">
+                <select name="status" class="input-custom w-auto min-w-[120px]">
                     <option value="">همه وضعیت‌ها</option>
                     <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>فعال</option>
                     <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>غیرفعال</option>

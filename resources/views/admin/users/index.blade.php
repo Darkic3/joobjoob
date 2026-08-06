@@ -21,9 +21,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="جستجوی نام، ایمیل یا موبایل..."
-                       class="w-full ps-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                       class="input-custom ps-10">
             </div>
-            <select name="admin" class="rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 transition-all">
+            <select name="admin" class="input-custom">
                 <option value="">همه کاربران</option>
                 <option value="1" @selected(request('admin') === '1')>مدیران ارشد</option>
                 <option value="0" @selected(request('admin') === '0')>کاربران عادی</option>

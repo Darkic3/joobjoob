@@ -21,18 +21,18 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام برند (فارسی) <span class="text-rose-500">*</span></label>
-        <input type="text" name="title[fa]" value="{{ $oldVal('title.fa') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="مثال: نایک" required>
+        <input type="text" name="title[fa]" value="{{ $oldVal('title.fa') }}" class="input-custom" placeholder="مثال: نایک" required>
         @error('title.fa') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام انگلیسی</label>
-        <input type="text" name="title[en]" value="{{ $oldVal('title.en') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="Nike" dir="ltr">
+        <input type="text" name="title[en]" value="{{ $oldVal('title.en') }}" class="input-custom" placeholder="Nike" dir="ltr">
     </div>
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">آدرس (اسلاگ) <span class="text-rose-500">*</span></label>
-        <input type="text" name="url" value="{{ $oldVal('url') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="nike" dir="ltr" data-auto-slug data-slug-source="input[name='title[en]']">
+        <input type="text" name="url" value="{{ $oldVal('url') }}" class="input-custom" placeholder="nike" dir="ltr" data-auto-slug data-slug-source="input[name='title[en]']">
         @error('url') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
@@ -43,14 +43,14 @@
                 <img src="{{ asset(config('paths.upload', 'uploads') . '/brands/' . $brand->image) }}" class="w-24 h-24 object-contain rounded-xl border border-gray-200 dark:border-gray-600 bg-white" alt="لوگوی برند">
             </div>
         @endif
-        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-500/10 dark:file:text-indigo-400 cursor-pointer">
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="input-custom cursor-pointer">
         <p class="text-xs text-gray-400 mt-1.5">فرمت‌های مجاز: JPG, PNG, WebP | حداکثر ۲ مگابایت</p>
         @error('image') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div class="md:col-span-2">
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">توضیحات برند (فارسی)</label>
-        <textarea name="description[fa]" rows="3" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="توضیح کوتاهی درباره برند...">{{ $oldVal('description.fa') }}</textarea>
+        <textarea name="description[fa]" rows="3" class="input-custom" placeholder="توضیح کوتاهی درباره برند...">{{ $oldVal('description.fa') }}</textarea>
     </div>
 
     <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">

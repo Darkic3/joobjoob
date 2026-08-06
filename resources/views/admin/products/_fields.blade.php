@@ -111,13 +111,13 @@
 
         <div class="lg:col-span-2">
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام محصول (فارسی) <span class="text-rose-500">*</span></label>
-            <input type="text" name="name[fa]" value="{{ $oldVal('name.fa') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="مثال: گوشی موبایل سامسونگ" required>
+            <input type="text" name="name[fa]" value="{{ $oldVal('name.fa') }}" class="input-custom" placeholder="مثال: گوشی موبایل سامسونگ" required>
             @error('name.fa') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">نام انگلیسی <span class="text-rose-500">*</span></label>
-            <input type="text" name="name[en]" value="{{ $oldVal('name.en') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="Samsung Galaxy" dir="ltr" required>
+            <input type="text" name="name[en]" value="{{ $oldVal('name.en') }}" class="input-custom" placeholder="Samsung Galaxy" dir="ltr" required>
             @error('name.en') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -126,14 +126,14 @@
             <div class="relative">
                 <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400 text-sm">/p/</span>
                 <!-- کلاس data-auto-slug برای اتصال به JS همگانی SlugHelper -->
-                <input type="text" name="slug" value="{{ $oldVal('slug') }}" class="w-full pr-16 pl-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 ltr:text-left" placeholder="samsung-galaxy" dir="ltr" data-auto-slug data-slug-source="input[name='name[en]']">
+                <input type="text" name="slug" value="{{ $oldVal('slug') }}" class="input-custom pr-16 ltr:text-left" placeholder="samsung-galaxy" dir="ltr" data-auto-slug data-slug-source="input[name='name[en]']">
             </div>
             @error('slug') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">دسته‌بندی <span class="text-rose-500">*</span></label>
-            <select name="product_category_id" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" required>
+            <select name="product_category_id" class="input-custom" required>
                 <option value="">انتخاب کنید...</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" @if($oldVal('product_category_id') == $category->id) selected @endif>{{ $category->trans('name') }}</option>
@@ -144,7 +144,7 @@
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
-            <select name="brand_id" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+            <select name="brand_id" class="input-custom">
                 <option value="">بدون برند</option>
                 @foreach($brands ?? [] as $brand)
                     <option value="{{ $brand->id }}" @if($oldVal('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
@@ -155,12 +155,12 @@
 
         <div class="lg:col-span-3">
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">توضیحات کوتاه</label>
-            <textarea name="short_description[fa]" rows="2" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="یک توضیح مختصر برای پیش‌نمایش محصول...">{{ $oldVal('short_description.fa') }}</textarea>
+            <textarea name="short_description[fa]" rows="2" class="input-custom" placeholder="یک توضیح مختصر برای پیش‌نمایش محصول...">{{ $oldVal('short_description.fa') }}</textarea>
         </div>
 
         <div class="lg:col-span-3">
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">توضیحات کامل</label>
-            <textarea name="description[fa]" class="ckeditor w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" rows="6">{{ $oldVal('description.fa') }}</textarea>
+            <textarea name="description[fa]" class="ckeditor input-custom" rows="6">{{ $oldVal('description.fa') }}</textarea>
         </div>
     </div>
 
@@ -169,13 +169,13 @@
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">قیمت اصلی (تومان) <span class="text-rose-500">*</span></label>
-            <input type="number" name="price" value="{{ $oldVal('price') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="5000000" required>
+            <input type="number" name="price" value="{{ $oldVal('price') }}" class="input-custom" placeholder="5000000" required>
             @error('price') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">قیمت با تخفیف (تومان)</label>
-            <input type="number" name="discount_price" value="{{ $oldVal('discount_price') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="4500000">
+            <input type="number" name="discount_price" value="{{ $oldVal('discount_price') }}" class="input-custom" placeholder="4500000">
             @error('discount_price') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -206,19 +206,19 @@
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">موجودی انبار <span class="text-rose-500">*</span></label>
-            <input type="number" name="stock" value="{{ $oldVal('stock', 0) }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="50" required>
+            <input type="number" name="stock" value="{{ $oldVal('stock', 0) }}" class="input-custom" placeholder="50" required>
             @error('stock') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">کد محصول (SKU)</label>
-            <input type="text" name="sku" value="{{ $oldVal('sku') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="PRD-12345" dir="ltr">
+            <input type="text" name="sku" value="{{ $oldVal('sku') }}" class="input-custom" placeholder="PRD-12345" dir="ltr">
             @error('sku') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وزن (گرم)</label>
-            <input type="number" name="weight" value="{{ $oldVal('weight') }}" class="w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="250">
+            <input type="number" name="weight" value="{{ $oldVal('weight') }}" class="input-custom" placeholder="250">
         </div>
     </div>
 
