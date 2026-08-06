@@ -3,7 +3,7 @@
 @section('tab-name', 'افزودن نقش')
 
 @section('content')
-    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
+    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">افزودن نقش جدید</h1>
@@ -15,7 +15,7 @@
             </a>
         </div>
 
-        <form action="{{ route('admin.roles.store') }}" method="POST" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <form action="{{ route('admin.roles.store') }}" method="POST" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
             @csrf
             @include('admin.roles._form')
 
