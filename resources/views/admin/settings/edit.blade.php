@@ -16,7 +16,8 @@
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-body p-0">
-                    <form action="{{ route('admin.settings.update', ['group' => $activeGroup]) }}" method="POST" enctype="multipart/form-data" id="settingsForm">
+                    <form action="{{ route('admin.settings.update', ['group' => $activeGroup]) }}" method="POST" enctype="multipart/form-data" id="settingsForm"
+                          x-data="{ activeTab: @js($activeGroup) }">
                         @csrf
                         @method('PUT')
 
@@ -25,12 +26,10 @@
                             <ul class="nav nav-tabs border-0" id="settingsTabs" role="tablist">
                                 @foreach ($tabs as $tabKey => $tabLabel)
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link rounded-top-3 px-4 py-3 fw-semibold @if ($activeGroup === $tabKey) active @endif"
-                                                id="tab-{{ $tabKey }}-btn"
-                                                data-bs-toggle="tab"
-                                                data-bs-target="#tab-{{ $tabKey }}"
-                                                type="button"
-                                                role="tab">
+                                        <button type="button" role="tab"
+                                                class="nav-link rounded-top-3 px-4 py-3 fw-semibold @if ($activeGroup === $tabKey) active @endif"
+                                                :class="{ 'active': activeTab === @js($tabKey) }"
+                                                @click="activeTab = @js($tabKey)">
                                             {{ $tabLabel }}
                                         </button>
                                     </li>
@@ -41,7 +40,9 @@
                         <!-- محتوای تب‌ها -->
                         <div class="tab-content p-4 p-md-5" id="settingsTabsContent">
                             @foreach ($tabs as $tabKey => $tabLabel)
-                                <div class="tab-pane fade @if ($activeGroup === $tabKey) show active @endif" id="tab-{{ $tabKey }}" role="tabpanel">
+                                <div class="tab-pane fade @if ($activeGroup === $tabKey) show active @endif"
+                                     :class="{ 'show active': activeTab === @js($tabKey) }"
+                                     id="tab-{{ $tabKey }}" role="tabpanel">
 
                                     {{-- بخش ویژه: آیتم‌های منو --}}
                                     @if ($tabKey == 'menu_items')
