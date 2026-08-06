@@ -9,10 +9,12 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">مدیریت اسلایدر اصلی (Hero)</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">مدیریت بنرها و اسلایدهای صفحه اصلی</p>
             </div>
-            <a href="{{ route('admin.hero-slides.create') }}" class="btn-primary flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>اسلاید جدید</span>
-            </a>
+            @if(auth()->user()->canAccess('admin.hero-slides.create'))
+                <a href="{{ route('admin.hero-slides.create') }}" class="btn-primary flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>اسلاید جدید</span>
+                </a>
+            @endif
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">

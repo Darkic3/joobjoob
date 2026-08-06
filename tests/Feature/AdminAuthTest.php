@@ -26,6 +26,51 @@ class AdminAuthTest extends TestCase
         $this->get('/admin/products')->assertRedirect(route('admin.login'));
     }
 
+    public function test_guest_is_redirected_to_login_for_every_admin_route(): void
+    {
+        // مهمان روی هر روت محافظت‌شده پنل → باید به لاگین ادمین هدایت شود، نه 403/404/200
+        $urls = [
+            '/admin/dashboard',
+            '/admin/blogs',
+            '/admin/blogs/create',
+            '/admin/blog-categories',
+            '/admin/blog-categories/create',
+            '/admin/hero-slides',
+            '/admin/hero-slides/create',
+            '/admin/trust-badges',
+            '/admin/trust-badges/create',
+            '/admin/products',
+            '/admin/products/create',
+            '/admin/product-categories',
+            '/admin/brands',
+            '/admin/brands/create',
+            '/admin/specifications',
+            '/admin/specifications/create',
+            '/admin/roles',
+            '/admin/roles/create',
+            '/admin/users',
+            '/admin/users/create',
+            '/admin/settings',
+            // روت‌های دارای پارامتر
+            '/admin/products/1/edit',
+            '/admin/blogs/1',
+            '/admin/users/1/edit',
+        ];
+
+        foreach ($urls as $url) {
+            $this->get($url)->assertRedirect(route('admin.login'));
+        }
+    }
+
+    public function test_logged_in_admin_is_redirected_away_from_login_page(): void
+    {
+        $user = $this->makeUser(['is_admin' => true]);
+
+        $this->actingAs($user)
+            ->get('/admin/login')
+            ->assertRedirect(route('admin.dashboard.index'));
+    }
+
     public function test_login_page_is_accessible(): void
     {
         $this->get('/admin/login')->assertOk()->assertSee('ورود به پنل');

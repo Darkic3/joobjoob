@@ -138,4 +138,43 @@ class AdminPermissionTest extends TestCase
             ->put("/admin/users/{$super->id}", ['name' => 'hacked', 'mobile' => '09120000002'])
             ->assertForbidden();
     }
+
+    public function test_sidebar_hides_links_user_lacks_permission_for(): void
+    {
+        // کاربر فقط با دسترسی محصولات
+        $user = $this->actingAsUserWith('admin.products.index');
+
+        $html = $this->actingAs($user)->get('/admin/products')->assertOk()->getContent();
+
+        // لینک بخش مجاز (محصولات) و داشبورد دیده می‌شود
+        $this->assertStringContainsString('href="'.route('admin.products.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.dashboard.index').'"', $html);
+
+        // لینک بخش‌های بدون دسترسی در سایدبار نیست
+        $this->assertStringNotContainsString('href="'.route('admin.blogs.index').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.blog-categories.index').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.roles.index').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.users.index').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.settings.edit').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.hero-slides.index').'"', $html);
+        $this->assertStringNotContainsString('href="'.route('admin.trust-badges.index').'"', $html);
+
+        // دکمه «افزودن محصول» هم بدون دسترسی create دیده نمی‌شود
+        $this->assertStringNotContainsString('href="'.route('admin.products.create').'"', $html);
+    }
+
+    public function test_super_admin_sees_all_sidebar_links(): void
+    {
+        $super = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        $html = $this->actingAs($super)->get('/admin/dashboard')->assertOk()->getContent();
+
+        $this->assertStringContainsString('href="'.route('admin.products.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.blogs.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.roles.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.users.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.settings.edit').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.hero-slides.index').'"', $html);
+        $this->assertStringContainsString('href="'.route('admin.trust-badges.index').'"', $html);
+    }
 }

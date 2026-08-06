@@ -11,10 +11,12 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">مدیریت مشخصات محصول</h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">مشخصه‌ها، مقادیر انتخابی (رنگ/سایز/...) و ویژگی‌های نوشتاری.</p>
             </div>
-            <a href="{{ route('admin.specifications.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                مشخصه جدید
-            </a>
+            @if(auth()->user()->canAccess('admin.specifications.create'))
+                <a href="{{ route('admin.specifications.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    مشخصه جدید
+                </a>
+            @endif
         </div>
 
         {{-- فیلتر و جستجو --}}
@@ -114,7 +116,9 @@
                                         <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                                     </div>
                                     <p class="font-semibold text-gray-700 dark:text-gray-300">هنوز مشخصه‌ای ثبت نشده است</p>
-                                    <a href="{{ route('admin.specifications.create') }}" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">اولین مشخصه را ایجاد کنید</a>
+                                    @if(auth()->user()->canAccess('admin.specifications.create'))
+                                        <a href="{{ route('admin.specifications.create') }}" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">اولین مشخصه را ایجاد کنید</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

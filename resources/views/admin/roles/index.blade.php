@@ -11,10 +11,12 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">مدیریت نقش‌ها و دسترسی‌ها</h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">نقش‌ها را بسازید و دسترسی هر نقش را به بخش‌های پنل مشخص کنید.</p>
             </div>
-            <a href="{{ route('admin.roles.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                نقش جدید
-            </a>
+            @if(auth()->user()->canAccess('admin.roles.create'))
+                <a href="{{ route('admin.roles.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    نقش جدید
+                </a>
+            @endif
         </div>
 
         {{-- جدول نقش‌ها --}}
@@ -81,7 +83,9 @@
                                         <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                     </div>
                                     <p class="font-semibold text-gray-700 dark:text-gray-300">هنوز نقشی ساخته نشده است</p>
-                                    <a href="{{ route('admin.roles.create') }}" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">اولین نقش را بسازید</a>
+                                    @if(auth()->user()->canAccess('admin.roles.create'))
+                                        <a href="{{ route('admin.roles.create') }}" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">اولین نقش را بسازید</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

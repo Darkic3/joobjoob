@@ -34,12 +34,14 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">مدیریت محصولات</h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">لیست کامل محصولات فروشگاه، ویرایش و مدیریت موجودی.</p>
             </div>
-            <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg>
-                افزودن محصول جدید
-            </a>
+            @if(auth()->user()->canAccess('admin.products.create'))
+                <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    افزودن محصول جدید
+                </a>
+            @endif
         </div>
 
         <!-- کارت فیلتر و جستجو -->
@@ -299,7 +301,9 @@
                                         @if(count($activeFilters) > 0)
                                             <a href="{{ route('admin.products.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 px-4 py-2 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">حذف همه فیلترها</a>
                                         @endif
-                                        <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-sm transition-all hover:shadow-md">افزودن محصول جدید</a>
+                                        @if(auth()->user()->canAccess('admin.products.create'))
+                                            <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-sm transition-all hover:shadow-md">افزودن محصول جدید</a>
+                                        @endif
                                     </div>
                                 </div>
                             </td>

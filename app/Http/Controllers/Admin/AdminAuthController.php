@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class AdminAuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin()
     {
+        // کاربرِ از قبل لاگین‌شده نیازی به دیدن فرم لاگین ندارد
+        if (auth()->check()) {
+            return redirect()->route('admin.dashboard.index');
+        }
+
         return view('admin.auth.login');
     }
 

@@ -11,12 +11,14 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">مدیریت مقالات</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">لیست تمام مقالات منتشر شده و پیش‌نویس</p>
             </div>
-            <a href="{{ route('admin.blogs.create') }}" class="btn-primary flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span>مقاله جدید</span>
-            </a>
+            @if(auth()->user()->canAccess('admin.blogs.create'))
+                <a href="{{ route('admin.blogs.create') }}" class="btn-primary flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>مقاله جدید</span>
+                </a>
+            @endif
         </div>
 
         {{-- فیلتر و جستجو --}}
@@ -152,7 +154,9 @@
                                         </svg>
                                     </div>
                                     <p class="text-gray-500 dark:text-gray-400 font-medium">هنوز مقاله‌ای ثبت نشده است</p>
-                                    <a href="{{ route('admin.blogs.create') }}" class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">اولین مقاله را ایجاد کنید &larr;</a>
+                                    @if(auth()->user()->canAccess('admin.blogs.create'))
+                                        <a href="{{ route('admin.blogs.create') }}" class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">اولین مقاله را ایجاد کنید &larr;</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
