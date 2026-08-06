@@ -23,6 +23,7 @@ return [
         'submit'         => 'Giriş Yap',
         'submitting'     => 'Giriş yapılıyor...',
         'restricted'     => 'Bu bölüme yalnızca mağaza yöneticileri erişebilir',
+        'failed'         => 'Bu bilgiler kayıtlarımızla eşleşmiyor.',
         'show_password'  => 'Şifreyi göster',
         'hide_password'  => 'Şifreyi gizle',
         'change_lang'    => 'Dili değiştir',

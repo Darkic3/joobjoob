@@ -60,6 +60,9 @@ class AdminOwnerSeeder extends Seeder
 
         $mainRole->permissions()->sync(Permission::pluck('id')->all());
 
+        // تغییر در دسترسی‌های یک نقش → باطل‌کردن کش همه کاربران
+        User::bumpPermissionsVersion();
+
         $this->command->info('✅ نقش سیستمی «main» آماده است ('.$mainRole->permissions()->count().' دسترسی).');
 
         // ───────────────────────── ۳) ادمین اصلی ─────────────────────────

@@ -23,6 +23,7 @@ return [
         'submit'         => 'Sign in',
         'submitting'     => 'Signing in...',
         'restricted'     => 'Access to this area is restricted to store administrators',
+        'failed'         => 'These credentials do not match our records.',
         'show_password'  => 'Show password',
         'hide_password'  => 'Hide password',
         'change_lang'    => 'Change language',

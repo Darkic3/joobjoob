@@ -661,7 +661,12 @@ curl -i http://site.test/admin/roles              # → 302 به لاگین
 | 6 | جدول `request_logs` + مدل `RequestLog` | میگریشن + `app/Models/RequestLog.php` | ستون‌ها مطابق `LogAdminRequests`: user_id, method, url, ip, status_code, payload |
 | 7 | `php artisan migrate` | — | ✅ گیت: جداول ساخته شوند + `php -l` تمیز |
 
-### فاز ۲ — مدل‌ها و کانفیگ (۲۰ → ۴۰٪) ☐
+### فاز ۲ — مدل‌ها و کانفیگ (۲۰ → ۴۰٪) ✅ انجام شده
+
+> اجرا شد: مدل‌های Role/Permission، ترِیت `HasAdminPermissions` (کش + بای‌پس سوپرادمین)، اتصال به User و حذف `hasAccess`، کانفیگ‌های `permissions.php` (۱۴ گروه، ۶۷ دسترسی) و `admin.php`، ۴ فایل ترجمه `permissions.php` + کلید `admin.login.failed`.
+> اصلاح جانبی: `mobile`، `avatar` و `is_active` به `$fillable` مدل User اضافه شد (mobile در دیتابیس اجباری بود ولی در مدل نبود).
+> تست زنده (در تراکنش برگشت‌پذیر): دسترسی بر اساس نقش درست جداسازی می‌شود + بای‌پس سوپرادمین فعال است.
+> 🔄 بهبود از ریویو: کلید کش **نسخه‌دار** شد — `User::bumpPermissionsVersion()` بعد از هر تغییر دسترسی‌های یک نقش، کش همه کاربران را یکجا باطل می‌کند (به‌جای پاک‌کردن تکی که می‌توانست فراموش شود).
 
 | # | کار | فایل |
 |---|---|---|
