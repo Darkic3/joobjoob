@@ -97,4 +97,17 @@ return [
         'mock_title'     => 'Laravel SEO Optimizasyonu İçin 10 İpucu',
         'mock_author'    => 'Sistem Yöneticisi',
     ],
+
+    'settings' => [
+        'title'             => 'Site Ayarları',
+        'subtitle'          => 'Site içeriğini ve görünüm ayarlarını yönetin',
+        'choose_file'       => 'Yeni dosya seç',
+        'no_file'           => 'Dosya seçilmedi',
+        'current_file'      => 'Mevcut dosya önizlemesi:',
+        'file_too_large'    => 'Dosya boyutu çok büyük',
+        'video_size_limit'  => 'Video boyutu 50 MB’ı aşmamalıdır.',
+        'got_it'            => 'Anladım',
+        'cancel'            => 'İptal',
+        'save'              => 'Değişiklikleri kaydet',
+    ],
 ];

@@ -97,4 +97,17 @@ return [
         'mock_title'     => '10 Laravel SEO Optimization Tips',
         'mock_author'    => 'System Admin',
     ],
+
+    'settings' => [
+        'title'             => 'Site Settings',
+        'subtitle'          => 'Manage site content and appearance settings',
+        'choose_file'       => 'Choose new file',
+        'no_file'           => 'No file selected',
+        'current_file'      => 'Current file preview:',
+        'file_too_large'    => 'File is too large',
+        'video_size_limit'  => 'Video size must not exceed 50 MB.',
+        'got_it'            => 'Got it',
+        'cancel'            => 'Cancel',
+        'save'              => 'Save changes',
+    ],
 ];
