@@ -17,12 +17,12 @@ class UserRequest extends FormRequest
         $userId = $this->route('user')?->id;
 
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
-            'mobile'   => ['required', 'string', 'max:20', Rule::unique('users', 'mobile')->ignore($userId)],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'mobile' => ['required', 'string', 'max:20', Rule::unique('users', 'mobile')->ignore($userId)],
             'password' => ['nullable', 'string', 'min:8'],
-            'roles'    => ['nullable', 'array'],
-            'roles.*'  => ['integer', 'exists:roles,id'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['integer', 'exists:roles,id'],
             'is_admin' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
         ];
