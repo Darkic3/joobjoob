@@ -29,4 +29,34 @@ class Setting extends Model
             default => $setting->value,
         };
     }
+
+    /**
+     * آدرس عمومی تصویر آپلودشده برای یک کلید تنظیمات
+     */
+    public static function imageFile(string $key): ?string
+    {
+        $value = static::getValue($key);
+        if (empty($value)) {
+            return null;
+        }
+
+        $path = 'uploads/settings/'.$value;
+
+        return file_exists(public_path($path)) ? asset($path) : null;
+    }
+
+    /**
+     * آدرس عمومی ویدیوی آپلودشده برای یک کلید تنظیمات
+     */
+    public static function videoFile(string $key): ?string
+    {
+        $value = static::getValue($key);
+        if (empty($value)) {
+            return null;
+        }
+
+        $path = 'uploads/settings/'.$value;
+
+        return file_exists(public_path($path)) ? asset($path) : null;
+    }
 }

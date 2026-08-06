@@ -28,6 +28,16 @@ class SettingService
     }
 
     /**
+     * فیلدهای یک گروه خاص از کانفیگ (فیلدها به‌صورت تخت با کلید tab تعریف شده‌اند)
+     */
+    public function fieldsForGroup(string $group): array
+    {
+        $configFields = config('settings.fields', []);
+
+        return array_filter($configFields, fn ($field) => ($field['tab'] ?? 'general') === $group);
+    }
+
+    /**
      * دریافت تمام تنظیمات یک گروه خاص
      */
     public function getGroup(string $group): array
@@ -38,8 +48,7 @@ class SettingService
             $settings = Setting::where('group', $group)->get()->pluck('value', 'key')->toArray();
 
             // پر کردن مقادیر خالی با defaults از کانفیگ
-            $configFields = config("settings.{$group}.fields", []);
-            foreach ($configFields as $key => $field) {
+            foreach ($this->fieldsForGroup($group) as $key => $field) {
                 if (! isset($settings[$key])) {
                     $settings[$key] = $field['default'] ?? null;
                 }
@@ -55,7 +64,7 @@ class SettingService
     public function updateGroup(string $group, array $data, array $files = []): void
     {
         DB::transaction(function () use ($group, $data, $files) {
-            $configFields = config("settings.{$group}.fields", []);
+            $configFields = $this->fieldsForGroup($group);
 
             foreach ($configFields as $key => $field) {
                 $value = $data[$key] ?? null;
@@ -136,12 +145,6 @@ class SettingService
 
     private function getDefaultFromConfig(string $key): mixed
     {
-        foreach (config('settings') as $group) {
-            if (isset($group['fields'][$key])) {
-                return $group['fields'][$key]['default'] ?? null;
-            }
-        }
-
-        return null;
+        return config("settings.fields.{$key}.default");
     }
 }
