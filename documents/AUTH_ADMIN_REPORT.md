@@ -24,6 +24,7 @@
 12. [چک‌لیست امنیتی — باید و نباید](#۱۲-چکلیست-امنیتی--باید-و-نباید)
 13. [راهنمای انتقال به سایت دیگر (Porting Guide)](#۱۳-راهنمای-انتقال-به-سایت-دیگر-porting-guide)
 14. [مسیر آینده (گام‌های بعدی)](#۱۴-مسیر-آینده-گامهای-بعدی)
+15. [نقشه راه پیاده‌سازی — فازبندی ۰→۱۰۰](#۱۵-نقشه-راه-پیادهسازی--فازبندی-۰۱۰۰)
 
 ---
 
@@ -640,4 +641,86 @@ curl -i http://site.test/admin/roles              # → 302 به لاگین
 
 ---
 
-*پایان سند. وضعیت: آماده پیاده‌سازی.*
+## ۱۵) نقشه راه پیاده‌سازی — فازبندی ۰→۱۰۰
+
+> نقشه اجرای گام‌به‌گام این فیچر روی پروژه. هر فاز با یک **گیت اعتبارسنجی** تمام می‌شود — تا سبز نشود، فاز بعدی شروع نمی‌شود.
+> وضعیت فازها با ☐ (انجام نشده) / ✅ (انجام شده) علامت می‌خورد.
+
+### فاز ۱ — دیتابیس (۰ → ۲۰٪) ✅ انجام شده
+
+> اجرا شد: همه میگریشن‌ها `DONE` + ساختار جداول تأیید شد (roles, permissions, permission_role, role_user, request_logs + ستون users.is_admin).
+> نکته: ستون `is_admin` در این پروژه از قبل در دیتابیس وجود داشت — میگریشن با `Schema::hasColumn` مقاوم شد.
+
+| # | کار | فایل | جزئیات کلیدی |
+|---|---|---|---|
+| 1 | میگریشن `is_admin` روی users | `2026_08_06_000001_add_is_admin_to_users_table.php` | `boolean is_admin default false` بعد از `is_active` |
+| 2 | جدول `roles` | میگریشن | `name unique` + `is_system bool` |
+| 3 | جدول `permissions` | میگریشن | `name unique` + `group index` + `label_key` |
+| 4 | جدول `permission_role` | میگریشن | پایوت با cascade + PK مرکب |
+| 5 | جدول `role_user` | میگریشن | پایوت با cascade + PK مرکب |
+| 6 | جدول `request_logs` + مدل `RequestLog` | میگریشن + `app/Models/RequestLog.php` | ستون‌ها مطابق `LogAdminRequests`: user_id, method, url, ip, status_code, payload |
+| 7 | `php artisan migrate` | — | ✅ گیت: جداول ساخته شوند + `php -l` تمیز |
+
+### فاز ۲ — مدل‌ها و کانفیگ (۲۰ → ۴۰٪) ☐
+
+| # | کار | فایل |
+|---|---|---|
+| 8 | مدل `Role` (relations: permissions, users) | `app/Models/Role.php` |
+| 9 | مدل `Permission` | `app/Models/Permission.php` |
+| 10 | ترِیت `HasAdminPermissions` (roles، permissionNames با کش، canAccess، forgetPermissionCache) | `app/Models/Traits/HasAdminPermissions.php` |
+| 11 | اتصال ترِیت به `User` + جایگزینی `hasAccess()` با `canAccess()` | `app/Models/User.php` |
+| 12 | کانفیگ درختی `config/permissions.php` (گروه‌های جمع مطابق نام روت‌ها + گروه‌های آینده + لیست free) | `config/permissions.php` |
+| 13 | کانفیگ `config/admin.php` (owner credentials از env) | `config/admin.php` |
+| 14 | ترجمه‌ها: `lang/{fa,en,ar,tr}/permissions.php` + کلید `admin.login.failed` به `admin.php`ها | ۵ فایل lang |
+
+✅ گیت: `config('permissions.permissions')` بدون خطا + `php -l` همه فایل‌ها
+
+### فاز ۳ — میدلور، لاگین و روت‌ها (۴۰ → ۶۵٪) ☐
+
+| # | کار | فایل | جزئیات کلیدی |
+|---|---|---|---|
+| 15 | بازنویسی `AdminPermission` (نسخه کامنت‌شده → فعال) | `app/Http/Middleware/AdminPermission.php` | guest→لاگین، is_admin بایپس، free وایت‌لیست، `abort_unless(canAccess, 403)` |
+| 16 | کنترلر `AdminAuthController` | `app/Http/Controllers/Admin/AdminAuthController.php` | showLogin / postLogin (چک ادمین + regenerate) / logout |
+| 17 | اصلاح `LogAdminRequests` | `app/Http/Middleware/LogAdminRequests.php` | حذف `json_encode` دستی (cast در مدل) |
+| 18 | روت‌ها: POST لاگین `throttle:5,1` + logout + گروه‌بندی تمام منابع زیر `['auth','adminPermission','log.admin']` | `routes/admin.php` | هیچ روت ادمینی خارج از گروه نماند |
+| 19 | صفحه لاگین: action فرم → `route('admin.login.submit')` + نمایش ارورهای validation | `resources/views/admin/auth/login.blade.php` | |
+| 20 | سایدبار: دکمه خروج → فرم POST | `sidebar` × ۲ | |
+| 21 | تست دستی: ورود غلط / درست / دسترسی محدود | — | |
+
+✅ گیت: ورود با کاربر عادی → رد؛ روت محافظت‌شده بدون لاگین → 302 لاگین؛ با ادمین → 200
+
+### فاز ۴ — سیدر و ادمین اصلی (۶۵ → ۷۵٪) ☐
+
+| # | کار | فایل |
+|---|---|---|
+| 22 | اجرای `AdminOwnerSeeder` (ساخته‌شده — تنظیم `ADMIN_OWNER_*` در `.env`) | `.env` |
+| 23 | تست ورود واقعی با ادمین اصلی + بررسی نقش main | — |
+
+✅ گیت: سیدر موفق + ورود با اعتبار env
+
+### فاز ۵ — UI مدیریت نقش‌ها و کاربران (۷۵ → ۹۵٪) ☐
+
+| # | کار | فایل | جزئیات کلیدی |
+|---|---|---|---|
+| 24 | `RoleController` (CRUD) + `RoleRequest` | کنترلر + فرم‌ریکوئست | ممانعت از حذف/تغییر `is_system` |
+| 25 | روت‌های `admin.roles.*` داخل گروه محافظت‌شده + افزودن به درخت کانفیگ | `routes/admin.php` | |
+| 26 | ویوها: `roles/index` + `roles/form` با چک‌باکس درختی + «انتخاب همه» + dedupe بر اساس label_key | ۲ ویو | عنوان‌ها از lang |
+| 27 | سایدبار + ترجمه‌ها: منوی «نقش‌ها و دسترسی‌ها» | sidebar × ۲ + lang | |
+| 28 | `UserController` حداقلی (index + edit برای نسبت دادن نقش‌ها و is_admin) + ویو | کنترلر + ویو | فقط سوپرادمین؛ ممانعت از غیرفعال‌کردن آخرین ادمین |
+
+✅ گیت: ساخت نقش جدید → کاربر با آن نقش فقط همان صفحات را ببیند
+
+### فاز ۶ — امنیت، تست و نهایی‌سازی (۹۵ → ۱۰۰٪) ☐
+
+| # | کار | فایل |
+|---|---|---|
+| 29 | تست‌های Feature: `AdminAuthTest` + `AdminPermissionTest` | `tests/Feature/*` |
+| 30 | `php artisan test` + `vendor/bin/pint` روی فایل‌های جدید | — |
+| 31 | تست کامل در مرورگر (لاگین، محدودیت، خروج) | — |
+| 32 | ریویو کد + به‌روزرسانی سند (تیک زدن چک‌لیست‌ها) | `documents/AUTH_ADMIN_REPORT.md` |
+
+✅ گیت نهایی: همه تست‌ها سبز + سناریوی دستی تأیید + سند به‌روز
+
+---
+
+*پایان سند. وضعیت: فاز ۱ در حال اجرا.*
