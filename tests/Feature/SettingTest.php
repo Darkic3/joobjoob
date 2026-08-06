@@ -6,12 +6,20 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Services\SettingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class SettingTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // حافظه‌ی استاتیک سرویس بین تست‌ها می‌ماند — هر تست از حالت تمیز شروع کند
+        app(SettingService::class)->flush();
+    }
 
     private function actingAsSuperAdmin(): void
     {
@@ -22,7 +30,6 @@ class SettingTest extends TestCase
 
     public function test_default_values_come_from_config(): void
     {
-        Cache::flush();
         $service = app(SettingService::class);
 
         $this->assertSame('فروشگاه شاپورا', $service->get('site_name'));
@@ -32,7 +39,6 @@ class SettingTest extends TestCase
 
     public function test_service_saves_and_reads_back_with_cache_invalidation(): void
     {
-        Cache::flush();
         $service = app(SettingService::class);
 
         $service->updateGroup('general', [
@@ -42,6 +48,39 @@ class SettingTest extends TestCase
 
         $this->assertSame('فروشگاه تست', $service->get('site_name'));
         $this->assertSame('فروشگاه تست', Setting::where('key', 'site_name')->value('value'));
+    }
+
+    public function test_all_settings_loaded_with_single_query_and_memoized_in_request(): void
+    {
+        $service = app(SettingService::class);
+
+        // یک تنظیم در دیتابیس می‌سازیم تا مطمئن شویم query واقعی زده می‌شود
+        Setting::create([
+            'key' => 'site_name',
+            'value' => 'فروشگاه یک کوئری',
+            'type' => 'text',
+            'group' => 'general',
+            'label' => 'نام سایت',
+        ]);
+
+        $queryCount = 0;
+        DB::listen(function () use (&$queryCount) {
+            $queryCount++;
+        });
+
+        // اولین خواندن → یک کوئری
+        $this->assertSame('فروشگاه یک کوئری', $service->get('site_name'));
+        $this->assertSame(1, $queryCount);
+
+        // خواندن‌های بعدی از حافظه‌ی درخواست → بدون کوئری جدید
+        $this->assertSame('فروشگاه یک کوئری', $service->get('site_name'));
+        $this->assertSame('فروشگاه یک کوئری', $service->get('site_name'));
+        $this->assertSame(1, $queryCount);
+
+        // getGroup هم از همان حافظه استفاده می‌کند
+        $group = $service->getGroup('general');
+        $this->assertSame('فروشگاه یک کوئری', $group['site_name']);
+        $this->assertSame(1, $queryCount);
     }
 
     public function test_fields_for_group_filters_by_tab(): void

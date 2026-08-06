@@ -11,19 +11,51 @@ use Illuminate\Support\Facades\DB;
 
 class SettingService
 {
-    private const CACHE_PREFIX = 'shopora_setting_';
+    /**
+     * کلید کش یکپارچه تمام تنظیمات (به‌جای یک کش جدا برای هر کلید)
+     */
+    private const CACHE_ALL = 'shopora_settings_all';
 
+    /**
+     * حافظه‌ی درخواست — همه‌ی تنظیمات فقط یک بار با یک کوئری لود می‌شوند
+     * و تا پایان ریکوئست از حافظه خوانده می‌شوند (بدون کوئری تکراری)
+     *
+     * @var array<string, mixed>|null
+     */
+    private static ?array $memory = null;
+
+    /**
+     * دریافت مقدار یک تنظیم (از حافظه/کش یکپارچه، سپس دیفالت کانفیگ و آرگومان)
+     */
     public function get(string $key, mixed $default = null): mixed
     {
-        return Cache::rememberForever(self::CACHE_PREFIX.$key, function () use ($key, $default) {
-            $setting = Setting::where('key', $key)->first();
+        $all = $this->all();
 
-            if (! $setting) {
-                // اگر در دیتابیس نبود، مقدار پیش‌فرض را از کانفیگ بخوان
-                return $this->getDefaultFromConfig($key) ?? $default;
-            }
+        if (array_key_exists($key, $all)) {
+            return $all[$key];
+        }
 
-            return $this->castValue($setting->value, $setting->type);
+        // اگر در دیتابیس نبود، مقدار پیش‌فرض را از کانفیگ بخوان
+        return $this->getDefaultFromConfig($key) ?? $default;
+    }
+
+    /**
+     * تمام تنظیمات — یک کوئری در هر ریکوئست + کش یکپارچه بین ریکوئست‌ها
+     *
+     * @return array<string, mixed>
+     */
+    public function all(): array
+    {
+        if (self::$memory !== null) {
+            return self::$memory;
+        }
+
+        return self::$memory = Cache::rememberForever(self::CACHE_ALL, function () {
+            return Setting::all()
+                ->mapWithKeys(fn (Setting $setting) => [
+                    $setting->key => $this->castValue($setting->value, $setting->type),
+                ])
+                ->all();
         });
     }
 
@@ -38,24 +70,20 @@ class SettingService
     }
 
     /**
-     * دریافت تمام تنظیمات یک گروه خاص
+     * دریافت تمام تنظیمات یک گروه خاص — از حافظه/کش یکپارچه + دیفالت‌های کانفیگ
+     *
+     * @return array<string, mixed>
      */
     public function getGroup(string $group): array
     {
-        $cacheKey = self::CACHE_PREFIX.'group_'.$group;
+        $all = $this->all();
+        $settings = [];
 
-        return Cache::rememberForever($cacheKey, function () use ($group) {
-            $settings = Setting::where('group', $group)->get()->pluck('value', 'key')->toArray();
+        foreach ($this->fieldsForGroup($group) as $key => $field) {
+            $settings[$key] = $all[$key] ?? ($field['default'] ?? null);
+        }
 
-            // پر کردن مقادیر خالی با defaults از کانفیگ
-            foreach ($this->fieldsForGroup($group) as $key => $field) {
-                if (! isset($settings[$key])) {
-                    $settings[$key] = $field['default'] ?? null;
-                }
-            }
-
-            return $settings;
-        });
+        return $settings;
     }
 
     /**
@@ -90,11 +118,20 @@ class SettingService
                         'options' => $field['options'] ?? null,
                     ]
                 );
-
-                // پاک کردن کش این کلید و گروه
-                $this->invalidateCache($key, $group);
             }
         });
+
+        // بعد از اتمام موفق تراکنش، کش و حافظه را پاک کن
+        $this->flush();
+    }
+
+    /**
+     * پاک‌سازی کش یکپارچه و حافظه‌ی درخواست
+     */
+    public function flush(): void
+    {
+        self::$memory = null;
+        Cache::forget(self::CACHE_ALL);
     }
 
     /**
@@ -126,22 +163,12 @@ class SettingService
     }
 
     /**
-     * پاکسازی هوشمند کش
-     */
-    private function invalidateCache(string $key, string $group): void
-    {
-        Cache::forget(self::CACHE_PREFIX.$key);
-        Cache::forget(self::CACHE_PREFIX.'group_'.$group);
-        Cache::forget(self::CACHE_PREFIX.'all');
-    }
-
-    /**
      * تبدیل نوع داده
      */
     private function castValue(mixed $value, string $type): mixed
     {
         return match ($type) {
-            'json', 'select' => json_decode($value, true),
+            'json', 'select' => json_decode((string) $value, true) ?? [],
             'boolean' => (bool) $value,
             default => (string) $value,
         };
