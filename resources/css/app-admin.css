@@ -114,6 +114,11 @@
         @apply mt-1 ms-4 ps-3 border-s-2 border-gray-100 dark:border-gray-700 space-y-1;
     }
 
+    .sidebar-label {
+        @apply whitespace-nowrap flex-1;
+        text-align: start;
+    }
+
     .stat-card {
         @apply bg-white dark:bg-gray-800
         border border-gray-100 dark:border-gray-700
