@@ -66,6 +66,7 @@ return [
         'manage_badges'    => 'Rozetleri Yönet',
         'settings'         => 'Ayarlar',
         'roles'            => 'Roller ve İzinler',
+        'users'            => 'Kullanıcılar',
         'logout'           => 'Çıkış Yap',
     ],
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\TrustBadgeController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -38,6 +39,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ هم کلید show ندارد
         // (اگر روت show می‌ماند، نقش main هم به آن دسترسی نداشت → تله 403)
         Route::resource('roles', RoleController::class)->except('show');
+        // مدیریت کاربران: فقط index/edit/update — ساخت کاربر از سمت فروشگاه است
+        // و حذف کاربران به عهده‌ی فلوهای آینده (deactivate) است
+        Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
 
         Route::get('settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');
