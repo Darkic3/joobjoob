@@ -46,7 +46,7 @@
         {{-- جدول نشان‌های اعتماد --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-right">
+                <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/80 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-4 w-16">#</th>
@@ -55,7 +55,7 @@
                         <th class="px-6 py-4 w-24">ترتیب</th>
                         <th class="px-6 py-4 w-28">وضعیت</th>
                         <th class="px-6 py-4 w-32">تاریخ</th>
-                        <th class="px-6 py-4 text-left w-24">عملیات</th>
+                        <th class="px-6 py-4 text-end w-24">عملیات</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -96,7 +96,7 @@
                                 <div class="text-[10px] text-gray-400 mt-0.5">{{ jdate_format('H:i', strtotime($badge->created_at)) }}</div>
                             </td>
 
-                            <td class="px-6 py-4 text-left">
+                            <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.trust-badges.edit', $badge) }}"
                                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="ویرایش">

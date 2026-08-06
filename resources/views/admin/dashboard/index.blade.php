@@ -114,14 +114,14 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-right">
+                <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-4">{{ __('admin.dashboard.th_title') }}</th>
                         <th class="px-6 py-4">{{ __('admin.dashboard.th_author') }}</th>
                         <th class="px-6 py-4">{{ __('admin.dashboard.th_status') }}</th>
                         <th class="px-6 py-4">{{ __('admin.dashboard.th_date') }}</th>
-                        <th class="px-6 py-4 text-left">{{ __('admin.dashboard.th_actions') }}</th>
+                        <th class="px-6 py-4 text-end">{{ __('admin.dashboard.th_actions') }}</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -133,12 +133,12 @@
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ __('admin.dashboard.mock_author') }}</td>
                         <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full ml-1.5"></span>
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full ms-1.5"></span>
                                     {{ __('admin.dashboard.status_published') }}
                                 </span>
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $todayDate }}</td>
-                        <td class="px-6 py-4 text-left">
+                        <td class="px-6 py-4 text-end">
                             <div class="flex items-center justify-end gap-1">
                                 <button class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="{{ __('admin.dashboard.edit') }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>

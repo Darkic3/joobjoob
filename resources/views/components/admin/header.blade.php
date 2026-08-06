@@ -105,7 +105,7 @@
                     <div class="w-8 h-8 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 rounded-full flex items-center justify-center text-sm font-semibold">
                         {{ mb_substr($user->name ?? __('admin.layout.unknown'), 0, 1) }}
                     </div>
-                    <div class="hidden sm:block text-right">
+                    <div class="hidden sm:block text-start">
                         <p class="text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight">{{ $user->name ?? __('admin.layout.unknown') }} {{ $user->family ?? '' }}</p>
                     </div>
                     <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -29,19 +29,19 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">شماره موبایل <span class="text-rose-500">*</span></label>
                     <input type="text" name="mobile" value="{{ old('mobile') }}" dir="ltr"
-                           class="input-custom text-right" required>
+                           class="input-custom text-start" required>
                     @error('mobile') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">ایمیل</label>
                     <input type="email" name="email" value="{{ old('email') }}" dir="ltr"
-                           class="input-custom text-right">
+                           class="input-custom text-start">
                     @error('email') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">رمز عبور <span class="text-rose-500">*</span></label>
                     <input type="password" name="password" dir="ltr" autocomplete="new-password"
-                           class="input-custom text-right" required>
+                           class="input-custom text-start" required>
                     @error('password') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>

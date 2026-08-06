@@ -45,7 +45,7 @@
         {{-- جدول مشخصات --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-right">
+                <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">مشخصه</th>
@@ -60,7 +60,7 @@
                     @forelse($specifications as $spec)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150 {{ $spec->parent_id ? 'bg-gray-50/50 dark:bg-gray-700/10' : '' }}">
                             <td class="px-6 py-4">
-                                <div class="{{ $spec->parent_id ? 'mr-6' : '' }}">
+                                <div class="{{ $spec->parent_id ? 'ms-6' : '' }}">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                         @if($spec->is_color && $spec->color_code)
                                             <span class="inline-block w-4 h-4 rounded-full border border-gray-200 dark:border-gray-600" style="background-color: {{ $spec->color_code }}"></span>

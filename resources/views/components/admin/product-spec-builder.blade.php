@@ -127,7 +127,7 @@
 
         <template x-if="variants.length > 0">
             <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
-                <table class="w-full text-sm text-right">
+                <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs font-semibold">
                     <tr>
                         <th class="px-4 py-3">تنوع</th>

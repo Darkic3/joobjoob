@@ -52,7 +52,7 @@
         {{-- جدول --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-right">
+                <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-4">#</th>
@@ -62,7 +62,7 @@
                         <th class="px-6 py-4">تعداد محصولات</th>
                         <th class="px-6 py-4">وضعیت</th>
                         <th class="px-6 py-4">ترتیب</th>
-                        <th class="px-6 py-4 text-left">عملیات</th>
+                        <th class="px-6 py-4 text-end">عملیات</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -104,7 +104,7 @@
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                                 {{ $category->sort_order }}
                             </td>
-                            <td class="px-6 py-4 text-left">
+                            <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-1">
                                     @if(auth()->user()->canAccess('admin.product-categories.edit'))
                                         <a href="{{ route('admin.product-categories.edit', $category) }}"

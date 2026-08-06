@@ -196,7 +196,7 @@
                     </div>
                 @endif
 
-                <input type="file" name="image" accept="image/*" class="input-custom file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300 cursor-pointer w-full">
+                <input type="file" name="image" accept="image/*" class="input-custom file:ms-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300 cursor-pointer w-full">
                 <p class="text-xs text-gray-500 dark:text-gray-400">پیشنهاد: ابعاد 1920x600 پیکسل | حداکثر حجم: ۲ مگابایت</p>
             </div>
         </div>

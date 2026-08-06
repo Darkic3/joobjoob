@@ -40,7 +40,7 @@
         {{-- جدول برندها --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-right">
+                <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">برند</th>
@@ -63,7 +63,7 @@
                                             <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold">{{ mb_substr($brand->trans('title'), 0, 1) }}</div>
                                         @endif
                                     </div>
-                                    <div class="mr-3">
+                                    <div class="ms-3">
                                         <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $brand->trans('title') }}</div>
                                         @if($brand->trans('description'))
                                             <div class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{{ $brand->trans('description') }}</div>

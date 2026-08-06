@@ -19,7 +19,7 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-right">
+                <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/80 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-4 w-16">#</th>
@@ -28,7 +28,7 @@
                         <th class="px-6 py-4">نشان (Badge)</th>
                         <th class="px-6 py-4">ترتیب</th>
                         <th class="px-6 py-4">وضعیت</th>
-                        <th class="px-6 py-4 text-left w-24">عملیات</th>
+                        <th class="px-6 py-4 text-end w-24">عملیات</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -64,7 +64,7 @@
                                         {{ $slide->is_active ? 'فعال' : 'غیرفعال' }}
                                     </span>
                             </td>
-                            <td class="px-6 py-4 text-left">
+                            <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.hero-slides.edit', $slide) }}" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="ویرایش">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
