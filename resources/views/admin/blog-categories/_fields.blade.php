@@ -67,7 +67,7 @@
     <x-admin.image-upload
         name="image"
         label="تصویر دسته‌بندی"
-        :currentImage="$category && $category->image ? Storage::url($category->image) : null" />
+        :currentImage="$category?->image_url" />
 
     {{-- توضیحات --}}
     <div class="md:col-span-2">

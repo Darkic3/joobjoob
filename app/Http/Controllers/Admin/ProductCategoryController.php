@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DTOs\ProductCategoryDTO;
+use App\Helpers\ImageHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductCategoryRequest;
 use App\Models\ProductCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductCategoryController extends Controller
 {
+    protected const UPLOAD_FOLDER = 'product-categories';
+
     public function index(Request $request): View
     {
         $categories = ProductCategory::query()
@@ -51,8 +53,9 @@ class ProductCategoryController extends Controller
         $dto = ProductCategoryDTO::fromRequest($request);
 
         $imagePath = null;
-        if ($dto->getImage()) {
-            $imagePath = $dto->getImage()->store('product-categories', 'public');
+        if ($dto->getImage()?->isValid()) {
+            // آپلود با هلپر اختصاصی شما (ImageHandler → ImageUploader → ImageResizer)
+            $imagePath = ImageHandler::handle(self::UPLOAD_FOLDER, $dto->getImage());
         }
 
         ProductCategory::create([
@@ -87,11 +90,22 @@ class ProductCategoryController extends Controller
         $dto = ProductCategoryDTO::fromRequest($request);
 
         $imagePath = $productCategory->image;
-        if ($dto->getImage()) {
-            if ($productCategory->image) {
-                Storage::disk('public')->delete($productCategory->image);
+
+        // حذف تصویر فعلی — وقتی کاربر از کامپوننت آپلود «حذف تصویر» را بزند
+        if ($request->boolean('remove_image') && $productCategory->image) {
+            ImageHandler::delete(self::UPLOAD_FOLDER, $productCategory->image);
+            $imagePath = null;
+        }
+
+        if ($dto->getImage()?->isValid()) {
+            // اول فایل جدید آپلود شود — اگر ناموفق بود تصویر قبلی پاک نمی‌شود (جلوگیری از از دست رفتن داده)
+            $newPath = ImageHandler::handle(self::UPLOAD_FOLDER, $dto->getImage());
+            if ($newPath) {
+                if ($imagePath) {
+                    ImageHandler::delete(self::UPLOAD_FOLDER, $imagePath);
+                }
+                $imagePath = $newPath;
             }
-            $imagePath = $dto->getImage()->store('product-categories', 'public');
         }
 
         $productCategory->update([
@@ -126,7 +140,7 @@ class ProductCategoryController extends Controller
         }
 
         if ($productCategory->image) {
-            Storage::disk('public')->delete($productCategory->image);
+            ImageHandler::delete(self::UPLOAD_FOLDER, $productCategory->image);
         }
 
         $productCategory->delete();

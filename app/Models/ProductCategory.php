@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -14,7 +15,7 @@ class ProductCategory extends Model
     protected $fillable = [
         'parent_id', 'name', 'slug', 'icon', 'image',
         'description', 'meta_title', 'meta_description',
-        'sort_order', 'is_active'
+        'sort_order', 'is_active',
     ];
 
     protected $casts = [
@@ -27,7 +28,7 @@ class ProductCategory extends Model
     ];
 
     // روابط
-    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'parent_id');
     }
@@ -49,6 +50,15 @@ class ProductCategory extends Model
         if (is_array($value) || is_object($value)) {
             return $value[app()->getLocale()] ?? $value['fa'] ?? null;
         }
+
         return $value;
+    }
+
+    // URL تصویر — تصاویر توسط ImageUploader در public/uploads/product-categories ذخیره می‌شوند
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image
+            ? asset(config('paths.upload', 'uploads').'/product-categories/'.$this->image)
+            : null;
     }
 }

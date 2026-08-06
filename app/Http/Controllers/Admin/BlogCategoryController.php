@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ImageHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BlogCategoryRequest;
 use App\Models\BlogCategory;
-use Illuminate\Support\Facades\Storage;
 
 class BlogCategoryController extends Controller
 {
+    protected const UPLOAD_FOLDER = 'blog-categories';
+
     public function index()
     {
         $categories = BlogCategory::withCount('blogs')
@@ -21,6 +23,7 @@ class BlogCategoryController extends Controller
     public function create()
     {
         $parentCategories = BlogCategory::where('is_active', true)->get();
+
         return view('admin.blog-categories.create', compact('parentCategories'));
     }
 
@@ -30,7 +33,7 @@ class BlogCategoryController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('blog-categories', 'public');
+            $imagePath = ImageHandler::handle(self::UPLOAD_FOLDER, $request->file('image'));
         }
 
         BlogCategory::create([
@@ -63,10 +66,14 @@ class BlogCategoryController extends Controller
 
         $imagePath = $blogCategory->image;
         if ($request->hasFile('image')) {
-            if ($blogCategory->image) {
-                Storage::disk('public')->delete($blogCategory->image);
+            // اول فایل جدید آپلود شود — اگر ناموفق بود تصویر قبلی پاک نمی‌شود
+            $newPath = ImageHandler::handle(self::UPLOAD_FOLDER, $request->file('image'));
+            if ($newPath) {
+                if ($blogCategory->image) {
+                    ImageHandler::delete(self::UPLOAD_FOLDER, $blogCategory->image);
+                }
+                $imagePath = $newPath;
             }
-            $imagePath = $request->file('image')->store('blog-categories', 'public');
         }
 
         $blogCategory->update([
@@ -92,7 +99,7 @@ class BlogCategoryController extends Controller
         }
 
         if ($blogCategory->image) {
-            Storage::disk('public')->delete($blogCategory->image);
+            ImageHandler::delete(self::UPLOAD_FOLDER, $blogCategory->image);
         }
 
         $blogCategory->delete();

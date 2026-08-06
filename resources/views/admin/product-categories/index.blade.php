@@ -71,7 +71,7 @@
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $categories->firstItem() + $loop->index }}</td>
                             <td class="px-6 py-4">
                                 @if($category->image)
-                                    <img src="{{ Storage::url($category->image) }}"
+                                    <img src="{{ $category->image_url }}"
                                          class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600"
                                          alt="{{ $category->trans('name') }}">
                                 @else

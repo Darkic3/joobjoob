@@ -132,8 +132,9 @@
             <x-admin.image-upload
                 name="image"
                 label="تصویر دسته‌بندی"
-                :currentImage="$category && $category->image ? Storage::url($category->image) : null" />
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">پیشنهاد: مربع ۴۰۰×۴۰۰ پیکسل | حداکثر حجم: ۲ مگابایت</p>
+                :currentImage="$category?->image_url"
+                :removable="true"
+                hint="پیشنهاد: مربع ۴۰۰×۴۰۰ پیکسل | حداکثر حجم: ۲ مگابایت" />
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 space-y-4">

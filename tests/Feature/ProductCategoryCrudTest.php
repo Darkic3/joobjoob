@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ProductCategoryCrudTest extends TestCase
@@ -78,6 +79,42 @@ class ProductCategoryCrudTest extends TestCase
 
         $this->assertStringContainsString('mobile-accessories', $html);
         $this->assertStringNotContainsString('laptops', $html);
+    }
+
+    public function test_create_with_empty_file_input_is_rejected_gracefully(): void
+    {
+        // مرورگرهای واقعی حتی وقتی کاربر تصویری انتخاب نمی‌کند، فیلد فایل خالی را با error=4 ارسال می‌کنند.
+        // لاراول این را به‌جای کرش (خطای قبلی «Path cannot be empty») با خطای ولیدیشن «uploaded» رد می‌کند.
+        $emptyFile = new UploadedFile('', 'dummy.png', 'image/png', UPLOAD_ERR_NO_FILE, true);
+
+        $this->actingAs($this->superAdmin())
+            ->post('/admin/product-categories', $this->categoryPayload(['image' => $emptyFile]))
+            ->assertSessionHasErrors('image');
+
+        $this->assertDatabaseMissing('product_categories', ['slug' => 'mobile-accessories']);
+    }
+
+    public function test_update_with_empty_file_input_keeps_existing_image(): void
+    {
+        $category = ProductCategory::create(['name' => ['fa' => 'قدیمی', 'en' => 'Old'], 'slug' => 'old-slug', 'image' => 'keep.webp', 'is_active' => true]);
+        $emptyFile = new UploadedFile('', 'dummy.png', 'image/png', UPLOAD_ERR_NO_FILE, true);
+
+        $this->actingAs($this->superAdmin())
+            ->put("/admin/product-categories/{$category->id}", $this->categoryPayload(['image' => $emptyFile]))
+            ->assertSessionHasErrors('image');
+
+        $this->assertSame('keep.webp', $category->refresh()->image);
+    }
+
+    public function test_update_can_remove_current_image(): void
+    {
+        $category = ProductCategory::create(['name' => ['fa' => 'دارای تصویر', 'en' => 'With Image'], 'slug' => 'with-image', 'image' => 'old.webp', 'is_active' => true]);
+
+        $this->actingAs($this->superAdmin())
+            ->put("/admin/product-categories/{$category->id}", $this->categoryPayload(['remove_image' => '1']))
+            ->assertRedirect(route('admin.product-categories.index'));
+
+        $this->assertNull($category->refresh()->image);
     }
 
     public function test_super_admin_can_create_product_category_via_http(): void

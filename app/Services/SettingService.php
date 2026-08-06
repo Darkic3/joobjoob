@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
+use App\Helpers\ImageHandler;
+use App\Helpers\Uploader;
 use App\Models\Setting;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 
 class SettingService
 {
     private const CACHE_PREFIX = 'shopora_setting_';
 
-
     public function get(string $key, mixed $default = null): mixed
     {
-        return Cache::rememberForever(self::CACHE_PREFIX . $key, function () use ($key, $default) {
+        return Cache::rememberForever(self::CACHE_PREFIX.$key, function () use ($key, $default) {
             $setting = Setting::where('key', $key)->first();
 
-            if (!$setting) {
+            if (! $setting) {
                 // اگر در دیتابیس نبود، مقدار پیش‌فرض را از کانفیگ بخوان
                 return $this->getDefaultFromConfig($key) ?? $default;
             }
@@ -32,7 +32,7 @@ class SettingService
      */
     public function getGroup(string $group): array
     {
-        $cacheKey = self::CACHE_PREFIX . 'group_' . $group;
+        $cacheKey = self::CACHE_PREFIX.'group_'.$group;
 
         return Cache::rememberForever($cacheKey, function () use ($group) {
             $settings = Setting::where('group', $group)->get()->pluck('value', 'key')->toArray();
@@ -40,7 +40,7 @@ class SettingService
             // پر کردن مقادیر خالی با defaults از کانفیگ
             $configFields = config("settings.{$group}.fields", []);
             foreach ($configFields as $key => $field) {
-                if (!isset($settings[$key])) {
+                if (! isset($settings[$key])) {
                     $settings[$key] = $field['default'] ?? null;
                 }
             }
@@ -85,21 +85,31 @@ class SettingService
     }
 
     /**
-     * مدیریت آپلود فایل و حذف فایل قدیمی (بدون پکیج)
+     * مدیریت آپلود فایل و حذف فایل قدیمی با هلپرهای اختصاصی شما
      */
     private function handleFileUpload(string $key, UploadedFile $file, string $type): string
     {
-        // ۱. دریافت مسیر فایل قدیمی برای حذف
+        // ۱. دریافت مسیر فایل قدیمی
         $oldPath = Setting::where('key', $key)->value('value');
 
-        // ۲. حذف فایل قدیمی اگر وجود داشته باشد
-        if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-            Storage::disk('public')->delete($oldPath);
+        // ۲. ذخیره فایل جدید — تصاویر با ImageHandler (تبدیل WebP) و بقیه با Uploader
+        //    اول آپلود جدید انجام می‌شود؛ فقط اگر موفق بود فایل قدیمی حذف می‌شود
+        if (str_starts_with($file->getMimeType() ?: '', 'image/')) {
+            $newPath = ImageHandler::handle('settings', $file);
+        } else {
+            $newPath = Uploader::upload($file, config('paths.upload', 'uploads').'/settings');
         }
 
-        // ۳. ذخیره فایل جدید (لاراول به صورت خودکار نام یکتا تولید می‌کند)
-        // اگر نیاز به تغییر سایز دارید، اینجا می‌توانید از GD یا Imagick PHP استفاده کنید
-        return $file->store('settings', 'public');
+        if (! $newPath) {
+            return (string) ($oldPath ?? '');
+        }
+
+        // ۳. حذف فایل قدیمی اگر وجود داشته باشد
+        if ($oldPath) {
+            ImageHandler::delete('settings', $oldPath);
+        }
+
+        return $newPath;
     }
 
     /**
@@ -107,9 +117,9 @@ class SettingService
      */
     private function invalidateCache(string $key, string $group): void
     {
-        Cache::forget(self::CACHE_PREFIX . $key);
-        Cache::forget(self::CACHE_PREFIX . 'group_' . $group);
-        Cache::forget(self::CACHE_PREFIX . 'all');
+        Cache::forget(self::CACHE_PREFIX.$key);
+        Cache::forget(self::CACHE_PREFIX.'group_'.$group);
+        Cache::forget(self::CACHE_PREFIX.'all');
     }
 
     /**
@@ -131,6 +141,7 @@ class SettingService
                 return $group['fields'][$key]['default'] ?? null;
             }
         }
+
         return null;
     }
 }

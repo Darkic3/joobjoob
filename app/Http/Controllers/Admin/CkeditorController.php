@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ImageHandler;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CkeditorController
 {
-
     public function upload(Request $request)
     {
         if ($request->hasFile('upload')) {
             $file = $request->file('upload');
-            $fileName = time() . '_' . $file->getClientOriginalName();
 
-            // ذخیره در پوشه public/uploads/ckeditor
-            $path = $file->storeAs('uploads/ckeditor', $fileName, 'public');
+            // آپلود با هلپر اختصاصی شما (ImageUploader → تبدیل WebP)
+            $fileName = ImageHandler::handle('ckeditor', $file);
 
-            $url = Storage::url($path);
+            if (! $fileName) {
+                return response()->json(['uploaded' => 0, 'error' => ['message' => 'آپلود تصویر ناموفق بود.']]);
+            }
 
             // فرمت پاسخ مورد نیاز CKEditor
             return response()->json([
                 'uploaded' => 1,
                 'fileName' => $fileName,
-                'url' => $url
+                'url' => asset(config('paths.upload', 'uploads').'/ckeditor/'.$fileName),
             ]);
         }
 
