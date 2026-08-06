@@ -26,7 +26,7 @@
         if (request('best_seller')) $activeFilters[] = ['label' => 'فقط پرفروش‌ها', 'url' => route('admin.products.index', request()->except(['page', 'best_seller']))];
     @endphp
 
-    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
+    <div x-data="{ searchOpen: false }" class="px-4 sm:px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
 
         <!-- هدر صفحه -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -34,158 +34,183 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">مدیریت محصولات</h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">لیست کامل محصولات فروشگاه، ویرایش و مدیریت موجودی.</p>
             </div>
-            @if(auth()->user()->canAccess('admin.products.create'))
-                <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    افزودن محصول جدید
-                </a>
-            @endif
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 rounded-full px-3 py-1.5 inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    <span><b class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $products->total() }}</b> محصول</span>
+                </span>
+                <button type="button" id="open-search-modal" @click="searchOpen = true"
+                        class="inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-400 dark:hover:border-indigo-500 font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    جستجو پیشرفته
+                    @if(count($activeFilters) > 0)
+                        <span class="bg-indigo-600 text-white text-xs font-bold min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center">{{ count($activeFilters) }}</span>
+                    @endif
+                </button>
+                @if(auth()->user()->canAccess('admin.products.create'))
+                    <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        افزودن محصول جدید
+                    </a>
+                @endif
+            </div>
         </div>
 
-        <!-- کارت فیلتر و جستجو -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6">
-            {{-- هدر کارت فیلتر --}}
-            <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-bold text-gray-800 dark:text-white">جستجو و فیلتر محصولات</h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">با فیلترهای پیشرفته سریع‌تر محصول مورد نظر را پیدا کنید</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 rounded-full px-3 py-1.5 inline-flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        <span><b class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $products->total() }}</b> محصول</span>
-                    </span>
-                    @if(count($activeFilters) > 0)
-                        <a href="{{ route('admin.products.index') }}" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 inline-flex items-center gap-1 bg-rose-50 dark:bg-rose-500/10 rounded-full px-3 py-1.5 transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            حذف همه فیلترها
-                        </a>
-                    @endif
-                </div>
+        <!-- چیپ‌های فیلترهای فعال -->
+        @if(count($activeFilters) > 0)
+            <div class="flex flex-wrap items-center gap-2 mb-6">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">فیلترهای فعال:</span>
+                @foreach($activeFilters as $filter)
+                    <a href="{{ $filter['url'] }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors group">
+                        {{ $filter['label'] }}
+                        <svg class="w-3 h-3 text-indigo-400 group-hover:text-rose-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </a>
+                @endforeach
+                <a href="{{ route('admin.products.index') }}" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 inline-flex items-center gap-1 hover:underline">حذف همه فیلترها</a>
             </div>
+        @endif
 
-            <form method="GET" action="{{ route('admin.products.index') }}" class="p-5 sm:p-6 space-y-4" id="product-filter-form">
-                {{-- ردیف اول: جستجو، دسته‌بندی، برند، وضعیت --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="lg:col-span-2">
-                        <label for="filter-search" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">جستجو</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 start-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </span>
-                            <input type="text" name="search" id="filter-search" value="{{ request('search') }}" placeholder="نام محصول، برند، SKU یا اسلاگ..."
-                                   class="input-custom ps-10 pe-14" data-filter-search>
-                            @if(request('search'))
-                                <a href="{{ route('admin.products.index', request()->except(['page', 'search'])) }}" class="absolute inset-y-0 start-9 flex items-center text-gray-400 hover:text-rose-500 transition-colors" title="حذف جستجو">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </a>
-                            @endif
-                            <kbd class="absolute inset-y-0 end-3 my-auto h-6 w-6 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-500 pointer-events-none" title="میانبر صفحه‌کلید: / یا Ctrl+K">/</kbd>
+        <!-- مودال جستجوی پیشرفته -->
+        <div :class="searchOpen ? 'flex' : 'hidden'" class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm admin-backdrop" @click="searchOpen = false"></div>
+            <div class="relative min-h-screen flex items-start sm:items-center justify-center p-4 sm:p-6 pointer-events-none">
+                <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl pointer-events-auto admin-modal-panel"
+                     @keydown.escape.window="searchOpen = false">
+                    <!-- هدر مودال -->
+                    <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800 dark:text-white">جستجوی پیشرفته محصولات</h2>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">با فیلترهای زیر محصول مورد نظر را سریع‌تر پیدا کنید</p>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label for="filter-category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">دسته‌بندی</label>
-                        <select name="category" id="filter-category" class="input-custom">
-                            <option value="">همه دسته‌ها</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" @if(request('category') == $category->id) selected @endif>{{ $category->trans('name') }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filter-brand" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
-                        <select name="brand_id" id="filter-brand" class="input-custom">
-                            <option value="">همه برندها</option>
-                            @foreach($brands as $brand)
-                                <option value="{{ $brand->id }}" @if(request('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filter-status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وضعیت نمایش</label>
-                        <select name="status" id="filter-status" class="input-custom">
-                            <option value="">همه</option>
-                            <option value="1" @if(request('status') == '1') selected @endif>فعال</option>
-                            <option value="0" @if(request('status') == '0') selected @endif>غیرفعال</option>
-                        </select>
-                    </div>
-                </div>
-
-                {{-- ردیف دوم: مرتب‌سازی، موجودی، قیمت --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <label for="filter-sort" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">مرتب‌سازی</label>
-                        <select name="sort" id="filter-sort" class="input-custom">
-                            <option value="newest" @if(request('sort')=='newest' || !request('sort')) selected @endif>جدیدترین</option>
-                            <option value="oldest" @if(request('sort')=='oldest') selected @endif>قدیمی‌ترین</option>
-                            <option value="price_asc" @if(request('sort')=='price_asc') selected @endif>ارزان‌ترین</option>
-                            <option value="price_desc" @if(request('sort')=='price_desc') selected @endif>گران‌ترین</option>
-                            <option value="name_asc" @if(request('sort')=='name_asc') selected @endif>نام (الفبایی)</option>
-                            <option value="name_desc" @if(request('sort')=='name_desc') selected @endif>نام (معکوس)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filter-availability" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">موجودی</label>
-                        <select name="availability" id="filter-availability" class="input-custom">
-                            <option value="">همه</option>
-                            <option value="in_stock" @if(request('availability')=='in_stock') selected @endif>موجود در انبار</option>
-                            <option value="out_of_stock" @if(request('availability')=='out_of_stock') selected @endif>ناموجود</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filter-price-min" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداقل قیمت</label>
-                        <input type="number" name="price_min" id="filter-price-min" value="{{ request('price_min') }}" min="0" placeholder="0" dir="ltr" class="input-custom text-left">
-                    </div>
-                    <div>
-                        <label for="filter-price-max" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداکثر قیمت</label>
-                        <input type="number" name="price_max" id="filter-price-max" value="{{ request('price_max') }}" min="0" placeholder="بدون محدودیت" dir="ltr" class="input-custom text-left">
-                    </div>
-                </div>
-
-                {{-- ردیف سوم: فیلترهای سریع و دکمه‌ها --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-                    <div class="flex flex-wrap items-center gap-4">
-                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="featured" value="1" @if(request('featured')) checked @endif class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span class="text-sm text-gray-600 dark:text-gray-300">فقط ویژه</span>
-                        </label>
-                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="best_seller" value="1" @if(request('best_seller')) checked @endif class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span class="text-sm text-gray-600 dark:text-gray-300">فقط پرفروش‌ها</span>
-                        </label>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button type="submit" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            اعمال فیلتر
+                        <button type="button" @click="searchOpen = false" class="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="بستن">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
-                        <a href="{{ route('admin.products.index') }}" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white font-medium px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200">
+                    </div>
+
+                    <form method="GET" action="{{ route('admin.products.index') }}" id="product-filter-form" class="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- جستجو --}}
+                            <div class="md:col-span-2">
+                                <label for="filter-search" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">جستجو</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 start-3 flex items-center pointer-events-none">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </span>
+                                    <input type="text" name="search" id="filter-search" value="{{ request('search') }}" placeholder="نام محصول، برند، SKU یا اسلاگ..."
+                                           class="input-custom ps-10 pe-14" data-filter-search>
+                                    @if(request('search'))
+                                        <a href="{{ route('admin.products.index', request()->except(['page', 'search'])) }}" class="absolute inset-y-0 start-9 flex items-center text-gray-400 hover:text-rose-500 transition-colors" title="حذف جستجو">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </a>
+                                    @endif
+                                    <kbd class="absolute inset-y-0 end-3 my-auto h-6 w-6 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-500 pointer-events-none" title="میانبر صفحه‌کلید: / یا Ctrl+K">/</kbd>
+                                </div>
+                            </div>
+
+                            {{-- دسته‌بندی --}}
+                            <div>
+                                <label for="filter-category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">دسته‌بندی</label>
+                                <select name="category" id="filter-category" class="input-custom">
+                                    <option value="">همه دسته‌ها</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" @if(request('category') == $category->id) selected @endif>{{ $category->trans('name') }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- برند --}}
+                            <div>
+                                <label for="filter-brand" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">برند</label>
+                                <select name="brand_id" id="filter-brand" class="input-custom">
+                                    <option value="">همه برندها</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}" @if(request('brand_id') == $brand->id) selected @endif>{{ $brand->trans('title') }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- وضعیت --}}
+                            <div>
+                                <label for="filter-status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">وضعیت نمایش</label>
+                                <select name="status" id="filter-status" class="input-custom">
+                                    <option value="">همه</option>
+                                    <option value="1" @if(request('status') == '1') selected @endif>فعال</option>
+                                    <option value="0" @if(request('status') == '0') selected @endif>غیرفعال</option>
+                                </select>
+                            </div>
+
+                            {{-- مرتب‌سازی --}}
+                            <div>
+                                <label for="filter-sort" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">مرتب‌سازی</label>
+                                <select name="sort" id="filter-sort" class="input-custom">
+                                    <option value="newest" @if(request('sort')=='newest' || !request('sort')) selected @endif>جدیدترین</option>
+                                    <option value="oldest" @if(request('sort')=='oldest') selected @endif>قدیمی‌ترین</option>
+                                    <option value="price_asc" @if(request('sort')=='price_asc') selected @endif>ارزان‌ترین</option>
+                                    <option value="price_desc" @if(request('sort')=='price_desc') selected @endif>گران‌ترین</option>
+                                    <option value="name_asc" @if(request('sort')=='name_asc') selected @endif>نام (الفبایی)</option>
+                                    <option value="name_desc" @if(request('sort')=='name_desc') selected @endif>نام (معکوس)</option>
+                                </select>
+                            </div>
+
+                            {{-- موجودی --}}
+                            <div>
+                                <label for="filter-availability" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">موجودی</label>
+                                <select name="availability" id="filter-availability" class="input-custom">
+                                    <option value="">همه</option>
+                                    <option value="in_stock" @if(request('availability')=='in_stock') selected @endif>موجود در انبار</option>
+                                    <option value="out_of_stock" @if(request('availability')=='out_of_stock') selected @endif>ناموجود</option>
+                                </select>
+                            </div>
+
+                            {{-- حداقل قیمت --}}
+                            <div>
+                                <label for="filter-price-min" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداقل قیمت</label>
+                                <input type="number" name="price_min" id="filter-price-min" value="{{ request('price_min') }}" min="0" placeholder="0" dir="ltr" class="input-custom text-left">
+                            </div>
+
+                            {{-- حداکثر قیمت --}}
+                            <div>
+                                <label for="filter-price-max" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">حداکثر قیمت</label>
+                                <input type="number" name="price_max" id="filter-price-max" value="{{ request('price_max') }}" min="0" placeholder="بدون محدودیت" dir="ltr" class="input-custom text-left">
+                            </div>
+                        </div>
+
+                        {{-- فیلترهای سریع --}}
+                        <div class="flex flex-wrap items-center gap-4 pt-1">
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="featured" value="1" @if(request('featured')) checked @endif class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">فقط ویژه</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="best_seller" value="1" @if(request('best_seller')) checked @endif class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">فقط پرفروش‌ها</span>
+                            </label>
+                        </div>
+                    </form>
+
+                    <!-- فوتر مودال -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+                        <a href="{{ route('admin.products.index') }}" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-rose-600 dark:hover:text-rose-400 font-medium text-sm px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             بازنشانی
                         </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="searchOpen = false" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-all">انصراف</button>
+                            <button type="submit" form="product-filter-form" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                اعمال فیلتر
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </form>
-
-            {{-- چیپ‌های فیلترهای فعال --}}
-            @if(count($activeFilters) > 0)
-                <div class="px-5 sm:px-6 pb-5 -mt-1 flex flex-wrap items-center gap-2">
-                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">فیلترهای فعال:</span>
-                    @foreach($activeFilters as $filter)
-                        <a href="{{ $filter['url'] }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors group">
-                            {{ $filter['label'] }}
-                            <svg class="w-3 h-3 text-indigo-400 group-hover:text-rose-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
+            </div>
         </div>
 
         <!-- جدول داده‌ها -->
@@ -324,9 +349,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('product-filter-form');
         const searchInput = document.getElementById('filter-search');
-        if (!form) return;
+        const openBtn = document.getElementById('open-search-modal');
+        if (!form || !openBtn) return;
 
-        // میانبر صفحه‌کلید: / یا Ctrl+K → فوکوس روی جستجو
+        // میانبر صفحه‌کلید: / یا Ctrl+K → باز کردن مودال جستجو
         document.addEventListener('keydown', function (e) {
             const tag = (e.target.tagName || '').toLowerCase();
             const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
@@ -334,22 +360,9 @@
 
             if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
                 e.preventDefault();
-                if (searchInput) searchInput.focus();
+                openBtn.click();
+                if (searchInput) setTimeout(function () { searchInput.focus(); }, 250);
             }
-        });
-
-        // جستجوی زنده با تاخیر (Debounce)
-        let debounceTimer = null;
-        if (searchInput) {
-            searchInput.addEventListener('input', function () {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(function () { form.requestSubmit(); }, 600);
-            });
-        }
-
-        // اعمال خودکار فیلتر هنگام تغییر سِلِکت‌ها و چک‌باکس‌ها
-        form.querySelectorAll('select, input[type="checkbox"]').forEach(function (el) {
-            el.addEventListener('change', function () { form.requestSubmit(); });
         });
     });
 </script>

@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
     html {
         font-family: 'Vazirmatn', sans-serif;
     }
@@ -117,6 +121,24 @@
     .sidebar-label {
         @apply whitespace-nowrap flex-1;
         text-align: start;
+    }
+
+    @keyframes admin-modal-in {
+        from { opacity: 0; transform: translateY(12px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .admin-modal-panel {
+        animation: admin-modal-in 0.2s ease-out;
+    }
+
+    @keyframes admin-backdrop-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .admin-backdrop {
+        animation: admin-backdrop-in 0.2s ease-out;
     }
 
     .stat-card {
