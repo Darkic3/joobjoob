@@ -11,6 +11,11 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SpecificationController;
 
+
+Route::get('/admin/login', function () {
+    return view('admin.auth.login');
+})->name('admin.login');
+
 //middleware(['adminPermission', 'log.admin'])->
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('blogs', BlogController::class);
