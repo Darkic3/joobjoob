@@ -92,8 +92,8 @@
                             </td>
 
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs">
-                                <div>{{ jdate_format('Y/m/d', strtotime($badge->created_at)) }}</div>
-                                <div class="text-[10px] text-gray-400 mt-0.5">{{ jdate_format('H:i', strtotime($badge->created_at)) }}</div>
+                                <div>{{ show_date($badge->created_at, 'Y/m/d') }}</div>
+                                <div class="text-[10px] text-gray-400 mt-0.5">{{ show_date($badge->created_at, 'H:i') }}</div>
                             </td>
 
                             <td class="px-6 py-4 text-end">

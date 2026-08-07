@@ -5,10 +5,8 @@
     $hour = now()->hour;
     $greeting = $hour < 12 ? __('admin.dashboard.greeting_morning')
         : ($hour < 17 ? __('admin.dashboard.greeting_noon') : __('admin.dashboard.greeting_evening'));
-    // تاریخ: برای فارسی شمسی (jdate)، بقیه با Carbon
-    $todayDate = $currentLocale === 'fa' && function_exists('jdate_format')
-        ? jdate_format('j F Y', time(), '', 'Asia/Tehran', 'fa')
-        : now()->locale($currentLocale ?: 'en')->translatedFormat('j F Y');
+    // تاریخ: برای فارسی/عربی شمسی (jdate)، سایر زبان‌ها میلادی محلی
+    $todayDate = show_date(null, 'j F Y');
 @endphp
 
 @section('tab-name', __('admin.dashboard.tab'))

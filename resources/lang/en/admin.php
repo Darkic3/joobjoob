@@ -189,6 +189,8 @@ return [
         'parent' => 'Parent',
         'no_parent' => 'No parent',
         'no_items' => 'No items found',
+        'jalali_hint' => 'Jalali date — automatically converted to Gregorian before saving.',
+        'gregorian_hint' => 'Gregorian date — saved directly to the database.',
         'slug' => 'URL',
         'featured' => 'Homepage',
         'show' => 'Show',

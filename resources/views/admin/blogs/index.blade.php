@@ -119,8 +119,8 @@
                             </td>
 
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs">
-                                <div>{{ jdate_format('Y/m/d', strtotime($blog->created_at)) }}</div>
-                                <div class="text-[10px] text-gray-400 mt-0.5">{{ jdate_format('H:i', strtotime($blog->created_at)) }}</div>
+                                <div>{{ show_date($blog->created_at, 'Y/m/d') }}</div>
+                                <div class="text-[10px] text-gray-400 mt-0.5">{{ show_date($blog->created_at, 'H:i') }}</div>
                             </td>
 
                             <td class="px-6 py-4 text-end">

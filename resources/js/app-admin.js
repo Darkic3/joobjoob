@@ -4,6 +4,9 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
+// بومی‌سازی ارقام بر اساس زبان سایت (fa/ar → فارسی، سایر → انگلیسی)
+import './localize-digits.js';
+
 window.Alpine = Alpine;
 
 /* ==========================================
@@ -166,6 +169,7 @@ Alpine.start();
 
 document.querySelectorAll('[data-countdown]').forEach(timer => {
     const endDate = new Date(timer.dataset.countdown).getTime();
+    const isPersian = window.localizeDigits && window.localizeDigits.isPersian();
 
     const interval = setInterval(() => {
         const now = new Date().getTime();
@@ -173,7 +177,7 @@ document.querySelectorAll('[data-countdown]').forEach(timer => {
 
         if (distance < 0) {
             clearInterval(interval);
-            timer.innerHTML = "پایان یافته";
+            timer.innerHTML = isPersian ? "پایان یافته" : "Ended";
             return;
         }
 
@@ -181,7 +185,10 @@ document.querySelectorAll('[data-countdown]').forEach(timer => {
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        timer.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const pad = n => String(n).padStart(2, '0');
+        let out = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        if (isPersian) out = out.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        timer.innerHTML = out;
     }, 1000);
 });
 

@@ -263,7 +263,7 @@
 
             {{-- فوتر پنل --}}
             <div class="relative z-10 flex items-center justify-between text-xs text-white/60 animate-fade-up">
-                <span>© {{ function_exists('jdate_format') ? jdate_format('Y', time(), '', 'Asia/Tehran', 'fa') : date('Y') }} — {{ __('messages.site_name') }}</span>
+                <span>© {{ show_date(null, 'Y') }} — {{ __('messages.site_name') }}</span>
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 hover:text-white transition-colors">
                     {{ __('admin.login.back_to_site') }}
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

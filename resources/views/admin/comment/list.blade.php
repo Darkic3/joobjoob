@@ -86,7 +86,7 @@
                                              role="status" id="spinner-{{ $comment->id }}"></div>
                                     </td>
                                     <td>
-                                        {{ jdate_format('Y/m/d', strtotime($comment->created_at)) }}
+                                        {{ show_date($comment->created_at, 'Y/m/d') }}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

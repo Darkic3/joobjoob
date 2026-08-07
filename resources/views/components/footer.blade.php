@@ -60,6 +60,6 @@
     </div>
 
     <p class="text-center text-sm mt-8" style="color: var(--text-secondary);">
-        &copy; {{ jdate_format('Y') }} {{ setting('site_name', __('messages.site_name')) }} — {{ setting('footer_copyright', '') }}
+        &copy; {{ show_date(null, 'Y') }} {{ setting('site_name', __('messages.site_name')) }} — {{ setting('footer_copyright', '') }}
     </p>
 </footer>

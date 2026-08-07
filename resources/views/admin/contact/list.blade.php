@@ -91,7 +91,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {{ jdate_format('Y/m/d', strtotime($request->created_at)) }}
+                                        {{ show_date($request->created_at, 'Y/m/d') }}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

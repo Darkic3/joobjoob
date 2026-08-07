@@ -189,6 +189,8 @@ return [
         'parent' => 'Üst',
         'no_parent' => 'Üstsüz',
         'no_items' => 'Öğe bulunamadı',
+        'jalali_hint' => 'Şemsi tarih — kaydetmeden önce otomatik olarak miladiye dönüştürülür.',
+        'gregorian_hint' => 'Miladi tarih — doğrudan veritabanına kaydedilir.',
         'slug' => 'Adres',
         'featured' => 'Ana Sayfa',
         'show' => 'Göster',

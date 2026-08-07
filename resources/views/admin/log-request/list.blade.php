@@ -74,7 +74,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {{ jdate_format('Y/m/d H:i', strtotime($log->created_at)) }}
+                                        {{ show_date($log->created_at, 'Y/m/d H:i') }}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
