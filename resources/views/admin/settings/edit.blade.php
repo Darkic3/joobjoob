@@ -1,4 +1,10 @@
 @php use App\Models\Setting; @endphp
+@php
+    // ترجمه با fallback به برچسب کانفیگ — اگر کلید ترجمه نبود، برچسب اصلی نمایش داده می‌شود
+    $t = function (string $key, ?string $fallback = null) {
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : ($fallback ?? $key);
+    };
+@endphp
 @extends('layouts.admin.app')
 
 @section('tab-name', __('admin.settings.title'))
@@ -27,7 +33,7 @@
                                        aria-controls="settings-tab-{{ $tabKey }}"
                                        aria-selected="{{ $activeGroup === $tabKey ? 'true' : 'false' }}"
                                        class="nav-link rounded-top-3 px-4 py-3 fw-semibold @if ($activeGroup === $tabKey) active @endif">
-                                        {{ $tabLabel }}
+                                        {{ $t('admin.settings.tabs.' . $tabKey, $tabLabel) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -63,7 +69,7 @@
                                             <div class="{{ $colClass }}">
                                                 <div class="mb-3">
                                                     <label for="{{ $fieldKey }}" class="form-label fw-semibold mb-2">
-                                                        {{ $config['label'] }}
+                                                        {{ $t('admin.settings.fields.' . $fieldKey, $config['label'] ?? '') }}
                                                         @if ($isRequired) <span class="text-danger">*</span> @endif
                                                     </label>
 
@@ -100,7 +106,7 @@
                                                                             </video>
                                                                         @endif
                                                                     @else
-                                                                        <img src="{{ Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ $config['label'] }}">
+                                                                        <img src="{{ Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ $t('admin.settings.fields.' . $fieldKey, $config['label'] ?? '') }}">
                                                                     @endif
 
                                                                     @if($type === 'file' && $cropper)

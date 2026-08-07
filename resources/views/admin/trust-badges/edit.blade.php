@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'ویرایش نشان اعتماد: ' . ($trustBadge->title ?? ''))
+@section('tab-name', __('admin.trust_badges.tab_edit', ['name' => $trustBadge->title ?? '']))
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6">
@@ -13,8 +13,8 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">ویرایش نشان اعتماد</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">اطلاعات نشان اعتماد را به‌روزرسانی کنید</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.trust_badges.edit') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.trust_badges.edit_sub') }}</p>
             </div>
         </div>
 

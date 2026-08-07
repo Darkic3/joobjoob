@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'ویرایش دسته‌بندی')
+@section('tab-name', __('admin.product_categories.edit'))
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6 animate-slide-up">
@@ -15,8 +15,8 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">ویرایش دسته‌بندی «{{ $productCategory->trans('name') }}»</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">اطلاعات دسته‌بندی را به‌روزرسانی کنید</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.product_categories.tab_edit', ['name' => $productCategory->trans('name')]) }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.product_categories.edit_sub') }}</p>
             </div>
         </div>
 

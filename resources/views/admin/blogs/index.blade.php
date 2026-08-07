@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'مدیریت مقالات')
+@section('tab-name', __('admin.blogs.tab'))
 
 @section('content')
     <div class="space-y-6 animate-slide-up">
@@ -8,15 +8,15 @@
         {{-- هدر صفحه --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">مدیریت مقالات</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">لیست تمام مقالات منتشر شده و پیش‌نویس</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.blogs.title') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.blogs.subtitle') }}</p>
             </div>
             @if(auth()->user()->canAccess('admin.blogs.create'))
                 <a href="{{ route('admin.blogs.create') }}" class="btn-primary flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    <span>مقاله جدید</span>
+                    <span>{{ __('admin.blogs.add_new') }}</span>
                 </a>
             @endif
         </div>
@@ -26,11 +26,11 @@
             <form action="{{ route('admin.blogs.index') }}" method="GET" class="flex flex-wrap gap-3">
                 <div class="flex-1 min-w-[200px]">
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="جستجو در عنوان..."
+                           placeholder="{{ __('admin.blogs.search_ph') }}"
                            class="input-custom w-full">
                 </div>
                 <select name="category" class="input-custom w-auto min-w-[150px]">
-                    <option value="">همه دسته‌بندی‌ها</option>
+                    <option value="">{{ __('admin.common.all_categories') }}</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                             {{ $category->title }}
@@ -38,15 +38,15 @@
                     @endforeach
                 </select>
                 <select name="status" class="input-custom w-auto min-w-[120px]">
-                    <option value="">همه وضعیت‌ها</option>
-                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>فعال</option>
-                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>غیرفعال</option>
+                    <option value="">{{ __('admin.common.all_statuses') }}</option>
+                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>{{ __('admin.common.active') }}</option>
+                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>{{ __('admin.common.inactive') }}</option>
                 </select>
                 <button type="submit" class="btn-primary px-6 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <span class="hidden sm:inline">جستجو</span>
+                    <span class="hidden sm:inline">{{ __('admin.common.search') }}</span>
                 </button>
             </form>
         </div>
@@ -58,12 +58,12 @@
                     <thead class="bg-gray-50/80 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-4 w-16">#</th>
-                        <th class="px-6 py-4 w-24">تصویر</th>
-                        <th class="px-6 py-4">عنوان و آدرس</th>
-                        <th class="px-6 py-4">دسته‌بندی</th>
-                        <th class="px-6 py-4">وضعیت</th>
-                        <th class="px-6 py-4">تاریخ</th>
-                        <th class="px-6 py-4 text-end w-24">عملیات</th>
+                        <th class="px-6 py-4 w-24">{{ __('admin.blogs.image') }}</th>
+                        <th class="px-6 py-4">{{ __('admin.blogs.title_url') }}</th>
+                        <th class="px-6 py-4">{{ __('admin.common.category') }}</th>
+                        <th class="px-6 py-4">{{ __('admin.common.status') }}</th>
+                        <th class="px-6 py-4">{{ __('admin.common.date') }}</th>
+                        <th class="px-6 py-4 text-end w-24">{{ __('admin.common.actions') }}</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -107,14 +107,14 @@
                                         {{ $blog->category->title }}
                                     </span>
                                 @else
-                                    <span class="text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg">بدون دسته</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg">{{ __('admin.blogs.no_category') }}</span>
                                 @endif
                             </td>
 
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg {{ $blog->is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-800' }}">
                                     <span class="w-1.5 h-1.5 {{ $blog->is_active ? 'bg-emerald-500' : 'bg-red-500' }} rounded-full"></span>
-                                    {{ $blog->is_active ? 'فعال' : 'غیرفعال' }}
+                                    {{ $blog->is_active ? __('admin.common.active') : __('admin.common.inactive') }}
                                 </span>
                             </td>
 
@@ -126,7 +126,7 @@
                             <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.blogs.edit', $blog) }}"
-                                       class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="ویرایش">
+                                       class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="{{ __('admin.common.edit') }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
@@ -135,7 +135,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="حذف">
+                                                class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="{{ __('admin.common.delete') }}">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
@@ -153,9 +153,9 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                                         </svg>
                                     </div>
-                                    <p class="text-gray-500 dark:text-gray-400 font-medium">هنوز مقاله‌ای ثبت نشده است</p>
+                                    <p class="text-gray-500 dark:text-gray-400 font-medium">{{ __('admin.blogs.empty') }}</p>
                                     @if(auth()->user()->canAccess('admin.blogs.create'))
-                                        <a href="{{ route('admin.blogs.create') }}" class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">اولین مقاله را ایجاد کنید &larr;</a>
+                                        <a href="{{ route('admin.blogs.create') }}" class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">{{ __('admin.blogs.create_first') }} &larr;</a>
                                     @endif
                                 </div>
                             </td>
