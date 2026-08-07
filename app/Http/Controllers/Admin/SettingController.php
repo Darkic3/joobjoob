@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
-use App\Models\Setting;
 use App\Services\SettingService;
-use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
@@ -21,17 +19,21 @@ class SettingController extends Controller
     {
         $config = config('settings');
 
-        if (!isset($config['tabs'][$group])) {
+        if (! isset($config['tabs'][$group])) {
             abort(404, 'گروه تنظیمات یافت نشد.');
         }
 
-        $currentValues = $this->settingService->getGroup($group);
+        // مقادیر همه گروه‌ها — برای سوییچ تب بدون رفرش، همه پنل‌ها یکجا رندر می‌شوند
+        $groupsValues = [];
+        foreach ($config['tabs'] as $tabKey => $tabLabel) {
+            $groupsValues[$tabKey] = $this->settingService->getGroup($tabKey);
+        }
 
         return view('admin.settings.edit', [
-            'activeGroup'      => $group,
-            'tabs'             => $config['tabs'],
-            'fields'           => $config['fields'],
-            'currentValues'    => $currentValues,
+            'activeGroup' => $group,
+            'tabs' => $config['tabs'],
+            'fields' => $config['fields'],
+            'groupsValues' => $groupsValues,
         ]);
     }
 

@@ -109,5 +109,6 @@ return [
         'got_it'            => 'Got it',
         'cancel'            => 'Cancel',
         'save'              => 'Save changes',
+        'no_fields_in_group'=> 'This group has no fields to configure yet.',
     ],
 ];

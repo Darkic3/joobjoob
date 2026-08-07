@@ -109,5 +109,6 @@ return [
         'got_it'            => 'Anladım',
         'cancel'            => 'İptal',
         'save'              => 'Değişiklikleri kaydet',
+        'no_fields_in_group'=> 'Bu grupta henüz yapılandırılacak alan yok.',
     ],
 ];
