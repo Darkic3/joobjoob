@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
@@ -46,6 +47,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');
+
+        // مدیریت زبان‌ها — اکشن‌های سریع ایندکس با پرمیشن ویرایش (toggle / make-default)
+        Route::resource('languages', LanguageController::class)->except('show');
+        Route::patch('languages/{language}/toggle', [LanguageController::class, 'toggle'])->name('languages.toggle');
+        Route::patch('languages/{language}/make-default', [LanguageController::class, 'makeDefault'])->name('languages.make-default');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

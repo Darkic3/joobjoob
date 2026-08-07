@@ -16,6 +16,7 @@ return [
         'roles'             => 'Roles & Permissions',
         'orders'            => 'Orders',
         'reviews'           => 'Reviews',
+        'languages'         => 'Languages',
     ],
 
     'access' => [
@@ -85,10 +86,15 @@ return [
         'orders' => [
             'index' => 'View orders',
             'show'  => 'Order details',
+        ],        'reviews' => [
+            'index'   => 'View reviews',
+            'delete'  => 'Delete review',
         ],
-        'reviews' => [
-            'index'  => 'View reviews',
-            'delete' => 'Delete review',
+        'languages' => [
+            'index'  => 'View languages',
+            'create' => 'Add language',
+            'edit'   => 'Edit language',
+            'delete' => 'Delete language',
         ],
     ],
 ];

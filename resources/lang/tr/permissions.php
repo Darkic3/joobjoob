@@ -16,6 +16,7 @@ return [
         'roles'             => 'Roller ve İzinler',
         'orders'            => 'Siparişler',
         'reviews'           => 'Yorumlar',
+        'languages'         => 'Diller',
     ],
 
     'access' => [
@@ -89,6 +90,12 @@ return [
         'reviews' => [
             'index'  => 'Yorumları görüntüle',
             'delete' => 'Yorumu sil',
+        ],
+        'languages' => [
+            'index'  => 'Dilleri Görüntüle',
+            'create' => 'Dil Ekle',
+            'edit'   => 'Dili Düzenle',
+            'delete' => 'Dili Sil',
         ],
     ],
 ];

@@ -123,6 +123,21 @@ return [
             ],
         ],
 
+        'languages' => [
+            'title' => 'permissions.groups.languages',
+            'access' => [
+                'index' => 'permissions.access.languages.index',
+                'create' => 'permissions.access.languages.create',
+                'store' => 'permissions.access.languages.create',
+                'edit' => 'permissions.access.languages.edit',
+                'update' => 'permissions.access.languages.edit',
+                // اکشن‌های سریع ایندکس (تغییر وضعیت / پیش‌فرض‌کردن) — همان لیبل ویرایش
+                'toggle' => 'permissions.access.languages.edit',
+                'make-default' => 'permissions.access.languages.edit',
+                'destroy' => 'permissions.access.languages.delete',
+            ],
+        ],
+
         // ⏳ گروه‌های آینده (از الان در درخت، تا نقش main خودکار پوشش دهد)
         'users' => [
             'title' => 'permissions.groups.users',
