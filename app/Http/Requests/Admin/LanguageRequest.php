@@ -29,7 +29,6 @@ class LanguageRequest extends FormRequest
             'name.*' => ['nullable', 'string', 'max:255'],
             'native_name' => ['required', 'string', 'max:255'],
             'dir' => ['required', 'in:rtl,ltr'],
-            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ];
     }
 

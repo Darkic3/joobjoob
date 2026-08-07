@@ -59,7 +59,6 @@ class LanguageCrudTest extends TestCase
                 'name' => ['fa' => 'آلمانی', 'en' => 'German'],
                 'native_name' => 'Deutsch',
                 'dir' => 'ltr',
-                'sort_order' => 5,
                 'is_active' => 1,
                 'is_default' => 0,
             ])
@@ -67,6 +66,25 @@ class LanguageCrudTest extends TestCase
 
         $this->assertDatabaseHas('languages', ['code' => 'de']);
         $this->assertTrue(app(LocaleService::class)->has('de'));
+    }
+
+    public function test_new_language_goes_to_end_of_order(): void
+    {
+        // ترتیب از فرم حذف شده — زبان جدید باید همیشه آخر لیست باشد
+        $max = (int) Language::max('sort_order');
+
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.languages.store'), [
+                'code' => 'de',
+                'name' => ['fa' => 'آلمانی'],
+                'native_name' => 'Deutsch',
+                'dir' => 'ltr',
+                'is_active' => 1,
+                'is_default' => 0,
+            ])
+            ->assertRedirect(route('admin.languages.index'));
+
+        $this->assertSame($max + 1, (int) Language::where('code', 'de')->value('sort_order'));
     }
 
     public function test_store_rejects_invalid_code(): void
@@ -106,7 +124,6 @@ class LanguageCrudTest extends TestCase
                 'native_name' => 'English Updated',
                 'name' => ['fa' => 'انگلیسی', 'en' => 'English'],
                 'dir' => 'ltr',
-                'sort_order' => 2,
                 'is_active' => 1,
                 'is_default' => 0,
             ])
@@ -126,7 +143,6 @@ class LanguageCrudTest extends TestCase
                 'native_name' => 'English',
                 'name' => ['fa' => 'انگلیسی', 'en' => 'English'],
                 'dir' => 'ltr',
-                'sort_order' => 2,
                 'is_active' => 1,
                 'is_default' => 1,
             ])
@@ -147,7 +163,6 @@ class LanguageCrudTest extends TestCase
                 'native_name' => 'فارسی',
                 'name' => ['fa' => 'فارسی', 'en' => 'Persian'],
                 'dir' => 'rtl',
-                'sort_order' => 1,
                 'is_active' => 0,
                 'is_default' => 0,
             ])
@@ -241,6 +256,56 @@ class LanguageCrudTest extends TestCase
 
         $this->actingAs($editor)
             ->get(route('admin.languages.index'))
+            ->assertForbidden();
+    }
+
+    public function test_reorder_updates_sort_order(): void
+    {
+        $fa = Language::where('code', 'fa')->firstOrFail();
+        $en = Language::where('code', 'en')->firstOrFail();
+        $ar = Language::where('code', 'ar')->firstOrFail();
+        $tr = Language::where('code', 'tr')->firstOrFail();
+
+        // ترتیب جدید: tr, ar, en, fa
+        $ids = [$tr->id, $ar->id, $en->id, $fa->id];
+
+        $this->actingAs($this->superAdmin())
+            ->postJson(route('admin.languages.reorder'), ['ids' => $ids])
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $this->assertSame(1, (int) $tr->fresh()->sort_order);
+        $this->assertSame(2, (int) $ar->fresh()->sort_order);
+        $this->assertSame(3, (int) $en->fresh()->sort_order);
+        $this->assertSame(4, (int) $fa->fresh()->sort_order);
+
+        // کش زبان‌ها هم باید تازه باشد
+        $this->assertSame(array_keys(app(LocaleService::class)->all()), ['tr', 'ar', 'en', 'fa']);
+    }
+
+    public function test_reorder_rejects_partial_or_invalid_ids(): void
+    {
+        $fa = Language::where('code', 'fa')->firstOrFail();
+        $en = Language::where('code', 'en')->firstOrFail();
+
+        // فقط بخشی از زبان‌ها → نامعتبر (باید همه باشند)
+        $this->actingAs($this->superAdmin())
+            ->postJson(route('admin.languages.reorder'), ['ids' => [$en->id, $fa->id]])
+            ->assertStatus(422);
+
+        // شناسه‌ی ناموجود → خطای اعتبارسنجی
+        $this->actingAs($this->superAdmin())
+            ->postJson(route('admin.languages.reorder'), ['ids' => [$fa->id, 99999]])
+            ->assertStatus(422);
+    }
+
+    public function test_reorder_requires_permission(): void
+    {
+        $editor = User::factory()->create(['is_admin' => false, 'is_active' => true]);
+        $editor->roles()->detach();
+
+        $this->actingAs($editor)
+            ->postJson(route('admin.languages.reorder'), ['ids' => [1, 2, 3, 4]])
             ->assertForbidden();
     }
 }

@@ -131,9 +131,10 @@ return [
                 'store' => 'permissions.access.languages.create',
                 'edit' => 'permissions.access.languages.edit',
                 'update' => 'permissions.access.languages.edit',
-                // اکشن‌های سریع ایندکس (تغییر وضعیت / پیش‌فرض‌کردن) — همان لیبل ویرایش
+                // اکشن‌های سریع ایندکس (تغییر وضعیت / پیش‌فرض‌کردن / ترتیب درگ‌اندروپ) — همان لیبل ویرایش
                 'toggle' => 'permissions.access.languages.edit',
                 'make-default' => 'permissions.access.languages.edit',
+                'reorder' => 'permissions.access.languages.edit',
                 'destroy' => 'permissions.access.languages.delete',
             ],
         ],

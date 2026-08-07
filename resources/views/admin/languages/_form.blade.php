@@ -66,29 +66,17 @@
         @error('name.fa') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
-    {{-- جهت + ترتیب --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('admin.languages.field_dir') }} <span class="text-rose-500">*</span>
-            </label>
-            <select name="dir" class="input-custom text-sm" required>
-                @php $dir = $isEdit ? old('dir', $language->dir) : old('dir', config('languages.'.old('code', '').'.dir', 'ltr')); @endphp
-                <option value="rtl" @selected($dir === 'rtl')>{{ __('admin.languages.rtl') }}</option>
-                <option value="ltr" @selected($dir === 'ltr')>{{ __('admin.languages.ltr') }}</option>
-            </select>
-            @error('dir') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('admin.languages.field_sort') }}
-            </label>
-            <input type="number" name="sort_order" min="0" max="9999" dir="ltr"
-                   value="{{ $isEdit ? old('sort_order', $language->sort_order) : old('sort_order', 0) }}"
-                   class="input-custom text-sm">
-            @error('sort_order') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
+    {{-- جهت — ترتیب در ایندکس با درگ‌اندروپ تنظیم می‌شود --}}
+    <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+            {{ __('admin.languages.field_dir') }} <span class="text-rose-500">*</span>
+        </label>
+        <select name="dir" class="input-custom text-sm" required>
+            @php $dir = $isEdit ? old('dir', $language->dir) : old('dir', config('languages.'.old('code', '').'.dir', 'ltr')); @endphp
+            <option value="rtl" @selected($dir === 'rtl')>{{ __('admin.languages.rtl') }}</option>
+            <option value="ltr" @selected($dir === 'ltr')>{{ __('admin.languages.ltr') }}</option>
+        </select>
+        @error('dir') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     {{-- فعال + پیش‌فرض --}}

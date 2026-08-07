@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LanguageRequest;
 use App\Models\Language;
 use App\Services\LocaleService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LanguageController extends Controller
@@ -26,6 +28,9 @@ class LanguageController extends Controller
     public function store(LanguageRequest $request): RedirectResponse
     {
         $data = $this->normalizedData($request, 'store');
+
+        // زبان جدید همیشه به انتهای ترتیب اضافه می‌شود (سورت از ایندکس با درگ‌اندروپ)
+        $data['sort_order'] = (Language::max('sort_order') ?? 0) + 1;
 
         $language = Language::create($data);
 
@@ -112,6 +117,43 @@ class LanguageController extends Controller
         return back()->with('success', __('admin.languages.updated'));
     }
 
+    /**
+     * اکشن سریع ایندکس: ذخیره‌ی ترتیب جدید (درگ‌اندروپ) — همه زبان‌ها با ترتیب جدید.
+     * ترتیب روی sort_order نوشته می‌شود تا scopes (ordered) و سوییچرها آن را رعایت کنند.
+     */
+    public function reorder(Request $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:languages,id'],
+        ]);
+
+        $ids = array_values(array_unique(array_map('intval', $validated['ids'])));
+
+        // ترتیب باید شامل همه‌ی زبان‌ها باشد — در غیر این صورت ترتیب خراب می‌شود
+        if (count($ids) !== Language::count()) {
+            return $request->expectsJson()
+                ? response()->json(['ok' => false, 'message' => __('admin.languages.order_invalid')], 422)
+                : back()->with('error', __('admin.languages.order_invalid'));
+        }
+
+        foreach ($ids as $index => $id) {
+            Language::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        app(LocaleService::class)->flush();
+
+        // مسیر AJAX (استفادهٔ اصلی UI): پیام در پاسخ JSON برمی‌گردد و JS بدون رفرش toast نشان می‌دهد.
+        // فلش فقط برای درخواست‌های فرم (غیر AJAX) ست می‌شود تا toast منسوخ روی صفحهٔ بعدی ظاهر نشود.
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'message' => __('admin.languages.order_saved')]);
+        }
+
+        session()->flash('success', __('admin.languages.order_saved'));
+
+        return back();
+    }
+
     public function destroy(Language $language): RedirectResponse
     {
         // زبان پیش‌فرض حذف نمی‌شود — اول پیش‌فرض را تغییر دهید
@@ -147,7 +189,6 @@ class LanguageController extends Controller
 
         $data['is_active'] = $request->boolean('is_active');
         $data['is_default'] = $request->boolean('is_default');
-        $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
 
         // نام‌های خالی را حذف کن تا localizedName() به fallback بیفتد
         if (isset($data['name'])) {

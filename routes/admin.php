@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CkeditorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\LanguageController;
@@ -52,9 +53,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('languages', LanguageController::class)->except('show');
         Route::patch('languages/{language}/toggle', [LanguageController::class, 'toggle'])->name('languages.toggle');
         Route::patch('languages/{language}/make-default', [LanguageController::class, 'makeDefault'])->name('languages.make-default');
+        // ذخیره ترتیب درگ‌اندروپ (ایندکس) — با پرمیشن ویرایش
+        Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-        Route::post('ckeditor/upload', [App\Http\Controllers\Admin\CkeditorController::class, 'upload'])->name('ckeditor.upload');
+        Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
     });
 });

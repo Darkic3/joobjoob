@@ -1,6 +1,15 @@
 <div
+    id="admin-toast"
     x-data="{
         messages: [],
+        // نمایش toast از هر جای صفحه (مثلاً بعد از ذخیرهٔ AJAX بدون رفرش)
+        show(message, type = 'success') {
+            const msg = { type: type, message: message };
+            this.messages.push(msg);
+            setTimeout(() => {
+                this.messages = this.messages.filter((m) => m !== msg);
+            }, 5000);
+        },
         init() {
             var flash = {{ json_encode(session('flash')) }};
             if (flash) {

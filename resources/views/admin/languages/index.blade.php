@@ -27,12 +27,105 @@
             </div>
         @endif
 
+        {{-- درگ‌اندروپ ترتیب زبان‌ها — نوار ذخیره + جدول در یک Alpine scope --}}
+        <div x-data="{
+                dragId: null,
+                overId: null,
+                changed: false,
+                saving: false,
+                onDragStart(id) { this.dragId = id; },
+                // root = $root (ریشهٔ کامپوننت) — استفاده از this.$el در x-on ناپایدار است
+                // الگوریتم پایدار بدون نوسان: محل درج مستقیماً از Y موش نسبت به وسطِ هر ردیف محاسبه می‌شود.
+                // dragover در مرورگر پیاپی (حتی بدون حرکت موش) شلیک می‌شود — پس بعد از هر جابه‌جایی اگر
+                // ردیف از قبل در جای درست باشد هیچ کاری نمی‌کنیم تا بین دو موقعیت نچرخد و ترتیبِ رها
+                // شده همان چیزی باشد که ذخیره می‌شود.
+                onDragOver(id, e, root) {
+                    if (this.dragId === null) return;
+                    const rows = [...root.querySelectorAll('tbody tr[data-id]')];
+                    const fromIdx = rows.findIndex(r => r.dataset.id == this.dragId);
+                    if (fromIdx < 0) return;
+                    const from = rows[fromIdx];
+                    // ایندکس درج: اولین ردیفی که موش بالایِ وسطِ آن است (پیش‌فرض: انتهای جدول).
+                    // insertBefore خودش «حذف و درج» انجام می‌دهد، پس همین ایندکسِ ساده درست است —
+                    // بدون هیچ decrement (decrement باعث می‌شد ردیف یک‌جا بالاتر/پایین‌تر از موش بیفتد).
+                    let insertIdx = rows.length;
+                    for (let i = 0; i < rows.length; i++) {
+                        const rect = rows[i].getBoundingClientRect();
+                        if (e.clientY < rect.top + rect.height / 2) { insertIdx = i; break; }
+                    }
+                    // ردیف از قبل در جای درست است → هیچ کاری نکن (جلوگیری از نوسان)
+                    const anchor = rows[insertIdx];
+                    if (fromIdx === insertIdx || (anchor && anchor === from)) return;
+                    if (anchor) from.parentNode.insertBefore(from, anchor);
+                    else from.parentNode.appendChild(from);
+                    this.changed = true;
+                },
+                // پایان درگ → ذخیرهٔ خودکار AJAX بدون رفرش (مثل الگوی صفحهٔ منوها)
+                onDragEnd(root) {
+                    this.dragId = null;
+                    this.overId = null;
+                    if (this.changed && !this.saving) this.saveOrder(root);
+                },
+                notify(message, type = 'success') {
+                    const el = document.getElementById('admin-toast');
+                    if (el && window.Alpine) {
+                        window.Alpine.$data(el).show(message, type);
+                    } else {
+                        console.warn('[languages] toast unavailable:', message);
+                    }
+                },
+                saveOrder(root) {
+                    if (this.saving) return;
+                    this.saving = true;
+                    const ids = [...root.querySelectorAll('tbody tr[data-id]')].map(r => Number(r.dataset.id));
+                    fetch('{{ route('admin.languages.reorder') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                        },
+                        body: JSON.stringify({ ids }),
+                    }).then(r => r.json()).then(data => {
+                        this.saving = false;
+                        if (data.ok) {
+                            this.changed = false;
+                            this.notify(data.message || '{{ __('admin.languages.order_saved') }}');
+                            return;
+                        }
+                        // شکست: چک‌باکس changed می‌ماند تا نوار ذخیره برای تلاش دوباره دیده شود
+                        this.notify(data.message || '{{ __('admin.languages.order_invalid') }}', 'error');
+                    }).catch(() => {
+                        this.saving = false;
+                        this.notify('{{ __('admin.languages.order_invalid') }}', 'error');
+                    });
+                }
+            }">
+
+        @if(auth()->user()->canAccess('admin.languages.reorder'))
+            {{-- نوار ذخیره ترتیب — فقط بعد از تغییر ردیف‌ها ظاهر می‌شود --}}
+            <div class="mb-3 flex items-center justify-between gap-3 px-1" x-show="changed" x-cloak>
+                <p class="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    {{ __('admin.languages.sort_hint') }}
+                </p>
+                <button type="button" @click="saveOrder($root)" :disabled="saving"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-wait">
+                    <svg x-show="saving" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                    {{ __('admin.languages.save_order') }}
+                </button>
+            </div>
+        @endif
+
         {{-- جدول زبان‌ها --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
+                        @if(auth()->user()->canAccess('admin.languages.reorder'))
+                            <th class="px-3 py-4 w-10 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.languages.order_col') }}</th>
+                        @endif
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.languages.name_col') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.languages.code_col') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.languages.dir_col') }}</th>
@@ -42,9 +135,24 @@
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">{{ __('admin.common.actions') }}</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700"
+                           @dragover.prevent @drop.prevent="onDragEnd($root)">
                     @forelse($languages as $language)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                        <tr data-id="{{ $language->id }}"
+                            class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
+                            :class="{ 'opacity-50': dragId === {{ $language->id }}, 'bg-indigo-50/60 dark:bg-indigo-500/10': overId === {{ $language->id }} }"
+                            @dragover.prevent="onDragOver({{ $language->id }}, $event, $root); overId = {{ $language->id }}"
+                            @dragleave="overId = null">
+                            @if(auth()->user()->canAccess('admin.languages.reorder'))
+                                {{-- دستگیره درگ — شروع کشیدن از اینجا --}}
+                                <td class="px-3 py-4 w-12 text-center cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors select-none"
+                                    draggable="true"
+                                    title="{{ __('admin.languages.sort_hint') }}"
+                                    @dragstart="onDragStart({{ $language->id }})"
+                                    @dragend="onDragEnd($root)">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8"/></svg>
+                                </td>
+                            @endif
                             {{-- نام زبان --}}
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
@@ -137,7 +245,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ auth()->user()->canAccess('admin.languages.reorder') ? 8 : 7 }}" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
                                         <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18zM8 9h8m-8 3h5m-5 3h2"/></svg>
@@ -154,6 +262,7 @@
                 </table>
             </div>
         </div>
+        </div>{{-- /درگ‌اندروپ ترتیب --}}
 
         <p class="mt-4 text-xs text-gray-400 dark:text-gray-500">{{ __('admin.languages.calendar_hint') }}</p>
     </div>
