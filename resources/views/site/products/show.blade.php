@@ -76,9 +76,9 @@
 
     {{-- Breadcrumb --}}
     <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ route('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
+        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
         <span class="mx-1">/</span>
-        <a href="{{ route('products.index') }}"
+        <a href="{{ localizedRoute('products.index') }}"
            class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
         @if($product->category)
             <span class="mx-1">/</span>
@@ -116,7 +116,7 @@
             {{-- برند + امتیاز --}}
             <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
                 @if($product->brand)
-                    <a href="{{ route('products.index', ['brand' => $product->brand->url]) }}"
+                    <a href="{{ localizedRoute('products.index', ['brand' => $product->brand->url]) }}"
                        class="inline-flex items-center gap-2 neu-flat-sm px-4 py-2 rounded-xl text-sm font-bold hover:text-[var(--accent)] transition-colors">
                         @if($product->brand->image)
                             <img

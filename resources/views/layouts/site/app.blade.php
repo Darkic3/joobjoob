@@ -15,6 +15,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', setting('site_name', __('messages.site_name')))</title>
 
+    {{-- SEO: canonical + hreflang + Open Graph locale --}}
+    <link rel="canonical" href="{{ localizedUrl() }}">
+    @foreach(locale()->active() as $code => $lang)
+        <link rel="alternate" hreflang="{{ $code }}" href="{{ localizedUrl($code) }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ localizedUrl(locale()->defaultCode()) }}">
+    <meta property="og:locale" content="{{ ogLocale() }}">
+    <meta property="og:locale:alternate" content="{{ ogLocale(locale()->defaultCode()) }}">
+
     @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">

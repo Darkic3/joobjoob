@@ -35,7 +35,7 @@
         <div class="neu-card">
             <h4 class="font-semibold mb-3">{{ __('messages.categories') }}</h4>
             <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                <li><a href="{{ route('products.index') }}" class="hover:opacity-80">{{ __('messages.products') }}</a></li>
+                <li><a href="{{ localizedRoute('products.index') }}" class="hover:opacity-80">{{ __('messages.products') }}</a></li>
             </ul>
         </div>
 
@@ -49,7 +49,7 @@
                     <li><a href="" class="hover:opacity-80">{{ __('messages.login') }}</a></li>
                     <li><a href="" class="hover:opacity-80">{{ __('messages.register') }}</a></li>
                 @endauth
-                <li><a href="{{ route('cart.index') }}" class="hover:opacity-80">{{ __('messages.cart') }}</a></li>
+                <li><a href="{{ localizedRoute('cart.index') }}" class="hover:opacity-80">{{ __('messages.cart') }}</a></li>
             </ul>
         </div>
 

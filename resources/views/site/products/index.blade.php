@@ -4,7 +4,7 @@
 
 @section('content')
     <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ route('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
+        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
         <span class="mx-1">/</span>
         <span style="color: var(--text-primary);">{{ __('messages.products') }}</span>
     </p>
@@ -20,10 +20,10 @@
         <aside id="filters-panel" class="hidden-mobile lg:block neu-flat p-5 h-fit lg:sticky lg:top-24">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="font-extrabold text-sm">{{ __('messages.filter') }}</h3>
-                <a href="{{ route('products.index') }}" class="text-xs font-semibold hover:text-[var(--accent)] transition-colors">{{ __('messages.reset') }}</a>
+                <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:text-[var(--accent)] transition-colors">{{ __('messages.reset') }}</a>
             </div>
 
-            <form method="GET" action="{{ route('products.index') }}" id="filter-form">
+            <form method="GET" action="{{ localizedRoute('products.index') }}" id="filter-form">
                 {{-- حفظ پارامتر جستجو در فرم --}}
                 @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
 
@@ -92,7 +92,7 @@
                     {{ __('messages.products') }}
                 </p>
 
-                <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2">
+                <form method="GET" action="{{ localizedRoute('products.index') }}" class="flex items-center gap-2">
                     {{-- حفظ فیلترهای فعلی در فرم مرتب‌سازی --}}
                     @foreach(request()->except('sort', 'page') as $key => $value)
                         @if(is_array($value))

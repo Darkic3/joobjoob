@@ -55,7 +55,7 @@
         <section class="reveal-on-scroll py-6">
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-lg font-extrabold">{{ setting('home_featured_title', __('messages.featured_products')) }}</h2>
-                <a href="{{ route('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
+                <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
                     {{ setting('home_view_all', __('messages.view_all')) }} ←
                 </a>
             </div>

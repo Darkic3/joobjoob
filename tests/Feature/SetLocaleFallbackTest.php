@@ -24,9 +24,9 @@ class SetLocaleFallbackTest extends TestCase
     /**
      * رندر صفحه‌ی اصلی با زبان مشخص شده توسط میدلور.
      */
-    private function htmlLangOf(array $params = []): string
+    private function htmlLangOf(string $path = '/'): string
     {
-        $response = $this->get(route('home', $params));
+        $response = $this->get($path);
 
         $response->assertOk();
 
@@ -35,96 +35,138 @@ class SetLocaleFallbackTest extends TestCase
         return $m[1] ?? '';
     }
 
+    // ── سایت: پیشوند URL تعیین‌کننده است ──────────────────────────────
+
     public function test_default_locale_is_fa(): void
     {
-        $this->assertSame('fa', $this->htmlLangOf());
+        $this->assertSame('fa', $this->htmlLangOf('/'));
+        $this->assertSame('fa', $this->htmlLangOf('/products'));
     }
 
-    public function test_lang_param_switches_locale(): void
+    public function test_locale_prefix_switches_locale(): void
     {
-        $this->assertSame('en', $this->htmlLangOf(['lang' => 'en']));
-        $this->assertSame('tr', $this->htmlLangOf(['lang' => 'tr']));
+        $this->assertSame('en', $this->htmlLangOf('/en'));
+        $this->assertSame('tr', $this->htmlLangOf('/tr'));
+        $this->assertSame('ar', $this->htmlLangOf('/ar'));
     }
 
-    public function test_unknown_lang_falls_back_to_default(): void
+    public function test_default_prefix_redirects_to_canonical(): void
     {
-        // de در جدول نیست → fallback بی‌صدا به پیش‌فرض (fa)
-        $this->assertSame('fa', $this->htmlLangOf(['lang' => 'de']));
+        $this->get('/fa')->assertRedirect('/');
+        $this->get('/fa/products')->assertRedirect('/products');
     }
 
-    public function test_inactive_lang_falls_back_but_keeps_previous_valid_session(): void
+    public function test_inactive_locale_redirects_to_default(): void
     {
-        // اول یک زبان معتبر را در session ذخیره کن
-        $this->withSession(['locale' => 'en']);
-        $this->assertSame('en', $this->htmlLangOf());
-
-        // حالا en را غیرفعال کن → درخواست بعدی باید fallback کند
         Language::where('code', 'en')->update(['is_active' => false]);
         app(LocaleService::class)->flush();
 
-        $this->assertSame('fa', $this->htmlLangOf());
+        $this->get('/en')->assertRedirect('/');
+        $this->get('/en/products')->assertRedirect('/products');
     }
 
-    public function test_single_language_mode_ignores_lang_param(): void
+    public function test_single_language_mode_redirects_all_prefixes_to_default(): void
     {
-        // همه را غیرفعال کن جز fa → حالت تک‌زبانه
+        // فقط fa فعال است
         Language::where('code', '!=', 'fa')->update(['is_active' => false]);
         app(LocaleService::class)->flush();
 
-        // ?lang=en فعال نیست (غیرفعال شده) و حالت تک‌زبانه است → fa
-        $this->assertSame('fa', $this->htmlLangOf(['lang' => 'en']));
+        // en روت دارد (در دیتابیس هست) ولی غیرفعال است → 301 به پیش‌فرض
+        $this->get('/en')->assertRedirect('/');
     }
 
-    public function test_session_locale_is_used_when_active(): void
+    public function test_unprefixed_site_lang_param_redirects_to_prefixed_url(): void
     {
-        $this->withSession(['locale' => 'tr']);
+        // سازگاری با عقب: بوکمارک قدیمی ?lang= → 301 به نسخه‌ی پیشونددار (SEO)
+        $this->get('/?lang=en')->assertRedirect('/en');
+        $this->get('/products?lang=tr')->assertRedirect('/tr/products');
+        $this->get('/cart?lang=ar')->assertRedirect('/ar/cart');
 
-        $this->assertSame('tr', $this->htmlLangOf());
+        // نکته: در صفحه‌های دارای مدل-بایندینگ (products/{slug})، اگر رکورد وجود
+        // نداشته باشد بایندینگ (قبل از میدلور) 404 می‌دهد — همان رفتار درست است.
     }
 
-    public function test_user_locale_wins_over_session(): void
+    public function test_unprefixed_site_lang_param_of_default_or_invalid_is_ignored(): void
     {
-        $user = User::factory()->create([
-            'is_admin' => false,
-            'is_active' => true,
-            'locale' => 'ar',
-        ]);
+        // پیش‌فرض — نیازی به ریدایرکت نیست (همین canonical است)
+        $this->assertSame('fa', $this->htmlLangOf('/?lang=fa'));
 
-        // session می‌گوید tr ولی کاربر لاگین‌شده ar دارد → ar برنده است
-        $this->actingAs($user)->withSession(['locale' => 'tr']);
-
-        $this->assertSame('ar', $this->htmlLangOf());
+        // کد ناموجود → نادیده → پیش‌فرض
+        $this->assertSame('fa', $this->htmlLangOf('/?lang=xx'));
     }
 
-    public function test_user_with_inactive_locale_falls_back(): void
+    public function test_unprefixed_site_lang_param_of_inactive_locale_is_ignored(): void
     {
-        $user = User::factory()->create([
-            'is_admin' => false,
-            'is_active' => true,
-            'locale' => 'ar',
-        ]);
-
-        Language::where('code', 'ar')->update(['is_active' => false]);
+        Language::where('code', 'en')->update(['is_active' => false]);
         app(LocaleService::class)->flush();
+
+        // en غیرفعال → نادیده → پیش‌فرض (بدون ریدایرکت)
+        $this->assertSame('fa', $this->htmlLangOf('/?lang=en'));
+    }
+
+    public function test_unprefixed_site_ignores_session_and_user_locale(): void
+    {
+        // مسیر بدون پیشوند = canonical پیش‌فرض — سشن/کاربر آن را عوض نمی‌کند
+        $this->withSession(['locale' => 'tr']);
+        $this->assertSame('fa', $this->htmlLangOf('/'));
+
+        $user = User::factory()->create(['is_admin' => false, 'is_active' => true, 'locale' => 'ar']);
+        $this->actingAs($user);
+        $this->assertSame('fa', $this->htmlLangOf('/'));
+    }
+
+    // ── پنل ادمین: زنجیره‌ی قدیمی حفظ شده است ─────────────────────────
+
+    public function test_admin_login_respects_lang_param(): void
+    {
+        $html = $this->get('/admin/login?lang=en')->assertOk()->getContent();
+
+        preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
+
+        $this->assertSame('en', $m[1] ?? '');
+    }
+
+    public function test_admin_respects_user_locale(): void
+    {
+        $user = User::factory()->create([
+            'is_admin' => true,
+            'is_active' => true,
+            'locale' => 'ar',
+        ]);
 
         $this->actingAs($user);
 
-        // locale کاربر (ar) غیرفعال است → به session/session قبلی → پیش‌فرض fa
-        $this->assertSame('fa', $this->htmlLangOf());
+        $html = $this->get('/admin/dashboard')->assertOk()->getContent();
+        preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
+
+        $this->assertSame('ar', $m[1] ?? '');
     }
 
-    public function test_rtl_direction_for_fa_and_ltr_for_en(): void
+    public function test_admin_respects_session_locale(): void
     {
-        $fa = $this->get(route('home'))->getContent();
-        $this->assertMatchesRegularExpression('/<html\s+lang="fa"\s+dir="rtl"/', $fa);
+        $this->withSession(['locale' => 'tr']);
 
-        $en = $this->get(route('home', ['lang' => 'en']))->getContent();
-        $this->assertMatchesRegularExpression('/<html\s+lang="en"\s+dir="ltr"/', $en);
+        $html = $this->get('/admin/login')->assertOk()->getContent();
+        preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
+
+        $this->assertSame('tr', $m[1] ?? '');
+    }
+
+    public function test_admin_user_with_inactive_locale_falls_back(): void
+    {
+        Language::where('code', 'ar')->update(['is_active' => false]);
+        app(LocaleService::class)->flush();
+
+        $user = User::factory()->create(['is_admin' => true, 'is_active' => true, 'locale' => 'ar']);
+        $this->actingAs($user);
+
+        // ar غیرفعال است → fallback به پیش‌فرض
+        $this->assertSame('fa', $this->htmlLangOf('/admin/dashboard'));
     }
 
     public function test_app_locale_is_set_for_translations(): void
     {
-        $this->get(route('home', ['lang' => 'en']));
+        $this->get('/en');
 
         $this->assertSame('en', app()->getLocale());
     }
