@@ -56,19 +56,6 @@
             </h3>
 
             <div class="space-y-4">
-                {{-- ترتیب نمایش --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {{ __('admin.common.sort_order') }}
-                    </label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', $trustBadge->sort_order ?? 0) }}"
-                           class="input-custom" min="0">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.trust_badges.sort_help') }}</p>
-                    @error('sort_order')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 {{-- Toggle: فعال --}}
                 <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.trust_badges.active') }}</span>

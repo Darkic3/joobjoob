@@ -17,24 +17,116 @@
             @endif
         </div>
 
+        {{-- درگ‌اندروپ ترتیب اسلایدها — نوار ذخیره + جدول در یک Alpine scope --}}
+        <div x-data="{
+                dragId: null,
+                overId: null,
+                changed: false,
+                saving: false,
+                onDragStart(id) { this.dragId = id; },
+                // محل درج از Y موش نسبت به وسط هر ردیف — پایدار و بدون نوسان (dragover پیاپی)
+                onDragOver(id, e, root) {
+                    if (this.dragId === null) return;
+                    const rows = [...root.querySelectorAll('tbody tr[data-id]')];
+                    const fromIdx = rows.findIndex(r => r.dataset.id == this.dragId);
+                    if (fromIdx < 0) return;
+                    const from = rows[fromIdx];
+                    let insertIdx = rows.length;
+                    for (let i = 0; i < rows.length; i++) {
+                        const rect = rows[i].getBoundingClientRect();
+                        if (e.clientY < rect.top + rect.height / 2) { insertIdx = i; break; }
+                    }
+                    const anchor = rows[insertIdx];
+                    if (fromIdx === insertIdx || (anchor && anchor === from)) return;
+                    if (anchor) from.parentNode.insertBefore(from, anchor);
+                    else from.parentNode.appendChild(from);
+                    this.changed = true;
+                },
+                // پایان درگ → ذخیرهٔ خودکار AJAX بدون رفرش
+                onDragEnd(root) {
+                    this.dragId = null;
+                    this.overId = null;
+                    if (this.changed && !this.saving) this.saveOrder(root);
+                },
+                notify(message, type = 'success') {
+                    const el = document.getElementById('admin-toast');
+                    if (el && window.Alpine) window.Alpine.$data(el).show(message, type);
+                    else console.warn('[admin] toast unavailable:', message);
+                },
+                saveOrder(root) {
+                    if (this.saving) return;
+                    this.saving = true;
+                    const ids = [...root.querySelectorAll('tbody tr[data-id]')].map(r => Number(r.dataset.id));
+                    fetch('{{ route('admin.hero-slides.reorder') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                        },
+                        body: JSON.stringify({ ids }),
+                    }).then(r => r.json()).then(data => {
+                        this.saving = false;
+                        if (data.ok) {
+                            this.changed = false;
+                            this.notify(data.message || '{{ __('admin.hero_slides.order_saved') }}');
+                            return;
+                        }
+                        this.notify(data.message || '{{ __('admin.hero_slides.order_invalid') }}', 'error');
+                    }).catch(() => {
+                        this.saving = false;
+                        this.notify('{{ __('admin.hero_slides.order_invalid') }}', 'error');
+                    });
+                }
+            }">
+
+        @if(auth()->user()->canAccess('admin.hero-slides.reorder'))
+            {{-- نوار ذخیره ترتیب — فقط بعد از تغییر ردیف‌ها ظاهر می‌شود --}}
+            <div class="mb-3 flex items-center justify-between gap-3 px-1" x-show="changed" x-cloak>
+                <p class="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    {{ __('admin.hero_slides.sort_hint') }}
+                </p>
+                <button type="button" @click="saveOrder($root)" :disabled="saving"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-wait">
+                    <svg x-show="saving" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                    {{ __('admin.hero_slides.save_order') }}
+                </button>
+            </div>
+        @endif
+
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/80 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-4 w-16">#</th>
+                        @if(auth()->user()->canAccess('admin.hero-slides.reorder'))
+                            <th class="px-3 py-4 w-10 text-center">{{ __('admin.hero_slides.order_col') }}</th>
+                        @endif
                         <th class="px-6 py-4 w-32">{{ __('admin.hero_slides.image') }}</th>
                         <th class="px-6 py-4">{{ __('admin.common.title') }}</th>
                         <th class="px-6 py-4">{{ __('admin.hero_slides.badge') }}</th>
-                        <th class="px-6 py-4">{{ __('admin.common.sort_order') }}</th>
                         <th class="px-6 py-4">{{ __('admin.common.status') }}</th>
                         <th class="px-6 py-4 text-end w-24">{{ __('admin.common.actions') }}</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700"
+                           @dragover.prevent @drop.prevent="onDragEnd($root)">
                     @forelse($slides as $slide)
-                        <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors group">
-                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono">{{ $loop->iteration }}</td>
+                        <tr data-id="{{ $slide->id }}"
+                            class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors group"
+                            :class="{ 'opacity-50': dragId === {{ $slide->id }}, 'bg-indigo-50/60 dark:bg-indigo-500/10': overId === {{ $slide->id }} }"
+                            @dragover.prevent="onDragOver({{ $slide->id }}, $event, $root); overId = {{ $slide->id }}"
+                            @dragleave="overId = null">
+                            @if(auth()->user()->canAccess('admin.hero-slides.reorder'))
+                                <td class="px-3 py-4 w-12 text-center cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors select-none"
+                                    draggable="true"
+                                    title="{{ __('admin.hero_slides.sort_hint') }}"
+                                    @dragstart="onDragStart({{ $slide->id }})"
+                                    @dragend="onDragEnd($root)">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8"/></svg>
+                                </td>
+                            @endif
                             <td class="px-6 py-4">
                                 @if($slide->image)
                                     <img src="{{ asset(config('paths.upload', 'uploads') . '/hero-slides/' . $slide->image) }}"
@@ -51,18 +143,15 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-800">
-                                        {{ $slide->trans('badge') ?: __('admin.hero_slides.no_badge') }}
-                                    </span>
-                            </td>
-                            <td class="px-6 py-4 text-center font-mono text-gray-600 dark:text-gray-300">
-                                {{ $slide->sort_order }}
+                                <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-800">
+                                    {{ $slide->trans('badge') ?: __('admin.hero_slides.no_badge') }}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg {{ $slide->is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-800' }}">
-                                        <span class="w-1.5 h-1.5 {{ $slide->is_active ? 'bg-emerald-500' : 'bg-red-500' }} rounded-full"></span>
-                                        {{ $slide->is_active ? __('admin.common.active') : __('admin.common.inactive') }}
-                                    </span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg {{ $slide->is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-800' }}">
+                                    <span class="w-1.5 h-1.5 {{ $slide->is_active ? 'bg-emerald-500' : 'bg-red-500' }} rounded-full"></span>
+                                    {{ $slide->is_active ? __('admin.common.active') : __('admin.common.inactive') }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-1">
@@ -80,7 +169,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="{{ auth()->user()->canAccess('admin.hero-slides.reorder') ? 6 : 5 }}" class="px-6 py-16 text-center">
                                 <p class="text-gray-500 dark:text-gray-400">{{ __('admin.hero_slides.empty') }}</p>
                             </td>
                         </tr>
@@ -88,11 +177,7 @@
                     </tbody>
                 </table>
             </div>
-            @if($slides->hasPages())
-                <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                    {{ $slides->links() }}
-                </div>
-            @endif
         </div>
+        </div>{{-- /درگ‌اندروپ ترتیب --}}
     </div>
 @endsection

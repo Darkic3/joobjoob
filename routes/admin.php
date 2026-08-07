@@ -55,6 +55,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('languages/{language}/make-default', [LanguageController::class, 'makeDefault'])->name('languages.make-default');
         // ذخیره ترتیب درگ‌اندروپ (ایندکس) — با پرمیشن ویرایش
         Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
+        Route::post('hero-slides/reorder', [HeroSlideController::class, 'reorder'])->name('hero-slides.reorder');
+        Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
+        Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

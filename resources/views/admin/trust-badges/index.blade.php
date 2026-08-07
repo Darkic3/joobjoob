@@ -43,25 +43,117 @@
             </form>
         </div>
 
+        {{-- درگ‌اندروپ ترتیب نشان‌ها — نوار ذخیره + جدول در یک Alpine scope --}}
+        <div x-data="{
+                dragId: null,
+                overId: null,
+                changed: false,
+                saving: false,
+                onDragStart(id) { this.dragId = id; },
+                // محل درج از Y موش نسبت به وسط هر ردیف — پایدار و بدون نوسان (dragover پیاپی)
+                onDragOver(id, e, root) {
+                    if (this.dragId === null) return;
+                    const rows = [...root.querySelectorAll('tbody tr[data-id]')];
+                    const fromIdx = rows.findIndex(r => r.dataset.id == this.dragId);
+                    if (fromIdx < 0) return;
+                    const from = rows[fromIdx];
+                    let insertIdx = rows.length;
+                    for (let i = 0; i < rows.length; i++) {
+                        const rect = rows[i].getBoundingClientRect();
+                        if (e.clientY < rect.top + rect.height / 2) { insertIdx = i; break; }
+                    }
+                    const anchor = rows[insertIdx];
+                    if (fromIdx === insertIdx || (anchor && anchor === from)) return;
+                    if (anchor) from.parentNode.insertBefore(from, anchor);
+                    else from.parentNode.appendChild(from);
+                    this.changed = true;
+                },
+                // پایان درگ → ذخیرهٔ خودکار AJAX بدون رفرش
+                onDragEnd(root) {
+                    this.dragId = null;
+                    this.overId = null;
+                    if (this.changed && !this.saving) this.saveOrder(root);
+                },
+                notify(message, type = 'success') {
+                    const el = document.getElementById('admin-toast');
+                    if (el && window.Alpine) window.Alpine.$data(el).show(message, type);
+                    else console.warn('[admin] toast unavailable:', message);
+                },
+                saveOrder(root) {
+                    if (this.saving) return;
+                    this.saving = true;
+                    const ids = [...root.querySelectorAll('tbody tr[data-id]')].map(r => Number(r.dataset.id));
+                    fetch('{{ route('admin.trust-badges.reorder') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                        },
+                        body: JSON.stringify({ ids }),
+                    }).then(r => r.json()).then(data => {
+                        this.saving = false;
+                        if (data.ok) {
+                            this.changed = false;
+                            this.notify(data.message || '{{ __('admin.trust_badges.order_saved') }}');
+                            return;
+                        }
+                        this.notify(data.message || '{{ __('admin.trust_badges.order_invalid') }}', 'error');
+                    }).catch(() => {
+                        this.saving = false;
+                        this.notify('{{ __('admin.trust_badges.order_invalid') }}', 'error');
+                    });
+                }
+            }">
+
+        @if(auth()->user()->canAccess('admin.trust-badges.reorder'))
+            {{-- نوار ذخیره ترتیب — فقط بعد از تغییر ردیف‌ها ظاهر می‌شود --}}
+            <div class="mb-3 flex items-center justify-between gap-3 px-1" x-show="changed" x-cloak>
+                <p class="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    {{ __('admin.trust_badges.sort_hint') }}
+                </p>
+                <button type="button" @click="saveOrder($root)" :disabled="saving"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-wait">
+                    <svg x-show="saving" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                    {{ __('admin.trust_badges.save_order') }}
+                </button>
+            </div>
+        @endif
+
         {{-- جدول نشان‌های اعتماد --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-start">
                     <thead class="bg-gray-50/80 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-4 w-16">#</th>
+                        @if(auth()->user()->canAccess('admin.trust-badges.reorder'))
+                            <th class="px-3 py-4 w-10 text-center">{{ __('admin.trust_badges.order_col') }}</th>
+                        @endif
                         <th class="px-6 py-4 w-20 text-center">{{ __('admin.trust_badges.icon') }}</th>
                         <th class="px-6 py-4">{{ __('admin.trust_badges.title_desc') }}</th>
-                        <th class="px-6 py-4 w-24">{{ __('admin.common.sort_order') }}</th>
                         <th class="px-6 py-4 w-28">{{ __('admin.common.status') }}</th>
                         <th class="px-6 py-4 w-32">{{ __('admin.common.date') }}</th>
                         <th class="px-6 py-4 text-end w-24">{{ __('admin.common.actions') }}</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700"
+                           @dragover.prevent @drop.prevent="onDragEnd($root)">
                     @forelse($badges as $badge)
-                        <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors group">
-                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono">{{ $loop->iteration }}</td>
+                        <tr data-id="{{ $badge->id }}"
+                            class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors group"
+                            :class="{ 'opacity-50': dragId === {{ $badge->id }}, 'bg-indigo-50/60 dark:bg-indigo-500/10': overId === {{ $badge->id }} }"
+                            @dragover.prevent="onDragOver({{ $badge->id }}, $event, $root); overId = {{ $badge->id }}"
+                            @dragleave="overId = null">
+                            @if(auth()->user()->canAccess('admin.trust-badges.reorder'))
+                                <td class="px-3 py-4 w-12 text-center cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors select-none"
+                                    draggable="true"
+                                    title="{{ __('admin.trust_badges.sort_hint') }}"
+                                    @dragstart="onDragStart({{ $badge->id }})"
+                                    @dragend="onDragEnd($root)">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8"/></svg>
+                                </td>
+                            @endif
 
                             <td class="px-6 py-4 text-center text-2xl">
                                 {{ $badge->icon }}
@@ -76,12 +168,6 @@
                                         {{ $badge->description }}
                                     </div>
                                 @endif
-                            </td>
-
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-mono text-sm">
-                                    {{ $badge->sort_order }}
-                                </span>
                             </td>
 
                             <td class="px-6 py-4">
@@ -119,7 +205,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="{{ auth()->user()->canAccess('admin.trust-badges.reorder') ? 6 : 5 }}" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
                                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,12 +223,7 @@
                     </tbody>
                 </table>
             </div>
-
-            @if(isset($badges) && $badges->hasPages())
-                <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                    {{ $badges->links() }}
-                </div>
-            @endif
         </div>
+        </div>{{-- /درگ‌اندروپ ترتیب --}}
     </div>
 @endsection

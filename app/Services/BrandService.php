@@ -18,6 +18,9 @@ class BrandService
     {
         $data = $this->prepareData($dto);
 
+        // ترتیب از فرم حذف شده — برند جدید همیشه به انتهای لیست اضافه می‌شود (سورت از ایندکس با درگ‌اندروپ)
+        $data['sort_order'] = (int) Brand::max('sort_order') + 1;
+
         $image = $dto->getImage();
         if ($image) {
             $data['image'] = ImageHandler::handle(self::UPLOAD_FOLDER, $image, self::IMAGE_SIZES);
@@ -53,29 +56,33 @@ class BrandService
         return $brand->delete();
     }
 
-    public function getPaginatedBrands(array $filters, int $perPage = 15)
+    /**
+     * لیست کامل برندها به ترتیب نمایش (sort_order) — بدون صفحه‌بندی،
+     * چون ترتیب با درگ‌اندروپ روی کل لیست انجام می‌شود (الگوی صفحهٔ زبان‌ها).
+     */
+    public function getOrderedBrands(array $filters)
     {
         return Brand::query()
             ->withCount('products')
-            ->when(!empty($filters['search']), function ($q) use ($filters) {
-                $q->where('title->fa', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('title->en', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('url', 'like', '%' . $filters['search'] . '%');
+            ->when(! empty($filters['search']), function ($q) use ($filters) {
+                $q->where('title->fa', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('title->en', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('url', 'like', '%'.$filters['search'].'%');
             })
             ->when(isset($filters['status']) && $filters['status'] !== '', function ($q) use ($filters) {
                 $q->where('active', $filters['status']);
             })
-            ->latest()
-            ->paginate($perPage);
+            ->ordered()
+            ->get();
     }
 
     private function prepareData(BrandDTO $dto): array
     {
         return [
-            'title'              => $dto->getTitle(),
-            'url'                => $dto->getUrl(),
-            'description'        => $dto->getDescription(),
-            'active'             => $dto->getIsActive(),
+            'title' => $dto->getTitle(),
+            'url' => $dto->getUrl(),
+            'description' => $dto->getDescription(),
+            'active' => $dto->getIsActive(),
             'show_in_first_page' => $dto->getShowInFirstPage(),
         ];
     }

@@ -220,7 +220,11 @@ return [
         'field_desc' => 'Kısa Açıklama',
         'desc_ph' => 'Bu rozet hakkında kısa bir açıklama...',
         'display' => 'Görüntüleme Ayarları',
-        'sort_help' => 'Küçük sayılar önce görüntülenir.',
+        'order_col' => 'Sıra',
+        'sort_hint' => 'Görüntüleme sırasını değiştirmek için satırları sürükleyin.',
+        'save_order' => 'Sıralamayı Kaydet',
+        'order_saved' => 'Sıralama başarıyla kaydedildi.',
+        'order_invalid' => 'Liste geçersiz — sayfayı yenileyip tekrar deneyin.',
         'active' => 'Aktif',
         'edit_btn' => 'Güven Rozetini Düzenle',
         'create_btn' => 'Güven Rozeti Oluştur',
@@ -343,6 +347,11 @@ return [
         'image_hint' => 'Önerilen: 1920x600 piksel | Maks boyut: 2 MB',
         'edit_btn' => 'Slaytı Düzenle',
         'create_btn' => 'Slayt Oluştur',
+        'order_col' => 'Sıra',
+        'sort_hint' => 'Görüntüleme sırasını değiştirmek için satırları sürükleyin.',
+        'save_order' => 'Sıralamayı Kaydet',
+        'order_saved' => 'Sıralama başarıyla kaydedildi.',
+        'order_invalid' => 'Liste geçersiz — sayfayı yenileyip tekrar deneyin.',
     ],
 
     'product_categories' => [
@@ -415,6 +424,11 @@ return [
         'show_home' => 'Ana sayfada göster',
         'save_btn' => 'Markayı Kaydet',
         'apply_btn' => 'Değişiklikleri Uygula',
+        'order_col' => 'Sıra',
+        'sort_hint' => 'Görüntüleme sırasını değiştirmek için satırları sürükleyin.',
+        'save_order' => 'Sıralamayı Kaydet',
+        'order_saved' => 'Sıralama başarıyla kaydedildi.',
+        'order_invalid' => 'Liste geçersiz — sayfayı yenileyip tekrar deneyin.',
     ],
 
     'specifications' => [

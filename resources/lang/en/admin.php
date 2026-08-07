@@ -220,7 +220,11 @@ return [
         'field_desc' => 'Short Description',
         'desc_ph' => 'A short description about this badge...',
         'display' => 'Display Settings',
-        'sort_help' => 'Smaller numbers are displayed first.',
+        'order_col' => 'Order',
+        'sort_hint' => 'Drag rows to change the display order.',
+        'save_order' => 'Save Order',
+        'order_saved' => 'Order saved successfully.',
+        'order_invalid' => 'The list is invalid — refresh the page and try again.',
         'active' => 'Active',
         'edit_btn' => 'Edit Trust Badge',
         'create_btn' => 'Create Trust Badge',
@@ -343,6 +347,11 @@ return [
         'image_hint' => 'Recommended: 1920x600 pixels | Max size: 2 MB',
         'edit_btn' => 'Edit Slide',
         'create_btn' => 'Create Slide',
+        'order_col' => 'Order',
+        'sort_hint' => 'Drag rows to change the display order.',
+        'save_order' => 'Save Order',
+        'order_saved' => 'Order saved successfully.',
+        'order_invalid' => 'The list is invalid — refresh the page and try again.',
     ],
 
     'product_categories' => [
@@ -415,6 +424,11 @@ return [
         'show_home' => 'Show on homepage',
         'save_btn' => 'Save Brand',
         'apply_btn' => 'Apply Changes',
+        'order_col' => 'Order',
+        'sort_hint' => 'Drag rows to change the display order.',
+        'save_order' => 'Save Order',
+        'order_saved' => 'Order saved successfully.',
+        'order_invalid' => 'The list is invalid — refresh the page and try again.',
     ],
 
     'specifications' => [

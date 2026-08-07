@@ -37,12 +37,93 @@
             </form>
         </div>
 
+        {{-- درگ‌اندروپ ترتیب برندها — نوار ذخیره + جدول در یک Alpine scope --}}
+        <div x-data="{
+                dragId: null,
+                overId: null,
+                changed: false,
+                saving: false,
+                onDragStart(id) { this.dragId = id; },
+                // محل درج از Y موش نسبت به وسط هر ردیف — پایدار و بدون نوسان (dragover پیاپی)
+                onDragOver(id, e, root) {
+                    if (this.dragId === null) return;
+                    const rows = [...root.querySelectorAll('tbody tr[data-id]')];
+                    const fromIdx = rows.findIndex(r => r.dataset.id == this.dragId);
+                    if (fromIdx < 0) return;
+                    const from = rows[fromIdx];
+                    let insertIdx = rows.length;
+                    for (let i = 0; i < rows.length; i++) {
+                        const rect = rows[i].getBoundingClientRect();
+                        if (e.clientY < rect.top + rect.height / 2) { insertIdx = i; break; }
+                    }
+                    const anchor = rows[insertIdx];
+                    if (fromIdx === insertIdx || (anchor && anchor === from)) return;
+                    if (anchor) from.parentNode.insertBefore(from, anchor);
+                    else from.parentNode.appendChild(from);
+                    this.changed = true;
+                },
+                // پایان درگ → ذخیرهٔ خودکار AJAX بدون رفرش
+                onDragEnd(root) {
+                    this.dragId = null;
+                    this.overId = null;
+                    if (this.changed && !this.saving) this.saveOrder(root);
+                },
+                notify(message, type = 'success') {
+                    const el = document.getElementById('admin-toast');
+                    if (el && window.Alpine) window.Alpine.$data(el).show(message, type);
+                    else console.warn('[admin] toast unavailable:', message);
+                },
+                saveOrder(root) {
+                    if (this.saving) return;
+                    this.saving = true;
+                    const ids = [...root.querySelectorAll('tbody tr[data-id]')].map(r => Number(r.dataset.id));
+                    fetch('{{ route('admin.brands.reorder') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                        },
+                        body: JSON.stringify({ ids }),
+                    }).then(r => r.json()).then(data => {
+                        this.saving = false;
+                        if (data.ok) {
+                            this.changed = false;
+                            this.notify(data.message || '{{ __('admin.brands.order_saved') }}');
+                            return;
+                        }
+                        this.notify(data.message || '{{ __('admin.brands.order_invalid') }}', 'error');
+                    }).catch(() => {
+                        this.saving = false;
+                        this.notify('{{ __('admin.brands.order_invalid') }}', 'error');
+                    });
+                }
+            }">
+
+        @if(auth()->user()->canAccess('admin.brands.reorder'))
+            {{-- نوار ذخیره ترتیب — فقط بعد از تغییر ردیف‌ها ظاهر می‌شود --}}
+            <div class="mb-3 flex items-center justify-between gap-3 px-1" x-show="changed" x-cloak>
+                <p class="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    {{ __('admin.brands.sort_hint') }}
+                </p>
+                <button type="button" @click="saveOrder($root)" :disabled="saving"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-wait">
+                    <svg x-show="saving" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                    {{ __('admin.brands.save_order') }}
+                </button>
+            </div>
+        @endif
+
         {{-- جدول برندها --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
+                        @if(auth()->user()->canAccess('admin.brands.reorder'))
+                            <th class="px-3 py-4 w-10 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.brands.order_col') }}</th>
+                        @endif
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.brands.title') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.brands.url') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.brands.products') }}</th>
@@ -51,9 +132,23 @@
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">{{ __('admin.common.actions') }}</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700"
+                           @dragover.prevent @drop.prevent="onDragEnd($root)">
                     @forelse($brands as $brand)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                        <tr data-id="{{ $brand->id }}"
+                            class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
+                            :class="{ 'opacity-50': dragId === {{ $brand->id }}, 'bg-indigo-50/60 dark:bg-indigo-500/10': overId === {{ $brand->id }} }"
+                            @dragover.prevent="onDragOver({{ $brand->id }}, $event, $root); overId = {{ $brand->id }}"
+                            @dragleave="overId = null">
+                            @if(auth()->user()->canAccess('admin.brands.reorder'))
+                                <td class="px-3 py-4 w-12 text-center cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors select-none"
+                                    draggable="true"
+                                    title="{{ __('admin.brands.sort_hint') }}"
+                                    @dragstart="onDragStart({{ $brand->id }})"
+                                    @dragend="onDragEnd($root)">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8"/></svg>
+                                </td>
+                            @endif
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-11 w-11 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 bg-gray-100 dark:bg-gray-700">
@@ -107,7 +202,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ auth()->user()->canAccess('admin.brands.reorder') ? 7 : 6 }}" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
                                         <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -123,11 +218,7 @@
                     </tbody>
                 </table>
             </div>
-            @if($brands->hasPages())
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
-                    {{ $brands->links() }}
-                </div>
-            @endif
         </div>
+        </div>{{-- /درگ‌اندروپ ترتیب --}}
     </div>
 @endsection

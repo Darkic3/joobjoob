@@ -15,16 +15,22 @@ class HeroSlideService
         return HeroSlide::active()->get();
     }
 
-    public function getPaginated(int $perPage = 15)
+    /**
+     * لیست کامل اسلایدها به ترتیب نمایش (sort_order) — بدون صفحه‌بندی،
+     * چون ترتیب با درگ‌اندروپ روی کل لیست انجام می‌شود (الگوی صفحهٔ زبان‌ها).
+     */
+    public function getOrdered()
     {
-        return HeroSlide::orderBy('sort_order', 'asc')
-            ->latest('id')
-            ->paginate($perPage);
+        return HeroSlide::orderBy('sort_order', 'asc')->orderBy('id')->get();
     }
 
     public function store(HeroSlideDTO $dto): HeroSlide
     {
         $data = $this->prepareData($dto);
+
+        // ترتیب از فرم حذف شده — اسلاید جدید همیشه به انتهای لیست اضافه می‌شود (سورت از ایندکس با درگ‌اندروپ)
+        $data['sort_order'] = (int) HeroSlide::max('sort_order') + 1;
+
         $data['image'] = $this->handleImageUpload($dto->image);
 
         return HeroSlide::create($data);

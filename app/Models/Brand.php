@@ -12,7 +12,7 @@ class Brand extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'title', 'url', 'description', 'image', 'active', 'show_in_first_page',
+        'title', 'url', 'description', 'image', 'active', 'show_in_first_page', 'sort_order',
     ];
 
     protected $casts = [
@@ -20,7 +20,13 @@ class Brand extends Model
         'description' => 'json',
         'active' => 'boolean',
         'show_in_first_page' => 'boolean',
+        'sort_order' => 'integer',
     ];
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
 
     public function products(): HasMany
     {
@@ -35,7 +41,7 @@ class Brand extends Model
     public function getItemImageAttribute(): ?string
     {
         return $this->image
-            ? asset(config('paths.upload', 'uploads') . '/brands/' . $this->image)
+            ? asset(config('paths.upload', 'uploads').'/brands/'.$this->image)
             : null;
     }
 
@@ -46,6 +52,7 @@ class Brand extends Model
         if (is_array($value) || is_object($value)) {
             return $value[app()->getLocale()] ?? $value['fa'] ?? null;
         }
+
         return $value;
     }
 }
