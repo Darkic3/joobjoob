@@ -1,6 +1,7 @@
 @php
     $user = auth()->user();
-    $locales = config('app.available_locales', ['fa' => 'فارسی', 'en' => 'English', 'ar' => 'العربية', 'tr' => 'Türkçe']);
+    // زبان‌های فعال از سرویس (منبع واحد حقیقت) — در حالت تک‌زبانه سوییچر مخفی می‌شود
+    $locales = locale()->active();
     $currentLocale = $currentLocale ?? app()->getLocale();
 @endphp
 
@@ -36,35 +37,37 @@
                 <span>{{ __('admin.layout.view_site') }}</span>
             </a>
 
-            {{-- انتخاب زبان --}}
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" title="{{ __('admin.layout.change_lang') }}"
-                        class="flex items-center gap-1.5 p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                    <span class="text-xs font-bold hidden sm:inline">{{ strtoupper($currentLocale) }}</span>
-                </button>
+            {{-- انتخاب زبان — فقط وقتی بیش از یک زبان فعال است --}}
+            @if (count($locales) > 1)
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" title="{{ __('admin.layout.change_lang') }}"
+                            class="flex items-center gap-1.5 p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        <span class="text-xs font-bold hidden sm:inline">{{ strtoupper($currentLocale) }}</span>
+                    </button>
 
-                <div x-show="open" @click.away="open = false" x-cloak
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute end-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50">
-                    @foreach($locales as $code => $label)
-                        <a href="{{ request()->fullUrlWithQuery(['lang' => $code]) }}"
-                           class="flex items-center justify-between px-4 py-2 text-sm transition-colors {{ $currentLocale === $code ? 'text-primary-600 dark:text-primary-400 font-bold bg-primary-50 dark:bg-primary-900/20' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                            <span>{{ $label }}</span>
-                            @if($currentLocale === $code)
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            @endif
-                        </a>
-                    @endforeach
+                    <div x-show="open" @click.away="open = false" x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute end-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50">
+                        @foreach($locales as $code => $lang)
+                            <a href="{{ request()->fullUrlWithQuery(['lang' => $code]) }}"
+                               class="flex items-center justify-between px-4 py-2 text-sm transition-colors {{ $currentLocale === $code ? 'text-primary-600 dark:text-primary-400 font-bold bg-primary-50 dark:bg-primary-900/20' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                                <span>{{ $lang->localizedName() }}</span>
+                                @if($currentLocale === $code)
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
 
             {{-- Theme Toggle --}}
             <x-admin.theme-toggle/>

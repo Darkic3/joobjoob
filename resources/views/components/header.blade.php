@@ -1,7 +1,9 @@
 @props(['cartCount' => 0])
 
 @php
-    $locales = config('app.available_locales', ['fa' => 'فارسی', 'en' => 'English', 'ar' => 'العربية', 'tr' => 'Türkçe']);
+    // زبان‌های فعال از سرویس (منبع واحد حقیقت) — در حالت تک‌زبانه سوییچر مخفی می‌شود
+    $locales = locale()->active();
+    $currentLocale = $currentLocale ?? app()->getLocale();
 @endphp
 
 <header class="sticky top-0 z-40 backdrop-blur" style="background:color-mix(in srgb, var(--bg) 90%, transparent);">
@@ -25,18 +27,20 @@
         </form>
 
         <div class="flex items-center gap-2 ms-auto">
-            <div class="relative">
-                <button type="button" data-lang-dropdown-btn class="neu-btn neu-btn-icon text-xs font-bold">
-                    {{ strtoupper($currentLocale ?? app()->getLocale()) }}
-                </button>
-                <div data-lang-dropdown-menu class="hidden absolute end-0 mt-2 neu-flat-sm p-2 w-32 text-sm z-50">
-                    @foreach($locales as $code => $label)
-                        <button type="button" data-lang-select="{{ $code }}" class="w-full text-start px-3 py-2 rounded-lg hover:opacity-70 {{ ($currentLocale ?? app()->getLocale()) === $code ? 'font-bold' : '' }}">
-                            {{ $label }}
-                        </button>
-                    @endforeach
+            @if (count($locales) > 1)
+                <div class="relative">
+                    <button type="button" data-lang-dropdown-btn class="neu-btn neu-btn-icon text-xs font-bold">
+                        {{ strtoupper($currentLocale) }}
+                    </button>
+                    <div data-lang-dropdown-menu class="hidden absolute end-0 mt-2 neu-flat-sm p-2 w-32 text-sm z-50">
+                        @foreach($locales as $code => $lang)
+                            <button type="button" data-lang-select="{{ $code }}" class="w-full text-start px-3 py-2 rounded-lg hover:opacity-70 {{ $currentLocale === $code ? 'font-bold' : '' }}">
+                                {{ $lang->localizedName() }}
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
 
             {{-- دات دیگر نیازی به id ندارد؛ موقعیتش را CSS بر اساس data-theme خودکار مدیریت می‌کند --}}
             <button type="button" id="theme-toggle" class="neu-toggle" title="{{ __('messages.dark_mode') }}">

@@ -2,22 +2,33 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\LocaleService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * تشخیص و اعمال زبان فعال کاربر.
- * اولویت: پارامتر URL > کاربر لاگین‌شده در دیتابیس > session > مرورگر > پیش‌فرض
+ *
+ * منبع واحد حقیقت: LocaleService (جدول languages) — نه config('app.available_locales').
+ *
+ * اولویت: حالت تک‌زبانه > پارامتر URL > کاربر لاگین‌شده > session > پیش‌فرض
+ * - زبان غیرفعال/ناموجود در هر مرحله → fallback بی‌صدا به زبان پیش‌فرض
+ * - در حالت تک‌زبانه (?lang=xx تعداد فعال ≤ ۱) → همیشه زبان پیش‌فرض
  */
 class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $available = array_keys(config('app.available_locales', ['fa' => 'فارسی']));
+        $locales = app(LocaleService::class);
+        $default = $locales->defaultCode();
 
-        // ۱. اگر در URL کوئری استرینگ ?lang=xx آمده باشد (از سوییچر زبان)
-        if ($request->has('lang') && in_array($request->get('lang'), $available)) {
+        // ۰) حالت تک‌زبانه — درخواست ?lang نادیده گرفته می‌شود
+        if ($locales->singleLanguageMode()) {
+            $locale = $default;
+        }
+        // ۱) اگر در URL کوئری استرینگ ?lang=xx آمده باشد — فقط اگر فعال باشد
+        elseif ($request->has('lang') && $locales->isActive($request->get('lang'))) {
             $locale = $request->get('lang');
             session(['locale' => $locale]);
 
@@ -25,26 +36,25 @@ class SetLocale
                 $request->user()->update(['locale' => $locale]);
             }
         }
-        // ۲. کاربر لاگین با ترجیح ذخیره‌شده در دیتابیس
-        elseif ($request->user() && $request->user()->locale && in_array($request->user()->locale, $available)) {
+        // ۲) کاربر لاگین با ترجیح ذخیره‌شده در دیتابیس — فقط اگر فعال باشد
+        elseif ($request->user() && $locales->isActive((string) $request->user()->locale)) {
             $locale = $request->user()->locale;
             session(['locale' => $locale]);
         }
-        // ۳. زبان ذخیره‌شده در session
-        elseif (session()->has('locale') && in_array(session('locale'), $available)) {
+        // ۳) زبان ذخیره‌شده در session — فقط اگر فعال باشد
+        elseif (session()->has('locale') && $locales->isActive((string) session('locale'))) {
             $locale = session('locale');
         }
-        // ۴. پیش‌فرض اپلیکیشن
+        // ۴) پیش‌فرض
         else {
-            $locale = config('app.locale');
+            $locale = $default;
             session(['locale' => $locale]);
         }
 
         app()->setLocale($locale);
 
-        // جهت متن برای استفاده در ویوها
-        $rtlLocales = config('app.rtl_locales', ['fa', 'ar']);
-        view()->share('direction', in_array($locale, $rtlLocales) ? 'rtl' : 'ltr');
+        // جهت متن برای استفاده در ویوها — از سرویس (به‌جای config('app.rtl_locales'))
+        view()->share('direction', $locales->isRtl($locale) ? 'rtl' : 'ltr');
         view()->share('currentLocale', $locale);
 
         return $next($request);

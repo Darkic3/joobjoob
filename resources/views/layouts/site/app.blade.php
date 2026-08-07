@@ -1,5 +1,10 @@
+@php
+    // زبان و جهت فعال (توسط SetLocale share می‌شود — fallback دفاعی از سرویس)
+    $currentLocale = $currentLocale ?? app()->getLocale();
+    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
+@endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? app()->getLocale() }}" dir="{{ $direction ?? 'rtl' }}"
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}"
       data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
 
 <head>
@@ -8,7 +13,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', setting('site_name', __('messages.site_name')))</title>
 
-    @if(($direction ?? 'rtl') === 'rtl')
+    @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     @endif

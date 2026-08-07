@@ -1,6 +1,6 @@
 @php
     $currentLocale = $currentLocale ?? app()->getLocale();
-    $direction = $direction ?? (in_array($currentLocale, config('app.rtl_locales', ['fa', 'ar'])) ? 'rtl' : 'ltr');
+    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}">
