@@ -4,9 +4,11 @@
     $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
     // زبان‌های فعال از سرویس — در حالت تک‌زبانه سوییچر مخفی می‌شود
     $locales = locale()->active();
+    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
+    $digitFamily = locale()->digitFamily($currentLocale);
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale }}" dir="{{ $direction }}">
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

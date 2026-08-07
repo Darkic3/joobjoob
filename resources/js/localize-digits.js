@@ -1,8 +1,12 @@
 /**
  * بومی‌سازی خودکار ارقام بر اساس زبان سایت
  * ------------------------------------------------------------
- * زبان‌های فارسی و عربی  →  ارقام فارسی (۰۱۲۳۴۵۶۷۸۹)
- * سایر زبان‌ها (en, tr, …)  →  ارقام انگلیسی (+ تبدیل ٪ به %)
+ * منبع واحد: صفت `data-digits` روی <html> که از سمت سرور بر اساس
+ * LocaleService::digitFamily() تنظیم می‌شود:
+ *   persian → ۰۱۲۳۴۵۶۷۸۹ + جداکننده‌ی هزارگان ٬
+ *   arabic  → ٠١٢٣٤٥٦٧٨٩ + جداکننده‌ی هزارگان ٬
+ *   latin   → 0123456789 + جداکننده‌ی ، و تبدیل ٪ → %
+ * (fallback قدیمی: اگر data-digits نبود، از lang نتیجه می‌گیریم)
  *
  * - روی تمام متن‌های قابل مشاهده‌ی صفحه اعمال می‌شود: قیمت، تعداد،
  *   موجودی، تاریخ، درصد، امتیاز، تایمر، بج سبد خرید، صفحه‌بندی و…
@@ -16,30 +20,49 @@
 
     var FA = '۰۱۲۳۴۵۶۷۸۹';   // ارقام فارسی
     var AR = '٠١٢٣٤٥٦٧٨٩';   // ارقام عربی استاندارد
-    var ALL = FA + AR;
+    var FA_RE = /[۰-۹]/g;
+    var AR_RE = /[٠-٩]/g;
     var ASCII_RE = /[0-9]/g;
-    var FA_AR_RE = /[۰-۹٠-٩]/g;
     var PERCENT_RE = /٪/g;
     var COMMA_RE = /,/g;
     var PERSIAN_COMMA_RE = /٬/g;
 
+    /**
+     * خانواده‌ی ارقام فعلی: persian | arabic | latin
+     * اولویت: data-digits (منبع واحد از سرور) → تشخیص از lang
+     */
+    function digitFamily() {
+        var el = document.documentElement;
+        var attr = el && el.getAttribute('data-digits');
+        if (attr === 'persian' || attr === 'arabic' || attr === 'latin') {
+            return attr;
+        }
+        var lang = ((el && el.getAttribute('lang')) || 'fa').toLowerCase();
+        if (lang === 'fa') return 'persian';
+        if (lang === 'ar') return 'arabic';
+        return 'latin';
+    }
+
     function isPersianLocale() {
-        var lang = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase();
-        return lang === 'fa' || lang === 'ar';
+        return digitFamily() !== 'latin';
     }
 
     function convertText(str) {
-        if (isPersianLocale()) {
-            // ارقام فارسی + جداکننده‌ی هزارگان استاندارد فارسی (٬)
+        var fam = digitFamily();
+
+        if (fam === 'persian') {
             return str
                 .replace(ASCII_RE, function (d) { return FA[+d]; })
                 .replace(COMMA_RE, '٬');
         }
+        if (fam === 'arabic') {
+            return str
+                .replace(ASCII_RE, function (d) { return AR[+d]; })
+                .replace(COMMA_RE, '٬');
+        }
         return str
-            .replace(FA_AR_RE, function (ch) {
-                var i = ALL.indexOf(ch);
-                return String(i < 10 ? i : i - 10);
-            })
+            .replace(FA_RE, function (ch) { return String(FA.indexOf(ch)); })
+            .replace(AR_RE, function (ch) { return String(AR.indexOf(ch)); })
             .replace(PERCENT_RE, '%')
             .replace(PERSIAN_COMMA_RE, ',');
     }
@@ -88,7 +111,7 @@
                     var v = m.target.nodeValue;
                     if (!/[0-9۰-۹٠-٩٪]/.test(v)) continue;
                     var c = convertText(v);
-                    // فقط اگر واقعاً تغییر کرده بنویس تا حلقه‌ی بینهایت نشود
+                    // فقط اگر واقعاً تغییر کرده بنویس تا حلقه‌ی بی‌نهایت نشود
                     if (c !== v) m.target.nodeValue = c;
                 } else if (m.type === 'childList' && m.addedNodes.length) {
                     // محتوای جدید اضافه شده — با debounce کل صفحه یک‌بار مرور شود
@@ -111,5 +134,5 @@
     }
 
     // در دسترس برای سایر اسکریپت‌ها (قبل از set کردن textContent)
-    window.localizeDigits = { convert: convertText, isPersian: isPersianLocale, walk: walk };
+    window.localizeDigits = { convert: convertText, isPersian: isPersianLocale, walk: walk, digitFamily: digitFamily };
 })();

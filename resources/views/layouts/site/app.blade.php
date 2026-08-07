@@ -2,9 +2,11 @@
     // زبان و جهت فعال (توسط SetLocale share می‌شود — fallback دفاعی از سرویس)
     $currentLocale = $currentLocale ?? app()->getLocale();
     $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
+    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
+    $digitFamily = locale()->digitFamily($currentLocale);
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale }}" dir="{{ $direction }}"
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}"
       data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
 
 <head>

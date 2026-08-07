@@ -481,15 +481,17 @@ function show_date(string|int|DateTimeInterface|null $timestamp = null, string $
 
 | `<html lang>` | ارقام | جداکننده‌ی هزارگان |
 |---|---|---|
-| `fa` | ۰۱۲۳۴۵۶۷۸۹ | `٬` |
-| `ar` | ٠١٢٣٤٥٦٧٨٩ | `٬` |
-| بقیه (`en`, `tr`, `de`, …) | 0123456789 | `,` + `٪` → `%` |
+| `data-digits` | ارقام | جداکننده‌ی هزارگان |
+|---|---|---|
+| `persian` (fa) | ۰۱۲۳۴۵۶۷۸۹ | `٬` |
+| `arabic` (ar یا هر زبان عربی‌رقم) | ٠١٢٣٤٥٦٧٨٩ | `٬` |
+| `latin` (en, tr, de, …) | 0123456789 | `,` + `٪` → `%` |
 
+- **منبع واحد:** صفت `data-digits` روی `<html>` که سرور از `LocaleService::digitFamily($locale)` می‌سازد — JS فقط از آن می‌خواند (با fallback به `lang` برای صفحات قدیمی/استاتیک).
 - روی همه‌ی گره‌های متنی اعمال می‌شود (قیمت، تعداد، موجودی، تاریخ، امتیاز، تایمر، بج سبد، صفحه‌بندی).
 - به فرم‌ها (`input/select/textarea`) و کد (`script/style/pre/code`) دست نمی‌زند.
 - `MutationObserver` محتوای داینامیک را در هر دو جهت تبدیل می‌کند.
-- **وقتی زبان جدیدی اضافه می‌شود** با `dir='ltr'` و digits=latin در کاتالوگ، هیچ کاری لازم نیست — چون `lang` روی `<html>` دقیقاً کد زبان جدید است و در شاخه‌ی «بقیه» می‌افتد.
-- (اختیاری) اگر زبانِ RTL غیرفارسی با ارقام لاتین خواستید، از صفت `data-digits` یا گسترش `isPersianLocale()` بر اساس خانواده‌ی رقمی کاتالوگ استفاده کنید.
+- **زبان جدید با `digits` در کاتالوگ تعیین می‌شود** — بدون تغییر کد JS: `latin` در `_default`، و برای هر خانواده فقط یک ورودی در `config/languages.php` کافی است.
 
 ---
 
@@ -716,14 +718,17 @@ $this->call([
 
 ✅ گیت: تست دستی fa/en + غیرفعال‌کردن یک زبان → fallback + مخفی‌شدن از سوییچر
 
-### فاز ۳ — تاریخ/اعداد داده‌محور (۵۰ → ۶۵٪)
+### فاز ۳ — تاریخ/اعداد داده‌محور (۵۰ → ۶۵٪) ✅ انجام شد
+
+> اجرا شد: `show_date()` → `LocaleService::isJalali()`، کامپوننت‌های `jalali-datetime` و `countdown-timer` → `isJalali()` — هیچ هاردکد `in_array(['fa','ar'])` در PHP/Blade نمانده است. ضمناً `localize-digits.js` **داده‌محور شد**: صفت `data-digits` (persian/arabic/latin) از `LocaleService::digitFamily()` روی `<html>` در هر ۴ layout (سایت، ادمین، لاگین، 429) ست می‌شود و JS از آن می‌خواند (با fallback به lang) — ارقام عربی هم حالا به‌درستی پشتیبانی می‌شوند.
+> تأیید زنده (tinker + مرورگر): `fa` → ۱۴۰۵/۰۵/۱۶ (شمسی) ✓ | `de` (زبان جدیدِ در کاتالوگ نبوده) → 2026/08/07 (میلادی/لاتین/ltr) با صفر کد ✓ | شبیه‌سازی زبان شمسی جدید `ur` (فقط افزودن به کاتالوگ) → isJalali=true + تاریخ شمسی ✓ | مرورگر: `de` → `data-digits="latin"` + سال 2026 در فوتر، `fa` → `data-digits="persian"` + سال ۱۴۰۵ ✓ | باندل Vite بازسازی شد ✓ | `view:cache` بدون خطا ✓
 
 | # | کار | فایل |
 |---|---|---|
 | 12 | `show_date` → `LocaleService::isJalali()` | `app/Helpers/date.php` |
 | 13 | `jalali-datetime` → `isJalali()` | `components/admin/jalali-datetime.blade.php` |
 | 14 | `countdown-timer` → `isJalali()` | `components/countdown-timer.blade.php` |
-| 15 | (اختیاری) `localize-digits` داده‌محور با `data-digits` | `resources/js/localize-digits.js` |
+| 15 | `localize-digits` داده‌محور با `data-digits` (persian/arabic/latin روی `<html>` + خواندن در JS) | `resources/js/localize-digits.js` + ۴ layout | ✅ انجام شد در فاز ۳ |
 
 ✅ گیت: افزودن زبان `de` → تاریخ میلادی، ارقام لاتین، پیکر میلادی — بدون تغییر کد
 
@@ -753,4 +758,4 @@ $this->call([
 
 ---
 
-*پایان سند. وضعیت: طراحی کامل — فازهای ۱ و ۲ انجام شد ✅ (فاز ۳ بعدی: تاریخ و اعداد داده‌محور).*
+*پایان سند. وضعیت: طراحی کامل — فازهای ۱، ۲ و ۳ انجام شد ✅ (فاز ۴ بعدی: صفحه مدیریت زبان‌ها + RBAC).*

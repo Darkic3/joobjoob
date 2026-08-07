@@ -7,8 +7,8 @@
 ])
 
 @php
-    // fa/ar → پیکر تقویم شمسی، سایر زبان‌ها → فیلد میلادی مستقیم
-    $isPersian = in_array(app()->getLocale(), ['fa', 'ar']);
+    // تقویم از سرویس زبان‌ها — jalali → پیکر شمسی، gregorian → فیلد میلادی مستقیم
+    $isPersian = locale()->isJalali(app()->getLocale());
     $inputId = 'jdp-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $name) . '-' . uniqid();
     $hiddenId = $inputId . '-hidden';
     $greg = '';
