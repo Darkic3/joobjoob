@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * تشخیص و اعمال زبان فعال کاربر.
  *
- * منبع واحد حقیقت: LocaleService (جدول languages) — نه config('app.available_locales').
+ * منبع واحد حقیقت: LocaleService (جدول languages).
  *
  * اولویت: حالت تک‌زبانه > پارامتر URL > کاربر لاگین‌شده > session > پیش‌فرض
  * - زبان غیرفعال/ناموجود در هر مرحله → fallback بی‌صدا به زبان پیش‌فرض
@@ -53,7 +53,7 @@ class SetLocale
 
         app()->setLocale($locale);
 
-        // جهت متن برای استفاده در ویوها — از سرویس (به‌جای config('app.rtl_locales'))
+        // جهت متن برای استفاده در ویوها — از سرویس
         view()->share('direction', $locales->isRtl($locale) ? 'rtl' : 'ltr');
         view()->share('currentLocale', $locale);
 

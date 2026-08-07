@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Cache;
  *  - کش یکپارچه بین ریکوئست‌ها (به‌جای کش جدا برای هر کلید)
  *  - flush() روی هر ذخیره/حذف زبان
  *
- * هیچ مصرف‌کننده‌ای نباید مستقیم از config('app.available_locales')
- * بخواند — همه باید از این سرویس.
+ * مصرف‌کننده‌ها فقط از این سرویس می‌خوانند — نه از آرایه‌های منسوخ
+ * کانفیگ (available_locales/rtl_locales حذف شده‌اند).
  */
 class LocaleService
 {
