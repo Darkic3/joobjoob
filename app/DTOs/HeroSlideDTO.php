@@ -3,28 +3,31 @@
 namespace App\DTOs;
 
 use App\Http\Requests\Admin\HeroSlideRequest;
+use App\Models\Blog;
+use App\Models\BlogCategory;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Http\UploadedFile;
 
 readonly class HeroSlideDTO
 {
     public function __construct(
-        public array  $title,
-        public array  $desc,
-        public array  $badge,
-        public bool   $button_active,
-        public array  $btn_text,
+        public array $title,
+        public array $desc,
+        public array $badge,
+        public bool $button_active,
+        public array $btn_text,
         public ?string $link_type,
         public ?string $link_value,
-        public ?int   $price,
-        public ?int   $old_price,
+        public ?int $price,
+        public ?int $old_price,
         public string $currency,
-        public bool   $rating_active,
+        public bool $rating_active,
         public ?string $rating,
-        public bool   $viewers_active,
-        public ?int   $viewers,
+        public bool $viewers_active,
+        public ?int $viewers,
         public ?UploadedFile $image,
-        public bool   $is_active,
-        public int    $sort_order,
+        public bool $is_active,
     ) {}
 
     public static function fromRequest(HeroSlideRequest $request): self
@@ -53,17 +56,16 @@ readonly class HeroSlideDTO
             viewers: $viewersActive ? $request->integer('viewers', 0) : null,
             image: $request->file('image'),
             is_active: $request->boolean('is_active'),
-            sort_order: $request->integer('sort_order', 0),
         );
     }
 
     public function getLinkableType(): ?string
     {
         return match ($this->link_type) {
-            'product' => \App\Models\Product::class,
-            'product_category' => \App\Models\ProductCategory::class,
-            'blog' => \App\Models\Blog::class,
-            'blog_category' => \App\Models\BlogCategory::class,
+            'product' => Product::class,
+            'product_category' => ProductCategory::class,
+            'blog' => Blog::class,
+            'blog_category' => BlogCategory::class,
             'page' => 'page',
             'custom' => 'url',
             default => null,
@@ -72,9 +74,7 @@ readonly class HeroSlideDTO
 
     public function getLinkableId(): ?string
     {
-        if ($this->link_type === 'custom' || $this->link_type === 'page') {
-            return $this->link_value;
-        }
+        // برای custom/page مقدار رشته‌ای (URL یا کلید صفحه) و برای مدل‌ها شناسهٔ مدل است
         return $this->link_value;
     }
 }

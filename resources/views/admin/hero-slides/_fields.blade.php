@@ -321,10 +321,7 @@
                 </label>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ترتیب نمایش</label>
-                <input type="number" name="sort_order" value="{{ old('sort_order', $heroSlide?->sort_order ?? 0) }}" class="input-custom" min="0">
-            </div>
+            {{-- ترتیب با درگ‌اندروپ در صفحهٔ ایندکس تنظیم می‌شود — اینجا فیلدی ندارد --}}
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">

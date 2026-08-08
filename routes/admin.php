@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CkeditorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\HeroSlideSearchController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
@@ -32,7 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('blogs', BlogController::class);
         Route::resource('blog-categories', BlogCategoryController::class);
-        Route::resource('hero-slides', HeroSlideController::class);
+        // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
+        Route::resource('hero-slides', HeroSlideController::class)->except('show');
+        Route::get('hero-slides/search-model', [HeroSlideSearchController::class, 'searchModel'])->name('hero-slides.search-model');
         Route::resource('trust-badges', TrustBadgeController::class);
         Route::resource('products', ProductController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)

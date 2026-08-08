@@ -101,6 +101,7 @@ return [
                 'edit' => 'permissions.access.hero-slides.edit',
                 'update' => 'permissions.access.hero-slides.edit',
                 'reorder' => 'permissions.access.hero-slides.edit',
+                'search-model' => 'permissions.access.hero-slides.edit',
                 'destroy' => 'permissions.access.hero-slides.delete',
             ],
         ],

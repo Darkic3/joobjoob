@@ -57,18 +57,17 @@ class HeroSlideService
     private function prepareData(HeroSlideDTO $dto): array
     {
         return [
-            'hero_type' => $dto->hero_type,
-            'badge' => $dto->badge,
             'title' => $dto->title,
             'desc' => $dto->desc,
+            'badge' => $dto->badge,
             'btn_text' => $dto->btn_text,
+            'linkable_type' => $dto->getLinkableType(),
+            'linkable_id' => $dto->getLinkableId(),
             'price' => $dto->price ?? 0,
             'old_price' => $dto->old_price,
             'currency' => $dto->currency,
             'rating' => $dto->rating,
             'viewers' => $dto->viewers ?? 0,
-            'linkable_type' => $dto->linkable_type,
-            'linkable_id' => $dto->linkable_id,
             'is_active' => $dto->is_active,
         ];
     }

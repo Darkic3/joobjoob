@@ -28,9 +28,9 @@ class ReorderActionsTest extends TestCase
 
     public function test_hero_slides_reorder_updates_sort_order(): void
     {
-        $a = HeroSlide::create(['hero_type' => 'informational', 'title' => ['fa' => 'A'], 'is_active' => true, 'sort_order' => 1]);
-        $b = HeroSlide::create(['hero_type' => 'informational', 'title' => ['fa' => 'B'], 'is_active' => true, 'sort_order' => 2]);
-        $c = HeroSlide::create(['hero_type' => 'informational', 'title' => ['fa' => 'C'], 'is_active' => true, 'sort_order' => 3]);
+        $a = HeroSlide::create(['title' => ['fa' => 'A'], 'is_active' => true, 'sort_order' => 1]);
+        $b = HeroSlide::create(['title' => ['fa' => 'B'], 'is_active' => true, 'sort_order' => 2]);
+        $c = HeroSlide::create(['title' => ['fa' => 'C'], 'is_active' => true, 'sort_order' => 3]);
 
         $this->actingAs($this->superAdmin())
             ->postJson(route('admin.hero-slides.reorder'), ['ids' => [$c->id, $a->id, $b->id]])
@@ -40,6 +40,27 @@ class ReorderActionsTest extends TestCase
         $this->assertSame(1, (int) $c->fresh()->sort_order);
         $this->assertSame(2, (int) $a->fresh()->sort_order);
         $this->assertSame(3, (int) $b->fresh()->sort_order);
+    }
+
+    public function test_super_admin_can_store_hero_slide_with_custom_url(): void
+    {
+        // بازتولید باگ مرج: HeroSlideService::prepareData به $dto->hero_type دسترسی داشت
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.hero-slides.store'), [
+                'title' => ['fa' => 'اسلاید تست'],
+                'button_active' => '1',
+                'btn_text' => ['fa' => 'مشاهده'],
+                'link_type' => 'custom',
+                'link_value' => 'https://example.com',
+                'is_active' => '1',
+            ])
+            ->assertRedirect(route('admin.hero-slides.index'));
+
+        $slide = HeroSlide::latest('id')->first();
+        $this->assertNotNull($slide);
+        $this->assertSame('url', $slide->linkable_type);
+        $this->assertSame('https://example.com', $slide->linkable_id);
+        $this->assertSame(1, (int) $slide->sort_order); // جدید → انتهای لیست
     }
 
     public function test_trust_badges_reorder_updates_sort_order(): void
