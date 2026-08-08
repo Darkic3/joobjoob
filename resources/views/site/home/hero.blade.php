@@ -80,12 +80,16 @@
                                             <p class="text-[10px] font-bold" style="color: var(--text-secondary);">
                                                 {{ app()->getLocale() === 'fa' ? 'امتیاز کاربران' : 'User Rating' }}
                                             </p>
-                                            <p class="text-sm font-black" style="color: var(--accent);" dir="ltr">
+                                            <p class="text-sm font-black" style="color: var(--accent);">
                                                 @if($slide->rating)
-                                                    {{ app()->getLocale() === 'fa' ? "{$slide->rating} از ۵.۰" : "{$slide->rating} / 5.0" }}
+                                                    @if(app()->getLocale() === 'fa')
+                                                        {{-- اعداد جدا (bdi) تا ترتیب «۴.۸ از ۵.۰» در RTL برعکس نشود --}}
+                                                        <bdi dir="ltr">{{ $slide->rating }}</bdi> از <bdi dir="ltr">۵.۰</bdi>
+                                                    @else
+                                                        <bdi dir="ltr">{{ $slide->rating }} / 5.0</bdi>
+                                                    @endif
                                                 @else
                                                     No Rate
-{{--                                                    {{ app()->getLocale() === 'fa' ? '۴.۹ از ۵.۰' : '4.9 / 5.0' }}--}}
                                                 @endif
                                             </p>
                                         </div>
