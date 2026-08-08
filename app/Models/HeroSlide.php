@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class HeroSlide extends Model
@@ -11,7 +11,7 @@ class HeroSlide extends Model
     protected $fillable = [
         'badge', 'title', 'desc', 'btn_text',
         'price', 'old_price', 'currency', 'rating', 'viewers',
-        'linkable_type', 'linkable_id', 'image', 'is_active', 'sort_order'
+        'linkable_type', 'linkable_id', 'image', 'is_active', 'sort_order',
     ];
 
     protected $casts = [
@@ -39,11 +39,13 @@ class HeroSlide extends Model
     public function trans(string $field): string
     {
         $value = $this->{$field};
-        if (!is_array($value) || empty($value)) {
+        if (! is_array($value) || empty($value)) {
             return '';
         }
         $currentLocale = app()->getLocale();
-        return $value[$currentLocale] ?? $value['fa'] ?? reset($value);
+
+        // مقادیر null داخل آرایه (مثلاً title = ['fa' => null]) نباید null برگردانند
+        return (string) ($value[$currentLocale] ?? $value['fa'] ?? reset($value) ?? '');
     }
 
     // اکسسور برای دریافت لینک نهایی اسلاید
@@ -74,18 +76,18 @@ class HeroSlide extends Model
     // بررسی آیا دکمه فعال است
     public function hasButton(): bool
     {
-        return !empty($this->btn_text['fa']) || !empty($this->linkable_type);
+        return ! empty($this->btn_text['fa']) || ! empty($this->linkable_type);
     }
 
     // بررسی آیا امتیاز فعال است
     public function hasRating(): bool
     {
-        return !empty($this->rating);
+        return ! empty($this->rating);
     }
 
     // بررسی آیا بازدیدکنندگان زنده فعال است
     public function hasViewers(): bool
     {
-        return !empty($this->viewers) && $this->viewers > 0;
+        return ! empty($this->viewers) && $this->viewers > 0;
     }
 }
