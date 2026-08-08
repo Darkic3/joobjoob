@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Site;
 
+use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\Request;
@@ -17,9 +18,18 @@ class CartController extends Controller
 
     public function add(Request $request, Product $product)
     {
-        $request->validate(['qty' => 'nullable|integer|min:1']);
+        $request->validate([
+            'qty' => 'nullable|integer|min:1',
+            'variant_id' => 'nullable|integer|exists:product_variants,id',
+        ]);
 
-        $this->cart->add($product, $request->get('qty', 1), $request->get('color'), $request->get('size'));
+        $this->cart->add(
+            $product,
+            $request->get('qty', 1),
+            $request->get('variant_id') ? (int) $request->get('variant_id') : null,
+            $request->get('color'),
+            $request->get('size')
+        );
 
         // اگر درخواست از نوع AJAX (JSON) بود، پاسخ جیسون بده
         if ($request->wantsJson()) {

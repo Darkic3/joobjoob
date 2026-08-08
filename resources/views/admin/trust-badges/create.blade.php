@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'افزودن نشان اعتماد')
+@section('tab-name', __('admin.trust_badges.create'))
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6">
@@ -13,8 +13,8 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">ایجاد نشان اعتماد جدید</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">اطلاعات نشان اعتماد جدید را وارد کنید</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.trust_badges.create') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.trust_badges.create_sub') }}</p>
             </div>
         </div>
 

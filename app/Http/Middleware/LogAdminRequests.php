@@ -27,7 +27,7 @@ class LogAdminRequests
                 'url'         => $request->fullUrl(),
                 'ip'          => $request->ip(),
                 'status_code' => $response->getStatusCode(),
-                'payload'     => json_encode($payload),
+                'payload'     => $payload, // مدل cast می‌کند (json) — بدون json_encode دستی
             ]);
         }
 

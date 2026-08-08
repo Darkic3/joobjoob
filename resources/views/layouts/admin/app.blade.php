@@ -1,26 +1,47 @@
+@php
+    // زبان و جهت فعال (توسط SetLocale به همه ویوها share می‌شود)
+    $currentLocale = $currentLocale ?? app()->getLocale();
+    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
+    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
+    $digitFamily = locale()->digitFamily($currentLocale);
+@endphp
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('tab-name', 'پنل مدیریت')</title>
+    <title>@yield('tab-name', __('admin.layout.panel'))</title>
     {{--    <link rel="shortcut icon" href="{{ $setting->imageFile('favicon') ?? asset('favicon.ico') }}">--}}
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 — نسخه RTL فقط برای زبان‌های راست‌به‌چپ، نسخه LTR برای بقیه.
+         ⚠️ bootstrap.rtl.min.css معادل کلاس‌های text-start/text-end را با !important راست‌به‌چپ می‌کند
+         و در زبان‌های چپ‌به‌چپ همه جدول‌ها و لیست‌ها را خراب می‌کرد؛ پس باید وابسته به جهت باشد. -->
+    @if($direction === 'rtl')
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    @else
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    @endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-bs-theme', 'light');
         }
     </script>
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-    {{--    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>--}}
+    {{-- CKEditor محلی پروژه --}}
+    <script src="{{ asset('assets/admin/ckeditor/ckeditor.js') }}"></script>
+    {{-- جلالی: کتابخانه تبدیل تاریخ + پیکر شمسی --}}
+    <script src="{{ asset('assets/admin/js/jalali.js') }}"></script>
+    <script src="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.js') }}"></script>
+    <!-- Jalali Datepicker -->
+    <link rel="stylesheet" href="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.css') }}">
+
     @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
     @stack('styles')
 </head>
@@ -29,7 +50,7 @@
 <x-admin.toast/>
 
 <div x-data="{ sidebarOpen: true, mobileSidebar: false }"
-     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
+     @toggle-sidebar.window="sidebarOpen = !sidebarOpen; if (!sidebarOpen) $dispatch('sidebar-closed')"
      @toggle-mobile.window="mobileSidebar = true"
      @close-mobile.window="mobileSidebar = false"
      class="flex min-h-screen">
@@ -37,7 +58,7 @@
     <x-admin.sidebar/>
 
     <div class="flex-1 flex flex-col min-h-screen transition-all duration-300"
-         :class="{ 'lg:mr-20': !sidebarOpen, 'lg:mr-64': sidebarOpen }">
+         :class="{ 'lg:ms-20': !sidebarOpen, 'lg:ms-64': sidebarOpen }">
 
         <x-admin.header/>
 

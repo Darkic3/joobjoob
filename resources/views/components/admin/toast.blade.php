@@ -1,6 +1,15 @@
 <div
+    id="admin-toast"
     x-data="{
         messages: [],
+        // نمایش toast از هر جای صفحه (مثلاً بعد از ذخیرهٔ AJAX بدون رفرش)
+        show(message, type = 'success') {
+            const msg = { type: type, message: message };
+            this.messages.push(msg);
+            setTimeout(() => {
+                this.messages = this.messages.filter((m) => m !== msg);
+            }, 5000);
+        },
         init() {
             var flash = {{ json_encode(session('flash')) }};
             if (flash) {
@@ -19,8 +28,12 @@
                 this.messages.push({ type: 'info', message: {{ json_encode(session('info')) }} });
             @endif
 
-            this.messages.forEach(function (msg, i) {
-                setTimeout(function () { this.messages.splice(i, 1); }.bind(this), 5000);
+            this.messages.forEach(function (msg) {
+                setTimeout(function () {
+                    // به‌جای splice با ایندکس (که با حذف پیام اول، ایندکس‌ها جابه‌جا می‌شوند)
+                    // خود پیام را فیلتر می‌کنیم تا پیام درست حذف شود.
+                    this.messages = this.messages.filter(function (m) { return m !== msg; });
+                }.bind(this), 5000);
             }.bind(this));
         },
         remove(index) { this.messages.splice(index, 1); }

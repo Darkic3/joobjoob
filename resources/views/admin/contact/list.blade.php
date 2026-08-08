@@ -91,7 +91,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {{ jdate_format('Y/m/d', strtotime($request->created_at)) }}
+                                        {{ show_date($request->created_at, 'Y/m/d') }}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
@@ -233,7 +233,17 @@
                     document.getElementById('modal-contact-email').innerText = data.email;
                     document.getElementById('modal-contact-dept').innerText = data.department;
                     document.getElementById('modal-contact-message').innerText = data.message;
-                    document.getElementById('modal-contact-date').innerText = data.created_at;
+                    // نمایش تاریخ شمسی (اگر کتابخانه جلالی لود شده باشد)، در غیر این صورت خام میلادی
+                    var rawDate = data.created_at;
+                    if (typeof window.jalaali !== 'undefined' && rawDate) {
+                        var d = new Date(rawDate);
+                        if (!isNaN(d.getTime())) {
+                            var j = window.jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+                            var pad = function (n) { return String(n).padStart(2, '0'); };
+                            rawDate = j.jy + '/' + pad(j.jm) + '/' + pad(j.jd) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+                        }
+                    }
+                    document.getElementById('modal-contact-date').innerText = rawDate;
 
                     document.getElementById('modal-contact-loading').classList.add('d-none');
                     document.getElementById('modal-contact-content').classList.remove('d-none');

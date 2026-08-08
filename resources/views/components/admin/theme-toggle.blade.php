@@ -7,20 +7,25 @@
             if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 this.isDark = true;
                 document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
             } else {
                 this.isDark = false;
                 document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-bs-theme', 'light');
             }
         },
         toggle() {
             this.isDark = !this.isDark;
             if (this.isDark) {
                 document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
             } else {
                 document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-bs-theme', 'light');
                 localStorage.setItem('theme', 'light');
             }
+            if (window.applyAdminThemeToCkeditor) window.applyAdminThemeToCkeditor();
         }
     }"
     @click="toggle()"

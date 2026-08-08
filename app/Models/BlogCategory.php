@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BlogCategory extends Model
 {
@@ -13,7 +13,7 @@ class BlogCategory extends Model
 
     protected $fillable = [
         'parent_id', 'title', 'slug', 'description', 'image',
-        'is_active', 'show_in_first_page', 'sort_order'
+        'is_active', 'show_in_first_page', 'sort_order',
     ];
 
     protected function casts(): array
@@ -45,5 +45,13 @@ class BlogCategory extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    // URL تصویر — تصاویر توسط ImageUploader در public/uploads/blog-categories ذخیره می‌شوند
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image
+            ? asset(config('paths.upload', 'uploads').'/blog-categories/'.$this->image)
+            : null;
     }
 }

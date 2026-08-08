@@ -5,10 +5,12 @@
 --}}
 @props(['endsInSeconds' => 3600, 'id' => 'cd'])
 
+@php $isPersian = locale()->isJalali(app()->getLocale()); @endphp
+
 <div class="flex items-center gap-2" id="{{ $id }}-wrap">
-    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-h">۰۰</div>:
-    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-m">۰۰</div>:
-    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-s">۰۰</div>
+    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-h">{{ $isPersian ? '۰۰' : '00' }}</div>:
+    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-m">{{ $isPersian ? '۰۰' : '00' }}</div>:
+    <div class="neu-pressed px-3 py-2 mono font-bold text-lg" id="{{ $id }}-s">{{ $isPersian ? '۰۰' : '00' }}</div>
 </div>
 
 <script>

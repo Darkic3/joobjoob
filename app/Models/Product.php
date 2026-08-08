@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,24 +14,28 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'product_category_id', 'name', 'slug', 'short_description', 'description',
-        'sku', 'brand', 'price', 'discount_price', 'stock', 'weight',
-        'status', 'is_featured', 'is_best_seller', 'colors', 'sizes', 'deal_ends_at',
+        'product_category_id', 'brand_id', 'name', 'slug', 'main_image', 'short_description', 'description',
+        'sku', 'price', 'discount_price', 'final_price', 'stock', 'weight',
+        'is_active', 'is_featured', 'is_best_seller', 'deal_ends_at',
+        'timer_active', 'start_timer', 'end_timer',
     ];
 
     protected $casts = [
         'name' => 'array',
         'short_description' => 'array',
         'description' => 'array',
-        'colors' => 'array',
-        'sizes' => 'array',
         'price' => 'integer',
         'discount_price' => 'integer',
+        'final_price' => 'integer',
         'stock' => 'integer',
         'weight' => 'integer',
         'is_featured' => 'boolean',
         'is_best_seller' => 'boolean',
+        'is_active' => 'boolean',
+        'timer_active' => 'boolean',
         'deal_ends_at' => 'datetime',
+        'start_timer' => 'datetime',
+        'end_timer' => 'datetime',
     ];
 
     // ==========================================
@@ -42,12 +47,118 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
-    // ⚠️ توجه: فقط یک متد reviews وجود دارد که شامل اسکوپ approved است
+    /**
+     * گروه‌های مشخصات انتخابی محصول (select) — فقط ردیف‌های والد
+     * (value=NULL و parent_id=NULL — مثل «رنگ» و «سایز»)
+     */
+    public function specifications(): BelongsToMany
+    {
+        return $this->belongsToMany(Specification::class, 'product_specification')
+            ->withPivot('value', 'parent_id')
+            ->wherePivotNull('value')
+            ->wherePivotNull('parent_id')
+            ->wherePivotNull('deleted_at');
+    }
+
+    /**
+     * مقادیر نوشتاری مشخصات (text) — ردیف‌هایی که value دارند
+     */
+    public function specificationValues(): HasMany
+    {
+        return $this->hasMany(ProductSpecification::class)
+            ->whereNotNull('value')
+            ->whereNull('deleted_at')
+            ->with('specification');
+    }
+
+    /**
+     * تمام ردیف‌های مشخصه (برای مدیریت در پنل)
+     */
+    public function productSpecifications(): HasMany
+    {
+        return $this->hasMany(ProductSpecification::class)->with('children', 'specification');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->with('specifications');
+    }
+
+    public function properties(): HasMany
+    {
+        return $this->hasMany(Property::class)->orderBy('sort_order');
+    }
+
+    // ==========================================
+    // محصولات مرتبط و مکمل (product_associations)
+    // ==========================================
+
+    public function related(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_associations',
+            'product_id', 'related_product_id')
+            ->withPivot('type')
+            ->wherePivot('type', 'related');
+    }
+
+    public function complement(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_associations',
+            'product_id', 'related_product_id')
+            ->withPivot('type')
+            ->wherePivot('type', 'complement');
+    }
+
+    public function associations(): HasMany
+    {
+        return $this->hasMany(ProductAssociation::class, 'product_id');
+    }
+
+    /**
+     * تصویر اصلی محصول — یا از ستون main_image یا اولین تصویر با is_primary
+     */
+    public function getMainImageAttribute(?string $value): ?string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        // اگر ستون خالی بود از روی رابطه استنتاج می‌کنیم (سازگاری با داده قبلی)
+        $primary = $this->relationLoaded('images')
+            ? $this->images->firstWhere('is_primary', true)
+            : $this->images()->where('is_primary', true)->first();
+
+        return $primary?->path;
+    }
+
+    /**
+     * URL کامل تصویر اصلی (در صورت نبودن، از اولین تصویر گالری)
+     */
+    public function getMainImageUrlAttribute(): ?string
+    {
+        if ($this->main_image) {
+            return asset(config('paths.upload', 'uploads') . '/products/' . $this->main_image);
+        }
+
+        // اگر رابطه لود شده باشد از حافظه استفاده کن (بدون کوئری اضافه)
+        if ($this->relationLoaded('images')) {
+            $primary = $this->images->firstWhere('is_primary', true) ?? $this->images->first();
+            return $primary?->url;
+        }
+
+        return $this->images()->orderBy('sort_order')->first()?->url;
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class)->approved();
@@ -57,9 +168,9 @@ class Product extends Model
     // اسکوپ‌های کوئری (Query Scopes)
     // ==========================================
 
-    public function scopePublished($query)
+    public function scopeActive($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('is_active', true);
     }
 
     public function scopeFeatured($query)
@@ -67,29 +178,53 @@ class Product extends Model
         return $query->where('is_featured', true);
     }
 
+    public function scopeBestSeller($query)
+    {
+        return $query->where('is_best_seller', true);
+    }
+
     // ==========================================
     // اکسسورها (Accessors)
     // ==========================================
 
+    /**
+     * مدل سه‌قیمته: final_price = اگر تخفیف دارد discounted_price وگرنه price
+     * اولویت با ستون دیتابیس (تجمیع واریانت) و سپس محاسبه لحظه‌ای
+     */
     public function getFinalPriceAttribute(): int
     {
-        return $this->discount_price ?? $this->price;
+        $value = $this->attributes['final_price'] ?? null;
+
+        if ($value !== null && (int) $value > 0) {
+            return (int) $value;
+        }
+
+        return $this->discount_price > 0 ? $this->discount_price : $this->price;
     }
 
     public function getHasDiscountAttribute(): bool
     {
-        return $this->discount_price && $this->discount_price < $this->price;
+        return $this->final_price > 0 && $this->discount_price > 0 && $this->discount_price < $this->price;
     }
 
     public function getDiscountPercentageAttribute(): ?int
     {
-        if ($this->has_discount) {
-            return round((($this->price - $this->discount_price) / $this->price) * 100);
+        if ($this->has_discount && $this->price > 0) {
+            return round((($this->price - $this->final_price) / $this->price) * 100);
         }
         return null;
     }
 
-    // دریافت میانگین امتیاز (بهینه‌شده برای جلوگیری از N+1)
+    /**
+     * آیا محصول واریانت‌دار است؟
+     */
+    public function getHasVariantsAttribute(): bool
+    {
+        return $this->relationLoaded('variants')
+            ? $this->variants->isNotEmpty()
+            : $this->variants()->exists();
+    }
+
     public function getAverageRatingAttribute(): float
     {
         if ($this->relationLoaded('reviews')) {
@@ -98,7 +233,6 @@ class Product extends Model
         return round($this->reviews()->avg('rating') ?? 0, 1);
     }
 
-    // دریافت تعداد نظرات (بهینه‌شده)
     public function getReviewsCountAttribute(): int
     {
         if ($this->relationLoaded('reviews')) {

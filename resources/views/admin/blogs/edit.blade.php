@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'ویرایش مقاله: ' . ($blog->title ?? ''))
+@section('tab-name', __('admin.blogs.tab_edit', ['name' => $blog->title ?? '']))
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6">
@@ -13,8 +13,8 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">ویرایش مقاله</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">اطلاعات مقاله را به‌روزرسانی کنید</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.blogs.edit') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.blogs.edit_sub') }}</p>
             </div>
         </div>
 

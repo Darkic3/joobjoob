@@ -4,7 +4,7 @@
     /** @var \App\Models\ProductCategory $category */
 
     $name = $category->trans('name') ?? 'دسته‌بندی';
-    $url = route('products.index', ['category' => $category->slug]);
+    $url = localizedRoute('products.index', ['category' => $category->slug]);
     $count = $category->products_count ?? 0;
 
     // نگاشت آیکون‌های متنی به ایموجی

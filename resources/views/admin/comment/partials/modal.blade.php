@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="text-end text-muted small">
-                    تاریخ ثبت: {{ jdate_format('Y/m/d H:i', strtotime($comment->created_at)) }}
+                    تاریخ ثبت: {{ show_date($comment->created_at, 'Y/m/d H:i') }}
                 </div>
             </div>
             <div class="modal-footer">

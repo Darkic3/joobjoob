@@ -2,7 +2,7 @@
 
 <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-right">
+        <table class="w-full text-sm text-start">
             <thead class="bg-gray-50/50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 font-semibold text-xs uppercase tracking-wider">
             <tr>
                 @foreach($headers as $header)

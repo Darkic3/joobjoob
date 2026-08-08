@@ -1,14 +1,30 @@
+@php
+    // زبان و جهت فعال (توسط SetLocale share می‌شود — fallback دفاعی از سرویس)
+    $currentLocale = $currentLocale ?? app()->getLocale();
+    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
+    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
+    $digitFamily = locale()->digitFamily($currentLocale);
+@endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? app()->getLocale() }}" dir="{{ $direction ?? 'rtl' }}"
+<html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}"
       data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', __('messages.site_name'))</title>
+    <title>@yield('title', setting('site_name', __('messages.site_name')))</title>
 
-    @if(($direction ?? 'rtl') === 'rtl')
+    {{-- SEO: canonical + hreflang + Open Graph locale --}}
+    <link rel="canonical" href="{{ localizedUrl() }}">
+    @foreach(locale()->active() as $code => $lang)
+        <link rel="alternate" hreflang="{{ $code }}" href="{{ localizedUrl($code) }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ localizedUrl(locale()->defaultCode()) }}">
+    <meta property="og:locale" content="{{ ogLocale() }}">
+    <meta property="og:locale:alternate" content="{{ ogLocale(locale()->defaultCode()) }}">
+
+    @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     @endif
@@ -22,18 +38,19 @@
 
 <body class="min-h-screen" style="background: var(--bg);">
 
-{{-- تعریف آرایه پیام‌ها در PHP برای جلوگیری از باگ کامپایلر Blade --}}
+{{-- تعریف آرایه پیام‌ها از تنظیمات سایت (نوار اعلان) --}}
 @php
-    $announceMessages = [
-        "🚚 " . __("messages.trust_free_shipping_desc") . " — امروز تا نیمه‌شب",
-        "🎁 با کد WELCOME10، ۱۰٪ تخفیف اولین خرید بگیر",
-        "🔥 پیشنهادهای لحظه‌ای فقط تا پایان امشب",
-    ];
+    $announceMessages = array_values(array_filter([
+        setting('announce_1'),
+        setting('announce_2'),
+        setting('announce_3'),
+    ]));
+    $firstAnnounce = $announceMessages[0] ?? ("🚚 " . __("messages.trust_free_shipping_desc"));
 @endphp
 
 <div class="announce-bar text-center text-xs md:text-sm font-semibold py-2 px-4">
         <span id="announce-text" data-messages='{{ json_encode($announceMessages) }}'>
-            🚚 {{ __('messages.trust_free_shipping_desc') }} — امروز تا نیمه‌شب
+            {{ $firstAnnounce }}
         </span>
 </div>
 

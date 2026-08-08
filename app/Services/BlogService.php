@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DTOs\BlogDTO;
 use App\Helpers\ImageHandler;
 use App\Models\Blog;
-use Illuminate\Support\Facades\File;
 
 class BlogService
 {
@@ -35,6 +34,7 @@ class BlogService
     public function destroy(Blog $blog): bool
     {
         $this->deleteImage($blog->image);
+
         return $blog->delete(); // به لطف SoftDeletes، حذف نرم انجام می‌شود
     }
 
@@ -42,9 +42,9 @@ class BlogService
     {
         return Blog::query()
             ->with('category')
-            ->when(!empty($filters['search']), fn($q) => $q->where('title', 'like', '%' . $filters['search'] . '%'))
-            ->when(!empty($filters['category']), fn($q) => $q->where('blog_category_id', $filters['category']))
-            ->when(isset($filters['status']) && $filters['status'] !== '', fn($q) => $q->where('is_active', $filters['status']))
+            ->when(! empty($filters['search']), fn ($q) => $q->where('title', 'like', '%'.$filters['search'].'%'))
+            ->when(! empty($filters['category']), fn ($q) => $q->where('blog_category_id', $filters['category']))
+            ->when(isset($filters['status']) && $filters['status'] !== '', fn ($q) => $q->where('is_active', $filters['status']))
             ->latest()
             ->paginate($perPage);
     }
@@ -52,14 +52,14 @@ class BlogService
     private function prepareData(BlogDTO $dto): array
     {
         return [
-            'title'              => $dto->getTitle(),
-            'slug'               => $dto->getSlug(),
-            'excerpt'            => $dto->getExcerpt(),
-            'content'            => $dto->getContent(),
-            'blog_category_id'   => $dto->getBlogCategoryId(),
-            'is_active'          => $dto->getIsActive(),
+            'title' => $dto->getTitle(),
+            'slug' => $dto->getSlug(),
+            'excerpt' => $dto->getExcerpt(),
+            'content' => $dto->getContent(),
+            'blog_category_id' => $dto->getBlogCategoryId(),
+            'is_active' => $dto->getIsActive(),
             'show_in_first_page' => $dto->getShowInFirstPage(),
-            'user_id'            => $dto->getUserId(),
+            'user_id' => $dto->getUserId(),
         ];
     }
 
@@ -68,7 +68,7 @@ class BlogService
      */
     private function handleImageUpload(?object $image): ?string
     {
-        if (!$image) {
+        if (! $image) {
             return null;
         }
 
@@ -83,19 +83,11 @@ class BlogService
      */
     private function deleteImage(?string $imageName): void
     {
-        if (!$imageName) {
+        if (! $imageName) {
             return;
         }
 
-        $baseUpload = config('paths.upload', 'uploads');
-        $fullPath = public_path("{$baseUpload}/" . self::UPLOAD_FOLDER . "/{$imageName}");
-
-        if (File::exists($fullPath)) {
-            File::delete($fullPath);
-        }
-
-        // نکته: اگر در آینده از قابلیت resize (ImageResizer) استفاده کردید،
-        // می‌توانید کد حذف پوشه‌های سایزبندی‌شده را هم اینجا اضافه کنید.
-        // فعلاً چون سایزی پاس نمی‌دهیم، فقط فایل اصلی حذف می‌شود که کاملاً کافی است.
+        // حذف با هلپر اختصاصی شما (هماهنگ با ImageUploader)
+        ImageHandler::delete(self::UPLOAD_FOLDER, $imageName);
     }
 }

@@ -21,14 +21,14 @@
     <label for="{{ $inputId }}" class="block text-sm font-medium text-gray-700">
         {{ $label }}
         @if($required)
-            <span class="text-red-500 mr-0.5">*</span>
+            <span class="text-red-500 ms-0.5">*</span>
         @endif
     </label>
     @endif
 
     <div class="relative">
         @if($icon)
-        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+        <div class="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none text-gray-400">
             {!! $icon !!}
         </div>
         @endif
@@ -51,8 +51,8 @@
                            ' . ($error
                                ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
                                : 'border-gray-300 hover:border-gray-400')
-                           . ($icon ? ' pr-10' : ' pr-3.5')
-                           . ' pl-3.5 py-2.5',
+                           . ($icon ? ' ps-10' : ' ps-3.5')
+                           . ' pe-3.5 py-2.5',
             ]) }}
         >
     </div>

@@ -16,9 +16,14 @@ class TrustBadgeService
     public function store(TrustBadgeDTO $dto): TrustBadge
     {
         $data = $this->prepareData($dto);
+
+        // ترتیب از فرم حذف شده — نشان جدید همیشه به انتهای لیست اضافه می‌شود (سورت از ایندکس با درگ‌اندروپ)
+        $data['sort_order'] = (int) TrustBadge::max('sort_order') + 1;
+
         $badge = TrustBadge::create($data);
 
         $this->clearCache();
+
         return $badge;
     }
 
@@ -47,21 +52,22 @@ class TrustBadgeService
     }
 
     /**
-     * دریافت لیست صفحه‌بندی شده با قابلیت فیلتر
+     * لیست کامل نشان‌ها به ترتیب نمایش (sort_order) — بدون صفحه‌بندی،
+     * چون ترتیب با درگ‌اندروپ روی کل لیست انجام می‌شود (الگوی صفحهٔ زبان‌ها).
      */
-    public function getPaginatedBadges(array $filters, int $perPage = 15)
+    public function getOrderedBadges(array $filters)
     {
         return TrustBadge::query()
-            ->when(!empty($filters['search']), function ($q) use ($filters) {
-                $q->where('title', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            ->when(! empty($filters['search']), function ($q) use ($filters) {
+                $q->where('title', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('description', 'like', '%'.$filters['search'].'%');
             })
             ->when(isset($filters['status']) && $filters['status'] !== '', function ($q) use ($filters) {
                 $q->where('is_active', $filters['status']);
             })
             ->orderBy('sort_order', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->orderBy('id', 'asc')
+            ->get();
     }
 
     /**
@@ -70,19 +76,18 @@ class TrustBadgeService
     private function prepareData(TrustBadgeDTO $dto): array
     {
         return [
-            'icon'        => $dto->getIcon(),
-            'title'       => $dto->getTitle(),
+            'icon' => $dto->getIcon(),
+            'title' => $dto->getTitle(),
             'description' => $dto->getDescription(),
-            'sort_order'  => $dto->getSortOrder(),
-            'is_active'   => $dto->getIsActive(),
+            'is_active' => $dto->getIsActive(),
         ];
     }
 
     /**
-     * پاکسازی کش پس از هرگونه تغییر (ایجاد، ویرایش، حذف)
+     * پاکسازی کش پس از هرگونه تغییر (ایجاد، ویرایش، حذف، ترتیب)
      * تا تغییرات بلافاصله در فرانت‌اند اعمال شود.
      */
-    private function clearCache(): void
+    public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
     }

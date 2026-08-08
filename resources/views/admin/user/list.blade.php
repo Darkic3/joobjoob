@@ -59,7 +59,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        {{ jdate_format('Y/m/d', strtotime($item->created_at)) }}
+                                        {{ show_date($item->created_at, 'Y/m/d') }}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

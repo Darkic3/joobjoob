@@ -1,3 +1,6 @@
+// بومی‌سازی ارقام بر اساس زبان سایت (fa/ar → فارسی، سایر → انگلیسی)
+import './localize-digits.js';
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ---------- تاگل تم: فقط data-theme را عوض می‌کنیم، بقیه (موقعیت دات) با CSS خودکار است ----------
@@ -93,12 +96,19 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function startCountdown(elIds, totalSeconds) {
-    function toFa(n) { return String(n).padStart(2, '0').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+    // ارقام بر اساس زبان سایت: فارسی/عربی → ۰۱۲۳، سایر → 0123
+    function toLocal(n) {
+        var s = String(n).padStart(2, '0');
+        if (window.localizeDigits && window.localizeDigits.isPersian()) {
+            s = s.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        }
+        return s;
+    }
     function tick() {
         totalSeconds = totalSeconds > 0 ? totalSeconds - 1 : 0;
-        if (elIds.h) document.getElementById(elIds.h).textContent = toFa(Math.floor(totalSeconds / 3600));
-        if (elIds.m) document.getElementById(elIds.m).textContent = toFa(Math.floor((totalSeconds % 3600) / 60));
-        if (elIds.s) document.getElementById(elIds.s).textContent = toFa(totalSeconds % 60);
+        if (elIds.h) document.getElementById(elIds.h).textContent = toLocal(Math.floor(totalSeconds / 3600));
+        if (elIds.m) document.getElementById(elIds.m).textContent = toLocal(Math.floor((totalSeconds % 3600) / 60));
+        if (elIds.s) document.getElementById(elIds.s).textContent = toLocal(totalSeconds % 60);
     }
     tick();
     return setInterval(tick, 1000);

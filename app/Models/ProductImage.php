@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 class ProductImage extends Model
 {
@@ -21,11 +20,47 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Accessor برای دریافت URL کامل به صورت خودکار
+    // ==========================================
+    // Accessorهای URL — هماهنگ با ImageUploader/ImageResizer
+    // فایل‌ها در public/uploads/products ذخیره می‌شوند
+    // ==========================================
+
     public function getUrlAttribute(): string
     {
-        // فرض بر این است که از دیسک 'public' استفاده می‌کنید
-        return Storage::disk('public')->url($this->path);
+        return asset(config('paths.upload', 'uploads') . '/products/' . $this->path);
+    }
+
+    // نسخه رسیز شده کوچک (اگر وجود داشته باشد)
+    public function getThumbUrlAttribute(): ?string
+    {
+        return $this->resizedUrl('thumb');
+    }
+
+    // نسخه رسیز شده متوسط
+    public function getMediumUrlAttribute(): ?string
+    {
+        return $this->resizedUrl('medium');
+    }
+
+    // نسخه رسیز شده بزرگ
+    public function getLargeUrlAttribute(): ?string
+    {
+        return $this->resizedUrl('large');
+    }
+
+    /**
+     * ساخت URL برای نسخه رسیز شده در زیرپوشه مشخص
+     */
+    private function resizedUrl(string $sizeKey): ?string
+    {
+        $path = config('paths.upload', 'uploads') . '/products/' . $sizeKey . '/' . $this->path;
+
+        // اگر فایل رسیز شده وجود نداشته باشد به تصویر اصلی برمی‌گردیم
+        if (is_file(public_path($path))) {
+            return asset($path);
+        }
+
+        return null;
     }
 
     public function getAltAttribute(): ?string

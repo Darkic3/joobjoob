@@ -48,7 +48,7 @@ class BlogCategoryRequest extends FormRequest
                 },
             ],
             'title' => 'required|string|max:255',
-            'url' => ['required', 'string', 'max:255', new UrlRule(BlogCategory::class, $id)],
+            'url' => ['required', 'string', 'max:255', new UrlRule(BlogCategory::class, $id, 'slug')],
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active' => 'boolean',

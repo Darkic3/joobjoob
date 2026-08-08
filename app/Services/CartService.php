@@ -19,10 +19,26 @@ class CartService
         return collect(session($this->sessionKey, []));
     }
 
-    public function add(Product $product, int $qty = 1, ?string $color = null, ?string $size = null): string
+    /**
+     * افزودن به سبد خرید
+     * اگر variant_id داده شود، قیمت/موجودی از واریانت خوانده می‌شود
+     */
+    public function add(Product $product, int $qty = 1, ?int $variantId = null, ?string $color = null, ?string $size = null): string
     {
         $cart = $this->content();
-        $rowId = md5($product->id.$color.$size);
+        $rowId = md5($product->id.$variantId.$color.$size);
+
+        // واریانت انتخابی
+        $variant = $variantId ? $product->variants()->find($variantId) : null;
+
+        $price = $variant ? $variant->final_price : $product->final_price;
+        $stock = $variant ? $variant->stock : $product->stock;
+        $label = $variant && $variant->specifications->isNotEmpty()
+            ? $variant->specifications
+                ->sortBy(fn ($s) => $s->parent_id ?? 0)
+                ->map(fn ($s) => $s->trans('title'))
+                ->implode(' / ')
+            : null;
 
         if ($cart->has($rowId)) {
             $cart[$rowId]['qty'] += $qty;
@@ -30,9 +46,12 @@ class CartService
             $cart[$rowId] = [
                 'rowId' => $rowId,
                 'product_id' => $product->id,
+                'variant_id' => $variantId,
+                'variant_label' => $label,
                 'name' => $product->name,
-                'price' => $product->final_price,
+                'price' => $price,
                 'qty' => $qty,
+                'stock' => $stock,
                 'color' => $color,
                 'size' => $size,
                 'image' => $product->images->first()->url ?? null,

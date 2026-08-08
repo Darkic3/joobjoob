@@ -3,13 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Traits\HasAdminPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasAdminPermissions, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -18,8 +19,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'mobile',
         'email',
         'password',
+        'avatar',
+        'is_active',
         'locale',
         'theme',
         'is_admin',
@@ -45,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -56,10 +62,5 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->is_admin ?? false;
-    }
-
-    public function hasAccess(string $routeName): bool
-    {
-        return $this->isAdmin();
     }
 }

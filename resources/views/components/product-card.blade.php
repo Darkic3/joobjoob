@@ -12,8 +12,9 @@
 
     // اطلاعات پایه
     $name = $product->trans('name');
-    $imageUrl = $product->images->first()?->url ?? 'https://picsum.photos/seed/fallback/300/300';
-    $url = route('products.show', $product->slug);
+    $imageUrl = $product->main_image_url ?? 'https://picsum.photos/seed/fallback/300/300';
+//    dd($product , $product->images , $imageUrl);
+    $url = localizedRoute('products.show', ['product' => $product->slug]);
 
     // قیمت و تخفیف (با استفاده از Accessorهای مدل)
     $hasDiscount = $product->has_discount;
