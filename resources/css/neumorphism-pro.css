@@ -1,15 +1,22 @@
 /* ==========================================================================
-   Neumorphism PRO — روان‌شناسی فروش: بج‌ها، انیمیشن‌ها، نشان رتبه
+   Neumorphism PRO — روان‌شناسی فروش + HERO SHOWCASE
+   لایه‌ی پیشرفته روی دیزاین‌سیستم پایه (neumorphism.css)
+   --------------------------------------------------------------------------
+   بخش‌ها:
+   1) توکن‌های PRO (سایه‌روشن روی تم‌ها)
+   2) Keyframeها
+   3) کامپوننت‌های روان‌شناسی فروش (بج‌ها، نشان رتبه، stock-bar، toast و…)
+   4) HERO SHOWCASE (اسلایدر تمام‌عرض با استیج، ذرات، هاله و انیمیشن پله‌ای)
    ========================================================================== */
 
+/* ==========================================================================
+   1) توکن‌های PRO
+   ========================================================================== */
 :root {
     --gold: #f5a623;
-    --silver: #a0aec0;
-    --bronze: #c98a4b;
+    --silver: #c7cdd6;   /* مدال نقره‌ی رتبه ۲ */
+    --bronze: #c98a4b;   /* مدال برنز رتبه ۳ */
     --urgency: #ff5b5b;
-    --gold: #f5a623;
-    --silver: #c7cdd6;   /* برای مدال نقره‌ی رتبه ۲ */
-    --bronze: #c98a4b;   /* برای مدال برنز رتبه ۳ */
     --live-dot: #2ecc71;
 }
 [data-theme="dark-neumorphism"] {
@@ -20,15 +27,39 @@
     --live-dot: #4ade80;
 }
 
+/* ==========================================================================
+   2) Keyframeها
+   ========================================================================== */
 @keyframes pulseGlow {
     0%, 100% { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 0 color-mix(in srgb, var(--urgency) 35%, transparent); }
     50%      { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 10px color-mix(in srgb, var(--urgency) 0%, transparent); }
 }
 @keyframes livePing { 0% { transform: scale(1); opacity: 1; } 75%, 100% { transform: scale(2.2); opacity: 0; } }
-@keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes popIn { from { transform: scale(.8); } to { transform: scale(1); } }
+@keyframes toastIn  { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes popIn    { from { transform: scale(.8); } to { transform: scale(1); } }
 
+@keyframes heroRingRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes heroAurora {
+    from { transform: translate3d(0, 0, 0) scale(.9); }
+    to   { transform: translate3d(-50px, 70px, 0) scale(1.15); }
+}
+@keyframes heroProductGlow {
+    0%, 100% { transform: scale(.92); opacity: .65; }
+    50%      { transform: scale(1.08); opacity: .95; }
+}
+@keyframes heroProductFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-14px) rotate(.7deg); }
+}
+@keyframes heroParticleFloat {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(.8); opacity: .25; }
+    50%      { transform: translate3d(0, -18px, 0) scale(1.3); opacity: .8; }
+}
+
+/* ==========================================================================
+   3) کامپوننت‌های روان‌شناسی فروش
+   ========================================================================== */
 @layer components {
 
     .neu-pulse { animation: pulseGlow 2.2s ease-in-out infinite; }
@@ -40,7 +71,7 @@
     .badge-new { background: var(--accent); color: var(--accent-contrast); font-weight: 700; font-size: .68rem; padding: .3rem .65rem; border-radius: 999px; }
     .badge-sale { background: var(--bg-elevated); color: var(--urgency); font-weight: 800; font-size: .7rem; padding: .3rem .65rem; border-radius: 999px; box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
 
-    /* ---------- نشان رتبه (پرفروش‌ترین‌ها): یک کلاس، رنگ از طریق CSS var پاس داده می‌شود ----------
+    /* نشان رتبه (پرفروش‌ترین‌ها): یک کلاس، رنگ از طریق --rank-color پاس داده می‌شود.
        دیگر هیچ هگز هاردکد یا shadow-lg ناهماهنگ با نئومورفیسم در Blade لازم نیست. */
     .neu-rank-badge {
         position: absolute; top: -10px; inset-inline-start: -10px; z-index: 10;
@@ -69,4 +100,274 @@
     .count-pop { animation: popIn .3s ease; }
 }
 
-@media (max-width: 640px) { .hero-visual { display: none; } }
+/* ==========================================================================
+   4) HERO SHOWCASE — اسلایدر سینمایی تمام‌عرض
+   --------------------------------------------------------------------------
+   نکته‌ی مهم رندر: کل محتوای متن (badge/title/desc/price/btns/trust) با
+   .hero-anim از opacity:0 شروع می‌شود و فقط وقتی اسلاید .swiper-slide-active
+   شد به‌صورت پله‌ای ظاهر می‌شود. بنابراین برای هر بخشِ متنی باید یک قانون
+   reveal زیر وجود داشته باشد وگرنه همیشه نامرئی می‌ماند.
+   ========================================================================== */
+
+/* ---------- 4.1) کانتینر تمام‌عرض ---------- */
+.hero-fullbleed {
+    width: 100vw;
+    margin-inline-start: calc(50% - 50vw);
+    position: relative;
+}
+
+/* ---------- 4.2) خود اسلایدر + پس‌زمینه (گرید و هاله) ---------- */
+.hero-swiper {
+    position: relative;
+    width: 100%;
+    min-height: clamp(600px, 76vh, 760px);
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 75% 45%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 28%),
+        radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 30%),
+        radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--gold) 5%, transparent) 0%, transparent 35%),
+        var(--bg);
+}
+
+/* گرید پس‌زمینه */
+.hero-swiper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    opacity: .13;
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--text-secondary) 9%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--text-secondary) 9%, transparent) 1px, transparent 1px);
+    background-size: 70px 70px;
+    mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+}
+
+/* هاله‌ی شناور بالای صفحه */
+.hero-swiper::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    top: -180px;
+    inset-inline-end: 8%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 24%, transparent), transparent 68%);
+    filter: blur(35px);
+    opacity: .55;
+    z-index: -2;
+    animation: heroAurora 9s ease-in-out infinite alternate;
+}
+
+/* رفع باگ رندر کروم */
+.hero-swiper .swiper-slide {
+    overflow: visible;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* ---------- 4.3) حلقه‌های مداری ---------- */
+.hero-stage-ring {
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+    box-shadow:
+        0 0 40px color-mix(in srgb, var(--accent) 8%, transparent),
+        inset 0 0 40px color-mix(in srgb, var(--accent) 5%, transparent);
+    animation: heroRingRotate 40s linear infinite;
+    pointer-events: none;
+}
+.hero-stage-ring::before,
+.hero-stage-ring::after {
+    content: "";
+    position: absolute;
+    inset: 9%;
+    border-radius: 50%;
+    border: 1px dashed color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.hero-stage-ring::after {
+    inset: 18%;
+    border-style: solid;
+    opacity: .45;
+}
+
+/* ---------- 4.4) محصول: هاله، تصویر، ذرات ---------- */
+.hero-product-glow {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 28%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 35%, transparent 70%);
+    filter: blur(20px);
+    opacity: .8;
+    animation: heroProductGlow 5s ease-in-out infinite;
+}
+
+.hero-product-image {
+    position: relative;
+    width: min(560px, 92%);
+    height: auto;
+    max-height: 540px;
+    object-fit: contain;
+    z-index: 5;
+    filter: drop-shadow(0 35px 30px color-mix(in srgb, var(--shadow-dark) 38%, transparent));
+    animation: heroProductFloat 5s ease-in-out infinite;
+    transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+
+.hero-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+.hero-particles span {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
+    opacity: .55;
+    animation: heroParticleFloat 6s ease-in-out infinite;
+}
+.hero-particles span:nth-child(1) { top: 22%; inset-inline-end: 35%; }
+.hero-particles span:nth-child(2) { top: 65%; inset-inline-end: 18%; animation-delay: -1s; }
+.hero-particles span:nth-child(3) { top: 30%; inset-inline-start: 42%; animation-delay: -2s; }
+.hero-particles span:nth-child(4) { top: 75%; inset-inline-start: 28%; animation-delay: -3s; }
+.hero-particles span:nth-child(5) { top: 18%; inset-inline-start: 65%; animation-delay: -4s; }
+.hero-particles span:nth-child(6) { top: 48%; inset-inline-end: 8%; animation-delay: -5s; }
+
+/* ---------- 4.5) ستون متن + انیمیشن پله‌ای ---------- */
+.hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 720px;
+}
+@media (min-width: 1024px) {
+    .hero-content { padding-inline-start: clamp(20px, 4vw, 70px); }
+}
+
+/* حالت اولیه‌ی همه‌ی بخش‌های متنی/تصویری: نامرئی */
+.hero-anim {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .7s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ظاهر شدن پله‌ای وقتی اسلاید فعال شد — هر بخش باید قانون خودش را داشته باشد */
+.swiper-slide-active .hero-badge,
+.swiper-slide-active .hero-title,
+.swiper-slide-active .hero-desc,
+.swiper-slide-active .hero-price,
+.swiper-slide-active .hero-btns,
+.swiper-slide-active .hero-trust,
+.swiper-slide-active .hero-image-wrap {
+    opacity: 1;
+    transform: translateY(0);
+}
+.swiper-slide-active .hero-badge      { transition-delay: .1s; }
+.swiper-slide-active .hero-title      { transition-delay: .2s; }
+.swiper-slide-active .hero-desc       { transition-delay: .3s; }
+.swiper-slide-active .hero-image-wrap { transition-delay: .3s; }
+.swiper-slide-active .hero-price      { transition-delay: .4s; }
+.swiper-slide-active .hero-btns       { transition-delay: .5s; }
+.swiper-slide-active .hero-trust      { transition-delay: .6s; }
+
+/* ---------- 4.6) تایپوگرافی عنوان ---------- */
+.hero-title {
+    max-width: 700px;
+    margin-bottom: 24px;
+    font-size: clamp(2.7rem, 5.4vw, 5.4rem);
+    line-height: 1.04;
+    font-weight: 900;
+    letter-spacing: -.035em;
+    text-wrap: balance;
+    color: var(--text-primary);
+    text-shadow: 0 8px 30px color-mix(in srgb, var(--shadow-dark) 12%, transparent);
+}
+.hero-title span {
+    color: var(--accent);
+    text-shadow: 0 0 35px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ---------- 4.6.1) ستاره‌های امتیاز هیرو ---------- */
+.hero-rating-stars span {
+    color: var(--text-secondary);
+    opacity: .3;
+}
+.hero-rating-stars span.is-filled {
+    color: var(--gold);
+    opacity: 1;
+}
+
+/* ---------- 4.7) ناوبری اسلایدر (داخل هیرو) ---------- */
+.hero-navigation {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: color-mix(in srgb, var(--bg-elevated) 82%, transparent) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 6px 7px 16px var(--shadow-dark), -5px -6px 14px var(--shadow-light) !important;
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease !important;
+}
+.hero-navigation.swiper-button-next { inset-inline-end: 20px; }
+.hero-navigation.swiper-button-prev { inset-inline-start: 20px; }
+.hero-navigation:hover {
+    background: var(--accent) !important;
+    transform: translateY(-50%) scale(1.08) !important;
+}
+
+/* فلش‌ها: آیکون متنی ساده + رنگ هماهنگ با تم */
+.hero-navigation::after {
+    font-family: 'Vazirmatn', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    color: var(--accent);
+    transition: color .25s ease;
+}
+.hero-navigation:hover::after { color: var(--accent-contrast); }
+[dir="rtl"] .swiper-button-next.hero-navigation::after { content: '←'; }
+[dir="rtl"] .swiper-button-prev.hero-navigation::after { content: '→'; }
+[dir="ltr"] .swiper-button-next.hero-navigation::after { content: '→'; }
+[dir="ltr"] .swiper-button-prev.hero-navigation::after { content: '←'; }
+
+/* در موبایل دکمه‌ها مخفی می‌شوند و فقط دات‌های صفحه‌بندی می‌مانند */
+@media (max-width: 767px) {
+    .hero-navigation { display: none !important; }
+}
+
+/* ---------- 4.8) صفحه‌بندی ---------- */
+.hero-pagination .swiper-pagination-bullet {
+    width: 6px;
+    height: 6px;
+    margin-inline: 4px !important;
+    opacity: .25;
+    background: var(--text-secondary);
+    transition: all .35s cubic-bezier(.2, .8, .2, 1);
+}
+.hero-pagination .swiper-pagination-bullet-active {
+    width: 34px;
+    opacity: 1;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* ---------- 4.9) ریسپانسیو ---------- */
+@media (max-width: 767px) {
+    .hero-swiper { min-height: 680px; }
+    .hero-product-image { width: min(320px, 82vw); max-height: 320px; }
+    .hero-product-glow { width: 300px; height: 300px; }
+}
+
+@media (min-width: 768px) {
+    .hero-swiper { min-height: 680px; }
+}
+
+@media (min-width: 1280px) {
+    .hero-swiper { min-height: 720px; }
+}

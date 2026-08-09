@@ -1,39 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
-@import './neumorphism-pro.css';
+/* دیزاین‌سیستم پایه، سپس لایه‌ی PRO (Hero و روان‌شناسی فروش) */
 @import './neumorphism.css';
+@import './neumorphism-pro.css';
 
 
-/* استایل‌های اختصاصی Swiper برای هماهنگی با نئومورفیسم */
-.swiper-button-next, .swiper-button-prev {
-    background: var(--bg-elevated);
-    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-    transition: all 0.3s ease;
-}
-.swiper-button-next:hover, .swiper-button-prev:hover {
-    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-    transform: scale(0.95);
-}
-/* حذف فلش‌های پیش‌فرض و جایگزینی با آیکون‌های بهتر (اختیاری) */
-.swiper-button-next::after, .swiper-button-prev::after {
-    font-family: 'Vazirmatn', sans-serif;
-    font-weight: 900;
-}
-[dir="rtl"] .swiper-button-next::after { content: '→'; }
-[dir="rtl"] .swiper-button-prev::after { content: '←'; }
-
-.swiper-pagination-bullet {
-    background: var(--text-secondary);
-    opacity: 0.3;
-    width: 10px;
-    height: 10px;
-    transition: all 0.3s ease;
-}
-.swiper-pagination-bullet-active {
-    background: var(--accent);
-    opacity: 1;
-    width: 24px;
-    border-radius: 999px;
-}
+/* استایل‌های اختصاصی Swiper همگی در neumorphism-pro.css (بخش HERO) هستند */
 
 @tailwind base;
 @tailwind components;
