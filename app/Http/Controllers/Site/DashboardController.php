@@ -10,23 +10,23 @@ class DashboardController extends Controller
     {
         $orders = auth()->user()->orders()->latest()->take(5)->get();
 
-        return view('dashboard.index', compact('orders'));
+        return view('site.dashboard.index', compact('orders'));
     }
 
     public function orders()
     {
         $orders = auth()->user()->orders()->latest()->paginate(10);
 
-        return view('dashboard.orders', compact('orders'));
+        return view('site.dashboard.orders', compact('orders'));
     }
 
     public function wishlist()
     {
-        return view('dashboard.wishlist');
+        return view('site.dashboard.wishlist');
     }
 
     public function addresses()
     {
-        return view('dashboard.addresses');
+        return view('site.dashboard.addresses');
     }
 }
