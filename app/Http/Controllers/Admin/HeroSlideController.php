@@ -57,6 +57,8 @@ class HeroSlideController extends Controller
                 'hasRating' => $slide->hasRating(),
                 'hasViewers' => $slide->hasViewers(),
                 'trusts' => $slide->trustFormSeed(),
+                // مدل لینک‌شده به فرمت نتایج جستجو — برای auto-select در فرم ادیت
+                'selectedModel' => $slide->linkableFormSeed(),
             ];
         }
 
@@ -70,6 +72,7 @@ class HeroSlideController extends Controller
             'trusts' => [
                 ['icon' => '✓', 'fa' => '+۱۲,۰۰۰ مشتری راضی', 'en' => '+12,000 happy customers'],
             ],
+            'selectedModel' => null,
         ];
     }
 

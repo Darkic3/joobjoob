@@ -158,6 +158,35 @@ class HeroSlide extends Model
     }
 
     /**
+     * قیمت نمایشی اسلاید.
+     * اگر اسلاید به یک محصول لینک شده باشد، قیمت به‌صورت زنده از خود محصول خوانده می‌شود
+     * (قیمت نهایی = با تخفیف) — با تغییر قیمت محصول، این‌جا هم خودکار تغییر می‌کند.
+     */
+    public function getPriceAttribute(?int $value): int
+    {
+        if ($this->linkable_type === Product::class && $this->linkable) {
+            return (int) $this->linkable->final_price;
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * قیمت قدیمی نمایشی اسلاید.
+     * برای اسلاید لینک‌شده به محصول: قیمت اصلی محصول (بدون تخفیف) اگر تخفیف داشته باشد، وگرنه ۰.
+     */
+    public function getOldPriceAttribute(?int $value): int
+    {
+        if ($this->linkable_type === Product::class && $this->linkable) {
+            $product = $this->linkable;
+
+            return (int) ($product->price > $product->final_price ? $product->price : 0);
+        }
+
+        return (int) $value;
+    }
+
+    /**
      * برچسب واحد پول اسلاید بر اساس زبان جاری.
      */
     public function currencyLabel(): string
@@ -214,6 +243,57 @@ class HeroSlide extends Model
         }
 
         return $url ?: null;
+    }
+
+    /**
+     * دادهٔ مدل لینک‌شده به فرمت نتایج جستجو (id/title/subtitle/image + قیمت برای محصول)
+     * تا موقع ادیت، مدل به‌صورت خودکار در فرم انتخاب و پر شده باشد.
+     *
+     * @return array{id: int, title: string, subtitle: string, image: ?string, price: ?int, old_price: ?int}|null
+     */
+    public function linkableFormSeed(): ?array
+    {
+        $model = $this->linkable;
+        if (! $model) {
+            return null;
+        }
+
+        $title = $this->linkedModelTitle($model);
+        if ($title === '') {
+            return null;
+        }
+
+        $image = method_exists($model, 'getMainImageUrlAttribute')
+            ? $model->main_image_url
+            : (method_exists($model, 'getImageUrlAttribute') ? $model->image_url : null);
+
+        return [
+            'id' => $model->getKey(),
+            'title' => $title,
+            'subtitle' => $model instanceof Product
+                ? number_format($model->final_price).' تومان'
+                : '',
+            'image' => $image,
+            'price' => $model instanceof Product ? (int) $model->final_price : null,
+            'old_price' => $model instanceof Product
+                ? (int) ($model->price > $model->final_price ? $model->price : 0)
+                : null,
+        ];
+    }
+
+    /**
+     * عنوان نمایشی مدل لینک‌شده (فیلد ترجمه‌ای یا رشته‌ای).
+     */
+    private function linkedModelTitle(Model $model): string
+    {
+        if (method_exists($model, 'trans')) {
+            $title = $model->trans('name') ?? $model->trans('title');
+            if ($title) {
+                return (string) $title;
+            }
+        }
+
+        return (string) ($model->title ?? $model->name ?? '');
     }
 
     /**

@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
 import Swiper from 'swiper';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -8,6 +9,9 @@ import 'swiper/css/pagination';
 import './localize-digits.js';
 
 window.Alpine = Alpine;
+
+// پلاگین Collapse — ساب‌منوهای سایدبار از x-collapse استفاده می‌کنند
+Alpine.plugin(collapse);
 
 /* ==========================================
    سازنده واریانت محصول (Product Spec Builder)
