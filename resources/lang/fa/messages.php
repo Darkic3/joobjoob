@@ -16,7 +16,9 @@ return [
     'added_to_cart' => 'محصول به سبد خرید اضافه شد',
     'buy_now' => 'خرید سریع',
     'featured_products' => 'محصولات ویژه',
+    'featured_subtitle' => 'منتخبی از بهترین‌های فروشگاه',
     'best_sellers' => 'پرفروش‌ترین‌ها',
+    'best_sellers_subtitle' => 'محبوب‌ترین‌ها به انتخاب مشتریان',
     'special_offers' => 'پیشنهادات ویژه',
     'customer_reviews' => 'نظرات مشتریان',
     'view_all' => 'مشاهده همه',
@@ -71,7 +73,6 @@ return [
     'register' => 'ثبت نام',
     'footer_desc' => 'توضیحات فوتر',
     'newsletter' => 'خبر نامه',
-
 
     'trust_free_shipping' => 'ارسال رایگان',
     'trust_free_shipping_desc' => 'بالای ۵۰۰ هزار تومان',

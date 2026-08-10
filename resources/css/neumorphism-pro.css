@@ -691,3 +691,129 @@
     opacity: .55;
     padding-bottom: 14px; /* تراز با چیپ‌ها (فضای برچسب) */
 }
+
+/* ==========================================================================
+   6.1) هدر بخش‌ها — الگوی مشترک برای تمام بخش‌های صفحهٔ اصلی
+   (آیکون نئومورفیک + عنوان گرادینتی + زیرعنوان + لینک «مشاهده همه»)
+   ========================================================================== */
+
+.section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.section-head-main {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+}
+.section-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    font-size: 1.25rem;
+    background: var(--bg-elevated);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    line-height: 1.25;
+    color: var(--text-primary);
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .section-title {
+        background: linear-gradient(90deg, var(--text-primary) 10%, var(--section-accent, var(--accent)) 130%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}
+.section-subtitle {
+    font-size: .72rem;
+    margin-top: .15rem;
+    color: var(--text-secondary);
+}
+.section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .55rem 1.1rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    transition: box-shadow .2s ease, color .2s ease, transform .2s ease;
+}
+.section-link:hover {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    color: var(--section-accent, var(--accent));
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   6.2) پوستهٔ بخش‌های ویژه و پرفروش‌ترین‌ها
+   (نوار رنگی بالا + هالهٔ گوشه — هم‌خانواده با deals-shell اما خنثی‌تر و تمیزتر)
+   ========================================================================== */
+
+.section-shell {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(150deg,
+        var(--bg-elevated) 45%,
+        color-mix(in srgb, var(--bg-elevated) 84%, var(--section-accent, var(--accent)) 16%) 100%);
+    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+    overflow: hidden;
+}
+.section-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: linear-gradient(90deg, transparent, var(--section-accent, var(--accent)), transparent);
+    opacity: .5;
+}
+.section-shell::after {
+    content: '';
+    position: absolute;
+    top: -130px;
+    inset-inline-end: -80px;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--section-accent, var(--accent)) 20%, transparent),
+        transparent 70%);
+    pointer-events: none;
+}
+.section-shell--featured { --section-accent: var(--accent); }
+.section-shell--bestsellers { --section-accent: var(--gold); }
+
+/* ==========================================================================
+   6.3) سکوی رتبهٔ اول پرفروش‌ترین‌ها — حلقهٔ طلایی درخشان
+   ========================================================================== */
+
+.podium-wrap {
+    border-radius: calc(var(--radius-lg) + 2px);
+    padding: 3px;
+    background: linear-gradient(135deg,
+        var(--gold),
+        color-mix(in srgb, var(--gold) 35%, transparent),
+        var(--gold));
+    animation: podiumPulse 3s ease-in-out infinite;
+}
+@keyframes podiumPulse {
+    0%, 100% { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold) 22%, transparent)); }
+    50%      { filter: drop-shadow(0 0 13px color-mix(in srgb, var(--gold) 42%, transparent)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .podium-wrap { animation: none; }
+}

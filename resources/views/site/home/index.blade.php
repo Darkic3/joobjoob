@@ -10,9 +10,14 @@
     {{-- ۲. دسته‌بندی‌ها --}}
     @if($categories->isNotEmpty())
         <section class="reveal-on-scroll mt-10 mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-extrabold">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
-                <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
+            <div class="section-head mb-6">
+                <div class="section-head-main">
+                    <span class="section-icon" aria-hidden="true">🗂</span>
+                    <div>
+                        <h2 class="section-title">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
+                    </div>
+                </div>
+                <a href="{{ localizedRoute('products.index') }}" class="section-link">
                     {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
                 </a>
             </div>
@@ -74,16 +79,27 @@
     {{-- ۵. محصولات ویژه --}}
     @if($featured->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="text-lg font-extrabold">{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</h2>
-                <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
-                    {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
-                </a>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                @foreach($featured as $product)
-                    <x-product-card :product="$product" />
-                @endforeach
+            <div class="section-shell section-shell--featured p-5 md:p-7">
+                <div class="relative z-10">
+                    <div class="section-head mb-7">
+                        <div class="section-head-main">
+                            <span class="section-icon" aria-hidden="true">✦</span>
+                            <div>
+                                <h2 class="section-title">{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</h2>
+                                <p class="section-subtitle">{{ __('messages.featured_subtitle') }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ localizedRoute('products.index') }}" class="section-link">
+                            {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        @foreach($featured as $product)
+                            <x-product-card :product="$product" />
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </section>
     @endif
@@ -91,12 +107,35 @@
     {{-- ۶. پرفروش‌ترین‌ها --}}
     @if($bestSellers->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <h2 class="text-lg font-extrabold mb-5">{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                @foreach($bestSellers as $index => $product)
-                    {{-- استفاده هوشمندانه از کامپوننت product-card با ارسال رتبه --}}
-                    <x-product-card :product="$product" :rank="$index + 1" />
-                @endforeach
+            <div class="section-shell section-shell--bestsellers p-5 md:p-7">
+                <div class="relative z-10">
+                    <div class="section-head mb-7">
+                        <div class="section-head-main">
+                            <span class="section-icon" aria-hidden="true">🏆</span>
+                            <div>
+                                <h2 class="section-title">{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
+                                <p class="section-subtitle">{{ __('messages.best_sellers_subtitle') }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ localizedRoute('products.index') }}" class="section-link">
+                            {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        @foreach($bestSellers as $index => $product)
+                            {{-- استفاده هوشمندانه از کامپوننت product-card با ارسال رتبه --}}
+                            @if($index === 0)
+                                {{-- سکوی طلایی برای رتبهٔ اول --}}
+                                <div class="podium-wrap h-full">
+                                    <x-product-card :product="$product" :rank="$index + 1" />
+                                </div>
+                            @else
+                                <x-product-card :product="$product" :rank="$index + 1" />
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </section>
     @endif
@@ -104,7 +143,14 @@
     {{-- ۷. نظرات مشتریان --}}
     @if($reviews->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <h2 class="text-lg font-extrabold mb-5">{{ settingOverride('home_reviews_title', __('messages.customer_reviews')) }}</h2>
+            <div class="section-head mb-6">
+                <div class="section-head-main">
+                    <span class="section-icon" aria-hidden="true">💬</span>
+                    <div>
+                        <h2 class="section-title">{{ settingOverride('home_reviews_title', __('messages.customer_reviews')) }}</h2>
+                    </div>
+                </div>
+            </div>
             <div class="grid md:grid-cols-3 gap-5">
                 @foreach($reviews as $review)
                     <div class="neu-card p-5 flex flex-col h-full">
