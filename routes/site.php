@@ -12,8 +12,10 @@
 // ⚠️ چرا کپی جدا؟ پارامتر اختیاری در ابتدای URI ({locale?}/products) توسط
 //   کامپایلر Laravel الزامی می‌شود — پس نسخه‌ی پیشونددار با {locale} اجباری ثبت می‌شود.
 
+use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\HomeController;
+use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProductController;
 
 // الگوی کد زبان برای constraint — امن: فقط کدهای واقعی (کاتالوگ + دیتابیس)
@@ -38,6 +40,15 @@ $siteRoutes = function () {
     // محصولات
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/product-categories/{category:slug}', [ProductController::class, 'category'])->name('products.category');
+
+    // وبلاگ
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+    Route::get('/blogs/{blog:slug}', [BlogController::class, 'show'])->name('blogs.show');
+    Route::get('/blog-categories/{category:slug}', [BlogController::class, 'category'])->name('blogs.category');
+
+    // صفحات استاتیک
+    Route::get('/page/{page}', [PageController::class, 'show'])->name('site.page');
 
     // سبد خرید
     Route::prefix('cart')->name('cart.')->group(function () {

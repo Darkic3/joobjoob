@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class ProductController extends Controller
 {
@@ -87,6 +88,23 @@ class ProductController extends Controller
         return array_values(array_unique($all));
     }
 
+    /**
+     * صفحهٔ یک دسته‌بندی محصول — محصولات خود دسته + تمام زیرشاخه‌ها.
+     */
+    public function category(ProductCategory $category)
+    {
+        abort_unless($category->is_active, 404);
+
+        $category->load('parent');
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('is_active', true)
+            ->whereIn('product_category_id', $this->categoryIdsWithDescendants([$category->slug]))
+            ->paginate(12);
+
+        return view('site.product-categories.show', compact('category', 'products'));
+    }
+
     public function show(Product $product)
     {
         $product->load([
@@ -124,7 +142,7 @@ class ProductController extends Controller
      * تصویر اصلی، گروه‌بندی مشخصات (والد/فرزند + مقادیر نوشتاری)،
      * ساختار واریانت برای انتخابگر و ارزان‌ترین واریانت موجود.
      *
-     * @return array{mainImage: string, specGroups: array, textValues: array, mainSpecs: array, variantsData: \Illuminate\Support\Collection, minVariant: mixed}
+     * @return array{mainImage: string, specGroups: array, textValues: array, mainSpecs: array, variantsData: Collection, minVariant: mixed}
      */
     private function prepareShowData(Product $product): array
     {

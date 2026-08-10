@@ -85,4 +85,38 @@ return [
     'view_products' => 'View Products',
     'special_deals' => 'Special Deals 🔥',
     'discount_off' => 'OFF',
+
+    // Blog
+    'blogs' => 'Blog',
+    'blog' => 'Post',
+    'blog_categories' => 'Blog Categories',
+    'read_more' => 'Read More',
+    'no_blogs_found' => 'No posts published yet.',
+    'views' => 'views',
+    'related_posts' => 'Related Posts',
+    'all_posts' => 'Back to all posts',
+
+    // Static pages
+    'pages' => [
+        'about' => [
+            'title' => 'About Us',
+            'description' => 'We are an online store focused on quality, product authenticity and customer satisfaction. Our goal is to give you the best shopping experience.',
+        ],
+        'contact' => [
+            'title' => 'Contact Us',
+            'description' => 'To reach our support team you can use the contact form, email or the phone number listed on the site. We will respond as soon as possible.',
+        ],
+        'faq' => [
+            'title' => 'Frequently Asked Questions',
+            'description' => 'Here you will find answers to common questions about ordering, shipping, payment and returns. If you cannot find your answer, contact support.',
+        ],
+        'terms' => [
+            'title' => 'Terms & Conditions',
+            'description' => 'Using this website means you accept the following terms and conditions. Please read the shipping, payment and return policies before purchasing.',
+        ],
+        'privacy' => [
+            'title' => 'Privacy Policy',
+            'description' => 'We respect your privacy. Your information is only used to process orders and improve our services, and is never shared with third parties.',
+        ],
+    ],
 ];

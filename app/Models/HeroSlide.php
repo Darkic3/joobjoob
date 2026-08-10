@@ -60,18 +60,22 @@ class HeroSlide extends Model
             return $this->linkable_id ?? '#';
         }
 
-        // اگر صفحه استاتیک باشد
+        // اگر صفحه استاتیک باشد (contact / about / faq / terms / privacy)
         if ($this->linkable_type === 'page') {
-            return route('site.page', $this->linkable_id);
+            return localizedRoute('site.page', ['page' => $this->linkable_id]);
         }
 
-        // اگر به یک مدل (محصول، دسته، مقاله) لینک شده باشد
-        if ($this->linkable_type && $this->linkable_id) {
-            // نکته: در آینده وقتی روت‌های فرانت‌اند را ساختی، این قسمت را آپدیت کن.
-            // مثال: if ($this->linkable_type === \App\Models\Blog::class) return route('blog.show', $this->linkable_id);
+        // اگر به یک مدل (محصول، دسته، مقاله) لینک شده باشد — روت واقعی سمت سایت
+        if ($this->linkable_type && $this->linkable_id && $this->linkable) {
+            $model = $this->linkable;
 
-            // فعلاً برای جلوگیری از ارور، یک لینک پیش‌فرض برمی‌گردانیم
-            return '#';
+            return match (true) {
+                $model instanceof Product => localizedRoute('products.show', ['product' => $model->slug]),
+                $model instanceof ProductCategory => localizedRoute('products.category', ['category' => $model->slug]),
+                $model instanceof Blog => localizedRoute('blogs.show', ['blog' => $model->slug]),
+                $model instanceof BlogCategory => localizedRoute('blogs.category', ['category' => $model->slug]),
+                default => '#',
+            };
         }
 
         return '#';

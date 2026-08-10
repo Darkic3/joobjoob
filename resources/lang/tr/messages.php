@@ -78,4 +78,38 @@ return [
     'view_products' => 'Ürünleri Görüntüle',
     'special_deals' => 'Özel Fırsatlar 🔥',
     'discount_off' => 'İndirim',
+
+    // Blog
+    'blogs' => 'Blog',
+    'blog' => 'Yazı',
+    'blog_categories' => 'Blog Kategorileri',
+    'read_more' => 'Devamını Oku',
+    'no_blogs_found' => 'Henüz yazı yayınlanmadı.',
+    'views' => 'görüntülenme',
+    'related_posts' => 'İlgili Yazılar',
+    'all_posts' => 'Tüm yazılara dön',
+
+    // Statik sayfalar
+    'pages' => [
+        'about' => [
+            'title' => 'Hakkımızda',
+            'description' => 'Kaliteye, ürün orijinalliğine ve müşteri memnuniyetine odaklanan bir çevrimiçi mağazayız. Amacımız size en iyi alışveriş deneyimini sunmaktır.',
+        ],
+        'contact' => [
+            'title' => 'İletişim',
+            'description' => 'Destek ekibimize ulaşmak için iletişim formunu, e-postayı veya sitede listelenen telefon numarasını kullanabilirsiniz. En kısa sürede size yanıt vereceğiz.',
+        ],
+        'faq' => [
+            'title' => 'Sık Sorulan Sorular',
+            'description' => 'Sipariş, kargo, ödeme ve iade ile ilgili sık sorulan soruların yanıtlarını burada bulabilirsiniz. Cevabınızı bulamazsanız destekle iletişime geçin.',
+        ],
+        'terms' => [
+            'title' => 'Şartlar ve Koşullar',
+            'description' => 'Bu web sitesini kullanmak aşağıdaki şartları kabul ettiğiniz anlamına gelir. Satın almadan önce lütfen kargo, ödeme ve iade politikalarını okuyun.',
+        ],
+        'privacy' => [
+            'title' => 'Gizlilik Politikası',
+            'description' => 'Gizliliğinize saygı duyuyoruz. Bilgileriniz yalnızca siparişleri işlemek ve hizmetlerimizi iyileştirmek için kullanılır ve asla üçüncü taraflarla paylaşılmaz.',
+        ],
+    ],
 ];
