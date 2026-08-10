@@ -60,6 +60,20 @@ class SettingService
     }
 
     /**
+     * مقدار تنظیم فقط اگر ادمین صریحاً ذخیره کرده باشد (و خالی نباشد)؛
+     * در غیر این صورت مقدار پیش‌فرض آرگومان برگردانده می‌شود.
+     *
+     * برخلاف get() که دیفالت کانفیگ را هم برمی‌گرداند، اینجا دیفالت کانفیگ نادیده گرفته می‌شود —
+     * مناسب متن‌هایی که باید به زبان جاری ترجمه شوند (مثل عنوان بخش‌های صفحه اصلی).
+     */
+    public function getStored(string $key, mixed $default = null): mixed
+    {
+        $value = $this->all()[$key] ?? null;
+
+        return ($value === null || $value === '') ? $default : $value;
+    }
+
+    /**
      * فیلدهای یک گروه خاص از کانفیگ (فیلدها به‌صورت تخت با کلید tab تعریف شده‌اند)
      */
     public function fieldsForGroup(string $group): array

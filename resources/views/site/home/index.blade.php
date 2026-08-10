@@ -11,9 +11,9 @@
     @if($categories->isNotEmpty())
         <section class="reveal-on-scroll mt-10 mb-8">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-extrabold">{{ setting('home_categories_title', __('messages.categories')) }}</h2>
+                <h2 class="text-lg font-extrabold">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
                 <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
-                    {{ setting('home_view_all', __('messages.view_all')) }} ←
+                    {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
                 </a>
             </div>
             {{-- گرید خودکار: با تعداد کم وسط‌چین و با تعداد زیاد تمام‌عرض --}}
@@ -33,8 +33,8 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">🔥</span>
                         <div>
-                            <h2 class="font-extrabold text-lg">{{ setting('home_deals_title', __('messages.special_offers')) }}</h2>
-                            <p class="text-xs" style="color: var(--text-secondary);">{{ setting('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
+                            <h2 class="font-extrabold text-lg">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
+                            <p class="text-xs" style="color: var(--text-secondary);">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
                         </div>
                     </div>
                     {{-- فرض بر این است که کامپوننت تایمر وجود دارد --}}
@@ -59,9 +59,9 @@
     @if($featured->isNotEmpty())
         <section class="reveal-on-scroll py-6">
             <div class="flex items-center justify-between mb-5">
-                <h2 class="text-lg font-extrabold">{{ setting('home_featured_title', __('messages.featured_products')) }}</h2>
+                <h2 class="text-lg font-extrabold">{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</h2>
                 <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
-                    {{ setting('home_view_all', __('messages.view_all')) }} ←
+                    {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
                 </a>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
@@ -75,7 +75,7 @@
     {{-- ۶. پرفروش‌ترین‌ها --}}
     @if($bestSellers->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <h2 class="text-lg font-extrabold mb-5">{{ setting('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
+            <h2 class="text-lg font-extrabold mb-5">{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($bestSellers as $index => $product)
                     {{-- استفاده هوشمندانه از کامپوننت product-card با ارسال رتبه --}}
@@ -88,7 +88,7 @@
     {{-- ۷. نظرات مشتریان --}}
     @if($reviews->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <h2 class="text-lg font-extrabold mb-5">{{ setting('home_reviews_title', __('messages.customer_reviews')) }}</h2>
+            <h2 class="text-lg font-extrabold mb-5">{{ settingOverride('home_reviews_title', __('messages.customer_reviews')) }}</h2>
             <div class="grid md:grid-cols-3 gap-5">
                 @foreach($reviews as $review)
                     <div class="neu-card p-5 flex flex-col h-full">

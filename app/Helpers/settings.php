@@ -11,3 +11,15 @@ if (! function_exists('setting')) {
         return app(SettingService::class)->get($key, $default);
     }
 }
+
+if (! function_exists('settingOverride')) {
+    /**
+     * مقدار تنظیم فقط اگر ادمین صریحاً ذخیره کرده باشد؛ وگرنه پیش‌فرض آرگومان.
+     * برای متن‌هایی که باید به زبان جاری ترجمه شوند (مثل عنوان بخش‌های صفحه اصلی) —
+     * دیفالت فارسی کانفیگ را نادیده می‌گیرد.
+     */
+    function settingOverride(string $key, mixed $default = null): mixed
+    {
+        return app(SettingService::class)->getStored($key, $default);
+    }
+}
