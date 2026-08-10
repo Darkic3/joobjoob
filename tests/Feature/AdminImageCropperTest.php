@@ -72,10 +72,13 @@ class AdminImageCropperTest extends TestCase
         $this->assertStringContainsString('window.ImageCropper', $html);
         $this->assertStringContainsString('dropzone-area', $html);
 
-        // نسبت و ابعاد خروجی کراپ هیرو: ۱۶:۵ @ ۱۹۲۰x۶۰۰
-        $this->assertStringContainsString('cropAspectRatio: 3.2', $html);
-        $this->assertStringContainsString('cropWidth: 1920', $html);
-        $this->assertStringContainsString('cropHeight: 600', $html);
+        // کراپ هیرو آزاد است — بدون نسبت/ابعاد اجباری (null یعنی سایز طبیعی کادر کراپ)
+        $this->assertStringContainsString('cropAspectRatio: null', $html);
+        $this->assertStringContainsString('cropWidth: null', $html);
+        $this->assertStringContainsString('cropHeight: null', $html);
+
+        // محدودیت حجم سمت کلاینت: ۲۰ مگابایت
+        $this->assertStringContainsString('maxSize: 20971520', $html);
     }
 
     public function test_blog_form_uses_image_upload_with_preview(): void

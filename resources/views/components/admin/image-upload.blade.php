@@ -9,6 +9,8 @@
     'cropAspectRatio' => null,
     'cropWidth' => null,
     'cropHeight' => null,
+    // حداکثر حجم مجاز به بایت — null یعنی بدون محدودیت سمت کلاینت (سرویس‌ورژن هم چک می‌کند)
+    'maxSize' => null,
 ])
 
 <div>
@@ -46,7 +48,7 @@
                  onclick="document.getElementById('{{ $name }}').click()"
                  ondragover="event.preventDefault(); this.classList.add('dragover')"
                  ondragleave="event.preventDefault(); this.classList.remove('dragover')"
-                 ondrop="fbImageDrop(event, '{{ $name }}')">
+                 ondrop="if (event.dataTransfer.files && event.dataTransfer.files[0] && !event.dataTransfer.files[0].type.startsWith('image/')) { fbImageDropInvalid(event, '{{ $name }}'); } else { fbImageDrop(event, '{{ $name }}'); }">
 
                 <div class="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-500 flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,6 +115,7 @@
             cropAspectRatio: @json($cropAspectRatio),
             cropWidth: @json($cropWidth),
             cropHeight: @json($cropHeight),
+            maxSize: @json($maxSize),
             croppedUrl: null,
         };
     })();
@@ -123,9 +126,37 @@
     async function fbImageSelect(input, name) {
         const file = input.files && input.files[0];
         if (!file) return;
-        if (!file.type.startsWith('image/')) return;
 
         const st = window.fbImageState[name];
+
+        // فایل انتخابی تصویر نیست — خطا و حذف انتخاب
+        if (!file.type.startsWith('image/')) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: @json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    text: file.name,
+                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                });
+            }
+            input.value = '';
+            return;
+        }
+
+        // حجم بیش از حد مجاز — خطا و حذف انتخاب
+        if (st.maxSize && file.size > st.maxSize) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: @json(__('admin.common.file_too_large'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    text: file.name,
+                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                });
+            }
+            input.value = '';
+            return;
+        }
+
         st.hasSelection = true;
 
         let blob;
@@ -232,5 +263,24 @@
         dt.items.add(file);
         input.files = dt.files;
         fbImageSelect(input, name);
+    }
+
+    // دراپ فایل غیرتصویر — از آپلود جلوگیری و خطا نمایش داده می‌شود
+    function fbImageDropInvalid(event, name) {
+        event.preventDefault();
+        const zone = document.getElementById('dropzone-' + name);
+        zone.classList.remove('dragover');
+
+        const file = event.dataTransfer.files && event.dataTransfer.files[0];
+        if (!file) return;
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: @json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                text: file.name,
+                confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            });
+        }
     }
 </script>

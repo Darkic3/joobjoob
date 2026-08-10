@@ -42,7 +42,7 @@ class HeroSlideRequest extends FormRequest
             'trusts.*.fa' => 'nullable|string|max:100',
             'trusts.*.en' => 'nullable|string|max:100',
 
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:20480',
             'is_active' => 'boolean',
         ];
     }
@@ -58,6 +58,9 @@ class HeroSlideRequest extends FormRequest
             'viewers.required_if' => 'تعداد بازدیدکنندگان الزامی است.',
             'price.numeric' => 'قیمت باید یک عدد معتبر باشد.',
             'price.min' => 'قیمت نمی‌تواند منفی باشد.',
+            'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
+            'image.mimes' => 'فرمت تصویر مجاز نیست (فقط jpg, jpeg, png, webp).',
+            'image.max' => 'حجم تصویر نباید بیشتر از ۲۰ مگابایت باشد.',
         ];
     }
 }

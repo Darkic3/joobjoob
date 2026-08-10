@@ -5,8 +5,8 @@
     سپس در جاوااسکریپت:
         const blob = await window.ImageCropper.open(file, {
             aspectRatio: 1,        // یا '4/3' ، '16/9' ، null برای آزاد
-            outputWidth: 1200,
-            outputHeight: 1200,
+            outputWidth: 1200,     // اختیاری — اگر ندهید، خروجی با سایز طبیعی کادر کراپ می‌شود
+            outputHeight: 1200,    // اختیاری — اگر ندهید، خروجی با سایز طبیعی کادر کراپ می‌شود
             format: 'image/webp',  // فرمت خروجی
             quality: 0.92,
         });
@@ -148,8 +148,9 @@
                 const aspect = options.aspectRatio ?? @json($aspectRatio) ?? null;
                 currentOptions = {
                     aspectRatio: aspect,
-                    outputWidth: options.outputWidth || 1200,
-                    outputHeight: options.outputHeight || 1200,
+                    // بدون ابعاد مشخص → سایز طبیعی کادر کراپ (کراپ آزاد)
+                    outputWidth: options.outputWidth || undefined,
+                    outputHeight: options.outputHeight || undefined,
                     format: options.format || 'image/webp',
                     quality: options.quality ?? 0.92,
                 };

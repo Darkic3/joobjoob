@@ -7,15 +7,18 @@
     viewersActive: '{{ old('viewers_active', $formData['hasViewers'] ? '1' : '0') }}' === '1',
     trusts: {{ json_encode(old('trusts', $formData['trusts']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
     linkType: '{{ old('link_type', $formData['linkType']) }}',
+    customUrl: '{{ old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '' }}',
+    pageValue: '{{ old('link_type', $formData['linkType']) === 'page' ? old('link_value', $formData['linkValue']) : '' }}',
     searchQuery: '',
     searchResults: [],
     isSearching: false,
     selectedModel: null,
-    linkableId: '{{ old('link_value', $formData['linkValue']) }}',
+    linkableId: '{{ old('link_type', $formData['linkType']) === 'product' || old('link_type', $formData['linkType']) === 'product_category' || old('link_type', $formData['linkType']) === 'blog' || old('link_type', $formData['linkType']) === 'blog_category' ? old('link_value', $formData['linkValue']) : '' }}',
 
     get isCustomUrl() { return this.linkType === 'custom'; },
     get isStaticPage() { return this.linkType === 'page'; },
     get isModel() { return ['product', 'product_category', 'blog', 'blog_category'].includes(this.linkType); },
+    get linkValue() { return this.isCustomUrl ? this.customUrl : (this.isStaticPage ? this.pageValue : this.linkableId); },
 
     async searchModels() {
         if (this.searchQuery.length < 2) {
@@ -140,21 +143,24 @@
                     {{-- URL دلخواه --}}
                     <div x-show="isCustomUrl" x-transition>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس لینک (URL)</label>
-                        <input type="url" name="link_value" value="{{ old('link_value', old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
+                        <input type="url" x-model="customUrl" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
                     </div>
 
                     {{-- صفحات استاتیک --}}
                     <div x-show="isStaticPage" x-transition>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">انتخاب صفحه</label>
-                        <select name="link_value" class="input-custom">
+                        <select x-model="pageValue" class="input-custom">
                             <option value="">-- انتخاب کنید --</option>
-                            <option value="contact" {{ old('link_value', $formData['linkValue']) === 'contact' ? 'selected' : '' }}>تماس با ما</option>
-                            <option value="about" {{ old('link_value', $formData['linkValue']) === 'about' ? 'selected' : '' }}>درباره ما</option>
-                            <option value="faq" {{ old('link_value', $formData['linkValue']) === 'faq' ? 'selected' : '' }}>سوالات متداول</option>
-                            <option value="terms" {{ old('link_value', $formData['linkValue']) === 'terms' ? 'selected' : '' }}>قوانین و مقررات</option>
-                            <option value="privacy" {{ old('link_value', $formData['linkValue']) === 'privacy' ? 'selected' : '' }}>حریم خصوصی</option>
+                            <option value="contact">تماس با ما</option>
+                            <option value="about">درباره ما</option>
+                            <option value="faq">سوالات متداول</option>
+                            <option value="terms">قوانین و مقررات</option>
+                            <option value="privacy">حریم خصوصی</option>
                         </select>
                     </div>
+
+                    {{-- مقدار نهایی لینک — یک فیلد واحد بر اساس نوع لینک --}}
+                    <input type="hidden" name="link_value" :value="linkValue">
 
                     {{-- مدل‌ها (محصول، دسته‌بندی، مقاله) --}}
                     <div x-show="isModel" x-transition class="space-y-3">
@@ -169,7 +175,6 @@
                                     class="input-custom"
                                     placeholder="برای جستجو تایپ کنید..."
                                 >
-                                <input type="hidden" name="link_value" :value="linkableId">
                                 <div x-show="isSearching" class="absolute left-3 top-1/2 -translate-y-1/2">
                                     <svg class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </div>
@@ -355,10 +360,8 @@
                 label="تصویر اسلاید"
                 :currentImage="$heroSlide?->imageUrl()"
                 :removable="true"
-                hint="پیشنهاد: ابعاد 1920x600 پیکسل | حداکثر حجم: ۲ مگابایت"
-                :cropAspectRatio="3.2"
-                :cropWidth="1920"
-                :cropHeight="600" />
+                hint="کراپ آزاد — هر سایزی که می‌خواهید کراپ کنید | حداکثر حجم: ۲۰ مگابایت"
+                :maxSize="20 * 1024 * 1024" />
         </div>
     </div>
 </div>

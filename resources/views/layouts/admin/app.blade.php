@@ -35,6 +35,8 @@
     <script src="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.js') }}"></script>
     <!-- Jalali Datepicker -->
     <link rel="stylesheet" href="{{ asset('assets/admin/jalalidatepicker.min/jalalidatepicker.min.css') }}">
+    {{-- SweetAlert2 — محلی (برای سوال‌های تأیید، خطاهای فرم و ...) --}}
+    <script src="{{ asset('assets/admin/js/sweetalert2.all.min.js') }}"></script>
 
     @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
     @stack('styles')

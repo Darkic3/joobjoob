@@ -73,8 +73,7 @@
                     text: 'این عمل قابل بازگشت نخواهد بود!',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#6c757d',
+                    customClass: { confirmButton: 'fb-swal-danger' },
                     confirmButtonText: 'بله، حذف کن!',
                     cancelButtonText: 'انصراف'
                 }).then(function (result) {
@@ -84,5 +83,26 @@
                 });
             }
         });
+
+        {{-- خطاهای اعتبارسنجی (پس از ریدایرکت بک) — نمایش به‌صورت swal --}}
+        @if($errors->any())
+            var escHtml = function (s) {
+                return String(s).replace(/[&<>"']/g, function (c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                });
+            };
+            var errorMessages = @json($errors->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (typeof Swal !== 'undefined' && errorMessages.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: @json(__('admin.common.save_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    html: '<ul class="text-start ps-4 mb-0">' + errorMessages.map(function (m) {
+                        return '<li class="mb-1">' + escHtml(m) + '</li>';
+                    }).join('') + '</ul>',
+                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    confirmButtonColor: '#d33',
+                });
+            }
+        @endif
     });
 </script>
