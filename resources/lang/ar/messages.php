@@ -11,6 +11,7 @@ return [
     'dashboard' => 'لوحة التحكم',
     'search_placeholder' => 'البحث عن منتج...',
     'add_to_cart' => 'أضف إلى السلة',
+    'added_short' => '✓ أُضيف',
     'added_to_cart' => 'تمت إضافة المنتج إلى السلة',
     'buy_now' => 'اشترِ الآن',
     'featured_products' => 'منتجات مميزة',

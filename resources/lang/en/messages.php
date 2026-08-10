@@ -11,6 +11,7 @@ return [
     'dashboard' => 'Dashboard',
     'search_placeholder' => 'Search products...',
     'add_to_cart' => 'Add to Cart',
+    'added_short' => '✓ Added',
     'added_to_cart' => 'Product added to cart',
     'buy_now' => 'Buy Now',
     'featured_products' => 'Featured Products',

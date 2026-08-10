@@ -15,26 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ---------- دکمه‌های افزودن به سبد: idle -> loading -> success ----------
-    document.querySelectorAll('.add-to-cart').forEach(function (btn) {
-        const original = btn.innerHTML;
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            btn.disabled = true;
-            btn.innerHTML = '<span class="btn-spinner"></span>';
-            setTimeout(function () {
-                btn.innerHTML = '✓ اضافه شد';
-                const badge = document.getElementById('cart-count');
-                if (badge) {
-                    badge.textContent = (parseInt(badge.textContent || '0') + 1);
-                    badge.classList.remove('count-pop');
-                    void badge.offsetWidth;
-                    badge.classList.add('count-pop');
-                }
-                setTimeout(function () { btn.innerHTML = original; btn.disabled = false; }, 1200);
-            }, 600);
-        });
-    });
+    // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success (هندلر اصلی پایین است) ----------
 
     // ---------- toast اثبات اجتماعی ----------
     const toastEl = document.getElementById('social-toast');
@@ -138,24 +119,35 @@ window.startCountdownTo = function (elIds, endMs) {
 };
 
 
+// ---------- دکمهٔ افزودن به سبد: idle -> loading -> success ----------
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
             const originalText = this.innerHTML;
-            const url = this.dataset.url;
+            const successText = this.dataset.success || '✓ اضافه شد';
 
             // حالت لودینگ
             this.innerHTML = '<span class="btn-spinner"></span>';
             this.disabled = true;
 
-            // شبیه‌سازی درخواست (در پروژه واقعی به جای setTimeout از fetch(url, {method: 'POST'}) استفاده کنید)
+            // شبیه‌سازی درخواست — در پروژهٔ واقعی به‌جای setTimeout از fetch(url, {method: 'POST'})
             setTimeout(() => {
-                this.innerHTML = '✓ اضافه شد';
-                this.classList.add('neu-btn-success'); // می‌توانید این کلاس را در CSS تعریف کنید
+                this.innerHTML = successText;
+                this.classList.add('neu-btn-success');
+
+                // شمارندهٔ سبد در هدر (اگر وجود داشته باشد)
+                const badge = document.getElementById('cart-count');
+                if (badge) {
+                    badge.textContent = (parseInt(badge.textContent || '0') + 1);
+                    badge.classList.remove('count-pop');
+                    void badge.offsetWidth;
+                    badge.classList.add('count-pop');
+                }
 
                 setTimeout(() => {
                     this.innerHTML = originalText;
+                    this.classList.remove('neu-btn-success');
                     this.disabled = false;
                 }, 1500);
             }, 800);

@@ -11,6 +11,7 @@ return [
     'dashboard' => 'Kontrol Paneli',
     'search_placeholder' => 'Ürün ara...',
     'add_to_cart' => 'Sepete Ekle',
+    'added_short' => '✓ Eklendi',
     'added_to_cart' => 'Ürün sepete eklendi',
     'buy_now' => 'Hemen Al',
     'featured_products' => 'Öne Çıkan Ürünler',

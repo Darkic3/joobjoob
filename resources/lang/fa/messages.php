@@ -12,6 +12,7 @@ return [
     'dashboard' => 'پنل کاربری',
     'search_placeholder' => 'جستجوی محصول...',
     'add_to_cart' => 'افزودن به سبد خرید',
+    'added_short' => '✓ اضافه شد',
     'added_to_cart' => 'محصول به سبد خرید اضافه شد',
     'buy_now' => 'خرید سریع',
     'featured_products' => 'محصولات ویژه',

@@ -77,7 +77,7 @@
                         {{ __('messages.only_left', ['count' => $product->stock]) }}
                     </span>
                 @elseif($hasDiscount)
-                    <span class="badge-sale absolute top-2 start-2 z-10 bg-[var(--accent)] text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                    <span class="badge-sale absolute top-2 start-2 z-10">
                         {{ $discountPercent }}٪-
                     </span>
                 @elseif($isNew)
@@ -139,15 +139,17 @@
 
         {{-- دکمه افزودن به سبد خرید --}}
         <button type="button"
-                class="add-to-cart neu-btn neu-btn-primary neu-btn-sm w-full py-2.5 text-xs font-bold flex items-center justify-center gap-2 transition-all
-                       {{ $outOfStock ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg hover:-translate-y-0.5' }}"
+                class="add-to-cart"
                 @disabled($outOfStock)
+                data-success="{{ __('messages.added_short') }}"
                 onclick="{{ $outOfStock ? '' : '/* منطق افزودن به سبد خرید */' }}">
 
             @if($outOfStock)
-                <span>🚫</span> {{ __('messages.out_of_stock') }}
+                <span aria-hidden="true">🚫</span>
+                <span>{{ __('messages.out_of_stock') }}</span>
             @else
-                <span>🛒</span> {{ __('messages.add_to_cart') }}
+                <span class="add-to-cart-icon" aria-hidden="true">🛒</span>
+                <span>{{ __('messages.add_to_cart') }}</span>
             @endif
         </button>
     </div>
