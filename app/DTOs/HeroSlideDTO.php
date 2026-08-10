@@ -26,6 +26,7 @@ readonly class HeroSlideDTO
         public ?string $rating,
         public bool $viewers_active,
         public ?int $viewers,
+        public array $trusts,
         public ?UploadedFile $image,
         public bool $is_active,
     ) {}
@@ -54,9 +55,39 @@ readonly class HeroSlideDTO
             rating: $ratingActive ? $request->input('rating') : null,
             viewers_active: $viewersActive,
             viewers: $viewersActive ? $request->integer('viewers', 0) : null,
+            trusts: self::normalizeTrusts((array) $request->input('trusts', [])),
             image: $request->file('image'),
             is_active: $request->boolean('is_active'),
         );
+    }
+
+    /**
+     * نرمال‌سازی آیتم‌های اعتماد: فقط آیتم‌های دارای متن پذیرفته می‌شوند،
+     * هر آیتم به شکل {icon, text: {fa, en}} ذخیره می‌شود و حداکثر ۵ آیتم.
+     */
+    private static function normalizeTrusts(array $raw): array
+    {
+        $trusts = [];
+
+        foreach ($raw as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $fa = trim((string) ($item['fa'] ?? ''));
+            $en = trim((string) ($item['en'] ?? ''));
+            if ($fa === '' && $en === '') {
+                continue;
+            }
+
+            $icon = trim((string) ($item['icon'] ?? '✓'));
+            $trusts[] = [
+                'icon' => $icon !== '' ? $icon : '✓',
+                'text' => ['fa' => $fa, 'en' => $en],
+            ];
+        }
+
+        return array_slice($trusts, 0, 5);
     }
 
     public function getLinkableType(): ?string

@@ -68,6 +68,7 @@ class HeroSlideService
             'currency' => $dto->currency,
             'rating' => $dto->rating,
             'viewers' => $dto->viewers ?? 0,
+            'trusts' => $dto->trusts,
             'is_active' => $dto->is_active,
         ];
     }

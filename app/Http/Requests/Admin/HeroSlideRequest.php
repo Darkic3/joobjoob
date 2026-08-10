@@ -37,6 +37,11 @@ class HeroSlideRequest extends FormRequest
             'viewers_active' => 'boolean',
             'viewers' => 'nullable|required_if:viewers_active,1|integer|min:0',
 
+            'trusts' => 'nullable|array|max:5',
+            'trusts.*.icon' => 'nullable|string|max:10',
+            'trusts.*.fa' => 'nullable|string|max:100',
+            'trusts.*.en' => 'nullable|string|max:100',
+
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active' => 'boolean',
         ];

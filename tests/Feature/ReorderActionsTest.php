@@ -63,6 +63,61 @@ class ReorderActionsTest extends TestCase
         $this->assertSame(1, (int) $slide->sort_order); // جدید → انتهای لیست
     }
 
+    public function test_hero_slide_stores_trust_items_normalized(): void
+    {
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.hero-slides.store'), [
+                'title' => ['fa' => 'اسلاید با آیتم‌های اعتماد'],
+                'trusts' => [
+                    ['icon' => '✓', 'fa' => '+۱۲,۰۰۰ مشتری راضی', 'en' => '+12,000 happy customers'],
+                    ['icon' => '🛡', 'fa' => 'تضمین اصالت کالا', 'en' => 'Authenticity Guarantee'],
+                    ['fa' => '', 'en' => ''], // آیتم خالی → نادیده گرفته شود
+                    ['fa' => 'پشتیبانی ۲۴/۷', 'en' => '24/7 Support'], // بدون آیکون → پیش‌فرض ✓
+                    ['icon' => '🚚', 'fa' => 'ارسال سریع', 'en' => 'Fast Shipping'],
+                ],
+                'is_active' => '1',
+            ])
+            ->assertRedirect(route('admin.hero-slides.index'));
+
+        $slide = HeroSlide::latest('id')->first();
+        $trusts = $slide->trusts;
+
+        $this->assertIsArray($trusts);
+        $this->assertCount(4, $trusts); // ۵ ورودی − آیتم خالی حذف شده
+        $this->assertSame('+۱۲,۰۰۰ مشتری راضی', $trusts[0]['text']['fa']);
+        $this->assertSame('+12,000 happy customers', $trusts[0]['text']['en']);
+        $this->assertSame('🛡', $trusts[1]['icon']);
+        $this->assertSame('✓', $trusts[2]['icon']); // fallback آیکون
+        $this->assertSame('ارسال سریع', $trusts[3]['text']['fa']);
+        $this->assertSame('Fast Shipping', $trusts[3]['text']['en']);
+
+        // رندر سایت: آیتم‌های ترجمه‌شده
+        $this->assertSame('+۱۲,۰۰۰ مشتری راضی', $slide->trustItems()[0]['text']);
+        $this->assertSame('✓', $slide->trustItems()[2]['icon']);
+
+        // اسلاید بدون آیتم اعتماد → چیزی نمایش داده نمی‌شود (بدون fallback هاردکد)
+        $legacy = HeroSlide::create(['title' => ['fa' => 'قدیمی']]);
+        $this->assertSame([], $legacy->trustItems());
+    }
+
+    public function test_hero_slide_rejects_more_than_five_trust_items(): void
+    {
+        $items = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $items[] = ['icon' => '✓', 'fa' => "آیتم {$i}", 'en' => "Item {$i}"];
+        }
+
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.hero-slides.store'), [
+                'title' => ['fa' => 'اسلاید بیش از حد'],
+                'trusts' => $items,
+                'is_active' => '1',
+            ])
+            ->assertSessionHasErrors('trusts');
+
+        $this->assertDatabaseCount('hero_slides', 0);
+    }
+
     public function test_trust_badges_reorder_updates_sort_order(): void
     {
         $a = TrustBadge::create(['icon' => 'a', 'title' => 'A', 'sort_order' => 1, 'is_active' => true]);

@@ -10,7 +10,7 @@ class HeroSlide extends Model
 {
     protected $fillable = [
         'badge', 'title', 'desc', 'btn_text',
-        'price', 'old_price', 'currency', 'rating', 'viewers',
+        'price', 'old_price', 'currency', 'rating', 'viewers', 'trusts',
         'linkable_type', 'linkable_id', 'image', 'is_active', 'sort_order',
     ];
 
@@ -19,6 +19,7 @@ class HeroSlide extends Model
         'title' => 'array',
         'desc' => 'array',
         'btn_text' => 'array',
+        'trusts' => 'array',
         'price' => 'integer',
         'old_price' => 'integer',
         'viewers' => 'integer',
@@ -89,5 +90,39 @@ class HeroSlide extends Model
     public function hasViewers(): bool
     {
         return ! empty($this->viewers) && $this->viewers > 0;
+    }
+
+    /**
+     * آیتم‌های اعتماد آمادهٔ رندر (با ترجمهٔ زبان جاری).
+     *
+     * فقط آیتم‌هایی که ادمین برای این اسلاید ذخیره کرده است برمی‌گردد —
+     * اگر آیتمی پیکربندی نشده باشد (NULL یا []) آرایهٔ خالی برمی‌گردد و چیزی نمایش داده نمی‌شود.
+     *
+     * @return array<int, array{icon: string, text: string}>
+     */
+    public function trustItems(): array
+    {
+        $items = [];
+        foreach ((array) $this->trusts as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $text = is_array($item['text'] ?? null)
+                ? ($item['text'][app()->getLocale()] ?? $item['text']['fa'] ?? $item['text']['en'] ?? '')
+                : (string) ($item['text'] ?? '');
+            $text = trim((string) $text);
+            if ($text === '') {
+                continue;
+            }
+
+            $icon = trim((string) ($item['icon'] ?? '✓'));
+            $items[] = [
+                'icon' => $icon !== '' ? $icon : '✓',
+                'text' => $text,
+            ];
+        }
+
+        return $items;
     }
 }

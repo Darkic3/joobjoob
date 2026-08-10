@@ -36,12 +36,27 @@
     }
     $currentLinkType = old('link_type', $currentLinkType);
     $currentLinkId = old('link_value', $currentLinkId);
+
+    // آیتم‌های اعتماد — از ورودی مجدد (بعد از خطای اعتبارسنجی) یا از مدل
+    $trusts = old('trusts', $heroSlide?->trusts ?? []);
+    $trusts = array_values(is_array($trusts) ? $trusts : []);
+    $trustSeed = [];
+    foreach ($trusts as $trust) {
+        if (!is_array($trust)) continue;
+        $trustText = is_array($trust['text'] ?? null) ? $trust['text'] : [];
+        $trustSeed[] = [
+            'icon' => $trust['icon'] ?? '✓',
+            'fa' => $trust['fa'] ?? $trustText['fa'] ?? '',
+            'en' => $trust['en'] ?? $trustText['en'] ?? '',
+        ];
+    }
 @endphp
 
 <div x-data="{
     buttonActive: '{{ old('button_active', $hasButton ? '1' : '0') }}' === '1',
     ratingActive: '{{ old('rating_active', $hasRating ? '1' : '0') }}' === '1',
     viewersActive: '{{ old('viewers_active', $hasViewers ? '1' : '0') }}' === '1',
+    trusts: {{ json_encode($trustSeed, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
     linkType: '{{ $currentLinkType }}',
     searchQuery: '',
     searchResults: [],
@@ -81,6 +96,11 @@
         this.selectedModel = null;
         this.linkableId = '';
         this.searchQuery = '';
+    },
+
+    addTrust() {
+        if (this.trusts.length >= 5) return;
+        this.trusts.push({ icon: '✓', fa: '', en: '' });
     }
 }" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -301,6 +321,56 @@
                 <input type="number" name="viewers" value="{{ old('viewers', $heroSlide?->viewers ?? '') }}" class="input-custom" placeholder="مثال: 42" min="0">
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">اگر مقدار وارد شود، در سمت سایت نمایش داده می‌شود.</p>
             </div>
+        </div>
+
+        {{-- ۵. باکس آیتم‌های اعتماد (مشتریان راضی، تضمین اصالت و…) --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    آیتم‌های اعتماد
+                </h3>
+                <button
+                    type="button"
+                    @click="addTrust()"
+                    :disabled="trusts.length >= 5"
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    افزودن آیتم
+                </button>
+            </div>
+
+            <template x-for="(trust, i) in trusts" :key="i">
+                <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="'آیتم ' + (i + 1)"></span>
+                        <button type="button" @click="trusts.splice(i, 1)" class="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            حذف
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">آیکون (ایموجی/نماد)</label>
+                            <input type="text" x-model="trust.icon" :name="'trusts[' + i + '][icon]'" class="input-custom" placeholder="✓" maxlength="4">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">متن (فارسی)</label>
+                            <input type="text" x-model="trust.fa" :name="'trusts[' + i + '][fa]'" class="input-custom" placeholder="مثال: +۱۲,۰۰۰ مشتری راضی">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Text (English)</label>
+                            <input type="text" x-model="trust.en" :name="'trusts[' + i + '][en]'" class="input-custom" dir="ltr" placeholder="+12,000 happy customers">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <p x-show="trusts.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
+                هنوز آیتمی اضافه نشده است — تا ۵ آیتم (مثل «مشتریان راضی»، «تضمین اصالت کالا»، «ارسال سریع» و…) می‌توانید اضافه کنید. اگر چیزی اضافه نکنید، در سایت نمایش داده نمی‌شود.
+            </p>
+            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="'حداکثر ۵ آیتم — ' + trusts.length + ' / 5'"></p>
         </div>
     </div>
 
