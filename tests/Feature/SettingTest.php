@@ -13,14 +13,6 @@ class SettingTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // حافظه‌ی استاتیک سرویس بین تست‌ها می‌ماند — هر تست از حالت تمیز شروع کند
-        app(SettingService::class)->flush();
-    }
-
     private function actingAsSuperAdmin(): void
     {
         $user = User::factory()->create(['is_admin' => true, 'is_active' => true]);
