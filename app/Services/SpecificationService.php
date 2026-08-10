@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\SpecificationDTO;
 use App\Models\Specification;
+use Illuminate\Database\Eloquent\Collection;
 
 class SpecificationService
 {
@@ -26,7 +27,7 @@ class SpecificationService
     /**
      * لیست مشخصه‌های والد (گروه‌ها) به صورت درختی برای نمایش در پنل
      */
-    public function getParents(): \Illuminate\Database\Eloquent\Collection
+    public function getParents(): Collection
     {
         return Specification::whereNull('parent_id')->with('children')->orderBy('id')->get();
     }
@@ -35,9 +36,9 @@ class SpecificationService
     {
         return Specification::query()
             ->with('parent')
-            ->when(!empty($filters['search']), function ($q) use ($filters) {
-                $q->where('title->fa', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('title->en', 'like', '%' . $filters['search'] . '%');
+            ->when(! empty($filters['search']), function ($q) use ($filters) {
+                $q->where('title->fa', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('title->en', 'like', '%'.$filters['search'].'%');
             })
             ->when(isset($filters['type']) && $filters['type'] !== '', function ($q) use ($filters) {
                 $q->where('type', $filters['type']);
@@ -52,12 +53,12 @@ class SpecificationService
     private function prepareData(SpecificationDTO $dto): array
     {
         return [
-            'title'      => $dto->getTitle(),
-            'type'       => $dto->getType(),
-            'parent_id'  => $dto->getParentId(),
-            'active'     => $dto->getIsActive(),
-            'is_filter'  => $dto->getIsFilter(),
-            'is_color'   => $dto->getIsColor(),
+            'title' => $dto->getTitle(),
+            'type' => $dto->getType(),
+            'parent_id' => $dto->getParentId(),
+            'active' => $dto->getIsActive(),
+            'is_filter' => $dto->getIsFilter(),
+            'is_color' => $dto->getIsColor(),
             'color_code' => $dto->getColorCode(),
         ];
     }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RequestLog;
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\RequestLog;
 use Illuminate\Support\Facades\Auth;
 
 class LogAdminRequests
@@ -22,12 +22,12 @@ class LogAdminRequests
             unset($payload['_token']);
 
             RequestLog::create([
-                'user_id'     => Auth::id(),
-                'method'      => $request->method(),
-                'url'         => $request->fullUrl(),
-                'ip'          => $request->ip(),
+                'user_id' => Auth::id(),
+                'method' => $request->method(),
+                'url' => $request->fullUrl(),
+                'ip' => $request->ip(),
                 'status_code' => $response->getStatusCode(),
-                'payload'     => $payload, // مدل cast می‌کند (json) — بدون json_encode دستی
+                'payload' => $payload, // مدل cast می‌کند (json) — بدون json_encode دستی
             ]);
         }
 

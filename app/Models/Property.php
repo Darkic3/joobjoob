@@ -25,6 +25,7 @@ class Property extends Model
         if (is_array($value) || is_object($value)) {
             return $value[app()->getLocale()] ?? $value['fa'] ?? null;
         }
+
         return $value;
     }
 }

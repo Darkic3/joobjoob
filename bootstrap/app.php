@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\AdminPermission;
+use App\Http\Middleware\LogAdminRequests;
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetTheme;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,13 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'adminPermission' => \App\Http\Middleware\AdminPermission::class,
-            'log.admin' => \App\Http\Middleware\LogAdminRequests::class,
+            'adminPermission' => AdminPermission::class,
+            'log.admin' => LogAdminRequests::class,
         ]);
 
         $middleware->web([
-            \App\Http\Middleware\SetLocale::class,
-            \App\Http\Middleware\SetTheme::class,
+            SetLocale::class,
+            SetTheme::class,
         ]);
 
         // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین ادمین

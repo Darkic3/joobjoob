@@ -27,6 +27,7 @@ class BlogController extends Controller
     public function create(): View
     {
         $categories = BlogCategory::where('is_active', true)->orderByDesc('id')->get();
+
         return view('admin.blogs.create', compact('categories'));
     }
 
@@ -42,6 +43,7 @@ class BlogController extends Controller
     public function edit(Blog $blog): View
     {
         $categories = BlogCategory::where('is_active', true)->orderByDesc('id')->get();
+
         return view('admin.blogs.edit', compact('blog', 'categories'));
     }
 

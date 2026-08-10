@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\File;
 class VideoHandler
 {
     public static function handle(
-        string       $folderName,
+        string $folderName,
         UploadedFile $file
-    ): ?string
-    {
+    ): ?string {
         return VideoUploader::upload($folderName, $file);
     }
 
@@ -23,7 +22,7 @@ class VideoHandler
 
         $baseUpload = config('paths.upload', 'uploads');
         $filePath = public_path("{$baseUpload}/{$folderName}/{$videoName}");
-//        $filePath = "/home/exirpd/public_html/{$baseUpload}/{$folderName}/{$videoName}";
+        //        $filePath = "/home/exirpd/public_html/{$baseUpload}/{$folderName}/{$videoName}";
 
         if (File::exists($filePath)) {
             return File::delete($filePath);

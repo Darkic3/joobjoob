@@ -10,6 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\Property;
 use App\Models\Specification;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class ProductSeeder extends Seeder
 {
@@ -36,8 +37,11 @@ class ProductSeeder extends Seeder
         // (firstWhere با کلید JSON مانند title->fa روی Collection کار نمی‌کند)
         $findValue = function ($collection, string $fa) {
             foreach ($collection as $item) {
-                if (($item->title['fa'] ?? '') === $fa) return $item;
+                if (($item->title['fa'] ?? '') === $fa) {
+                    return $item;
+                }
             }
+
             return null;
         };
 
@@ -66,8 +70,8 @@ class ProductSeeder extends Seeder
 
         // مشخصات انتخابی: رنگ (مشکی، سفید) و سایز (39-41، 42-44)
         $this->attachSelectSpecs($socks, [
-            [$colorGroup, $colorValues->filter(fn($v) => in_array($v->title['fa'] ?? '', ['مشکی', 'سفید']))],
-            [$sizeGroup, $sizeValues->filter(fn($v) => in_array($v->title['fa'] ?? '', ['39-41', '42-44']))],
+            [$colorGroup, $colorValues->filter(fn ($v) => in_array($v->title['fa'] ?? '', ['مشکی', 'سفید']))],
+            [$sizeGroup, $sizeValues->filter(fn ($v) => in_array($v->title['fa'] ?? '', ['39-41', '42-44']))],
         ]);
 
         // واریانت‌ها: ۲ رنگ × ۲ سایز
@@ -127,8 +131,8 @@ class ProductSeeder extends Seeder
         );
 
         $this->attachSelectSpecs($tshirt, [
-            [$colorGroup, $colorValues->filter(fn($v) => in_array($v->title['fa'] ?? '', ['سفید', 'مشکی', 'سورمه‌ای']))],
-            [$sizeGroup, $sizeValues->filter(fn($v) => in_array($v->title['fa'] ?? '', ['S', 'M', 'L', 'XL']))],
+            [$colorGroup, $colorValues->filter(fn ($v) => in_array($v->title['fa'] ?? '', ['سفید', 'مشکی', 'سورمه‌ای']))],
+            [$sizeGroup, $sizeValues->filter(fn ($v) => in_array($v->title['fa'] ?? '', ['S', 'M', 'L', 'XL']))],
         ]);
 
         $whiteT = $findValue($colorValues, 'سفید');
@@ -218,12 +222,13 @@ class ProductSeeder extends Seeder
 
     /**
      * اتصال مشخصات انتخابی (گروه + مقادیر) به محصول
-     * @param array<int, array{0: ?Specification, 1: \Illuminate\Support\Collection}> $groups
+     *
+     * @param  array<int, array{0: ?Specification, 1: Collection}>  $groups
      */
     private function attachSelectSpecs(Product $product, array $groups): void
     {
         foreach ($groups as [$group, $values]) {
-            if (!$group || $values->isEmpty()) {
+            if (! $group || $values->isEmpty()) {
                 continue;
             }
 

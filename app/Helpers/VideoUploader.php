@@ -10,22 +10,22 @@ class VideoUploader
     {
         $baseUpload = config('paths.upload', 'uploads');
         $base_path = public_path("{$baseUpload}/{$folderName}/");
-//        $base_path = "/home/exirpd/public_html/{$baseUpload}/{$folderName}/";
+        //        $base_path = "/home/exirpd/public_html/{$baseUpload}/{$folderName}/";
 
-        if (!is_dir($base_path)) {
+        if (! is_dir($base_path)) {
             mkdir($base_path, 0755, true);
         }
 
         $extension = $file->getClientOriginalExtension();
 
         $allowedExtensions = ['mp4', 'mkv', 'avi', 'mov', 'webm'];
-        if (!in_array(strtolower($extension), $allowedExtensions)) {
+        if (! in_array(strtolower($extension), $allowedExtensions)) {
             return null;
         }
 
-        $fileName = md5(microtime()) . '.' . $extension;
+        $fileName = md5(microtime()).'.'.$extension;
 
-        if (!$file->move($base_path, $fileName)) {
+        if (! $file->move($base_path, $fileName)) {
             return null;
         }
 

@@ -7,13 +7,13 @@ use App\Http\Requests\Admin\SpecificationRequest;
 readonly class SpecificationDTO
 {
     public function __construct(
-        private array    $title,
-        private string   $type,
-        private ?int     $parentId,
-        private bool     $isActive,
-        private bool     $isFilter,
-        private bool     $isColor,
-        private ?string  $colorCode,
+        private array $title,
+        private string $type,
+        private ?int $parentId,
+        private bool $isActive,
+        private bool $isFilter,
+        private bool $isColor,
+        private ?string $colorCode,
     ) {}
 
     public static function fromRequest(SpecificationRequest $request): self
@@ -32,11 +32,38 @@ readonly class SpecificationDTO
     }
 
     // Getters
-    public function getTitle(): array { return $this->title; }
-    public function getType(): string { return $this->type; }
-    public function getParentId(): ?int { return $this->parentId; }
-    public function getIsActive(): bool { return $this->isActive; }
-    public function getIsFilter(): bool { return $this->isFilter; }
-    public function getIsColor(): bool { return $this->isColor; }
-    public function getColorCode(): ?string { return $this->colorCode; }
+    public function getTitle(): array
+    {
+        return $this->title;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getParentId(): ?int
+    {
+        return $this->parentId;
+    }
+
+    public function getIsActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function getIsFilter(): bool
+    {
+        return $this->isFilter;
+    }
+
+    public function getIsColor(): bool
+    {
+        return $this->isColor;
+    }
+
+    public function getColorCode(): ?string
+    {
+        return $this->colorCode;
+    }
 }

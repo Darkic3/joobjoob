@@ -19,7 +19,7 @@ class ProductCategoryRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // تولید اسلاگ از روی نام فارسی اگر اسلاگ وارد نشده باشد
-        if (empty($this->slug) && !empty($this->name['fa'])) {
+        if (empty($this->slug) && ! empty($this->name['fa'])) {
             $this->merge([
                 'slug' => $this->prepareSlug($this->name['fa'], null),
             ]);
@@ -31,20 +31,20 @@ class ProductCategoryRequest extends FormRequest
         $id = $this->route('product_category')?->id;
 
         return [
-            'parent_id'             => 'nullable|exists:product_categories,id',
-            'name'                  => 'required|array',
-            'name.fa'               => 'required|string|max:100',
-            'name.en'               => 'required|string|max:100',
-            'slug'                  => ['required', 'string', 'max:150', new UrlRule(ProductCategory::class, $id)],
-            'icon'                  => 'nullable|string|max:50',
-            'image'                 => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'description'           => 'nullable|array',
-            'description.fa'        => 'nullable|string',
-            'description.en'        => 'nullable|string',
-            'meta_title'            => 'nullable|array',
-            'meta_description'      => 'nullable|array',
-            'sort_order'            => 'nullable|integer|min:0',
-            'is_active'             => 'boolean',
+            'parent_id' => 'nullable|exists:product_categories,id',
+            'name' => 'required|array',
+            'name.fa' => 'required|string|max:100',
+            'name.en' => 'required|string|max:100',
+            'slug' => ['required', 'string', 'max:150', new UrlRule(ProductCategory::class, $id)],
+            'icon' => 'nullable|string|max:50',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'description' => 'nullable|array',
+            'description.fa' => 'nullable|string',
+            'description.en' => 'nullable|string',
+            'meta_title' => 'nullable|array',
+            'meta_description' => 'nullable|array',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_active' => 'boolean',
         ];
     }
 

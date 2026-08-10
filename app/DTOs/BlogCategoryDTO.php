@@ -3,7 +3,6 @@
 namespace App\DTOs;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
 
 readonly class BlogCategoryDTO
 {

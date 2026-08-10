@@ -19,7 +19,7 @@ class BrandRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // تولید خودکار اسلاگ اگر خالی باشد
-        if (empty($this->url) && !empty($this->title['fa'])) {
+        if (empty($this->url) && ! empty($this->title['fa'])) {
             $this->merge([
                 'url' => $this->prepareSlug($this->title['fa'], null),
             ]);
@@ -31,15 +31,15 @@ class BrandRequest extends FormRequest
         $id = $this->route('brand')?->id;
 
         return [
-            'title'              => 'required|array',
-            'title.fa'           => 'required|string|max:255',
-            'title.en'           => 'nullable|string|max:255',
-            'url'                => ['required', 'string', 'max:255', new UrlRule(Brand::class, $id, 'url')],
-            'description'        => 'nullable|array',
-            'description.fa'     => 'nullable|string',
-            'description.en'     => 'nullable|string',
-            'image'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'active'             => 'boolean',
+            'title' => 'required|array',
+            'title.fa' => 'required|string|max:255',
+            'title.en' => 'nullable|string|max:255',
+            'url' => ['required', 'string', 'max:255', new UrlRule(Brand::class, $id, 'url')],
+            'description' => 'nullable|array',
+            'description.fa' => 'nullable|string',
+            'description.en' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'active' => 'boolean',
             'show_in_first_page' => 'boolean',
         ];
     }

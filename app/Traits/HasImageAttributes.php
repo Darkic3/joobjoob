@@ -8,11 +8,11 @@ trait HasImageAttributes
 {
     protected function makeImageAttribute(string $column, ?string $folder = null, string $size = 'original'): ?string
     {
-        $baseUpload = config('paths.upload','assets/uploads');
+        $baseUpload = config('paths.upload', 'assets/uploads');
         $value = $this->{$column};
 
         if (empty($value) || $value === ' ') {
-            return null; //asset('assets/admin/images/noimage.png')
+            return null; // asset('assets/admin/images/noimage.png')
         }
 
         $uploadFolder = $folder ?? Str::kebab(Str::pluralStudly(class_basename($this)));
@@ -22,11 +22,12 @@ trait HasImageAttributes
             $path = "{$baseUpload}/{$uploadFolder}/{$size}/{$value}";
         }
 
-        if(env('APP_ENV') !== "local"){
+        if (env('APP_ENV') !== 'local') {
             $fullPath = base_path('public_html/'.$path);
-        }else{
+        } else {
             $fullPath = public_path($path);
         }
-        return file_exists($fullPath) ? asset($path) : null; //asset('assets/admin/images/noimage.png')
+
+        return file_exists($fullPath) ? asset($path) : null; // asset('assets/admin/images/noimage.png')
     }
 }

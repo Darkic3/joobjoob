@@ -10,18 +10,18 @@ class ImageHandler
      * آپلود و رسیز تصویر
      */
     public static function handle(
-        string       $folderName,
+        string $folderName,
         UploadedFile $file,
-        ?array       $sizes = null
-    ): ?string
-    {
+        ?array $sizes = null
+    ): ?string {
         $fileName = ImageUploader::upload($folderName, $file);
 
-        if (!$fileName || !$sizes) {
+        if (! $fileName || ! $sizes) {
             return $fileName;
         }
 
         ImageResizer::resize($fileName, $folderName, $sizes);
+
         return $fileName;
     }
 
@@ -44,7 +44,7 @@ class ImageHandler
         }
 
         // حذف نسخه‌های رسیز شده (هر کدام در زیرپوشه خودشان)
-        if (!empty($sizes)) {
+        if (! empty($sizes)) {
             foreach (array_keys($sizes) as $sizeKey) {
                 $resizedFile = "{$basePath}/{$sizeKey}/{$image}";
                 if (is_file($resizedFile)) {

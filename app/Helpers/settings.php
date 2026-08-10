@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\SettingService;
+use Illuminate\Support\Facades\Lang;
 
 if (! function_exists('setting')) {
     /**
@@ -30,6 +31,6 @@ if (! function_exists('trans_or')) {
      */
     function trans_or(string $key, ?string $fallback = null): string
     {
-        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : ($fallback ?? $key);
+        return Lang::has($key) ? __($key) : ($fallback ?? $key);
     }
 }

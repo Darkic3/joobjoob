@@ -68,8 +68,8 @@ class AdminOwnerSeeder extends Seeder
         // ───────────────────────── ۳) ادمین اصلی ─────────────────────────
         $owner = config('admin.owner', []);
 
-        $name   = $owner['name'] ?? 'مدیر اصلی';
-        $email  = $owner['email'] ?? 'admin@shopora.test';
+        $name = $owner['name'] ?? 'مدیر اصلی';
+        $email = $owner['email'] ?? 'admin@shopora.test';
         $mobile = $owner['mobile'] ?? '09120000000';
         $password = $owner['password'] ?? null;
 
@@ -77,10 +77,10 @@ class AdminOwnerSeeder extends Seeder
         $user = User::where('email', $email)->orWhere('mobile', $mobile)->first()
             ?? new User(['email' => $email]);
 
-        $user->name      = $name;
-        $user->email     = $email;
-        $user->mobile    = $mobile;
-        $user->is_admin  = true;
+        $user->name = $name;
+        $user->email = $email;
+        $user->mobile = $mobile;
+        $user->is_admin = true;
         $user->is_active = true;
 
         if ($password) {

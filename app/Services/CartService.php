@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Product;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 /**
  * سرویس سبد خرید مبتنی بر Session.
@@ -94,7 +93,7 @@ class CartService
     {
         $coupon = session('coupon');
 
-        if (!$coupon) {
+        if (! $coupon) {
             return 0;
         }
 
@@ -123,6 +122,7 @@ class CartService
 
         if (isset($coupons[strtoupper($code)])) {
             session(['coupon' => array_merge($coupons[strtoupper($code)], ['code' => strtoupper($code)])]);
+
             return true;
         }
 

@@ -40,6 +40,7 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
     }
+
     /**
      * Reverse the migrations.
      */

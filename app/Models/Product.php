@@ -129,7 +129,7 @@ class Product extends Model
      */
     public function getMainImageAttribute(?string $value): ?string
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             return $value;
         }
 
@@ -147,12 +147,13 @@ class Product extends Model
     public function getMainImageUrlAttribute(): ?string
     {
         if ($this->main_image) {
-            return asset(config('paths.upload', 'uploads') . '/products/' . $this->main_image);
+            return asset(config('paths.upload', 'uploads').'/products/'.$this->main_image);
         }
 
         // اگر رابطه لود شده باشد از حافظه استفاده کن (بدون کوئری اضافه)
         if ($this->relationLoaded('images')) {
             $primary = $this->images->firstWhere('is_primary', true) ?? $this->images->first();
+
             return $primary?->url;
         }
 
@@ -212,6 +213,7 @@ class Product extends Model
         if ($this->has_discount && $this->price > 0) {
             return round((($this->price - $this->final_price) / $this->price) * 100);
         }
+
         return null;
     }
 
@@ -230,6 +232,7 @@ class Product extends Model
         if ($this->relationLoaded('reviews')) {
             return round($this->reviews->avg('rating') ?? 0, 1);
         }
+
         return round($this->reviews()->avg('rating') ?? 0, 1);
     }
 
@@ -238,6 +241,7 @@ class Product extends Model
         if ($this->relationLoaded('reviews')) {
             return $this->reviews->count();
         }
+
         return $this->reviews()->count();
     }
 
@@ -252,6 +256,7 @@ class Product extends Model
         if (is_array($value) || is_object($value)) {
             return $value[app()->getLocale()] ?? $value['fa'] ?? null;
         }
+
         return $value;
     }
 }

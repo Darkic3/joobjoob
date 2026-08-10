@@ -17,9 +17,9 @@ class ProductService
 
     // ابعاد رسیز شده برای هر تصویر (ImageResizer با cover-crop)
     protected const IMAGE_SIZES = [
-        'thumb'  => [300, 300],
+        'thumb' => [300, 300],
         'medium' => [800, 800],
-        'large'  => [1200, 1200],
+        'large' => [1200, 1200],
     ];
 
     /**
@@ -59,7 +59,7 @@ class ProductService
             $product->update($data);
 
             // حذف تصاویر انتخابی توسط کاربر
-            if (!empty($dto->getDeleteImages())) {
+            if (! empty($dto->getDeleteImages())) {
                 $this->deleteImagesByIds($product, $dto->getDeleteImages());
             }
 
@@ -86,6 +86,7 @@ class ProductService
     {
         return DB::transaction(function () use ($product) {
             $this->deleteOldImages($product);
+
             return $product->delete();
         });
     }
@@ -99,7 +100,7 @@ class ProductService
             ->with(['category', 'images', 'brand']); // Eager Loading برای جلوگیری از N+1
 
         // جستجو در نام فارسی/انگلیسی، برند، اسلاگ و شناسه کالا (SKU)
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name->fa', 'like', "%{$search}%")
@@ -111,26 +112,26 @@ class ProductService
         }
 
         // فیلتر دسته‌بندی
-        $query->when(!empty($filters['category']), fn($q) => $q->where('product_category_id', $filters['category']));
+        $query->when(! empty($filters['category']), fn ($q) => $q->where('product_category_id', $filters['category']));
 
         // فیلتر برند
-        $query->when(!empty($filters['brand_id']), fn($q) => $q->where('brand_id', $filters['brand_id']));
+        $query->when(! empty($filters['brand_id']), fn ($q) => $q->where('brand_id', $filters['brand_id']));
 
         // فیلتر وضعیت نمایش (فعال/غیرفعال)
-        $query->when(($filters['status'] ?? '') === '1', fn($q) => $q->where('is_active', true));
-        $query->when(($filters['status'] ?? '') === '0', fn($q) => $q->where('is_active', false));
+        $query->when(($filters['status'] ?? '') === '1', fn ($q) => $q->where('is_active', true));
+        $query->when(($filters['status'] ?? '') === '0', fn ($q) => $q->where('is_active', false));
 
         // فیلتر موجودی انبار
-        $query->when(($filters['availability'] ?? '') === 'in_stock', fn($q) => $q->where('stock', '>', 0));
-        $query->when(($filters['availability'] ?? '') === 'out_of_stock', fn($q) => $q->where('stock', '<=', 0));
+        $query->when(($filters['availability'] ?? '') === 'in_stock', fn ($q) => $q->where('stock', '>', 0));
+        $query->when(($filters['availability'] ?? '') === 'out_of_stock', fn ($q) => $q->where('stock', '<=', 0));
 
         // فیلتر بازه قیمت (بر اساس final_price طبق گزارش)
-        $query->when(isset($filters['price_min']) && $filters['price_min'] !== '', fn($q) => $q->where('final_price', '>=', (int) $filters['price_min']));
-        $query->when(isset($filters['price_max']) && $filters['price_max'] !== '', fn($q) => $q->where('final_price', '<=', (int) $filters['price_max']));
+        $query->when(isset($filters['price_min']) && $filters['price_min'] !== '', fn ($q) => $q->where('final_price', '>=', (int) $filters['price_min']));
+        $query->when(isset($filters['price_max']) && $filters['price_max'] !== '', fn ($q) => $q->where('final_price', '<=', (int) $filters['price_max']));
 
         // فیلتر محصولات ویژه و پرفروش
-        $query->when(!empty($filters['featured']), fn($q) => $q->where('is_featured', true));
-        $query->when(!empty($filters['best_seller']), fn($q) => $q->where('is_best_seller', true));
+        $query->when(! empty($filters['featured']), fn ($q) => $q->where('is_featured', true));
+        $query->when(! empty($filters['best_seller']), fn ($q) => $q->where('is_best_seller', true));
 
         // مرتب‌سازی
         $sort = $filters['sort'] ?? 'newest';
@@ -169,24 +170,24 @@ class ProductService
 
         return [
             'product_category_id' => $dto->getProductCategoryId(),
-            'brand_id'            => $dto->getBrandId(),
-            'name'                => $dto->getName(),
-            'slug'                => $dto->getSlug(),
-            'short_description'   => $dto->getShortDescription(),
-            'description'         => $dto->getDescription(),
-            'sku'                 => $dto->getSku(),
-            'price'               => $dto->getPrice(),
-            'discount_price'      => $dto->getDiscountPrice(),
-            'final_price'         => $finalPrice,
-            'stock'               => $dto->getStock(),
-            'weight'              => $dto->getWeight(),
-            'is_active'           => $dto->getIsActive(),
-            'is_featured'         => $dto->getIsFeatured(),
-            'is_best_seller'      => $dto->getIsBestSeller(),
-            'deal_ends_at'        => $dto->getDealEndsAt(),
-            'timer_active'        => $dto->getTimerActive(),
-            'start_timer'         => $dto->getStartTimer(),
-            'end_timer'           => $dto->getEndTimer(),
+            'brand_id' => $dto->getBrandId(),
+            'name' => $dto->getName(),
+            'slug' => $dto->getSlug(),
+            'short_description' => $dto->getShortDescription(),
+            'description' => $dto->getDescription(),
+            'sku' => $dto->getSku(),
+            'price' => $dto->getPrice(),
+            'discount_price' => $dto->getDiscountPrice(),
+            'final_price' => $finalPrice,
+            'stock' => $dto->getStock(),
+            'weight' => $dto->getWeight(),
+            'is_active' => $dto->getIsActive(),
+            'is_featured' => $dto->getIsFeatured(),
+            'is_best_seller' => $dto->getIsBestSeller(),
+            'deal_ends_at' => $dto->getDealEndsAt(),
+            'timer_active' => $dto->getTimerActive(),
+            'start_timer' => $dto->getStartTimer(),
+            'end_timer' => $dto->getEndTimer(),
         ];
     }
 
@@ -210,8 +211,8 @@ class ProductService
         foreach ($dto->getSpecs() as $parentId => $childIds) {
             $rows[] = [
                 'specification_id' => $parentId,
-                'value'            => null,
-                'parent_id'        => null,
+                'value' => null,
+                'parent_id' => null,
             ];
         }
 
@@ -219,8 +220,8 @@ class ProductService
         foreach ($dto->getTextSpecs() as $specId => $value) {
             $rows[] = [
                 'specification_id' => $specId,
-                'value'            => $value,
-                'parent_id'        => null,
+                'value' => $value,
+                'parent_id' => null,
             ];
         }
 
@@ -236,16 +237,16 @@ class ProductService
         // ردیف‌های فرزند (مقادیر انتخابی) — به ردیف والد خود متصل می‌شوند
         foreach ($dto->getSpecs() as $parentId => $childIds) {
             $parentRowId = $parentRows[$parentId] ?? null;
-            if (!$parentRowId) {
+            if (! $parentRowId) {
                 continue;
             }
 
             foreach ($childIds as $childId) {
                 ProductSpecification::create([
-                    'product_id'       => $product->id,
+                    'product_id' => $product->id,
                     'specification_id' => $childId,
-                    'value'            => null,
-                    'parent_id'        => $parentRowId,
+                    'value' => null,
+                    'parent_id' => $parentRowId,
                 ]);
             }
         }
@@ -273,18 +274,18 @@ class ProductService
         $variantsQuery->get()->each->delete();
 
         foreach ($submitted as $variantData) {
-            $finalPrice = !empty($variantData['discount_price']) && $variantData['discount_price'] > 0
+            $finalPrice = ! empty($variantData['discount_price']) && $variantData['discount_price'] > 0
                 ? $variantData['discount_price']
                 : $variantData['price'];
 
             $variant = ProductVariant::updateOrCreate(
                 ['id' => $variantData['id'] ?? null, 'product_id' => $product->id],
                 [
-                    'price'           => $variantData['price'],
-                    'discounted_price'=> $variantData['discount_price'],
-                    'final_price'     => $finalPrice,
-                    'stock'           => $variantData['stock'],
-                    'weight'          => $variantData['weight'] ?: 100,
+                    'price' => $variantData['price'],
+                    'discounted_price' => $variantData['discount_price'],
+                    'final_price' => $finalPrice,
+                    'stock' => $variantData['stock'],
+                    'weight' => $variantData['weight'] ?: 100,
                 ]
             );
 
@@ -301,7 +302,7 @@ class ProductService
      */
     private function aggregateVariantPrices(Product $product): void
     {
-        if (!$product->variants()->exists()) {
+        if (! $product->variants()->exists()) {
             return;
         }
 
@@ -315,10 +316,10 @@ class ProductService
 
         if ($minVariant) {
             $product->update([
-                'price'           => $minVariant->price,
-                'discounted_price'=> $minVariant->discounted_price,
-                'final_price'     => $minVariant->final_price,
-                'stock'           => $sumStock,
+                'price' => $minVariant->price,
+                'discounted_price' => $minVariant->discounted_price,
+                'final_price' => $minVariant->final_price,
+                'stock' => $sumStock,
             ]);
         } else {
             // هیچ واریانتِ موجود و قیمت‌داری نیست — فقط موجودی را جمع کن
@@ -338,8 +339,8 @@ class ProductService
         foreach ($dto->getProperties() as $index => $property) {
             Property::create([
                 'product_id' => $product->id,
-                'title'      => $property['title'],
-                'value'      => $property['value'],
+                'title' => $property['title'],
+                'value' => $property['value'],
                 'sort_order' => $index,
             ]);
         }
@@ -372,6 +373,7 @@ class ProductService
 
     /**
      * افزودن تصاویر جدید به گالری (بدون حذف تصاویر قبلی)
+     *
      * @return array<int, ProductImage> ایندکس‌شده بر اساس ایندکس فایل ارسالی
      */
     private function appendImages(Product $product, array $uploadedFiles): array
@@ -382,12 +384,12 @@ class ProductService
         foreach ($uploadedFiles as $index => $file) {
             $imagePath = ImageHandler::handle(self::UPLOAD_FOLDER, $file, self::IMAGE_SIZES);
 
-            if (!$imagePath) {
+            if (! $imagePath) {
                 continue;
             }
 
             $created[$index] = $product->images()->create([
-                'path'       => $imagePath,
+                'path' => $imagePath,
                 'is_primary' => false,
                 'sort_order' => $startSort + $index + 1,
             ]);
@@ -429,18 +431,19 @@ class ProductService
         }
 
         // ۲) تصویر اصلی از بین تصاویر جدید ارسالی
-        if (!$target && $mainNewIndex !== null && isset($newImages[$mainNewIndex])) {
+        if (! $target && $mainNewIndex !== null && isset($newImages[$mainNewIndex])) {
             $target = $newImages[$mainNewIndex];
         }
 
         // ۳) در غیر این صورت اولین تصویر گالری
-        if (!$target) {
+        if (! $target) {
             $target = $product->images()->orderBy('sort_order')->first();
         }
 
-        if (!$target) {
+        if (! $target) {
             // هیچ تصویری وجود ندارد → تصویر اصلی پاک می‌شود
             $product->update(['main_image' => null]);
+
             return;
         }
 

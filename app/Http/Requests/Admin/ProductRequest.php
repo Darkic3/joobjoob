@@ -19,7 +19,7 @@ class ProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // تولید خودکار اسلاگ اگر خالی باشد
-        if (empty($this->slug) && !empty($this->name['fa'])) {
+        if (empty($this->slug) && ! empty($this->name['fa'])) {
             $this->merge([
                 'slug' => $this->prepareSlug($this->name['fa'], null),
             ]);
@@ -34,71 +34,71 @@ class ProductRequest extends FormRequest
         $id = $this->route('product')?->id;
 
         return [
-            'product_category_id'   => 'required|exists:product_categories,id',
-            'brand_id'              => 'nullable|exists:brands,id',
-            'name'                  => 'required|array',
-            'name.fa'               => 'required|string|max:255',
-            'name.en'               => 'required|string|max:255',
-            'slug'                  => ['required', 'string', 'max:255', new UrlRule(Product::class, $id)],
+            'product_category_id' => 'required|exists:product_categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'name' => 'required|array',
+            'name.fa' => 'required|string|max:255',
+            'name.en' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:255', new UrlRule(Product::class, $id)],
 
-            'short_description'     => 'nullable|array',
-            'description'           => 'nullable|array',
+            'short_description' => 'nullable|array',
+            'description' => 'nullable|array',
 
-            'sku'                   => 'nullable|string|max:100|unique:products,sku,' . $id,
+            'sku' => 'nullable|string|max:100|unique:products,sku,'.$id,
 
-            'price'                 => 'nullable|integer|min:0',
-            'discount_price'        => 'nullable|integer|min:0',
-            'stock'                 => 'nullable|integer|min:0',
-            'weight'                => 'nullable|integer|min:0',
+            'price' => 'nullable|integer|min:0',
+            'discount_price' => 'nullable|integer|min:0',
+            'stock' => 'nullable|integer|min:0',
+            'weight' => 'nullable|integer|min:0',
 
-            'is_active'             => 'boolean',
-            'is_featured'           => 'boolean',
-            'is_best_seller'        => 'boolean',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_best_seller' => 'boolean',
 
-            'deal_ends_at'          => 'nullable|date|after:now',
-            'timer_active'          => 'boolean',
-            'start_timer'           => 'nullable|date',
-            'end_timer'             => 'nullable|date|after:start_timer',
+            'deal_ends_at' => 'nullable|date|after:now',
+            'timer_active' => 'boolean',
+            'start_timer' => 'nullable|date',
+            'end_timer' => 'nullable|date|after:start_timer',
 
             // مشخصه‌های انتخابی: [parent_id => [child_id, ...]]
-            'specs'                 => 'nullable|array',
-            'specs.*'               => 'array',
-            'specs.*.*'             => 'integer|exists:specifications,id',
+            'specs' => 'nullable|array',
+            'specs.*' => 'array',
+            'specs.*.*' => 'integer|exists:specifications,id',
 
             // مقادیر نوشتاری: [specification_id => value]
-            'text_specs'            => 'nullable|array',
-            'text_specs.*'          => 'nullable|string|max:500',
+            'text_specs' => 'nullable|array',
+            'text_specs.*' => 'nullable|string|max:500',
 
             // واریانت‌ها
-            'variants'              => 'nullable|array',
-            'variants.*.id'         => 'nullable|integer|exists:product_variants,id',
-            'variants.*.spec_ids'   => 'nullable|array',
+            'variants' => 'nullable|array',
+            'variants.*.id' => 'nullable|integer|exists:product_variants,id',
+            'variants.*.spec_ids' => 'nullable|array',
             'variants.*.spec_ids.*' => 'integer|exists:specifications,id',
-            'variants.*.price'      => 'nullable|integer|min:0',
+            'variants.*.price' => 'nullable|integer|min:0',
             'variants.*.discount_price' => 'nullable|integer|min:0',
-            'variants.*.stock'      => 'nullable|integer|min:0',
-            'variants.*.weight'     => 'nullable|integer|min:0',
+            'variants.*.stock' => 'nullable|integer|min:0',
+            'variants.*.weight' => 'nullable|integer|min:0',
 
             // ویژگی‌های آزاد (properties)
-            'properties'            => 'nullable|array',
-            'properties.*.title'    => 'nullable|string|max:255',
-            'properties.*.value'    => 'nullable|string|max:500',
+            'properties' => 'nullable|array',
+            'properties.*.title' => 'nullable|string|max:255',
+            'properties.*.value' => 'nullable|string|max:500',
 
             // محصولات مرتبط و مکمل
-            'related_ids'           => 'nullable|array',
-            'related_ids.*'         => 'integer|exists:products,id',
-            'complement_ids'        => 'nullable|array',
-            'complement_ids.*'      => 'integer|exists:products,id',
+            'related_ids' => 'nullable|array',
+            'related_ids.*' => 'integer|exists:products,id',
+            'complement_ids' => 'nullable|array',
+            'complement_ids.*' => 'integer|exists:products,id',
 
             // تصاویر
-            'images'                => 'nullable|array',
-            'images.*'              => 'image|mimes:jpg,jpeg,png,webp|max:3072',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:3072',
 
-            'delete_images'         => 'nullable|array',
-            'delete_images.*'       => 'integer',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'integer',
 
-            'main_image_id'         => 'nullable|integer',
-            'main_new_index'        => 'nullable|integer',
+            'main_image_id' => 'nullable|integer',
+            'main_new_index' => 'nullable|integer',
         ];
     }
 

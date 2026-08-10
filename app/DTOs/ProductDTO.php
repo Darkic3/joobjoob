@@ -8,34 +8,34 @@ use Illuminate\Http\UploadedFile;
 readonly class ProductDTO
 {
     public function __construct(
-        private int             $productCategoryId,
-        private ?int            $brandId,
-        private array           $name,
-        private string          $slug,
-        private ?array          $shortDescription,
-        private ?array          $description,
-        private ?string         $sku,
-        private int             $price,
-        private ?int            $discountPrice,
-        private int             $stock,
-        private ?int            $weight,
-        private bool            $isActive,
-        private bool            $isFeatured,
-        private bool            $isBestSeller,
-        private ?string         $dealEndsAt,
-        private ?string         $startTimer,
-        private ?string         $endTimer,
-        private bool            $timerActive,
-        private array           $specs,        // [parent_id => [child specification_id, ...]] — مشخصه‌های انتخابی
-        private array           $textSpecs,    // [specification_id => value] — مقادیر نوشتاری
-        private array           $variants,     // [['id'=>?, 'spec_ids'=>[], 'price'=>, 'discount_price'=>, 'stock'=>, 'weight'=>], ...]
-        private array           $properties,   // [['id'=>?, 'title'=>, 'value'=>], ...]
-        private array           $relatedIds,   // شناسه محصولات مرتبط
-        private array           $complementIds,// شناسه محصولات مکمل
-        private array           $images,       // آرایه‌ای از UploadedFile (تصاویر جدید)
-        private array           $deleteImages, // شناسه‌های تصاویر موجود که باید حذف شوند
-        private ?int            $mainImageId,  // شناسه تصویر اصلی (موجود)
-        private ?int            $mainNewIndex, // ایندکس تصویر اصلی در میان تصاویر جدید
+        private int $productCategoryId,
+        private ?int $brandId,
+        private array $name,
+        private string $slug,
+        private ?array $shortDescription,
+        private ?array $description,
+        private ?string $sku,
+        private int $price,
+        private ?int $discountPrice,
+        private int $stock,
+        private ?int $weight,
+        private bool $isActive,
+        private bool $isFeatured,
+        private bool $isBestSeller,
+        private ?string $dealEndsAt,
+        private ?string $startTimer,
+        private ?string $endTimer,
+        private bool $timerActive,
+        private array $specs,        // [parent_id => [child specification_id, ...]] — مشخصه‌های انتخابی
+        private array $textSpecs,    // [specification_id => value] — مقادیر نوشتاری
+        private array $variants,     // [['id'=>?, 'spec_ids'=>[], 'price'=>, 'discount_price'=>, 'stock'=>, 'weight'=>], ...]
+        private array $properties,   // [['id'=>?, 'title'=>, 'value'=>], ...]
+        private array $relatedIds,   // شناسه محصولات مرتبط
+        private array $complementIds,// شناسه محصولات مکمل
+        private array $images,       // آرایه‌ای از UploadedFile (تصاویر جدید)
+        private array $deleteImages, // شناسه‌های تصاویر موجود که باید حذف شوند
+        private ?int $mainImageId,  // شناسه تصویر اصلی (موجود)
+        private ?int $mainNewIndex, // ایندکس تصویر اصلی در میان تصاویر جدید
     ) {}
 
     public static function fromRequest(ProductRequest $request): self
@@ -50,12 +50,12 @@ readonly class ProductDTO
             }
 
             $variants[] = [
-                'id'             => !empty($v['id']) ? (int) $v['id'] : null,
-                'spec_ids'       => array_values(array_filter(array_map('intval', (array) ($v['spec_ids'] ?? [])))),
-                'price'          => $price,
+                'id' => ! empty($v['id']) ? (int) $v['id'] : null,
+                'spec_ids' => array_values(array_filter(array_map('intval', (array) ($v['spec_ids'] ?? [])))),
+                'price' => $price,
                 'discount_price' => (int) ($v['discount_price'] ?? 0),
-                'stock'          => $stock,
-                'weight'         => (int) ($v['weight'] ?? 100),
+                'stock' => $stock,
+                'weight' => (int) ($v['weight'] ?? 100),
             ];
         }
 
@@ -68,7 +68,7 @@ readonly class ProductDTO
             }
 
             $properties[] = [
-                'id'    => !empty($p['id']) ? (int) $p['id'] : null,
+                'id' => ! empty($p['id']) ? (int) $p['id'] : null,
                 'title' => ['fa' => $title, 'en' => $title],
                 'value' => $value,
             ];
@@ -114,10 +114,11 @@ readonly class ProductDTO
         $result = [];
         foreach ((array) $input as $parentId => $children) {
             $ids = array_values(array_filter(array_map('intval', (array) $children)));
-            if (!empty($ids)) {
+            if (! empty($ids)) {
                 $result[(int) $parentId] = $ids;
             }
         }
+
         return $result;
     }
 
@@ -133,36 +134,148 @@ readonly class ProductDTO
                 $result[(int) $specId] = $value;
             }
         }
+
         return $result;
     }
 
     // Getters
-    public function getProductCategoryId(): int { return $this->productCategoryId; }
-    public function getBrandId(): ?int { return $this->brandId; }
-    public function getName(): array { return $this->name; }
-    public function getSlug(): string { return $this->slug; }
-    public function getShortDescription(): ?array { return $this->shortDescription; }
-    public function getDescription(): ?array { return $this->description; }
-    public function getSku(): ?string { return $this->sku; }
-    public function getPrice(): int { return $this->price; }
-    public function getDiscountPrice(): ?int { return $this->discountPrice; }
-    public function getStock(): int { return $this->stock; }
-    public function getWeight(): ?int { return $this->weight; }
-    public function getIsActive(): bool { return $this->isActive; }
-    public function getIsFeatured(): bool { return $this->isFeatured; }
-    public function getIsBestSeller(): bool { return $this->isBestSeller; }
-    public function getDealEndsAt(): ?string { return $this->dealEndsAt; }
-    public function getStartTimer(): ?string { return $this->startTimer; }
-    public function getEndTimer(): ?string { return $this->endTimer; }
-    public function getTimerActive(): bool { return $this->timerActive; }
-    public function getSpecs(): array { return $this->specs; }
-    public function getTextSpecs(): array { return $this->textSpecs; }
-    public function getVariants(): array { return $this->variants; }
-    public function getProperties(): array { return $this->properties; }
-    public function getRelatedIds(): array { return $this->relatedIds; }
-    public function getComplementIds(): array { return $this->complementIds; }
-    public function getImages(): array { return $this->images; }
-    public function getDeleteImages(): array { return $this->deleteImages; }
-    public function getMainImageId(): ?int { return $this->mainImageId; }
-    public function getMainNewIndex(): ?int { return $this->mainNewIndex; }
+    public function getProductCategoryId(): int
+    {
+        return $this->productCategoryId;
+    }
+
+    public function getBrandId(): ?int
+    {
+        return $this->brandId;
+    }
+
+    public function getName(): array
+    {
+        return $this->name;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function getShortDescription(): ?array
+    {
+        return $this->shortDescription;
+    }
+
+    public function getDescription(): ?array
+    {
+        return $this->description;
+    }
+
+    public function getSku(): ?string
+    {
+        return $this->sku;
+    }
+
+    public function getPrice(): int
+    {
+        return $this->price;
+    }
+
+    public function getDiscountPrice(): ?int
+    {
+        return $this->discountPrice;
+    }
+
+    public function getStock(): int
+    {
+        return $this->stock;
+    }
+
+    public function getWeight(): ?int
+    {
+        return $this->weight;
+    }
+
+    public function getIsActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function getIsFeatured(): bool
+    {
+        return $this->isFeatured;
+    }
+
+    public function getIsBestSeller(): bool
+    {
+        return $this->isBestSeller;
+    }
+
+    public function getDealEndsAt(): ?string
+    {
+        return $this->dealEndsAt;
+    }
+
+    public function getStartTimer(): ?string
+    {
+        return $this->startTimer;
+    }
+
+    public function getEndTimer(): ?string
+    {
+        return $this->endTimer;
+    }
+
+    public function getTimerActive(): bool
+    {
+        return $this->timerActive;
+    }
+
+    public function getSpecs(): array
+    {
+        return $this->specs;
+    }
+
+    public function getTextSpecs(): array
+    {
+        return $this->textSpecs;
+    }
+
+    public function getVariants(): array
+    {
+        return $this->variants;
+    }
+
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    public function getRelatedIds(): array
+    {
+        return $this->relatedIds;
+    }
+
+    public function getComplementIds(): array
+    {
+        return $this->complementIds;
+    }
+
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+    public function getDeleteImages(): array
+    {
+        return $this->deleteImages;
+    }
+
+    public function getMainImageId(): ?int
+    {
+        return $this->mainImageId;
+    }
+
+    public function getMainNewIndex(): ?int
+    {
+        return $this->mainNewIndex;
+    }
 }

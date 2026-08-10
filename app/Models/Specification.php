@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -41,7 +42,7 @@ class Specification extends Model
             ->orderBy('id')->with('children');
     }
 
-    public function products(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_specification')
             ->withPivot('value', 'parent_id')
@@ -53,7 +54,7 @@ class Specification extends Model
         return $this->hasMany(ProductSpecification::class, 'specification_id');
     }
 
-    public function variants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function variants(): BelongsToMany
     {
         return $this->belongsToMany(ProductVariant::class, 'product_variant_specification',
             'specification_id', 'product_variant_id');
@@ -84,6 +85,7 @@ class Specification extends Model
         if (is_array($value) || is_object($value)) {
             return $value[app()->getLocale()] ?? $value['fa'] ?? null;
         }
+
         return $value;
     }
 }

@@ -27,7 +27,7 @@ class ProductImage extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset(config('paths.upload', 'uploads') . '/products/' . $this->path);
+        return asset(config('paths.upload', 'uploads').'/products/'.$this->path);
     }
 
     // نسخه رسیز شده کوچک (اگر وجود داشته باشد)
@@ -53,7 +53,7 @@ class ProductImage extends Model
      */
     private function resizedUrl(string $sizeKey): ?string
     {
-        $path = config('paths.upload', 'uploads') . '/products/' . $sizeKey . '/' . $this->path;
+        $path = config('paths.upload', 'uploads').'/products/'.$sizeKey.'/'.$this->path;
 
         // اگر فایل رسیز شده وجود نداشته باشد به تصویر اصلی برمی‌گردیم
         if (is_file(public_path($path))) {
@@ -69,6 +69,7 @@ class ProductImage extends Model
         if (is_array($alt)) {
             return $alt[app()->getLocale()] ?? $alt['fa'] ?? null;
         }
+
         return $alt;
     }
 }

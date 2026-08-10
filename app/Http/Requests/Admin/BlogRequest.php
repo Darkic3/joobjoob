@@ -5,7 +5,6 @@ namespace App\Http\Requests\Admin;
 use App\Models\Blog;
 use App\Rules\UrlRule;
 use App\Traits\HasSlug;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BlogRequest extends FormRequest
@@ -31,13 +30,13 @@ class BlogRequest extends FormRequest
         $id = $this->route('blog')?->id;
 
         return [
-            'title'            => 'required|string|max:255',
-            'slug'             => ['required', 'string', 'max:255', new UrlRule(Blog::class, $id)],
-            'excerpt'          => 'nullable|string',
-            'content'          => 'required|string',
-            'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'title' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:255', new UrlRule(Blog::class, $id)],
+            'excerpt' => 'nullable|string',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'blog_category_id' => 'nullable|exists:blog_categories,id',
-            'is_active'        => 'boolean',
+            'is_active' => 'boolean',
             'show_in_first_page' => 'boolean',
         ];
     }

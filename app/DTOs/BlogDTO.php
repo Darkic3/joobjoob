@@ -8,16 +8,16 @@ use Illuminate\Http\UploadedFile;
 readonly class BlogDTO
 {
     public function __construct(
-        private string        $title,
-        private string        $slug,
-        private ?string       $excerpt,
-        private string        $content,
-        private ?int          $blogCategoryId,
-        private bool          $isActive,
-        private bool          $showInFirstPage,
+        private string $title,
+        private string $slug,
+        private ?string $excerpt,
+        private string $content,
+        private ?int $blogCategoryId,
+        private bool $isActive,
+        private bool $showInFirstPage,
         private ?UploadedFile $image,
-        private bool          $removeImage = false,
-        private ?int          $userId = null,
+        private bool $removeImage = false,
+        private ?int $userId = null,
     ) {}
 
     public static function fromRequest(BlogRequest $request, ?int $userId = null): self
@@ -37,14 +37,53 @@ readonly class BlogDTO
     }
 
     // Getters
-    public function getTitle(): string { return $this->title; }
-    public function getSlug(): string { return $this->slug; }
-    public function getExcerpt(): ?string { return $this->excerpt; }
-    public function getContent(): string { return $this->content; }
-    public function getBlogCategoryId(): ?int { return $this->blogCategoryId; }
-    public function getIsActive(): bool { return $this->isActive; }
-    public function getShowInFirstPage(): bool { return $this->showInFirstPage; }
-    public function getImage(): ?UploadedFile { return $this->image; }
-    public function getRemoveImage(): bool { return $this->removeImage; }
-    public function getUserId(): ?int { return $this->userId; }
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function getExcerpt(): ?string
+    {
+        return $this->excerpt;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function getBlogCategoryId(): ?int
+    {
+        return $this->blogCategoryId;
+    }
+
+    public function getIsActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function getShowInFirstPage(): bool
+    {
+        return $this->showInFirstPage;
+    }
+
+    public function getImage(): ?UploadedFile
+    {
+        return $this->image;
+    }
+
+    public function getRemoveImage(): bool
+    {
+        return $this->removeImage;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
 }
