@@ -127,32 +127,16 @@
                 {{ __('admin.blogs.featured_image') }}
             </h3>
 
-            <div class="space-y-3">
-                @if($blog && $blog->image)
-                    <div class="relative group">
-                        {{-- ✅ اصلاح آدرس تصویر برای هماهنگی با ImageUploader --}}
-                        <img src="{{ asset(config('paths.upload', 'uploads') . '/blogs/' . $blog->image) }}"
-                             class="w-full rounded-lg border border-gray-200 dark:border-gray-600 object-cover"
-                             alt="{{ __('admin.blogs.featured_image') }}">
-                        <button type="button" onclick="this.parentElement.remove()"
-                                class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm opacity-0 group-hover:opacity-100">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                @endif
-
-                <input type="file" name="image" accept="image/*"
-                       class="input-custom file:ms-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300 cursor-pointer w-full">
-
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ __('admin.blogs.image_formats') }}
-                </p>
-                @error('image')
-                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            {{-- پیش‌نمایش + کراپ تصویر با کامپوننت همگانی image-upload --}}
+            <x-admin.image-upload
+                name="image"
+                :label="__('admin.blogs.featured_image')"
+                :currentImage="$blog?->image_url"
+                :removable="true"
+                :hint="__('admin.blogs.image_formats')"
+                :cropAspectRatio="1.77777777777778"
+                :cropWidth="1600"
+                :cropHeight="900" />
         </div>
     </div>
 </div>

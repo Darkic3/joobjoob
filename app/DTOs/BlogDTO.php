@@ -16,6 +16,7 @@ readonly class BlogDTO
         private bool          $isActive,
         private bool          $showInFirstPage,
         private ?UploadedFile $image,
+        private bool          $removeImage = false,
         private ?int          $userId = null,
     ) {}
 
@@ -30,6 +31,7 @@ readonly class BlogDTO
             isActive: $request->boolean('is_active'),
             showInFirstPage: $request->boolean('show_in_first_page'),
             image: $request->file('image'),
+            removeImage: $request->boolean('remove_image'),
             userId: $userId
         );
     }
@@ -43,5 +45,6 @@ readonly class BlogDTO
     public function getIsActive(): bool { return $this->isActive; }
     public function getShowInFirstPage(): bool { return $this->showInFirstPage; }
     public function getImage(): ?UploadedFile { return $this->image; }
+    public function getRemoveImage(): bool { return $this->removeImage; }
     public function getUserId(): ?int { return $this->userId; }
 }

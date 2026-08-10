@@ -63,11 +63,16 @@
         @enderror
     </div>
 
-    {{-- تصویر --}}
-    <x-admin.image-upload
-        name="image"
-        :label="__('admin.blog_categories.field_image')"
-        :currentImage="$category?->image_url" />
+    {{-- تصویر — تمام‌عرض در گرید دو ستونه --}}
+    <div class="md:col-span-2">
+        <x-admin.image-upload
+            name="image"
+            :label="__('admin.blog_categories.field_image')"
+            :currentImage="$category?->image_url"
+            :cropAspectRatio="1"
+            :cropWidth="800"
+            :cropHeight="800" />
+    </div>
 
     {{-- توضیحات --}}
     <div class="md:col-span-2">

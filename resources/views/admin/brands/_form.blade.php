@@ -19,15 +19,16 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{{ __('admin.brands.logo') }}</label>
-        @if($brand && $brand->image)
-            <div class="mb-2">
-                <img src="{{ asset(config('paths.upload', 'uploads') . '/brands/' . $brand->image) }}" class="w-24 h-24 object-contain rounded-xl border border-gray-200 dark:border-gray-600 bg-white" alt="{{ __('admin.brands.logo') }}">
-            </div>
-        @endif
-        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="input-custom cursor-pointer">
-        <p class="text-xs text-gray-400 mt-1.5">{{ __('admin.brands.logo_formats') }}</p>
-        @error('image') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+        {{-- پیش‌نمایش + کراپ لوگو با کامپوننت همگانی image-upload --}}
+        <x-admin.image-upload
+            name="image"
+            :label="__('admin.brands.logo')"
+            :currentImage="$brand?->item_image"
+            :removable="true"
+            :hint="__('admin.brands.logo_formats')"
+            :cropAspectRatio="1"
+            :cropWidth="800"
+            :cropHeight="800" />
     </div>
 
     <div class="md:col-span-2">

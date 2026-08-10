@@ -41,6 +41,10 @@ class BrandService
             }
 
             $data['image'] = ImageHandler::handle(self::UPLOAD_FOLDER, $image, self::IMAGE_SIZES);
+        } elseif ($dto->getRemoveImage() && $brand->image) {
+            // حذف واقعی تصویر فعلی (دکمهٔ حذف در کامپوننت آپلود)
+            ImageHandler::delete(self::UPLOAD_FOLDER, $brand->image, self::IMAGE_SIZES);
+            $data['image'] = null;
         }
 
         return $brand->update($data);

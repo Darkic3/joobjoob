@@ -26,6 +26,10 @@ class BlogService
         if ($dto->getImage()) {
             $this->deleteImage($blog->image);
             $data['image'] = $this->handleImageUpload($dto->getImage());
+        } elseif ($dto->getRemoveImage() && $blog->image) {
+            // حذف واقعی تصویر فعلی (دکمهٔ حذف در کامپوننت آپلود)
+            $this->deleteImage($blog->image);
+            $data['image'] = null;
         }
 
         return $blog->update($data);

@@ -126,7 +126,10 @@
                 :label="__('admin.product_categories.field_image')"
                 :currentImage="$category?->image_url"
                 :removable="true"
-                :hint="__('admin.product_categories.image_hint')" />
+                :hint="__('admin.product_categories.image_hint')"
+                :cropAspectRatio="1"
+                :cropWidth="800"
+                :cropHeight="800" />
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 space-y-4">

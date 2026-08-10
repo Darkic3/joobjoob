@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Blog extends Model
 {
@@ -12,7 +12,7 @@ class Blog extends Model
 
     protected $fillable = [
         'blog_category_id', 'user_id', 'title', 'slug', 'excerpt',
-        'content', 'image', 'views', 'is_active', 'show_in_first_page'
+        'content', 'image', 'views', 'is_active', 'show_in_first_page',
     ];
 
     protected function casts(): array
@@ -50,5 +50,12 @@ class Blog extends Model
     public function incrementViews(): void
     {
         $this->increment('views');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image
+            ? asset(config('paths.upload', 'uploads').'/blogs/'.$this->image)
+            : null;
     }
 }

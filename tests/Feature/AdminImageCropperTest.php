@@ -39,6 +39,11 @@ class AdminImageCropperTest extends TestCase
 
         // کامپوننت image-upload کراپ داخلی دارد و نباید دوباره توسط هندلر سراسری کراپ شود
         $this->assertStringContainsString('data-no-crop', $html);
+
+        // نسبت و ابعاد خروجی کراپ دسته‌بندی: مربع ۱:۱ @ ۸۰۰x۸۰۰
+        $this->assertStringContainsString('cropAspectRatio: 1', $html);
+        $this->assertStringContainsString('cropWidth: 800', $html);
+        $this->assertStringContainsString('cropHeight: 800', $html);
     }
 
     public function test_brand_form_has_global_cropper_for_raw_file_input(): void
@@ -48,6 +53,43 @@ class AdminImageCropperTest extends TestCase
         $html = $this->get(route('admin.brands.create'))->assertOk()->getContent();
 
         $this->assertStringContainsString('window.ImageCropper', $html);
+        // برند حالا از کامپوننت image-upload با دراپ‌زون و پیش‌نمایش کراپ استفاده می‌کند
+        $this->assertStringContainsString('dropzone-area', $html);
         $this->assertStringContainsString('name="image"', $html);
+
+        // نسبت و ابعاد خروجی کراپ لوگوی برند: مربع ۱:۱ @ ۸۰۰x۸۰۰
+        $this->assertStringContainsString('cropAspectRatio: 1', $html);
+        $this->assertStringContainsString('cropWidth: 800', $html);
+        $this->assertStringContainsString('cropHeight: 800', $html);
+    }
+
+    public function test_hero_slide_form_uses_image_upload_with_preview(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('window.ImageCropper', $html);
+        $this->assertStringContainsString('dropzone-area', $html);
+
+        // نسبت و ابعاد خروجی کراپ هیرو: ۱۶:۵ @ ۱۹۲۰x۶۰۰
+        $this->assertStringContainsString('cropAspectRatio: 3.2', $html);
+        $this->assertStringContainsString('cropWidth: 1920', $html);
+        $this->assertStringContainsString('cropHeight: 600', $html);
+    }
+
+    public function test_blog_form_uses_image_upload_with_preview(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $html = $this->get(route('admin.blogs.create'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('window.ImageCropper', $html);
+        $this->assertStringContainsString('dropzone-area', $html);
+
+        // نسبت و ابعاد خروجی کراپ تصویر شاخص بلاگ: ۱۶:۹ @ ۱۶۰۰x۹۰۰
+        $this->assertStringContainsString('cropAspectRatio: 1.77777777777778', $html);
+        $this->assertStringContainsString('cropWidth: 1600', $html);
+        $this->assertStringContainsString('cropHeight: 900', $html);
     }
 }

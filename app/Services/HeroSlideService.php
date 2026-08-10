@@ -42,6 +42,10 @@ class HeroSlideService
         if ($dto->image) {
             $this->deleteImage($slide->image);
             $data['image'] = $this->handleImageUpload($dto->image);
+        } elseif ($dto->removeImage && $slide->image) {
+            // حذف واقعی تصویر فعلی (دکمهٔ حذف در کامپوننت آپلود)
+            $this->deleteImage($slide->image);
+            $data['image'] = null;
         }
 
         return $slide->update($data);

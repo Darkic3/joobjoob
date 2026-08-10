@@ -12,6 +12,7 @@ readonly class BrandDTO
         private string          $url,
         private ?array          $description,
         private ?UploadedFile   $image,
+        private bool            $removeImage = false,
         private bool            $isActive,
         private bool            $showInFirstPage,
     ) {}
@@ -23,6 +24,7 @@ readonly class BrandDTO
             url: $request->validated('url'),
             description: $request->validated('description'),
             image: $request->file('image'),
+            removeImage: $request->boolean('remove_image'),
             isActive: $request->boolean('active', true),
             showInFirstPage: $request->boolean('show_in_first_page'),
         );
@@ -33,6 +35,7 @@ readonly class BrandDTO
     public function getUrl(): string { return $this->url; }
     public function getDescription(): ?array { return $this->description; }
     public function getImage(): ?UploadedFile { return $this->image; }
+    public function getRemoveImage(): bool { return $this->removeImage; }
     public function getIsActive(): bool { return $this->isActive; }
     public function getShowInFirstPage(): bool { return $this->showInFirstPage; }
 }

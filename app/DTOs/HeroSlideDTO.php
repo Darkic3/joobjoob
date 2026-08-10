@@ -28,6 +28,7 @@ readonly class HeroSlideDTO
         public ?int $viewers,
         public array $trusts,
         public ?UploadedFile $image,
+        public bool $removeImage,
         public bool $is_active,
     ) {}
 
@@ -57,6 +58,7 @@ readonly class HeroSlideDTO
             viewers: $viewersActive ? $request->integer('viewers', 0) : null,
             trusts: self::normalizeTrusts((array) $request->input('trusts', [])),
             image: $request->file('image'),
+            removeImage: $request->boolean('remove_image'),
             is_active: $request->boolean('is_active'),
         );
     }

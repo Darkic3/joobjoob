@@ -11,7 +11,7 @@
     'cropHeight' => null,
 ])
 
-<div class="col-span-2">
+<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ $label }}</label>
 
     <div class="flex flex-col sm:flex-row gap-4">
