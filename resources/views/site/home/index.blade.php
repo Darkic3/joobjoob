@@ -29,15 +29,20 @@
     @if($deals->isNotEmpty())
         <section id="deals" class="reveal-on-scroll py-6">
             <div class="deals-shell relative overflow-hidden p-5 md:p-8">
-                {{-- هالهٔ تزئینی --}}
+                {{-- هالهٔ آتش --}}
                 <div class="deals-glow" aria-hidden="true"></div>
+
+                {{-- ذرات آتش بالارونده --}}
+                <div class="deals-embers" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
 
                 <div class="relative z-10">
                     <div class="flex flex-wrap items-center justify-between gap-5 mb-8">
                         <div class="flex items-center gap-3.5">
                             <span class="deals-flame" aria-hidden="true">🔥</span>
                             <div>
-                                <h2 class="font-black text-xl leading-tight">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
+                                <h2 class="deals-title font-black text-xl leading-tight">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
                                 <p class="text-xs mt-1" style="color: var(--text-secondary);">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
                             </div>
                         </div>

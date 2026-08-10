@@ -408,11 +408,14 @@
    5) پیشنهادات داغ (تایمردار) + شمارش معکوس
    ========================================================================== */
 
-/* ---------- 5.1) پوستهٔ بخش ---------- */
+/* ---------- 5.1) پوستهٔ بخش — آتشی و ویژه ---------- */
 .deals-shell {
     position: relative;
     border-radius: var(--radius-lg);
-    background: linear-gradient(145deg, var(--bg-elevated) 55%, color-mix(in srgb, var(--bg-elevated) 88%, var(--urgency) 12%));
+    /* پس‌زمینهٔ گرم: از رنگ پایه به تنت آتش (نارنجی-قرمز) */
+    background: linear-gradient(145deg,
+        var(--bg-elevated) 30%,
+        color-mix(in srgb, var(--bg-elevated) 78%, #ff8a3d 22%) 100%);
     box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
     transition: box-shadow .25s ease;
 }
@@ -420,30 +423,39 @@
     content: '';
     position: absolute;
     inset: 0 0 auto 0;
-    height: 4px;
+    height: 5px;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    background: linear-gradient(90deg, var(--urgency), var(--gold), var(--urgency));
-    background-size: 200% 100%;
-    animation: dealsStrip 6s linear infinite;
+    background: linear-gradient(90deg, var(--urgency), var(--gold), #ff8a3d, var(--urgency));
+    background-size: 250% 100%;
+    animation: dealsStrip 5s linear infinite;
+    filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--urgency) 45%, transparent));
 }
 @keyframes dealsStrip {
     from { background-position: 0 0; }
-    to   { background-position: 200% 0; }
+    to   { background-position: 250% 0; }
 }
 
-/* هالهٔ تزئینی گوشه */
+/* هالهٔ آتش در گوشه — گرم‌تر و درخشان‌تر */
 .deals-glow {
     position: absolute;
-    top: -120px;
-    inset-inline-end: -80px;
-    width: 340px;
-    height: 340px;
+    top: -140px;
+    inset-inline-end: -90px;
+    width: 420px;
+    height: 420px;
     border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--urgency) 16%, transparent), transparent 70%);
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--gold) 26%, transparent),
+        color-mix(in srgb, var(--urgency) 12%, transparent) 45%,
+        transparent 70%);
     pointer-events: none;
+    animation: glowBreath 5s ease-in-out infinite;
+}
+@keyframes glowBreath {
+    0%, 100% { opacity: .75; }
+    50%      { opacity: 1; }
 }
 
-/* آیکون شعلهٔ متحرک */
+/* آیکون شعلهٔ متحرک با هالهٔ نئونی */
 .deals-flame {
     display: inline-grid;
     place-items: center;
@@ -454,11 +466,66 @@
     font-size: 1.45rem;
     background: var(--bg-elevated);
     box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-    animation: flameBob 2.4s ease-in-out infinite;
+    animation: flameBob 2.4s ease-in-out infinite, flameGlow 2.4s ease-in-out infinite;
 }
 @keyframes flameBob {
     0%, 100% { transform: translateY(0) scale(1); }
-    50%      { transform: translateY(-4px) scale(1.06); }
+    50%      { transform: translateY(-4px) scale(1.08); }
+}
+@keyframes flameGlow {
+    0%, 100% { box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light), 0 0 10px color-mix(in srgb, var(--urgency) 28%, transparent); }
+    50%      { box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light), 0 0 26px color-mix(in srgb, var(--urgency) 60%, transparent); }
+}
+
+/* تیتر گرادینتی آتشی (با fallback برای مرورگرهای قدیمی) */
+.deals-title {
+    color: var(--text-primary);
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .deals-title {
+        background: linear-gradient(90deg, var(--gold), #ff8a3d 55%, var(--urgency));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}
+
+/* ذرات آتش بالارونده (embers) */
+.deals-embers {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+}
+.deals-embers span {
+    position: absolute;
+    bottom: 6%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gold), var(--urgency));
+    opacity: 0;
+    animation: emberRise 5.5s linear infinite;
+}
+.deals-embers span:nth-child(1) { left: 10%;  --drift: 14px;  animation-delay: 0s;    animation-duration: 5.5s; }
+.deals-embers span:nth-child(2) { left: 28%;  --drift: -18px; animation-delay: 1.7s;  animation-duration: 6.4s; width: 4px; height: 4px; }
+.deals-embers span:nth-child(3) { left: 52%;  --drift: 10px;  animation-delay: 3.1s;  animation-duration: 5s;   width: 6px; height: 6px; }
+.deals-embers span:nth-child(4) { left: 74%;  --drift: -12px; animation-delay: .9s;   animation-duration: 6.9s; width: 4px; height: 4px; }
+.deals-embers span:nth-child(5) { left: 90%;  --drift: 16px;  animation-delay: 2.5s;  animation-duration: 5.9s; width: 5px; height: 5px; }
+@keyframes emberRise {
+    0%   { transform: translateY(0) translateX(0) scale(.5); opacity: 0; }
+    12%  { opacity: .95; }
+    55%  { opacity: .65; }
+    100% { transform: translateY(-400px) translateX(var(--drift, 12px)) scale(1.1); opacity: 0; }
+}
+
+/* احترام به تنظیمات کاهش حرکت کاربر */
+@media (prefers-reduced-motion: reduce) {
+    .deals-embers span,
+    .deals-flame,
+    .deals-shell::before,
+    .deals-glow { animation: none; }
 }
 
 /* ---------- 5.2) شمارش معکوس ---------- */
