@@ -96,11 +96,11 @@
                 Swal.fire({
                     icon: 'error',
                     title: @json(__('admin.common.save_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    html: '<ul class="text-start ps-4 mb-0">' + errorMessages.map(function (m) {
-                        return '<li class="mb-1">' + escHtml(m) + '</li>';
+                    // لیست خطاها وسط‌چین — بدون بولت، با فاصلهٔ راحت
+                    html: '<ul class="mb-0" style="list-style:none; padding:0; text-align:center;">' + errorMessages.map(function (m) {
+                        return '<li class="mb-2 last:mb-0">' + escHtml(m) + '</li>';
                     }).join('') + '</ul>',
                     confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    confirmButtonColor: '#d33',
                 });
             }
         @endif

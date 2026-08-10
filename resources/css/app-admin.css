@@ -581,15 +581,15 @@
     transform: translateY(-1px);
 }
 
-/* RTL — متن‌ها و چیدمان برای زبان‌های راست‌به‌چپ */
+/* RTL — متن‌ها و چیدمان برای زبان‌های راست‌به‌چپ
+   عنوان و متن وسط‌چین می‌مانند (مثل حالت پیش‌فرض SweetAlert2) — فقط جهت/فونت درست می‌شود */
 [dir='rtl'] .swal2-popup {
     direction: rtl;
-    text-align: right;
 }
 
 [dir='rtl'] .swal2-title,
 [dir='rtl'] .swal2-html-container {
-    text-align: right;
+    text-align: center;
 }
 
 [dir='rtl'] .swal2-actions {

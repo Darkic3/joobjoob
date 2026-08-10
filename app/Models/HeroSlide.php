@@ -29,7 +29,10 @@ class HeroSlide extends Model
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_active', true)->orderBy('sort_order', 'asc');
+        // linkable برای fallback تصویر (وقتی اسلاید تصویری ندارد، از مدل لینک‌شده می‌گیرد)
+        return $query->where('is_active', true)
+            ->with('linkable')
+            ->orderBy('sort_order', 'asc');
     }
 
     public function linkable(): MorphTo
@@ -179,7 +182,8 @@ class HeroSlide extends Model
     }
 
     /**
-     * آدرس تصویر اسلاید — لینک خارجی یا مسیر آپلود محلی.
+     * آدرس تصویر اسلاید — لینک خارجی، مسیر آپلود محلی، یا تصویر مدل لینک‌شده
+     * (اگر اسلاید تصویری ندارد ولی به محصول/دسته/مقاله لینک شده، تصویر همان مدل استفاده می‌شود).
      */
     public function imageUrl(): string
     {
@@ -187,7 +191,29 @@ class HeroSlide extends Model
             return $this->image;
         }
 
-        return asset(config('paths.upload', 'uploads').'/hero-slides/'.$this->image);
+        if (! empty($this->image)) {
+            return asset(config('paths.upload', 'uploads').'/hero-slides/'.$this->image);
+        }
+
+        return $this->linkedModelImage() ?? '';
+    }
+
+    /**
+     * تصویر مدل لینک‌شده (محصول → تصویر اصلی، دسته/مقاله → تصویر شاخص).
+     */
+    private function linkedModelImage(): ?string
+    {
+        $model = $this->linkable;
+        if (! $model) {
+            return null;
+        }
+
+        $url = method_exists($model, 'getMainImageUrlAttribute') ? $model->main_image_url : null;
+        if (! $url && method_exists($model, 'getImageUrlAttribute')) {
+            $url = $model->image_url;
+        }
+
+        return $url ?: null;
     }
 
     /**
