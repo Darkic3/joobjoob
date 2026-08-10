@@ -45,8 +45,10 @@
                             </button>
                         </div>
 
-                        <div class="p-4 overflow-auto bg-gray-100 dark:bg-gray-900">
-                            <img id="image-cropper-source" alt="تصویر برای برش" class="block max-w-full mx-auto">
+                        {{-- ناحیه تصویر: بدون اسکرول — هر تصویری با هر ابعادی داخل همین فضا فیت می‌شود
+                             (flex-1 min-h-0 = باقی‌ماندهٔ ارتفاع؛ Cropper با viewMode:2 تصویر را در همین فضا محدود می‌کند) --}}
+                        <div class="p-4 overflow-hidden bg-gray-100 dark:bg-gray-900 flex-1 min-h-0 flex items-center justify-center">
+                            <img id="image-cropper-source" alt="تصویر برای برش" class="block max-w-full max-h-full mx-auto">
                         </div>
 
                         <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
@@ -163,6 +165,9 @@
                     reader.onload = (e) => {
                         imageEl.src = e.target.result;
                         imageEl.onload = () => {
+                            // ابتدا مدال را نشان بده تا کانتینر اندازهٔ واقعی داشته باشد؛
+                            // بعد Cropper را بساز تا تصویر دقیقاً در فضای بدون‌اسکرول فیت شود.
+                            show();
                             if (cropper) cropper.destroy();
                             cropper = new Cropper(imageEl, {
                                 viewMode: 2,
@@ -177,7 +182,6 @@
                                 checkOrientation: true,
                                 modal: true,
                             });
-                            show();
                         };
                     };
                     reader.onerror = () => { reject(new Error('خطا در خواندن تصویر')); close(); };

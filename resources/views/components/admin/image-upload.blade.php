@@ -1,6 +1,6 @@
 @props([
     'name',
-    'label',
+    'label' => null,
     'currentImage' => null,
     'removable' => false,
     'removeKey' => 'remove_image',
@@ -14,80 +14,78 @@
 ])
 
 <div>
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ $label }}</label>
+    @if($label)
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $label }}</label>
+    @endif
 
-    <div class="flex flex-col sm:flex-row gap-4">
-        {{-- پیش‌نمایش تصویر --}}
-        <div class="relative shrink-0 mx-auto sm:mx-0">
-            <div id="preview-{{ $name }}"
-                 class="w-32 h-32 rounded-xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
-                @if($currentImage)
-                    <img src="{{ $currentImage }}" class="w-full h-full object-cover" alt="پیش‌نمایش تصویر">
-                @else
-                    <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                @endif
-            </div>
-
-            {{-- دکمه پاک‌کردن انتخاب جدید / حذف تصویر فعلی --}}
-            <button type="button" id="clear-btn-{{ $name }}"
-                    onclick="fbImageClearOrRemove('{{ $name }}')"
-                    title="حذف تصویر"
-                    class="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all duration-150 @if(!($currentImage && $removable)) hidden @endif">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+    {{-- ردیف پیش‌نمایش تصویر --}}
+    <div class="relative w-fit mb-4">
+        <div id="preview-{{ $name }}"
+             class="w-32 h-32 rounded-2xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden bg-gray-50 dark:bg-gray-800 flex items-center justify-center shadow-sm">
+            @if($currentImage)
+                <img src="{{ $currentImage }}" class="w-full h-full object-cover" alt="پیش‌نمایش تصویر">
+            @else
+                <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-            </button>
+            @endif
         </div>
 
-        {{-- دراپ‌زون انتخاب تصویر --}}
-        <div class="flex-1">
-            <div id="dropzone-{{ $name }}"
-                 class="dropzone-area relative flex flex-col items-center justify-center gap-2 w-full min-h-[8.5rem] rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50/60 dark:bg-gray-800/40 hover:border-primary-400 hover:bg-primary-50/50 dark:hover:border-primary-500 dark:hover:bg-primary-900/10 cursor-pointer transition-all duration-200 px-6 py-6 text-center"
-                 onclick="document.getElementById('{{ $name }}').click()"
-                 ondragover="event.preventDefault(); this.classList.add('dragover')"
-                 ondragleave="event.preventDefault(); this.classList.remove('dragover')"
-                 ondrop="if (event.dataTransfer.files && event.dataTransfer.files[0] && !event.dataTransfer.files[0].type.startsWith('image/')) { fbImageDropInvalid(event, '{{ $name }}'); } else { fbImageDrop(event, '{{ $name }}'); }">
+        {{-- دکمه پاک‌کردن انتخاب جدید / حذف تصویر فعلی --}}
+        <button type="button" id="clear-btn-{{ $name }}"
+                onclick="fbImageClearOrRemove('{{ $name }}')"
+                title="حذف تصویر"
+                class="absolute -top-2 -end-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all duration-150 @if(!($currentImage && $removable)) hidden @endif">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
 
-                <div class="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-500 flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                    </svg>
-                </div>
+    {{-- دراپ‌زون انتخاب تصویر --}}
+    <div id="dropzone-{{ $name }}"
+         class="dropzone-area relative flex flex-col items-center justify-center gap-1.5 w-full min-h-[7.5rem] rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50/60 dark:bg-gray-800/40 hover:border-primary-400 hover:bg-primary-50/50 dark:hover:border-primary-500 dark:hover:bg-primary-900/10 cursor-pointer transition-all duration-200 px-4 py-5 text-center"
+         onclick="document.getElementById('{{ $name }}').click()"
+         ondragover="event.preventDefault(); this.classList.add('dragover')"
+         ondragleave="event.preventDefault(); this.classList.remove('dragover')"
+         ondrop="if (event.dataTransfer.files && event.dataTransfer.files[0] && !event.dataTransfer.files[0].type.startsWith('image/')) { fbImageDropInvalid(event, '{{ $name }}'); } else { fbImageDrop(event, '{{ $name }}'); }">
 
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">تصویر را انتخاب کنید</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">کلیک کنید یا فایل را اینجا رها کنید</p>
+        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-md flex items-center justify-center mb-1 transition-transform duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+        </div>
 
-                {{-- نام فایل انتخاب‌شده --}}
-                <div id="file-chip-{{ $name }}" class="hidden mt-1">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span id="file-chip-text-{{ $name }}"></span>
-                    </span>
-                </div>
-            </div>
+        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">تصویر را انتخاب کنید</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">کلیک کنید یا فایل را اینجا رها کنید</p>
 
-            {{-- اعلان «تصویر فعلی حذف خواهد شد» --}}
-            <div id="remove-notice-{{ $name }}" class="hidden mt-2">
-                <p class="text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2">
-                    تصویر فعلی هنگام ذخیره حذف خواهد شد.
-                    <button type="button" onclick="fbImageUndoRemove('{{ $name }}')"
-                            class="underline font-semibold hover:text-amber-700 dark:hover:text-amber-300 ms-1">انصراف</button>
-                </p>
-            </div>
-
-            @if($hint)
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ $hint }}</p>
-            @endif
-
-            @error($name)
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+        {{-- نام فایل انتخاب‌شده --}}
+        <div id="file-chip-{{ $name }}" class="hidden mt-1">
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full max-w-full">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span id="file-chip-text-{{ $name }}" class="truncate"></span>
+            </span>
         </div>
     </div>
+
+    {{-- اعلان «تصویر فعلی حذف خواهد شد» --}}
+    <div id="remove-notice-{{ $name }}" class="hidden mt-2">
+        <p class="text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2">
+            تصویر فعلی هنگام ذخیره حذف خواهد شد.
+            <button type="button" onclick="fbImageUndoRemove('{{ $name }}')"
+                    class="underline font-semibold hover:text-amber-700 dark:hover:text-amber-300 ms-1">انصراف</button>
+        </p>
+    </div>
+
+    @if($hint)
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2.5 leading-relaxed">{{ $hint }}</p>
+    @endif
+
+    @error($name)
+    <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
+    @enderror
 
     {{-- اینپوت فایل مخفی — با کلیک روی دراپ‌زون یا کشیدن فایل باز می‌شود --}}
     {{-- data-no-crop: کراپ داخل خود کامپوننت انجام می‌شود (نه توسط هندلر سراسری) --}}

@@ -9,16 +9,20 @@
     linkType: '{{ old('link_type', $formData['linkType']) }}',
     customUrl: '{{ old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '' }}',
     pageValue: '{{ old('link_type', $formData['linkType']) === 'page' ? old('link_value', $formData['linkValue']) : '' }}',
-    searchQuery: '',
+    searchQuery: @json($formData['selectedModel']['title'] ?? '', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
     searchResults: [],
     isSearching: false,
-    selectedModel: null,
+    selectedModel: @json($formData['selectedModel'] ?? null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
     linkableId: '{{ old('link_type', $formData['linkType']) === 'product' || old('link_type', $formData['linkType']) === 'product_category' || old('link_type', $formData['linkType']) === 'blog' || old('link_type', $formData['linkType']) === 'blog_category' ? old('link_value', $formData['linkValue']) : '' }}',
+    price: @json(old('price', $heroSlide?->price ?? 0)),
+    oldPrice: @json(old('old_price', $heroSlide?->old_price ?? 0)),
 
     get isCustomUrl() { return this.linkType === 'custom'; },
     get isStaticPage() { return this.linkType === 'page'; },
     get isModel() { return ['product', 'product_category', 'blog', 'blog_category'].includes(this.linkType); },
     get linkValue() { return this.isCustomUrl ? this.customUrl : (this.isStaticPage ? this.pageValue : this.linkableId); },
+    // وقتی محصولی انتخاب شده، قیمت‌ها خودکار از محصول خوانده می‌شوند و قابل ویرایش نیستند
+    get isPriceAuto() { return this.linkType === 'product' && !!this.selectedModel; },
 
     async searchModels() {
         if (this.searchQuery.length < 2) {
@@ -42,6 +46,12 @@
         this.linkableId = model.id;
         this.searchQuery = model.title || model.name || '';
         this.searchResults = [];
+
+        // قیمت‌ها به‌صورت خودکار از محصول انتخاب‌شده پر می‌شوند
+        if (this.linkType === 'product' && model.price !== undefined && model.price !== null) {
+            this.price = model.price;
+            this.oldPrice = model.old_price ?? 0;
+        }
     },
 
     clearSelection() {
@@ -213,17 +223,26 @@
 
                         {{-- اطلاعات بازاریابی محصول --}}
                         <div x-show="linkType === 'product' && selectedModel" class="space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">اطلاعات بازاریابی محصول</h4>
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                اطلاعات بازاریابی محصول
+                                <span x-show="isPriceAuto" class="inline-flex items-center gap-1 text-[10px] font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                    خودکار از محصول
+                                </span>
+                            </h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">قیمت فعلی</label>
-                                    <input type="number" name="price" value="{{ old('price', $heroSlide?->price ?? '') }}" class="input-custom" placeholder="قیمت محصول" min="0">
+                                    <input type="number" name="price" x-model="price" :disabled="isPriceAuto" class="input-custom disabled:opacity-60 disabled:cursor-not-allowed" placeholder="قیمت محصول" min="0">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">قیمت قدیمی (اختیاری)</label>
-                                    <input type="number" name="old_price" value="{{ old('old_price', $heroSlide?->old_price ?? '') }}" class="input-custom" placeholder="برای نمایش تخفیف">
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">قیمت قدیمی (برای نمایش تخفیف)</label>
+                                    <input type="number" name="old_price" x-model="oldPrice" :disabled="isPriceAuto" class="input-custom disabled:opacity-60 disabled:cursor-not-allowed" placeholder="برای نمایش تخفیف">
                                 </div>
                             </div>
+                            <p x-show="isPriceAuto" class="text-[11px] text-primary-600 dark:text-primary-300 leading-relaxed">
+                                قیمت و تخفیف به‌صورت خودکار از محصول خوانده می‌شوند — اگر قیمت محصول در آینده تغییر کند، این‌جا هم خودکار به‌روز می‌شود.
+                            </p>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">واحد پول</label>
                                 <select name="currency" class="input-custom">
@@ -352,15 +371,22 @@
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 تصویر اسلاید
+
+                {{-- راهنمای fallback تصویر — فقط وقتی مدلی (محصول/مقاله/دسته) لینک شده باشد --}}
+                <span x-show="isModel" class="relative inline-flex ms-1 group" aria-label="راهنما">
+                    <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="absolute bottom-full start-1/2 -translate-x-1/2 mb-2 w-64 text-[11px] font-normal leading-relaxed text-white dark:text-gray-100 bg-gray-900 dark:bg-gray-700 rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50 shadow-lg">
+                        اگر تصویری انتخاب نکنید، تصویر شاخص محصول به‌صورت خودکار در هیرو نمایش داده می‌شود.
+                    </span>
+                </span>
             </h3>
 
             {{-- پیش‌نمایش + کراپ تصویر با کامپوننت همگانی image-upload --}}
             <x-admin.image-upload
                 name="image"
-                label="تصویر اسلاید"
                 :currentImage="$heroSlide?->imageUrl()"
                 :removable="true"
-                hint="کراپ آزاد — هر سایزی که می‌خواهید کراپ کنید | حداکثر حجم: ۲۰ مگابایت"
+                hint="کراپ آزاد — هر سایزی دلخواه · حداکثر حجم: ۲۰ مگابایت"
                 :maxSize="20 * 1024 * 1024" />
         </div>
     </div>
