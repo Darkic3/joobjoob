@@ -86,6 +86,26 @@
     .stock-bar { width: 100%; height: 7px; border-radius: 999px; overflow: hidden; background: var(--bg-elevated); box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
     .stock-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--urgency), var(--gold)); transition: width .6s ease; }
 
+    /* برچسب تخفیف قیمت — استیکر کوچک چرخیده برای جلب توجه */
+    .price-off {
+        display: inline-flex;
+        align-items: center;
+        background: var(--urgency);
+        color: #fff;
+        font-size: .62rem;
+        font-weight: 800;
+        line-height: 1;
+        padding: .24rem .45rem;
+        border-radius: 999px;
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--urgency) 45%, transparent);
+        transform: rotate(-3deg);
+    }
+
+    /* هالهٔ ملایم زیر قیمت نهایی برای برجسته‌سازی */
+    .price-glow {
+        text-shadow: 0 2px 14px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
     .stars { color: var(--gold); letter-spacing: 1px; }
 
     .product-actions { position: absolute; top: 10px; inset-inline-end: 10px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transform: translateX(var(--slide, 8px)); transition: opacity .2s ease, transform .2s ease; }
@@ -382,4 +402,103 @@
 
 @media (min-width: 1280px) {
     .hero-swiper { min-height: 720px; }
+}
+
+/* ==========================================================================
+   5) پیشنهادات داغ (تایمردار) + شمارش معکوس
+   ========================================================================== */
+
+/* ---------- 5.1) پوستهٔ بخش ---------- */
+.deals-shell {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(145deg, var(--bg-elevated) 55%, color-mix(in srgb, var(--bg-elevated) 88%, var(--urgency) 12%));
+    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+    transition: box-shadow .25s ease;
+}
+.deals-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: linear-gradient(90deg, var(--urgency), var(--gold), var(--urgency));
+    background-size: 200% 100%;
+    animation: dealsStrip 6s linear infinite;
+}
+@keyframes dealsStrip {
+    from { background-position: 0 0; }
+    to   { background-position: 200% 0; }
+}
+
+/* هالهٔ تزئینی گوشه */
+.deals-glow {
+    position: absolute;
+    top: -120px;
+    inset-inline-end: -80px;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--urgency) 16%, transparent), transparent 70%);
+    pointer-events: none;
+}
+
+/* آیکون شعلهٔ متحرک */
+.deals-flame {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    font-size: 1.45rem;
+    background: var(--bg-elevated);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    animation: flameBob 2.4s ease-in-out infinite;
+}
+@keyframes flameBob {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-4px) scale(1.06); }
+}
+
+/* ---------- 5.2) شمارش معکوس ---------- */
+.cd-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+.cd-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 52px;
+}
+.cd-chip {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 800;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: .5rem .55rem;
+    min-width: 52px;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    color: var(--urgency);
+    background: var(--bg-elevated);
+    box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+}
+.cd-label {
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    line-height: 1;
+}
+.cd-sep {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    opacity: .55;
+    padding-bottom: 14px; /* تراز با چیپ‌ها (فضای برچسب) */
 }

@@ -95,7 +95,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function startCountdown(elIds, totalSeconds) {
+// توابع تایمر روی window قرار می‌گیرند تا اسکریپت‌های inline داخل Blade (کامپوننت countdown-timer)
+// بتوانند آن‌ها را صدا بزنند — وگرنه Vite/Rollup آن‌ها را به‌عنوان کد استفاده‌نشده حذف می‌کند (tree-shake).
+window.startCountdown = function (elIds, totalSeconds) {
     // ارقام بر اساس زبان سایت: فارسی/عربی → ۰۱۲۳، سایر → 0123
     function toLocal(n) {
         var s = String(n).padStart(2, '0');
@@ -112,7 +114,28 @@ function startCountdown(elIds, totalSeconds) {
     }
     tick();
     return setInterval(tick, 1000);
-}
+};
+
+// تایمر دقیق: زمان پایان (میلی‌ثانیه) را می‌گیرد و هر ثانیه از روی Date.now() محاسبه می‌کند —
+// اگر صفحه مدت‌ها باز بماند هم دقیق می‌ماند و بعد از پایان روی ۰۰:۰۰:۰۰ می‌ایستد.
+window.startCountdownTo = function (elIds, endMs) {
+    // ارقام بر اساس زبان سایت: فارسی/عربی → ۰۱۲۳، سایر → 0123
+    function toLocal(n) {
+        var s = String(n).padStart(2, '0');
+        if (window.localizeDigits && window.localizeDigits.isPersian()) {
+            s = s.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        }
+        return s;
+    }
+    function tick() {
+        var remaining = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
+        if (elIds.h) document.getElementById(elIds.h).textContent = toLocal(Math.floor(remaining / 3600));
+        if (elIds.m) document.getElementById(elIds.m).textContent = toLocal(Math.floor((remaining % 3600) / 60));
+        if (elIds.s) document.getElementById(elIds.s).textContent = toLocal(remaining % 60);
+    }
+    tick();
+    return setInterval(tick, 1000);
+};
 
 
 document.addEventListener('DOMContentLoaded', function () {

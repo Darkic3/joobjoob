@@ -29,8 +29,7 @@ class HomeController extends Controller
             ->get();
 
         // تعداد محصولات هر دسته‌بندی با احتساب کل زیرشاخه‌ها (بدون N+1)
-        $this->attachSubtreeProductCounts($categories);
-        // محصولات پیشنهاد ویژه: تخفیف‌دار با تایمر فعال و در بازه زمانی معتبر
+        $this->attachSubtreeProductCounts($categories);        // محصولات پیشنهاد ویژه: تخفیف‌دار با تایمر فعال و در بازه زمانی معتبر
         $deals = Product::with('images')
             ->where('is_active', true)
             ->where('discount_price', '>', 0)
@@ -40,22 +39,29 @@ class HomeController extends Controller
                         $t->whereNotNull('end_timer')->where('end_timer', '>', now());
                     });
             })
-            ->take(4)->get()
+            ->take(4)
+            ->get()
             ->map(function ($product) {
-                // محاسبه درصد فروش (فرض: اگر sold_count در دیتابیس دارید از آن استفاده کنید)
-                // در اینجا یک فرمول تقریبی بر اساس موجودی فعلی و فرض فروش ۵۰ عدد استفاده شده است
-                $estimatedSold = 50;
-                $total = $estimatedSold + $product->stock;
-                $product->sold_percent = $total > 0 ? min(100, round(($estimatedSold / $total) * 100)) : 0;
+                // درصد فروش: هیوریستیک کمبود موجودی (تا زمان راه‌اندازی جدول سفارش‌ها)
+                // موجودی کمتر → درصد «فروخته شده» بالاتر = اثر کمبود/فوریت
+                $product->sold_percent = $product->stock > 0
+                    ? min(100, max(15, (int) round(100 * 50 / (50 + $product->stock))))
+                    : 100;
 
                 return $product;
             });
+
+        // زمان پایان پیشنهاد: زودترین پایان در میان پیشنهادهای فعال — برای تایمر بخش
+        $dealEndsAt = $deals
+            ->map(fn ($product) => $product->end_timer ?? $product->deal_ends_at)
+            ->filter()
+            ->min();
         $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(4)->get();
         $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(4)->get();
         $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
         $slides = $this->heroSlideService->getSlides();
 
-        return view('site.home.index', compact('categories', 'deals', 'featured', 'bestSellers', 'reviews', 'slides'));
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'slides'));
     }
 
     /**

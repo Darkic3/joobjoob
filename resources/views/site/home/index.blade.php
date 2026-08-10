@@ -28,23 +28,33 @@
     {{-- ۳. پیشنهادهای داغ با تایمر --}}
     @if($deals->isNotEmpty())
         <section id="deals" class="reveal-on-scroll py-6">
-            <div class="neu-flat-lg p-5 md:p-7">
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🔥</span>
-                        <div>
-                            <h2 class="font-extrabold text-lg">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
-                            <p class="text-xs" style="color: var(--text-secondary);">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
+            <div class="deals-shell relative overflow-hidden p-5 md:p-8">
+                {{-- هالهٔ تزئینی --}}
+                <div class="deals-glow" aria-hidden="true"></div>
+
+                <div class="relative z-10">
+                    <div class="flex flex-wrap items-center justify-between gap-5 mb-8">
+                        <div class="flex items-center gap-3.5">
+                            <span class="deals-flame" aria-hidden="true">🔥</span>
+                            <div>
+                                <h2 class="font-black text-xl leading-tight">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
+                                <p class="text-xs mt-1" style="color: var(--text-secondary);">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <span class="text-[11px] font-bold hidden sm:block" style="color: var(--text-secondary);">
+                                {{ __('messages.deal_ends_in') }}
+                            </span>
+                            <x-countdown-timer :ends-at="$dealEndsAt" id="deal-cd"/>
                         </div>
                     </div>
-                    {{-- فرض بر این است که کامپوننت تایمر وجود دارد --}}
-                    <x-countdown-timer :ends-in-seconds="9912" id="deal-cd"/>
-                </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    @foreach($deals as $product)
-                        <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
-                    @endforeach
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        @foreach($deals as $product)
+                            <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </section>

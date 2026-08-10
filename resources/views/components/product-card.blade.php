@@ -74,7 +74,7 @@
             @if(!$rank)
                 @if($lowStock)
                     <span class="badge-urgency absolute top-2 start-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse">
-                        فقط {{ $product->stock }} عدد!
+                        {{ __('messages.only_left', ['count' => $product->stock]) }}
                     </span>
                 @elseif($hasDiscount)
                     <span class="badge-sale absolute top-2 start-2 z-10 bg-[var(--accent)] text-white text-[10px] font-bold px-2 py-1 rounded-full">
@@ -82,39 +82,48 @@
                     </span>
                 @elseif($isNew)
                     <span class="badge-new absolute top-2 start-2 z-10 bg-[var(--success)] text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                        جدید
+                        {{ __('messages.new_badge') }}
                     </span>
                 @endif
             @endif
         </div>
 
-        {{-- نام محصول --}}
-        <h4 class="text-xs font-semibold mb-2 line-clamp-2 min-h-[2.5rem] leading-relaxed" style="color: var(--text-primary);">
+        {{-- نام محصول — فونت بزرگ‌تر و بولدتر برای خوانایی بهتر (مخصوصاً فارسی) --}}
+        <h4 class="text-[13px] font-bold mb-2 line-clamp-2 min-h-[2.6rem] leading-relaxed" style="color: var(--text-primary);">
             {{ $name }}
         </h4>
 
-        {{-- امتیاز و تعداد نظرات --}}
-        <div class="flex items-center gap-1 text-[11px] mb-2">
-            <span class="text-[var(--gold)] tracking-widest">
-                {{ str_repeat('★', floor($rating)) }}{{ str_repeat('☆', 5 - floor($rating)) }}
-            </span>
-            <span style="color: var(--text-secondary);">({{ $reviewCount }})</span>
-        </div>
+        {{-- امتیاز و تعداد نظرات — فقط اگر امتیاز وجود داشته باشد --}}
+        @if($rating > 0)
+            <div class="flex items-center gap-1 text-[11px] mb-2">
+                <span class="text-[var(--gold)] tracking-widest">
+                    {{ str_repeat('★', floor($rating)) }}{{ str_repeat('☆', 5 - floor($rating)) }}
+                </span>
+                <span style="color: var(--text-secondary);">({{ $reviewCount }})</span>
+            </div>
+        @endif
     </a>
 
     {{-- بخش قیمت و دکمه خرید --}}
     <div class="mt-auto pt-3 border-t border-[var(--shadow-light)]/50">
-        <div class="flex items-baseline gap-2 mb-3">
-            <span class="mono font-extrabold text-base" style="color: var(--accent);" dir="ltr">
-                {{ number_format($finalPrice) }}
-            </span>
-            <span class="text-[10px] font-bold" style="color: var(--text-secondary);">تومان</span>
-
+        <div class="mb-3">
+            {{-- قیمت قبلی + برچسب تخفیف — خط کوچک بالای قیمت نهایی --}}
             @if($hasDiscount)
-                <span class="mono text-[11px] line-through ms-auto" style="color: var(--text-secondary);" dir="ltr">
-                    {{ number_format($originalPrice) }}
-                </span>
+                <div class="flex items-center gap-1.5 mb-1">
+                    <span class="mono text-[11px] font-semibold line-through" style="color: var(--text-secondary); opacity: .8;" dir="ltr">
+                        {{ number_format($originalPrice) }}
+                    </span>
+                    <span class="price-off">{{ $discountPercent }}٪-</span>
+                </div>
             @endif
+
+            {{-- قیمت نهایی — بزرگ، بولد و با هاله برای جلب توجه --}}
+            <div class="flex items-baseline gap-1.5">
+                <span class="mono font-black text-xl leading-none price-glow" style="color: var(--accent);" dir="ltr">
+                    {{ number_format($finalPrice) }}
+                </span>
+                <span class="text-[11px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
+            </div>
         </div>
 
         {{-- نوار پیشرفت فروش (فقط در صورت ارسال soldPercent) --}}
@@ -124,7 +133,7 @@
                      style="width: {{ $soldPercent }}%;"></div>
             </div>
             <p class="text-[10px] font-semibold mb-3" style="color: {{ $soldPercent >= 80 ? 'var(--urgency)' : 'var(--text-secondary)' }};">
-                {{ $soldPercent }}٪ فروخته شد
+                {{ $soldPercent }}٪ {{ __('messages.sold_percent') }}
             </p>
         @endif
 
