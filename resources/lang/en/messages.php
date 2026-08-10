@@ -57,6 +57,7 @@ return [
     'new_badge' => 'NEW',
     'toman' => 'IRT',
     'dont_miss_out' => "Don't miss out",
+    'trust_title' => 'Why shop with us?',
     'quick_view' => 'Quick view',
 
     'specifications' => 'Specifications',

@@ -120,8 +120,8 @@ class ReorderActionsTest extends TestCase
 
     public function test_trust_badges_reorder_updates_sort_order(): void
     {
-        $a = TrustBadge::create(['icon' => 'a', 'title' => 'A', 'sort_order' => 1, 'is_active' => true]);
-        $b = TrustBadge::create(['icon' => 'b', 'title' => 'B', 'sort_order' => 2, 'is_active' => true]);
+        $a = TrustBadge::create(['icon' => 'a', 'title' => ['fa' => 'A'], 'sort_order' => 1, 'is_active' => true]);
+        $b = TrustBadge::create(['icon' => 'b', 'title' => ['fa' => 'B'], 'sort_order' => 2, 'is_active' => true]);
 
         $this->actingAs($this->superAdmin())
             ->postJson(route('admin.trust-badges.reorder'), ['ids' => [$b->id, $a->id]])
@@ -191,18 +191,18 @@ class ReorderActionsTest extends TestCase
     public function test_trust_badge_store_works_without_sort_order(): void
     {
         // regression: sort_order از فرم حذف شده — استور باید بدون آن کار کند و آخر لیست باشد
-        TrustBadge::create(['icon' => 'a', 'title' => 'A', 'sort_order' => 1, 'is_active' => true]);
+        TrustBadge::create(['icon' => 'a', 'title' => ['fa' => 'A'], 'sort_order' => 1, 'is_active' => true]);
         $max = (int) TrustBadge::max('sort_order');
 
         $this->actingAs($this->superAdmin())
             ->post(route('admin.trust-badges.store'), [
                 'icon' => '🚚',
-                'title' => 'Test Badge',
+                'title' => ['fa' => 'Test Badge'],
                 'is_active' => 1,
             ])
             ->assertRedirect(route('admin.trust-badges.index'));
 
-        $badge = TrustBadge::where('title', 'Test Badge')->firstOrFail();
+        $badge = TrustBadge::where('title->fa', 'Test Badge')->firstOrFail();
         $this->assertSame($max + 1, (int) $badge->sort_order);
     }
 

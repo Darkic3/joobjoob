@@ -57,6 +57,7 @@ return [
     'new_badge' => 'YENİ',
     'toman' => 'IRT',
     'dont_miss_out' => 'Kaçırma',
+    'trust_title' => 'Neden bizden alışveriş yapmalısınız?',
     'quick_view' => 'Hızlı Bakış',
 
     'trust_free_shipping' => 'Ücretsiz Kargo',

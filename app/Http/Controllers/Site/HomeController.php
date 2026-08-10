@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Review;
 use App\Services\HeroSlideService;
+use App\Services\TrustBadgeService;
 use Database\Seeders\BrandSeeder;
 use Database\Seeders\ProductCategorySeeder;
 use Database\Seeders\ProductSeeder;
@@ -16,7 +17,10 @@ use Illuminate\Support\Facades\Artisan;
 
 class HomeController extends Controller
 {
-    public function __construct(protected HeroSlideService $heroSlideService) {}
+    public function __construct(
+        protected HeroSlideService $heroSlideService,
+        protected TrustBadgeService $trustBadgeService,
+    ) {}
 
     public function index()
     {
@@ -61,7 +65,10 @@ class HomeController extends Controller
         $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
         $slides = $this->heroSlideService->getSlides();
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'slides'));
+        // نشان‌های اعتماد فعال — محدودیت و کش داخل سرویس مدیریت می‌شود
+        $trustBadges = $this->trustBadgeService->getActiveForSite();
+
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'slides', 'trustBadges'));
     }
 
     /**

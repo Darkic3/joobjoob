@@ -1,27 +1,27 @@
+@props(['badges' => []])
+
 @php
-    // دریافت داده‌ها از کش (اگر کش وجود نداشته باشد، یک بار از دیتابیس می‌خواند و برای ۱ ساعت ذخیره می‌کند)
-    // این کار باعث می‌شود حتی اگر این کامپوننت را ۱۰ بار در یک صفحه استفاده کنید، فقط ۱ کوئری به دیتابیس زده شود.
-    $badges = \Illuminate\Support\Facades\Cache::remember('trust_badges_active', 3600, function () {
-        return \App\Models\TrustBadge::where('is_active', true)
-                                     ->orderBy('sort_order', 'asc')
-                                     ->get();
-    });
+    // کامپوننت فقط رندر می‌کند — داده را کنترلر آماده کرده و پاس می‌دهد.
+    $badges = collect($badges);
 @endphp
 
 @if($badges->isNotEmpty())
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        @foreach($badges as $badge)
-            <div class="neu-flat-sm p-5 flex flex-col items-center text-center gap-2">
-                {{-- نمایش آیکون (ایموجی یا کلاس) --}}
-                <span class="text-xl">{{ $badge->icon }}</span>
+    {{-- چیدمان مرکزگرا: با هر تعداد نشان (۱ تا ۶) به‌صورت متقارن وسط‌چین نمایش داده می‌شود --}}
+    <div class="trust-strip flex flex-wrap justify-center gap-4">
+        @foreach($badges as $i => $badge)
+            {{-- هر نشان یک رنگ از پالت می‌گیرد (چرخشی) --}}
+            <div class="trust-item neu-flat-sm p-5 w-[calc(50%-0.5rem)] sm:w-52 md:w-56 flex flex-col items-center text-center gap-3"
+                 style="--trust-color: var(--trust-{{ ($i % 4) + 1 }});">
 
-                {{-- نمایش عنوان --}}
-                {{-- نکته: اگر در دیتابیس به جای متن فارسی، کلید ترجمه (مثل messages.trust_free_shipping) ذخیره کرده‌اید، از __($badge->title) استفاده کنید --}}
-                <p class="text-xs font-bold">{{ $badge->title }}</p>
+                {{-- آیکون در چیپ دایره‌ای رنگی --}}
+                <span class="trust-icon" aria-hidden="true">{{ $badge->icon }}</span>
 
-                {{-- نمایش توضیحات (در صورت وجود) --}}
-                @if($badge->description)
-                    <p class="text-[11px]" style="color:var(--text-secondary);">{{ $badge->description }}</p>
+                {{-- عنوان (ترجمه‌شده) --}}
+                <p class="text-xs font-bold leading-relaxed">{{ $badge->trans('title') }}</p>
+
+                {{-- توضیحات (در صورت وجود) --}}
+                @if($badge->trans('description'))
+                    <p class="text-[11px] leading-relaxed" style="color: var(--text-secondary);">{{ $badge->trans('description') }}</p>
                 @endif
             </div>
         @endforeach

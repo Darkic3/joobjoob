@@ -8,17 +8,23 @@ readonly class TrustBadgeDTO
 {
     public function __construct(
         private string $icon,
-        private string $title,
-        private ?string $description,
+        private array $title,
+        private ?array $description,
         private bool $isActive,
     ) {}
 
     public static function fromRequest(TrustBadgeRequest $request): self
     {
+        $fa = trim((string) $request->validated('description.fa', ''));
+        $en = trim((string) $request->validated('description.en', ''));
+
         return new self(
             icon: $request->validated('icon'),
-            title: $request->validated('title'),
-            description: $request->validated('description'),
+            title: [
+                'fa' => (string) $request->validated('title.fa', ''),
+                'en' => (string) $request->validated('title.en', ''),
+            ],
+            description: ($fa === '' && $en === '') ? null : ['fa' => $fa, 'en' => $en],
             isActive: $request->boolean('is_active'),
         );
     }
@@ -29,12 +35,12 @@ readonly class TrustBadgeDTO
         return $this->icon;
     }
 
-    public function getTitle(): string
+    public function getTitle(): array
     {
         return $this->title;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): ?array
     {
         return $this->description;
     }

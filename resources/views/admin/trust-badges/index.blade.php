@@ -161,11 +161,11 @@
 
                             <td class="px-6 py-4">
                                 <div class="font-bold text-gray-800 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                    {{ Str::limit($badge->title, 40) }}
+                                    {{ Str::limit($badge->trans('title'), 40) }}
                                 </div>
-                                @if($badge->description)
+                                @if($badge->trans('description'))
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-                                        {{ $badge->description }}
+                                        {{ $badge->trans('description') }}
                                     </div>
                                 @endif
                             </td>

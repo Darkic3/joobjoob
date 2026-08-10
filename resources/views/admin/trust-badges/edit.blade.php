@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', __('admin.trust_badges.tab_edit', ['name' => $trustBadge->title ?? '']))
+@section('tab-name', __('admin.trust_badges.tab_edit', ['name' => $trustBadge->trans('title')]))
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6">

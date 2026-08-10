@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\TrustBadgeDTO;
 use App\Models\TrustBadge;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class TrustBadgeService
@@ -12,6 +13,11 @@ class TrustBadgeService
      * کلید کش برای نگهداری لیست نشان‌های فعال
      */
     private const CACHE_KEY = 'trust_badges_active';
+
+    /**
+     * حداکثر تعداد نشان‌هایی که در سایت (صفحهٔ اصلی) نمایش داده می‌شود
+     */
+    public const SITE_MAX_BADGES = 6;
 
     public function store(TrustBadgeDTO $dto): TrustBadge
     {
@@ -52,6 +58,20 @@ class TrustBadgeService
     }
 
     /**
+     * نشان‌های فعال برای نمایش در سایت (صفحهٔ اصلی) — با کش و محدودیت.
+     *
+     * همهٔ نشان‌ها با یک کوئری از دیتابیس خوانده می‌شود (اگر کش موجود نباشد)
+     * و برای ۱ ساعت کش می‌ماند؛ هر تغییری در پنل ادمین کش را پاک می‌کند.
+     * محدودیت نمایش (SITE_MAX_BADGES) این‌جا اعمال می‌شود تا ویو فقط مصرف‌کننده باشد.
+     */
+    public function getActiveForSite(int $limit = self::SITE_MAX_BADGES): Collection
+    {
+        return Cache::remember(self::CACHE_KEY, 3600, function () use ($limit) {
+            return TrustBadge::activeOrdered()->limit($limit)->get();
+        });
+    }
+
+    /**
      * لیست کامل نشان‌ها به ترتیب نمایش (sort_order) — بدون صفحه‌بندی،
      * چون ترتیب با درگ‌اندروپ روی کل لیست انجام می‌شود (الگوی صفحهٔ زبان‌ها).
      */
@@ -59,8 +79,13 @@ class TrustBadgeService
     {
         return TrustBadge::query()
             ->when(! empty($filters['search']), function ($q) use ($filters) {
-                $q->where('title', 'like', '%'.$filters['search'].'%')
-                    ->orWhere('description', 'like', '%'.$filters['search'].'%');
+                $term = '%'.$filters['search'].'%';
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('title->fa', 'like', $term)
+                        ->orWhere('title->en', 'like', $term)
+                        ->orWhere('description->fa', 'like', $term)
+                        ->orWhere('description->en', 'like', $term);
+                });
             })
             ->when(isset($filters['status']) && $filters['status'] !== '', function ($q) use ($filters) {
                 $q->where('is_active', $filters['status']);

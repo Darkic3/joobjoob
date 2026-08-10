@@ -19,30 +19,43 @@
             @enderror
         </div>
 
-        {{-- عنوان --}}
+        {{-- عنوان (چندزبانه) --}}
         <div class="space-y-1.5">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ __('admin.trust_badges.field_title') }} <span class="text-red-500">*</span>
             </label>
-            <input type="text" name="title" value="{{ old('title', $trustBadge->title ?? '') }}"
-                   class="input-custom"
-                   placeholder="{{ __('admin.trust_badges.title_ph') }}" required>
-            @error('title')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <input type="text" name="title[fa]" value="{{ old('title.fa', $trustBadge->title['fa'] ?? '') }}"
+                           class="input-custom" placeholder="{{ __('admin.trust_badges.title_ph') }}" required>
+                    @error('title.fa')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <input type="text" name="title[en]" value="{{ old('title.en', $trustBadge->title['en'] ?? '') }}"
+                           class="input-custom" placeholder="Title (English)" dir="ltr">
+                </div>
+            </div>
         </div>
 
-        {{-- توضیحات --}}
+        {{-- توضیحات (چندزبانه) --}}
         <div class="space-y-1.5">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ __('admin.trust_badges.field_desc') }}
             </label>
-            <textarea name="description" rows="4"
-                      class="input-custom resize-y min-h-[100px]"
-                      placeholder="{{ __('admin.trust_badges.desc_ph') }}">{{ old('description', $trustBadge->description ?? '') }}</textarea>
-            @error('description')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <textarea name="description[fa]" rows="4"
+                              class="input-custom resize-y min-h-[100px]"
+                              placeholder="{{ __('admin.trust_badges.desc_ph') }}">{{ old('description.fa', $trustBadge->description['fa'] ?? '') }}</textarea>
+                </div>
+                <div>
+                    <textarea name="description[en]" rows="4"
+                              class="input-custom resize-y min-h-[100px]" dir="ltr"
+                              placeholder="Description (English)">{{ old('description.en', $trustBadge->description['en'] ?? '') }}</textarea>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -67,7 +67,8 @@
 
     {{-- ۴. نشان‌های اعتماد --}}
     <section class="reveal-on-scroll py-6">
-        <x-trust-badges/>
+        <h2 class="text-lg font-extrabold mb-6">{{ __('messages.trust_title') }}</h2>
+        <x-trust-badges :badges="$trustBadges"/>
     </section>
 
     {{-- ۵. محصولات ویژه --}}

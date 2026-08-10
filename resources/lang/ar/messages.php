@@ -57,6 +57,7 @@ return [
     'new_badge' => 'جديد',
     'toman' => 'IRT',
     'dont_miss_out' => 'لا تفوت الفرصة',
+    'trust_title' => 'لماذا تتسوق معنا؟',
     'quick_view' => 'عرض سريع',
 
     'trust_free_shipping' => 'شحن مجاني',

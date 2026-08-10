@@ -614,6 +614,42 @@
     .deals-glow { animation: none; }
 }
 
+/* ==========================================================================
+   6) نشان‌های اعتماد
+   ========================================================================== */
+:root, [data-theme="light-neumorphism"] {
+    --trust-1: var(--success);   /* سبز — ارسال/گارانتی */
+    --trust-2: var(--accent);    /* بنفش — اصالت */
+    --trust-3: var(--gold);      /* طلایی — بازگشت/پاداش */
+    --trust-4: var(--urgency);   /* قرمز — پشتیبانی/فوریت */
+}
+
+.trust-item {
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.trust-item:hover {
+    transform: translateY(-4px);
+}
+
+/* چیپ دایره‌ای آیکون — رنگی شده با --trust-color هر آیتم */
+.trust-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    background: color-mix(in srgb, var(--trust-color) 13%, var(--bg-elevated));
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light),
+                0 0 0 1px color-mix(in srgb, var(--trust-color) 22%, transparent);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+.trust-item:hover .trust-icon {
+    transform: scale(1.12) rotate(-6deg);
+    box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light),
+                0 4px 14px color-mix(in srgb, var(--trust-color) 35%, transparent);
+}
+
 /* ---------- 5.2) شمارش معکوس ---------- */
 .cd-wrap {
     display: inline-flex;

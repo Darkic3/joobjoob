@@ -61,6 +61,7 @@ return [
 
     'verified_purchase' => 'تایید شده',
     'dont_miss_out' => 'از دستش نده',
+    'trust_title' => 'چرا از ما خرید کنید؟',
 
     'specifications' => 'مشخصات فنی',
     'description' => 'توضیحات',
