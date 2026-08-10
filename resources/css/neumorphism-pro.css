@@ -293,13 +293,25 @@
 }
 
 /* ---------- 4.6.1) ستاره‌های امتیاز هیرو ---------- */
-.hero-rating-stars span {
+/* ستاره‌های امتیاز: هر ستاره دو لایه دارد — پایهٔ خاکستری + روکش طلایی با عرض درصدی
+   برای نیمه‌پر شدن (مثلاً 4.6 → ۴ ستارهٔ کامل + ۶۰٪ ستارهٔ پنجم).
+   inset-inline-start باعث می‌شود در RTL از راست و در LTR از چپ پر شود. */
+.hero-rating-stars .hero-star {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+}
+.hero-rating-stars .hero-star-bg {
     color: var(--text-secondary);
     opacity: .3;
 }
-.hero-rating-stars span.is-filled {
+.hero-rating-stars .hero-star-fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    overflow: hidden;
+    white-space: nowrap;
     color: var(--gold);
-    opacity: 1;
 }
 
 /* ---------- 4.7) ناوبری اسلایدر (داخل هیرو) ---------- */

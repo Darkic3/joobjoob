@@ -151,8 +151,13 @@
                                             class="hero-rating-stars flex items-center gap-[3px] text-base leading-none"
                                             aria-hidden="true"
                                         >
+                                            @php($ratingValue = (float) $slide->rating)
                                             @for($s = 1; $s <= 5; $s++)
-                                                <span class="{{ $s <= (int) round((float) $slide->rating) ? 'is-filled' : '' }}">★</span>
+                                                @php($fill = min(100, max(0, ($ratingValue - ($s - 1)) * 100)))
+                                                <span class="hero-star">
+                                                    <span class="hero-star-bg">★</span>
+                                                    <span class="hero-star-fill" style="width: {{ $fill }}%;">★</span>
+                                                </span>
                                             @endfor
                                         </div>
 
