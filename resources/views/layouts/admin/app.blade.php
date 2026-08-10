@@ -64,6 +64,9 @@
     <x-admin.mobile-sidebar/>
 </div>
 
+{{-- کراپر سراسری تصویر — برای همهٔ inputهای تصویری ادمین (window.ImageCropper) --}}
+<x-admin.image-cropper />
+
 @stack('modals')
 <x-admin.scripts/>
 @stack('scripts')

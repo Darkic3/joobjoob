@@ -199,7 +199,39 @@ document.querySelectorAll('[data-countdown]').forEach(timer => {
 
 document.addEventListener('DOMContentLoaded', function() {
     initProductGallery();
+    initGlobalImageCrop();
 });
+
+/* ==========================================
+   کراپ سراسری تصویر — هر input[type=file] تک‌تصویری ادمین
+   (هیرو اسلاید، بلاگ، برند، لوگو/فاوآیکون تنظیمات و …)
+   ========================================== */
+function initGlobalImageCrop() {
+    // ورودی‌هایی که خودشان کراپ می‌کنند (image-upload) با data-no-crop علامت زده شده‌اند
+    // و گالری محصول (multiple) فلو اختصاصی خودش را دارد.
+    document.addEventListener('change', async (e) => {
+        const input = e.target;
+        if (!(input instanceof HTMLInputElement) || input.type !== 'file') return;
+        if (input.multiple || input.dataset.noCrop !== undefined) return;
+        if (!input.accept || !input.accept.toLowerCase().includes('image')) return;
+
+        const file = input.files && input.files[0];
+        if (!file || !window.ImageCropper) return;
+
+        try {
+            const aspect = input.dataset.cropAspect ? parseFloat(input.dataset.cropAspect) : null;
+            const blob = await window.ImageCropper.open(file, { aspectRatio: aspect });
+
+            const croppedName = file.name.replace(/\.[^.]+$/, '') + '.webp';
+            const dt = new DataTransfer();
+            dt.items.add(new File([blob], croppedName, { type: blob.type || 'image/webp' }));
+            input.files = dt.files;
+        } catch (e) {
+            // کاربر انصراف داد — فایل انتخاب‌شده حذف می‌شود
+            input.value = '';
+        }
+    });
+}
 
 /* ==========================================
    گالری تصاویر محصول — کراپ + تصویر اصلی + حذف

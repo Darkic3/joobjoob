@@ -88,14 +88,7 @@
                                                                         <img src="{{ \App\Models\Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ trans_or('admin.settings.fields.'.$fieldKey, $config['label'] ?? '') }}">
                                                                     @endif
 
-                                                                    @if(($config['type'] ?? 'text') === 'file' && ($config['cropper'] ?? false))
-                                                                        <x-admin.cropper-modal
-                                                                            :inputId="$fieldKey"
-                                                                            :aspectWidth="500"
-                                                                            :aspectHeight="738"
-                                                                            :outputWidth="500"
-                                                                            :outputHeight="738" />
-                                                                    @endif
+                                                                    {{-- کراپ تصویر به‌صورت سراسری (هندلر تغییر فایل در app-admin.js) انجام می‌شود --}}
                                                                 </div>
                                                             @endif
                                                         </div>

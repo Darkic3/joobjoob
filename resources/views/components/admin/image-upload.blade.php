@@ -5,6 +5,10 @@
     'removable' => false,
     'removeKey' => 'remove_image',
     'hint' => 'JPG، PNG یا WebP | حداکثر حجم: ۲ مگابایت',
+    // تنظیمات کراپ — null یعنی آزاد (بدون نسبت/ابعاد اجباری)
+    'cropAspectRatio' => null,
+    'cropWidth' => null,
+    'cropHeight' => null,
 ])
 
 <div class="col-span-2">
@@ -84,7 +88,8 @@
     </div>
 
     {{-- اینپوت فایل مخفی — با کلیک روی دراپ‌زون یا کشیدن فایل باز می‌شود --}}
-    <input type="file" name="{{ $name }}" id="{{ $name }}" accept="image/*" class="hidden"
+    {{-- data-no-crop: کراپ داخل خود کامپوننت انجام می‌شود (نه توسط هندلر سراسری) --}}
+    <input type="file" name="{{ $name }}" id="{{ $name }}" accept="image/*" class="hidden" data-no-crop
            onchange="fbImageSelect(this, '{{ $name }}')">
 
     {{-- حذف تصویر فعلی هنگام ذخیره --}}
@@ -105,12 +110,17 @@
             originalHtml: preview.innerHTML,
             placeholderHtml: placeholderHtml,
             hasSelection: false,
+            cropAspectRatio: @json($cropAspectRatio),
+            cropWidth: @json($cropWidth),
+            cropHeight: @json($cropHeight),
+            croppedUrl: null,
         };
     })();
 
     // نکته: اگر در یک صفحه چند نمونه از این کامپوننت دارید، برای هر کدام name یکتا بدهید
     // (state و شناسه‌ها بر اساس name ساخته می‌شوند)
-    function fbImageSelect(input, name) {
+    // انتخاب تصویر → باز شدن کراپر → نمایش پیش‌نمایش تصویر کراپ‌شده
+    async function fbImageSelect(input, name) {
         const file = input.files && input.files[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) return;
@@ -118,23 +128,42 @@
         const st = window.fbImageState[name];
         st.hasSelection = true;
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const preview = document.getElementById('preview-' + name);
-            preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover">';
-            preview.classList.remove('opacity-40', 'grayscale');
-            document.getElementById('clear-btn-' + name).classList.remove('hidden');
+        let blob;
+        try {
+            blob = await window.ImageCropper.open(file, {
+                aspectRatio: st.cropAspectRatio,
+                outputWidth: st.cropWidth || undefined,
+                outputHeight: st.cropHeight || undefined,
+            });
+        } catch (e) {
+            // انصراف از کراپ — فایل انتخاب‌شده حذف می‌شود
+            input.value = '';
+            st.hasSelection = false;
+            return;
+        }
 
-            // نام فایل
-            document.getElementById('file-chip-text-' + name).textContent = file.name;
-            document.getElementById('file-chip-' + name).classList.remove('hidden');
+        // جایگزینی فایل اینپوت با خروجی کراپ‌شده
+        const croppedName = file.name.replace(/\.[^.]+$/, '') + '.webp';
+        const dt = new DataTransfer();
+        dt.items.add(new File([blob], croppedName, { type: blob.type || 'image/webp' }));
+        input.files = dt.files;
 
-            // انتخاب فایل جدید یعنی حذفِ تصویرِ قبلی منتفی است
-            const removeInput = document.getElementById('remove-' + name);
-            if (removeInput) removeInput.value = '0';
-            document.getElementById('remove-notice-' + name).classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
+        if (st.croppedUrl) URL.revokeObjectURL(st.croppedUrl);
+        st.croppedUrl = URL.createObjectURL(blob);
+
+        const preview = document.getElementById('preview-' + name);
+        preview.innerHTML = '<img src="' + st.croppedUrl + '" class="w-full h-full object-cover">';
+        preview.classList.remove('opacity-40', 'grayscale');
+        document.getElementById('clear-btn-' + name).classList.remove('hidden');
+
+        // نام فایل
+        document.getElementById('file-chip-text-' + name).textContent = croppedName;
+        document.getElementById('file-chip-' + name).classList.remove('hidden');
+
+        // انتخاب فایل جدید یعنی حذفِ تصویرِ قبلی منتفی است
+        const removeInput = document.getElementById('remove-' + name);
+        if (removeInput) removeInput.value = '0';
+        document.getElementById('remove-notice-' + name).classList.add('hidden');
     }
 
     function fbImageClearOrRemove(name) {
@@ -151,6 +180,7 @@
         const input = document.getElementById(name);
         input.value = '';
         st.hasSelection = false;
+        if (st.croppedUrl) { URL.revokeObjectURL(st.croppedUrl); st.croppedUrl = null; }
 
         const preview = document.getElementById('preview-' + name);
         preview.innerHTML = st.originalHtml;
