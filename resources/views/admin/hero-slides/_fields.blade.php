@@ -37,8 +37,13 @@
     $currentLinkType = old('link_type', $currentLinkType);
     $currentLinkId = old('link_value', $currentLinkId);
 
-    // آیتم‌های اعتماد — از ورودی مجدد (بعد از خطای اعتبارسنجی) یا از مدل
-    $trusts = old('trusts', $heroSlide?->trusts ?? []);
+    // آیتم‌های اعتماد — از ورودی مجدد (بعد از خطای اعتبارسنجی) یا از مدل؛
+    // هنگام ساخت اسلاید جدید یک آیتم پیش‌فرض «+۱۲,۰۰۰ مشتری راضی» از قبل اضافه می‌شود
+    $trusts = old('trusts', $heroSlide?->trusts ?? ($heroSlide ? [] : [[
+        'icon' => '✓',
+        'fa' => '+۱۲,۰۰۰ مشتری راضی',
+        'en' => '+12,000 happy customers',
+    ]]));
     $trusts = array_values(is_array($trusts) ? $trusts : []);
     $trustSeed = [];
     foreach ($trusts as $trust) {

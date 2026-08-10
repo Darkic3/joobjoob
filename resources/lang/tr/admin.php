@@ -298,6 +298,7 @@ return [
         'image' => 'Görsel',
         'badge' => 'Rozet',
         'no_badge' => 'Rozetsiz',
+        'trust_items' => 'güven öğesi',
         'empty' => 'Henüz slayt oluşturulmadı.',
         'create' => 'Yeni Slayt Oluştur',
         'create_sub' => 'Ana sayfa afişi veya slayt bilgilerini girin',

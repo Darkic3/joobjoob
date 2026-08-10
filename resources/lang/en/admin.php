@@ -298,6 +298,7 @@ return [
         'image' => 'Image',
         'badge' => 'Badge',
         'no_badge' => 'No badge',
+        'trust_items' => 'trust items',
         'empty' => 'No slide has been created yet.',
         'create' => 'Create New Slide',
         'create_sub' => 'Enter the homepage banner or slide details',

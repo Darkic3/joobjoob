@@ -141,6 +141,11 @@
                                 <div class="font-bold text-gray-800 dark:text-gray-100 truncate max-w-[200px]" title="{{ $slide->trans('title') }}">
                                     {{ Str::limit($slide->trans('title'), 40) }}
                                 </div>
+                                @php($trustCount = count($slide->trustItems()))
+                                <span class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-full border {{ $trustCount > 0 ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border-amber-100 dark:border-amber-800' : 'bg-gray-50 text-gray-400 dark:bg-gray-700/40 dark:text-gray-500 border-gray-100 dark:border-gray-700' }}">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    {{ $trustCount }} {{ __('admin.hero_slides.trust_items') }}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-800">
