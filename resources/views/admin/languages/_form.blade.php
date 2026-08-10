@@ -1,18 +1,9 @@
-@php
-    $language = $language ?? null;
-    $isEdit = $language !== null;
-
-    // کدهای زبانی که برای «نام ترجمه‌شده» ورودی می‌گیریم:
-    // همه‌ی زبان‌های فعال + کد خودِ زبانِ در حال ویرایش (حتی اگر غیرفعال باشد)
-    $nameLocales = locale()->active();
-    if ($isEdit && ! isset($nameLocales[$language->code])) {
-        $nameLocales = [$language->code => $language] + $nameLocales;
-    }
-@endphp
+{{-- دادهٔ nameLocales در LanguageController (create/edit) آماده می‌شود --}}
+@props(['language' => null])
 
 <div x-data="{
-        active: {{ $isEdit ? ($language->is_active ? 'true' : 'false') : 'true' }},
-        isDefault: {{ $isEdit ? ($language->is_default ? 'true' : 'false') : 'false' }}
+        active: {{ $language ? ($language->is_active ? 'true' : 'false') : 'true' }},
+        isDefault: {{ $language ? ($language->is_default ? 'true' : 'false') : 'false' }}
     }">
 
     {{-- کد زبان — در ویرایش فقط‌خواندنی --}}
@@ -21,12 +12,12 @@
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                 {{ __('admin.languages.field_code') }} <span class="text-rose-500">*</span>
             </label>
-            <input type="text" name="code" value="{{ $isEdit ? old('code', $language->code) : old('code') }}"
+            <input type="text" name="code" value="{{ $language ? old('code', $language->code) : old('code') }}"
                    class="input-custom text-sm" placeholder="{{ __('admin.languages.code_ph') }}"
-                   dir="ltr" {{ $isEdit ? 'disabled' : 'required' }}
+                   dir="ltr" {{ $language ? 'disabled' : 'required' }}
                    pattern="[a-z]{2,8}" maxlength="8">
             @error('code') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
-            @if($isEdit)
+            @if($language)
                 <p class="text-[10px] text-gray-400 mt-1">{{ __('admin.languages.code_readonly') }}</p>
             @endif
         </div>
@@ -35,7 +26,7 @@
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                 {{ __('admin.languages.field_native_name') }} <span class="text-rose-500">*</span>
             </label>
-            <input type="text" name="native_name" value="{{ $isEdit ? old('native_name', $language->native_name) : old('native_name') }}"
+            <input type="text" name="native_name" value="{{ $language ? old('native_name', $language->native_name) : old('native_name') }}"
                    class="input-custom text-sm" placeholder="{{ __('admin.languages.native_name_ph') }}" required>
             @error('native_name') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
@@ -48,17 +39,12 @@
         </label>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             @foreach($nameLocales as $code => $lang)
-                @php
-                    $current = $isEdit ? ($language->name[$code] ?? '') : '';
-                    $oldVal = old("name.{$code}", $current);
-                    $required = $code === 'fa';
-                @endphp
                 <div>
                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $lang->localizedName() }} ({{ $code }}) @if($required) <span class="text-rose-500">*</span> @endif
+                        {{ $lang->localizedName() }} ({{ $code }}) @if($code === 'fa') <span class="text-rose-500">*</span> @endif
                     </label>
-                    <input type="text" name="name[{{ $code }}]" value="{{ $oldVal }}"
-                           class="input-custom text-sm" dir="auto" @if($required) required @endif>
+                    <input type="text" name="name[{{ $code }}]" value="{{ old("name.{$code}", $language ? ($language->name[$code] ?? '') : '') }}"
+                           class="input-custom text-sm" dir="auto" @if($code === 'fa') required @endif>
                 </div>
             @endforeach
         </div>
@@ -72,9 +58,8 @@
             {{ __('admin.languages.field_dir') }} <span class="text-rose-500">*</span>
         </label>
         <select name="dir" class="input-custom text-sm" required>
-            @php $dir = $isEdit ? old('dir', $language->dir) : old('dir', config('languages.'.old('code', '').'.dir', 'ltr')); @endphp
-            <option value="rtl" @selected($dir === 'rtl')>{{ __('admin.languages.rtl') }}</option>
-            <option value="ltr" @selected($dir === 'ltr')>{{ __('admin.languages.ltr') }}</option>
+            <option value="rtl" @selected(old('dir', $language ? $language->dir : config('languages.'.old('code', '').'.dir', 'ltr')) === 'rtl')>{{ __('admin.languages.rtl') }}</option>
+            <option value="ltr" @selected(old('dir', $language ? $language->dir : config('languages.'.old('code', '').'.dir', 'ltr')) === 'ltr')>{{ __('admin.languages.ltr') }}</option>
         </select>
         @error('dir') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>

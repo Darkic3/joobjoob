@@ -22,7 +22,7 @@ class LanguageController extends Controller
 
     public function create(): View
     {
-        return view('admin.languages.create');
+        return view('admin.languages.create', ['nameLocales' => app(LocaleService::class)->active()]);
     }
 
     public function store(LanguageRequest $request): RedirectResponse
@@ -48,7 +48,14 @@ class LanguageController extends Controller
 
     public function edit(Language $language): View
     {
-        return view('admin.languages.edit', compact('language'));
+        // کدهای زبانی که برای «نام ترجمه‌شده» ورودی می‌گیریم:
+        // همهٔ زبان‌های فعال + کد خودِ زبانِ در حال ویرایش (حتی اگر غیرفعال باشد)
+        $nameLocales = app(LocaleService::class)->active();
+        if (! isset($nameLocales[$language->code])) {
+            $nameLocales = [$language->code => $language] + $nameLocales;
+        }
+
+        return view('admin.languages.edit', ['language' => $language, 'nameLocales' => $nameLocales]);
     }
 
     public function update(LanguageRequest $request, Language $language): RedirectResponse

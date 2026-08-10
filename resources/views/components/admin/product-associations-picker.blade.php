@@ -1,27 +1,4 @@
-@props([
-    'products' => collect(),
-    'relatedIds' => [],
-    'complementIds' => [],
-    'currentProductId' => null,
-])
-
-@php
-    $productList = $products
-        ->filter(fn($p) => (int) $p->id !== (int) $currentProductId)
-        ->map(fn($p) => [
-            'id'    => (int) $p->id,
-            'label' => $p->trans('name') . ' (#' . $p->id . ')',
-        ])
-        ->values()
-        ->all();
-
-    $payload = [
-        'products'      => $productList,
-        'relatedIds'    => array_map('intval', (array) $relatedIds),
-        'complementIds' => array_map('intval', (array) $complementIds),
-    ];
-@endphp
-
+{{-- دادهٔ payload در کلاس Admin\ProductAssociationsPicker آماده می‌شود --}}
 <div x-data="productAssociationsPicker(@js($payload))" class="space-y-6">
 
     {{-- راهنما --}}

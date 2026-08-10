@@ -1,79 +1,4 @@
-@php
-    // اگر $product پاس داده نشده باشد، مقدار آن را null قرار می‌دهیم
-    $product = $product ?? null;
-    $isEdit = $product !== null;
-
-    $oldVal = function($key, $default = '') use ($isEdit, $product) {
-        if (old($key) !== null) return old($key);
-        if ($isEdit && $product) {
-            $keys = explode('.', $key);
-            $value = $product;
-            foreach ($keys as $k) {
-                if (is_object($value) && isset($value->$k)) $value = $value->$k;
-                elseif (is_array($value) && isset($value[$k])) $value = $value[$k];
-                else return $default;
-            }
-            return $value;
-        }
-        return $default;
-    };
-
-    // ========== داده‌های مشخصات و تنوع برای سازنده واریانت ==========
-    // مشخصه‌های والد (گروه‌ها) با فرزندان
-    $specGroups = $specifications ?? collect();
-
-    // مقادیر انتخاب‌شده فعلی محصول: [parent_id => [child_id, ...]]
-    $selectedSpecs = [];
-    $textSpecValues = [];
-
-    if ($isEdit) {
-        foreach ($product->productSpecifications as $ps) {
-            // ردیف والد (گروه) — فرزندان آن را می‌گیریم
-            if ($ps->value === null && $ps->parent_id === null) {
-                $selectedSpecs[$ps->specification_id] = $ps->children->pluck('specification_id')->map(fn($id) => (int) $id)->all();
-            }
-            // مقادیر نوشتاری
-            if ($ps->value !== null) {
-                $textSpecValues[$ps->specification_id] = $ps->value;
-            }
-        }
-    }
-
-    // واریانت‌های موجود: [{id, spec_ids[], price, discount_price, stock, weight}]
-    $existingVariants = [];
-    if ($isEdit) {
-        foreach ($product->variants as $v) {
-            $existingVariants[] = [
-                'id'             => $v->id,
-                'spec_ids'       => $v->specifications->pluck('id')->map(fn($id) => (int) $id)->sort()->values()->all(),
-                'price'          => (int) $v->price,
-                'discount_price' => (int) $v->discounted_price,
-                'stock'          => (int) $v->stock,
-                'weight'         => (int) $v->weight,
-            ];
-        }
-    }
-
-    // ویژگی‌های آزاد فعلی
-    $existingProperties = [];
-    if ($isEdit) {
-        foreach ($product->properties as $prop) {
-            $existingProperties[] = [
-                'id'    => $prop->id,
-                'title' => $prop->trans('title') ?? '',
-                'value' => $prop->value,
-            ];
-        }
-    }
-
-    // محصولات مرتبط و مکمل فعلی
-    $relatedIds = $isEdit ? $product->related->pluck('id')->map(fn($id) => (int) $id)->all() : [];
-    $complementIds = $isEdit ? $product->complement->pluck('id')->map(fn($id) => (int) $id)->all() : [];
-
-    // لیست محصولات برای انتخابگر مرتبط/مکمل (از کنترلر با نام products می‌آید)
-    $allProducts = $products ?? collect();
-@endphp
-
+{{-- داده‌های فرم (oldVal/isEdit/selectedSpecs/…) در ProductController::formData آماده می‌شود --}}
 <div x-data="{ tab: 'general' }" class="space-y-6">
 
     <!-- نوار تب‌ها -->
@@ -225,8 +150,8 @@
     <!-- تب ۳: مشخصات و تنوع -->
     <div x-show="tab === 'specs'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
         <x-admin.product-spec-builder
-            :spec-groups="$specGroups"
-            :text-specifications="$textSpecifications ?? collect()"
+            :spec-groups="$specifications"
+            :text-specifications="$textSpecifications"
             :selected-specs="$selectedSpecs"
             :text-spec-values="$textSpecValues"
             :existing-variants="$existingVariants"
@@ -237,7 +162,7 @@
     <!-- تب ۴: محصولات مرتبط و مکمل -->
     <div x-show="tab === 'related'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display: none;">
         <x-admin.product-associations-picker
-            :products="$products ?? collect()"
+            :products="$products"
             :related-ids="$relatedIds"
             :complement-ids="$complementIds"
             :current-product-id="$isEdit ? $product->id : null"

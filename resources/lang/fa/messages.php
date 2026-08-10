@@ -82,5 +82,13 @@ return [
     'trust_support' => 'پشتیبانی ۲۴/۷',
     'trust_support_desc' => 'همیشه در دسترس',
 
-
+    // هیرو
+    'user_rating' => 'امتیاز کاربران',
+    'viewing_now' => 'نفر در حال مشاهده',
+    'no_slides' => 'هنوز بنری تعریف نشده است.',
+    'next_slide' => 'اسلاید بعدی',
+    'prev_slide' => 'اسلاید قبلی',
+    'view_products' => 'مشاهده محصولات',
+    'special_deals' => 'پیشنهادات ویژه 🔥',
+    'discount_off' => 'تخفیف',
 ];

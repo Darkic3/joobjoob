@@ -1,30 +1,4 @@
-@props([
-    'name' => '',
-    'value' => '',      // مقدار میلادی (Y-m-d H:i یا هر فرمت پارس‌شدنی) از دیتابیس
-    'label' => '',
-    'required' => false,
-    'placeholder' => '۱۴۰۳/۰۵/۱۴ ۱۵:۳۰',
-])
-
-@php
-    // تقویم از سرویس زبان‌ها — jalali → پیکر شمسی، gregorian → فیلد میلادی مستقیم
-    $isPersian = locale()->isJalali(app()->getLocale());
-    $inputId = 'jdp-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $name) . '-' . uniqid();
-    $hiddenId = $inputId . '-hidden';
-    $greg = '';
-    $jalaliInit = '';
-
-    if ($value) {
-        try {
-            $greg = \Carbon\Carbon::parse($value)->format('Y-m-d H:i');
-            // تبدیل به شمسی با ارقام انگلیسی (برای پارس در JS)
-            $jalaliInit = jdate_format('Y/m/d H:i', strtotime($greg), '', 'Asia/Tehran', 'en');
-        } catch (\Throwable $e) {
-            // مقدار نامعتبر → خالی
-        }
-    }
-@endphp
-
+{{-- محاسبات (isPersian/inputId/greg/jalaliInit) در کلاس Admin\JalaliDatetime آماده می‌شود --}}
 @if($isPersian)
     <div>
         @if($label)

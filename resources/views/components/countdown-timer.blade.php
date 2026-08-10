@@ -1,26 +1,8 @@
 {{--
     تایمر شمارش معکوس نئومورفیک با برچسب.
-    Props:
-    - endsAt (DateTimeInterface|int|null) — زمان واقعی پایان پیشنهاد (دقیق‌تر: از روی Date.now() محاسبه می‌شود)
-    - endsInSeconds (int|null) — ثانیه‌های باقی‌مانده از زمان رندر (فال‌بک قدیمی)
-    - id (string) — پیشوند یکتا برای شناسه‌های DOM، وقتی چند تایمر در یک صفحه هست لازم است
+    Props (از کلاس CountdownTimer): endsAt | endsInSeconds | id
+    محاسبهٔ زمان پایان (endMs) در کلاس انجام می‌شود.
 --}}
-@props(['endsAt' => null, 'endsInSeconds' => null, 'id' => 'cd'])
-
-@php
-    $endMs = null;
-    if ($endsAt !== null) {
-        if ($endsAt instanceof \DateTimeInterface) {
-            $endMs = $endsAt->getTimestamp() * 1000;
-        } else {
-            $endMs = (int) $endsAt;
-            // اگر ورودی به ثانیه بود (نه میلی‌ثانیه) به میلی‌ثانیه تبدیل کن
-            if ($endMs < 100000000000) {
-                $endMs *= 1000;
-            }
-        }
-    }
-@endphp
 
 <div class="cd-wrap" id="{{ $id }}-wrap" role="timer" aria-label="{{ __('messages.deal_ends_in') }}">
     <div class="cd-unit">

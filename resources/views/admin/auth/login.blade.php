@@ -1,12 +1,4 @@
-@php
-    // زبان و جهت فعال (توسط SetLocale به همه ویوها share می‌شود)
-    $currentLocale = $currentLocale ?? app()->getLocale();
-    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
-    // زبان‌های فعال از سرویس — در حالت تک‌زبانه سوییچر مخفی می‌شود
-    $locales = locale()->active();
-    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
-    $digitFamily = locale()->digitFamily($currentLocale);
-@endphp
+{{-- داده‌های زبان/جهت/ارقام/زبان‌های فعال توسط LocaleComposer (سراسری) آماده می‌شود --}}
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}">
 <head>
@@ -134,15 +126,6 @@
 
     @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
 </head>
-
-@php
-    // لاگین واقعی — POST /admin/login (admin.login.submit)
-    $loginAction = route('admin.login.submit');
-    $resetAction = Route::has('admin.password.email') ? route('admin.password.email') : null;
-    $errorsBag   = $errors ?? null;
-    $hasError    = session('error') || ($errorsBag && $errorsBag->any());
-    $flashType   = session('error') ? 'error' : (session('success') ? 'success' : null);
-@endphp
 
 <body class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 font-sans antialiased selection:bg-primary-500/30">
 
@@ -300,8 +283,8 @@
                 </div>
 
                 {{-- هشدارها --}}
-                <div x-data="{ show: {{ $hasError ? 'true' : 'false' }} }" class="mb-5 space-y-3">
-                    @if($hasError)
+                <div x-data="{ show: {{ (session('error') || ($errors && $errors->any())) ? 'true' : 'false' }} }" class="mb-5 space-y-3">
+                    @if(session('error') || ($errors && $errors->any()))
                         <div x-show="show" x-transition.opacity.duration.300ms
                              class="flex items-start gap-3 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
                             <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,9 +293,9 @@
                             <div class="flex-1 leading-6">
                                 @if(session('error'))
                                     {{ session('error') }}
-                                @elseif($errorsBag)
+                                @elseif($errors && $errors->any())
                                     <ul class="list-disc pr-4 space-y-0.5">
-                                        @foreach($errorsBag->all() as $err)<li>{{ $err }}</li>@endforeach
+                                        @foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach
                                     </ul>
                                 @endif
                             </div>
@@ -322,7 +305,7 @@
                         </div>
                     @endif
 
-                    @if($flashType === 'success')
+                    @if(session('success'))
                         <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.300ms
                              class="flex items-start gap-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
                             <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,7 +332,7 @@
                         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('admin.login.welcome_sub') }}</p>
                     </div>
 
-                    <form method="POST" action="{{ $loginAction }}"
+                    <form method="POST" action="{{ route('admin.login.submit') }}"
                           x-data="{ showPassword: false, loading: false, email: '{{ old('email') }}' }"
                           @submit="loading = true"
                           class="space-y-5">
@@ -370,10 +353,10 @@
                                 <input type="email" id="login-email" name="email" required autofocus autocomplete="email"
                                        x-model="email"
                                        placeholder="name@example.com"
-                                       class="login-input {{ $errorsBag && $errorsBag->has('email') ? 'has-error' : '' }}">
+                                       class="login-input {{ $errors->has('email') ? 'has-error' : '' }}">
                             </div>
-                            @if($errorsBag && $errorsBag->has('email'))
-                                <p class="mt-1.5 text-xs text-rose-500">{{ $errorsBag->first('email') }}</p>
+                            @if($errors->has('email'))
+                                <p class="mt-1.5 text-xs text-rose-500">{{ $errors->first('email') }}</p>
                             @endif
                         </div>
 
@@ -381,8 +364,8 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <label for="login-password" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('admin.login.password') }}</label>
-                                @if($resetAction)
-                                    <a href="{{ $resetAction }}" class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">{{ __('admin.login.forgot') }}</a>
+                                @if(Route::has('admin.password.email'))
+                                    <a href="{{ route('admin.password.email') }}" class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">{{ __('admin.login.forgot') }}</a>
                                 @endif
                             </div>
                             <div class="relative">
@@ -393,7 +376,7 @@
                                 </span>
                                 <input :type="showPassword ? 'text' : 'password'" id="login-password" name="password" required
                                        autocomplete="current-password" placeholder="••••••••"
-                                       class="login-input pl-11 {{ $errorsBag && $errorsBag->has('password') ? 'has-error' : '' }}">
+                                       class="login-input pl-11 {{ $errors->has('password') ? 'has-error' : '' }}">
                                 <button type="button" @click="showPassword = !showPassword"
                                         :title="showPassword ? '{{ __('admin.login.hide_password') }}' : '{{ __('admin.login.show_password') }}'"
                                         :aria-label="showPassword ? '{{ __('admin.login.hide_password') }}' : '{{ __('admin.login.show_password') }}'"
@@ -407,8 +390,8 @@
                                     </svg>
                                 </button>
                             </div>
-                            @if($errorsBag && $errorsBag->has('password'))
-                                <p class="mt-1.5 text-xs text-rose-500">{{ $errorsBag->first('password') }}</p>
+                            @if($errors->has('password'))
+                                <p class="mt-1.5 text-xs text-rose-500">{{ $errors->first('password') }}</p>
                             @endif
                         </div>
 

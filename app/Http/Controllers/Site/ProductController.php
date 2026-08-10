@@ -61,7 +61,13 @@ class ProductController extends Controller
         // برندهای فعال
         $brands = Brand::where('active', true)->orderBy('id')->get();
 
-        return view('site.products.index', compact('products', 'categories', 'brands'));
+        // دادهٔ فیلترهای فعلی برای حفظ حالت فرم‌ها (بدون منطق request در ویو)
+        $filters = $request->except(['sort', 'page']);
+        $selectedCategories = array_values(array_filter((array) ($request->input('category') ?? [])));
+        $selectedBrand = $request->input('brand');
+        $selectedSort = $request->input('sort', 'default');
+
+        return view('site.products.index', compact('products', 'categories', 'brands', 'filters', 'selectedCategories', 'selectedBrand', 'selectedSort'));
     }
 
     /**
@@ -107,6 +113,92 @@ class ProductController extends Controller
 
         $complement = $product->complement;
 
-        return view('site.products.show', compact('product', 'related', 'complement'));
+        // داده‌های نمایشی صفحهٔ محصول (مشخصات/واریانت‌ها/تصویر اصلی) — از ویو خارج شده
+        $viewData = $this->prepareShowData($product);
+
+        return view('site.products.show', array_merge(compact('product', 'related', 'complement'), $viewData));
+    }
+
+    /**
+     * داده‌های نمایشی صفحهٔ جزئیات محصول را آماده می‌کند:
+     * تصویر اصلی، گروه‌بندی مشخصات (والد/فرزند + مقادیر نوشتاری)،
+     * ساختار واریانت برای انتخابگر و ارزان‌ترین واریانت موجود.
+     *
+     * @return array{mainImage: string, specGroups: array, textValues: array, mainSpecs: array, variantsData: \Illuminate\Support\Collection, minVariant: mixed}
+     */
+    private function prepareShowData(Product $product): array
+    {
+        $mainImage = $product->main_image_url ?? 'https://picsum.photos/seed/'.$product->slug.'/600/600';
+
+        // ۱) مشخصه‌های انتخابی گروه‌بندی‌شده: والد → [مقادیر]
+        $specGroups = [];
+        foreach ($product->productSpecifications as $ps) {
+            if ($ps->value === null && $ps->parent_id === null && $ps->specification) {
+                $group = $ps->specification;
+                $values = $ps->children->map(fn ($c) => $c->specification?->trans('title'))->filter()->implode('، ');
+                $specGroups[$group->id] = ['title' => $group->trans('title'), 'values' => $values];
+            }
+        }
+
+        // ۲) مقادیر نوشتاری
+        $textValues = [];
+        foreach ($product->productSpecifications as $ps) {
+            if ($ps->value !== null && $ps->specification) {
+                $textValues[] = ['title' => $ps->specification->trans('title'), 'value' => $ps->value];
+            }
+        }
+
+        // ۳) ساختار واریانت برای انتخابگر
+        // main_specs: [{id, title, is_color, children: [{id, title, color_code, variant_ids}]}]
+        $mainSpecs = [];
+        $variants = $product->variants;
+        foreach ($variants as $variant) {
+            foreach ($variant->specifications as $spec) {
+                if (! $spec->parent) {
+                    continue;
+                }
+                $groupId = $spec->parent->id;
+                if (! isset($mainSpecs[$groupId])) {
+                    $mainSpecs[$groupId] = [
+                        'id' => $groupId,
+                        'title' => $spec->parent->trans('title'),
+                        'is_color' => (bool) $spec->parent->is_color,
+                        'children' => [],
+                    ];
+                }
+                $childKey = $spec->id;
+                if (! isset($mainSpecs[$groupId]['children'][$childKey])) {
+                    $mainSpecs[$groupId]['children'][$childKey] = [
+                        'id' => $spec->id,
+                        'title' => $spec->trans('title'),
+                        'color_code' => $spec->color_code,
+                        'variant_ids' => [],
+                    ];
+                }
+                $mainSpecs[$groupId]['children'][$childKey]['variant_ids'][] = $variant->id;
+            }
+        }
+        $mainSpecs = array_values(array_map(fn ($g) => [
+            'id' => $g['id'],
+            'title' => $g['title'],
+            'is_color' => $g['is_color'],
+            'children' => array_values($g['children']),
+        ], $mainSpecs));
+
+        // واریانت‌ها با specification_ids و قیمت برای JS
+        $variantsData = $variants->map(fn ($v) => [
+            'id' => $v->id,
+            'spec_ids' => $v->specifications->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all(),
+            'price' => (int) $v->price,
+            'discount_price' => (int) $v->discounted_price,
+            'final_price' => (int) $v->final_price,
+            'stock' => (int) $v->stock,
+            'percent' => $v->percent,
+        ])->values();
+
+        // ارزان‌ترین واریانت موجود
+        $minVariant = $variants->where('stock', '>', 0)->where('final_price', '>', 0)->sortBy('final_price')->first();
+
+        return compact('mainImage', 'specGroups', 'textValues', 'mainSpecs', 'variantsData', 'minVariant');
     }
 }

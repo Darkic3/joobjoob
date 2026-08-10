@@ -1,38 +1,20 @@
-@php
-    $spec = $spec ?? null;
-    $isEdit = $spec !== null;
-
-    $oldVal = function($key, $default = '') use ($isEdit, $spec) {
-        if (old($key) !== null) return old($key);
-        if ($isEdit && $spec) {
-            $keys = explode('.', $key);
-            $value = $spec;
-            foreach ($keys as $k) {
-                if (is_object($value) && isset($value->$k)) $value = $value->$k;
-                elseif (is_array($value) && isset($value[$k])) $value = $value[$k];
-                else return $default;
-            }
-            return $value;
-        }
-        return $default;
-    };
-@endphp
+@props(['spec' => null])
 
 <div x-data="{
-    type: '{{ $oldVal('type', 'select') }}',
-    isColor: {{ $oldVal('is_color') ? 'true' : 'false' }},
-    colorCode: '{{ $oldVal('color_code', '#3B82F6') }}'
+    type: '{{ old('type', $spec?->type ?? 'select') }}',
+    isColor: {{ old('is_color', $spec?->is_color ?? false) ? 'true' : 'false' }},
+    colorCode: '{{ old('color_code', $spec?->color_code ?? '#3B82F6') }}'
 }" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{{ __('admin.specifications.title_fa') }} <span class="text-rose-500">*</span></label>
-        <input type="text" name="title[fa]" value="{{ $oldVal('title.fa') }}" class="input-custom" placeholder="{{ __('admin.specifications.title_fa_ph') }}" required>
+        <input type="text" name="title[fa]" value="{{ old('title.fa', $spec?->title['fa'] ?? '') }}" class="input-custom" placeholder="{{ __('admin.specifications.title_fa_ph') }}" required>
         @error('title.fa') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{{ __('admin.specifications.title_en') }}</label>
-        <input type="text" name="title[en]" value="{{ $oldVal('title.en') }}" class="input-custom" placeholder="{{ __('admin.specifications.title_en_ph') }}" dir="ltr">
+        <input type="text" name="title[en]" value="{{ old('title.en', $spec?->title['en'] ?? '') }}" class="input-custom" placeholder="{{ __('admin.specifications.title_en_ph') }}" dir="ltr">
     </div>
 
     {{-- نوع مشخصه --}}
@@ -63,7 +45,7 @@
         <select name="parent_id" class="input-custom">
             <option value="">{{ __('admin.specifications.no_parent') }}</option>
             @foreach($parents as $parent)
-                <option value="{{ $parent->id }}" @if($oldVal('parent_id') == $parent->id) selected @endif>{{ $parent->trans('title') }}</option>
+                <option value="{{ $parent->id }}" @if(old('parent_id', $spec?->parent_id) == $parent->id) selected @endif>{{ $parent->trans('title') }}</option>
             @endforeach
         </select>
     </div>
@@ -74,7 +56,7 @@
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.specifications.color_palette') }}</span>
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="is_color" value="0">
-                <input type="checkbox" name="is_color" value="1" x-model="isColor" class="sr-only peer" @if($oldVal('is_color')) checked @endif>
+                <input type="checkbox" name="is_color" value="1" x-model="isColor" class="sr-only peer" @if(old('is_color', $spec?->is_color ?? false)) checked @endif>
                 <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:ring-2 peer-checked:ring-indigo-500 dark:bg-gray-600 peer-checked:bg-indigo-600 transition-all"></div>
                 <div class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:-translate-x-5 dark:bg-gray-300"></div>
             </label>
@@ -91,7 +73,7 @@
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.specifications.in_filter_label') }}</span>
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="is_filter" value="0">
-                <input type="checkbox" name="is_filter" value="1" class="sr-only peer" @if($oldVal('is_filter')) checked @endif>
+                <input type="checkbox" name="is_filter" value="1" class="sr-only peer" @if(old('is_filter', $spec?->is_filter ?? false)) checked @endif>
                 <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:ring-2 peer-checked:ring-indigo-500 dark:bg-gray-600 peer-checked:bg-indigo-600 transition-all"></div>
                 <div class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:-translate-x-5 dark:bg-gray-300"></div>
             </label>
@@ -103,7 +85,7 @@
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.specifications.active') }}</span>
         <label class="relative inline-flex items-center cursor-pointer">
             <input type="hidden" name="active" value="0">
-            <input type="checkbox" name="active" value="1" class="sr-only peer" @if($oldVal('active', true)) checked @endif>
+            <input type="checkbox" name="active" value="1" class="sr-only peer" @if(old('active', $spec?->active ?? true)) checked @endif>
             <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:ring-2 peer-checked:ring-indigo-500 dark:bg-gray-600 peer-checked:bg-indigo-600 transition-all"></div>
             <div class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:-translate-x-5 dark:bg-gray-300"></div>
         </label>

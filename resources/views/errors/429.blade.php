@@ -1,8 +1,3 @@
-@php
-    $currentLocale = $currentLocale ?? app()->getLocale();
-    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
-    $digitFamily = locale()->digitFamily($currentLocale);
-@endphp
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}">
 <head>

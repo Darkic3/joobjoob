@@ -1,11 +1,6 @@
 @props(['cartCount' => 0])
 
-@php
-    // زبان‌های فعال از سرویس (منبع واحد حقیقت) — در حالت تک‌زبانه سوییچر مخفی می‌شود
-    $locales = locale()->active();
-    $currentLocale = $currentLocale ?? app()->getLocale();
-@endphp
-
+{{-- locales/currentLocale از LocaleComposer سراسری می‌آید --}}
 <header class="sticky top-0 z-40 backdrop-blur" style="background:color-mix(in srgb, var(--bg) 90%, transparent);">
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center gap-4">
 

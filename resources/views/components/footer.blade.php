@@ -1,3 +1,13 @@
+@php
+    $socialLinks = collect([
+        'social_instagram' => 'اینستاگرام',
+        'social_telegram' => 'تلگرام',
+        'social_whatsapp' => 'واتساپ',
+        'social_twitter' => 'توییتر',
+        'social_youtube' => 'یوتیوب',
+    ])->filter(fn ($label, $key) => setting($key))->all();
+@endphp
+
 <footer class="mt-16 py-10" style="background: var(--bg-elevated);">
     <div class="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div class="neu-card">
@@ -18,10 +28,7 @@
                     @endif
                 </ul>
             @endif
-            @php
-                $socials = collect(['social_instagram' => 'اینستاگرام', 'social_telegram' => 'تلگرام', 'social_whatsapp' => 'واتساپ', 'social_twitter' => 'توییتر', 'social_youtube' => 'یوتیوب']);
-                $socialLinks = $socials->filter(fn($label, $key) => setting($key))->all();
-            @endphp
+            {{-- لینک‌های شبکهٔ اجتماعی فعال (از تنظیمات) --}}
             @if($socialLinks)
                 <div class="flex items-center gap-2 mt-3">
                     @foreach($socialLinks as $key => $label)

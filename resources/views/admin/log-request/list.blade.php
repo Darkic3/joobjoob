@@ -46,18 +46,9 @@
                                     <td>{{ $log->user->name ?? 'کاربر مهمان/حذف شده' }}</td>
                                     <td>{{ $log->ip }}</td>
                                     <td>
-                                        @php
-                                            $methodColor = match($log->method) {
-                                                'GET' => '#07ddef',
-                                                'POST' => '#198754',
-                                                'PUT', 'PATCH' => '#ffc107',
-                                                'DELETE' => '#dc3545',
-                                                default => '#6c757d',
-                                            };
-                                            $textColor = ($log->method == 'POST' || $log->method == 'DELETE') ? '#fff' : '#373535';
-                                        @endphp
+                                        {{-- رنگ‌های نشان متد در RequestLog::methodBadge() آماده می‌شود --}}
                                         <span class="d-inline-block rounded-pill px-3 py-2"
-                                              style="font-size: 0.85rem; font-weight: 600; background-color: {{ $methodColor }}; color: {{ $textColor }}; font-family: 'Vazirmatn', sans-serif;">
+                                              style="font-size: 0.85rem; font-weight: 600; background-color: {{ $log->methodBadge()['bg'] }}; color: {{ $log->methodBadge()['text'] }}; font-family: 'Vazirmatn', sans-serif;">
                                             {{ $log->method }}
                                         </span>
                                     </td>
@@ -116,12 +107,7 @@
                                                             <strong class="d-block text-warning mb-2">Payload
                                                                 (Body):</strong>
                                                             <pre class="bg-dark p-3 rounded"
-                                                                 style="max-height: 300px; overflow-y: auto; color: #adbac7;">
-                                                            @php
-                                                                $payloadData = json_decode($log->payload, true);
-                                                                echo $payloadData ? json_encode($payloadData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No Data';
-                                                            @endphp
-                                                            </pre>
+                                                                 style="max-height: 300px; overflow-y: auto; color: #adbac7;">{{ $log->payload ? json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No Data' }}</pre>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer border-top border-secondary">

@@ -1,10 +1,8 @@
-@php
-    $user = auth()->user();
-    // زبان‌های فعال از سرویس (منبع واحد حقیقت) — در حالت تک‌زبانه سوییچر مخفی می‌شود
-    $locales = locale()->active();
-    $currentLocale = $currentLocale ?? app()->getLocale();
-@endphp
+@props([])
 
+@php $user = auth()->user(); @endphp
+
+{{-- locales/currentLocale از LocaleComposer سراسری می‌آید --}}
 <header class="sticky top-0 z-20 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 transition-colors duration-300">
     <div class="flex items-center justify-between h-16">
 

@@ -1,10 +1,4 @@
-@php use App\Models\Setting; @endphp
-@php
-    // ترجمه با fallback به برچسب کانفیگ — اگر کلید ترجمه نبود، برچسب اصلی نمایش داده می‌شود
-    $t = function (string $key, ?string $fallback = null) {
-        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : ($fallback ?? $key);
-    };
-@endphp
+{{-- داده‌ها (fieldsByTab/groupsValues/…) در SettingController آماده می‌شود؛ ترجمه با fallback از هلمر trans_or() --}}
 @extends('layouts.admin.app')
 
 @section('tab-name', __('admin.settings.title'))
@@ -33,7 +27,7 @@
                                        aria-controls="settings-tab-{{ $tabKey }}"
                                        aria-selected="{{ $activeGroup === $tabKey ? 'true' : 'false' }}"
                                        class="nav-link rounded-top-3 px-4 py-3 fw-semibold @if ($activeGroup === $tabKey) active @endif">
-                                        {{ $t('admin.settings.tabs.' . $tabKey, $tabLabel) }}
+                                        {{ trans_or('admin.settings.tabs.'.$tabKey, $tabLabel) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -51,43 +45,29 @@
                                     @method('PUT')
 
                                     <div class="row g-4 p-4 p-md-5">
-                                        @php
-                                            $groupFields = collect($fields)->filter(fn ($f) => ($f['tab'] ?? 'general') === $tabKey);
-                                        @endphp
-
-                                        @forelse ($groupFields as $fieldKey => $config)
-                                            @php
-                                                $value = old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null);
-                                                $type = $config['type'] ?? 'text';
-                                                $ckeditor = $config['ckeditor'] ?? false;
-                                                $isRequired = $config['required'] ?? false;
-                                                $guide = $config['guide'] ?? false;
-                                                $cropper = $config['cropper'] ?? false;
-                                                $colClass = ($type === 'textarea' || $type === 'ckeditor') ? 'col-12' : 'col-md-6';
-                                            @endphp
-
-                                            <div class="{{ $colClass }}">
+                                        @forelse ($fieldsByTab[$tabKey] ?? [] as $fieldKey => $config)
+                                            <div class="{{ in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']) ? 'col-12' : 'col-md-6' }}">
                                                 <div class="mb-3">
                                                     <label for="{{ $fieldKey }}" class="form-label fw-semibold mb-2">
-                                                        {{ $t('admin.settings.fields.' . $fieldKey, $config['label'] ?? '') }}
-                                                        @if ($isRequired) <span class="text-danger">*</span> @endif
+                                                        {{ trans_or('admin.settings.fields.'.$fieldKey, $config['label'] ?? '') }}
+                                                        @if ($config['required'] ?? false) <span class="text-danger">*</span> @endif
                                                     </label>
 
-                                                    @if($guide)
+                                                    @if($config['guide'] ?? false)
                                                         <div class="alert alert-light border d-flex align-items-start py-2 mb-3" role="alert">
                                                             <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
-                                                            <small class="text-muted">{{ $guide }}</small>
+                                                            <small class="text-muted">{{ $config['guide'] }}</small>
                                                         </div>
                                                     @endif
 
                                                     {{-- آپلود فایل / ویدیو --}}
-                                                    @if ($type === 'file' || $type === 'video')
+                                                    @if (($config['type'] ?? 'text') === 'file' || ($config['type'] ?? 'text') === 'video')
                                                         <div class="border rounded-3 p-3 bg-light bg-opacity-50 dark:bg-gray-800 dark:border-gray-600">
                                                             <div class="mb-3">
                                                                 <label class="custom-file-upload-btn w-100 text-center py-3 rounded-3 border border-dashed cursor-pointer hover-bg-light transition-all">
                                                                     <input type="file" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}" class="d-none"
-                                                                           accept="{{ $type === 'video' ? 'video/mp4,video/x-m4v,video/*' : 'image/*' }}"
-                                                                           @if ($isRequired && empty($value)) required @endif
+                                                                           accept="{{ ($config['type'] ?? 'text') === 'video' ? 'video/mp4,video/x-m4v,video/*' : 'image/*' }}"
+                                                                           @if (($config['required'] ?? false) && empty(old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null))) required @endif
                                                                            onchange="updateFileName(this)">
                                                                     <i class="bi bi-cloud-arrow-up fs-4 text-primary mb-2 d-block"></i>
                                                                     <span class="fw-semibold upload-label-text">{{ __('admin.settings.choose_file') }}</span>
@@ -95,45 +75,43 @@
                                                                 </label>
                                                             </div>
 
-                                                            @if ($value)
+                                                            @if (old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null))
                                                                 <div class="mt-3 p-2 bg-white rounded-3 border dark:bg-gray-900 dark:border-gray-600">
                                                                     <p class="small fw-bold text-muted mb-2">{{ __('admin.settings.current_file') }}:</p>
-                                                                    @if ($type === 'video')
-                                                                        @php $videoUrl = Setting::videoFile($fieldKey); @endphp
-                                                                        @if ($videoUrl)
+                                                                    @if (($config['type'] ?? 'text') === 'video')
+                                                                        @if (\App\Models\Setting::videoFile($fieldKey))
                                                                             <video controls class="w-100 rounded-2" style="max-height: 200px;">
-                                                                                <source src="{{ $videoUrl }}" type="video/mp4">
+                                                                                <source src="{{ \App\Models\Setting::videoFile($fieldKey) }}" type="video/mp4">
                                                                             </video>
                                                                         @endif
                                                                     @else
-                                                                        <img src="{{ Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ $t('admin.settings.fields.' . $fieldKey, $config['label'] ?? '') }}">
+                                                                        <img src="{{ \App\Models\Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ trans_or('admin.settings.fields.'.$fieldKey, $config['label'] ?? '') }}">
                                                                     @endif
 
-                                                                    @if($type === 'file' && $cropper)
-                                                                        @include('admin.image-croper.modal-croper', [
-                                                                            'inputId' => $fieldKey,
-                                                                            'aspectWidth' => 500,
-                                                                            'aspectHeight' => 738,
-                                                                            'outputWidth' => 500,
-                                                                            'outputHeight' => 738
-                                                                        ])
+                                                                    @if(($config['type'] ?? 'text') === 'file' && ($config['cropper'] ?? false))
+                                                                        <x-admin.cropper-modal
+                                                                            :inputId="$fieldKey"
+                                                                            :aspectWidth="500"
+                                                                            :aspectHeight="738"
+                                                                            :outputWidth="500"
+                                                                            :outputHeight="738" />
                                                                     @endif
                                                                 </div>
                                                             @endif
                                                         </div>
 
                                                         {{-- تکست ایریا / ادیتور --}}
-                                                    @elseif($type === 'textarea' || $type === 'ckeditor')
+                                                    @elseif(in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']))
                                                         <textarea name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                  class="input-custom @if ($ckeditor) ckeditor @endif"
+                                                                  class="input-custom @if ($config['ckeditor'] ?? false) ckeditor @endif"
                                                                   rows="5"
-                                                                  @if ($isRequired) required @endif>{{ $value }}</textarea>
+                                                                  @if ($config['required'] ?? false) required @endif>{{ old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null) }}</textarea>
 
                                                         {{-- اینپوت متنی --}}
                                                     @else
-                                                        <input type="{{ $type }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                               value="{{ $value }}" class="input-custom"
-                                                               @if ($isRequired) required @endif>
+                                                        <input type="{{ $config['type'] ?? 'text' }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
+                                                               value="{{ old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null) }}" class="input-custom"
+                                                               @if ($config['required'] ?? false) required @endif>
                                                     @endif
                                                 </div>
                                             </div>

@@ -2,29 +2,7 @@
 
 
 @section('content')
-    @php
-        // ساخت چیپ‌های فیلترهای فعال برای نمایش زیر کارت جستجو
-        $sortLabels = ['newest' => __('admin.products.sort_newest'), 'oldest' => __('admin.products.sort_oldest'), 'price_asc' => __('admin.products.sort_price_asc'), 'price_desc' => __('admin.products.sort_price_desc'), 'name_asc' => __('admin.products.sort_name_asc'), 'name_desc' => __('admin.products.sort_name_desc')];
-        $availabilityLabels = ['in_stock' => __('admin.products.in_stock'), 'out_of_stock' => __('admin.products.out_of_stock')];
-
-        $activeFilters = [];
-        if (request('search')) $activeFilters[] = ['label' => __('admin.common.search') . ': «' . request('search') . '»', 'url' => route('admin.products.index', request()->except(['page', 'search']))];
-        if (request('category')) {
-            $catName = $categories->firstWhere('id', (int) request('category'))?->trans('name') ?? __('admin.products.no_category');
-            $activeFilters[] = ['label' => __('admin.common.category') . ': ' . $catName, 'url' => route('admin.products.index', request()->except(['page', 'category']))];
-        }
-        if (request('brand_id')) {
-            $brandName = $brands->firstWhere('id', (int) request('brand_id'))?->trans('title') ?? __('admin.products.no_brand');
-            $activeFilters[] = ['label' => __('admin.products.field_brand') . ': ' . $brandName, 'url' => route('admin.products.index', request()->except(['page', 'brand_id']))];
-        }
-        if (request('status') !== '' && request('status') !== null) $activeFilters[] = ['label' => __('admin.common.status') . ': ' . (request('status') == '1' ? __('admin.common.active') : __('admin.common.inactive')), 'url' => route('admin.products.index', request()->except(['page', 'status']))];
-        if (request('sort') && request('sort') !== 'newest') $activeFilters[] = ['label' => __('admin.products.sort') . ': ' . ($sortLabels[request('sort')] ?? request('sort')), 'url' => route('admin.products.index', request()->except(['page', 'sort']))];
-        if (request('availability')) $activeFilters[] = ['label' => __('admin.products.availability') . ': ' . ($availabilityLabels[request('availability')] ?? request('availability')), 'url' => route('admin.products.index', request()->except(['page', 'availability']))];
-        if (request('price_min')) $activeFilters[] = ['label' => __('admin.products.min_price') . ': ' . number_format((int) request('price_min')), 'url' => route('admin.products.index', request()->except(['page', 'price_min']))];
-        if (request('price_max')) $activeFilters[] = ['label' => __('admin.products.max_price') . ': ' . number_format((int) request('price_max')), 'url' => route('admin.products.index', request()->except(['page', 'price_max']))];
-        if (request('featured')) $activeFilters[] = ['label' => __('admin.products.only_featured'), 'url' => route('admin.products.index', request()->except(['page', 'featured']))];
-        if (request('best_seller')) $activeFilters[] = ['label' => __('admin.products.only_best'), 'url' => route('admin.products.index', request()->except(['page', 'best_seller']))];
-    @endphp
+{{-- چیپ‌های فیلترهای فعال در ProductController::activeFilterChips آماده می‌شود --}}
 
     <div x-data="{ searchOpen: false }" class="px-4 sm:px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
 

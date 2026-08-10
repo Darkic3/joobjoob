@@ -1,46 +1,8 @@
 {{--
-    کارت محصول — سازگار با مدل Product و پشتیبانی چندزبانه
-    Props:
-    - product: instance of App\Models\Product
-    - rank: (اختیاری) 1 تا 3 برای مدال طلا/نقره/برنز در بخش پرفروش‌ترین‌ها
-    - soldPercent: (اختیاری) درصد فروش برای نمایش نوار پیشرفت (مخصوص پیشنهادهای داغ)
+    کارت محصول — سازگار با مدل Product و پشتیبانی چندزبانه.
+    Props (از کلاس ProductCard): product | rank | soldPercent
+    همهٔ محاسبات نمایشی در کلاس کامپوننت انجام می‌شود؛ این ویو فقط رندر است.
 --}}
-@props(['product', 'rank' => null, 'soldPercent' => null])
-
-@php
-    /** @var \App\Models\Product $product */
-
-    // اطلاعات پایه
-    $name = $product->trans('name');
-    $imageUrl = $product->main_image_url ?? 'https://picsum.photos/seed/fallback/300/300';
-//    dd($product , $product->images , $imageUrl);
-    $url = localizedRoute('products.show', ['product' => $product->slug]);
-
-    // قیمت و تخفیف (با استفاده از Accessorهای مدل)
-    $hasDiscount = $product->has_discount;
-    $discountPercent = $product->discount_percentage ?? 0;
-    $finalPrice = $product->final_price;
-    $originalPrice = $product->price;
-
-    // وضعیت موجودی
-    $lowStock = $product->stock > 0 && $product->stock <= 5;
-    $outOfStock = $product->stock === 0;
-
-    // نشان جدید (محصولاتی که در ۱۴ روز اخیر اضافه شده‌اند)
-    $isNew = $product->created_at->diffInDays(now()) <= 14;
-
-    // امتیاز و نظرات (با fallback ایمن)
-    $rating = round($product->reviews->avg('rating') ?? 0, 1);
-    $reviewCount = $product->reviews->count();
-
-    // استایل رتبه‌بندی (منطبق با طراحی قبلی شما)
-    $rankStyles = [
-        1 => ['color' => 'var(--gold)',   'text' => '#000'],
-        2 => ['color' => 'var(--silver)', 'text' => '#000'],
-        3 => ['color' => 'var(--bronze)', 'text' => '#fff'],
-    ];
-    $rankStyle = $rank ? ($rankStyles[$rank] ?? ['color' => 'var(--bg-elevated)', 'text' => 'var(--text-secondary)']) : null;
-@endphp
 
 <div class="neu-card neu-interactive group relative flex flex-col h-full p-4">
 

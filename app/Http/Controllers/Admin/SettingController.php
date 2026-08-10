@@ -29,10 +29,17 @@ class SettingController extends Controller
             $groupsValues[$tabKey] = $this->settingService->getGroup($tabKey);
         }
 
+        // فیلدها گروه‌بندی‌شده بر اساس تب — کلید هر فیلد (مثل site_name) حفظ می‌شود
+        // تا نام اینپوت‌ها (`settings[site_name]`) و برچسب‌ها درست رندر شوند.
+        $fieldsByTab = [];
+        foreach ($config['fields'] as $fieldKey => $field) {
+            $fieldsByTab[$field['tab'] ?? 'general'][$fieldKey] = $field;
+        }
+
         return view('admin.settings.edit', [
             'activeGroup' => $group,
             'tabs' => $config['tabs'],
-            'fields' => $config['fields'],
+            'fieldsByTab' => $fieldsByTab,
             'groupsValues' => $groupsValues,
         ]);
     }

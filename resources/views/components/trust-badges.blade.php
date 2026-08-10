@@ -1,11 +1,7 @@
 @props(['badges' => []])
 
-@php
-    // کامپوننت فقط رندر می‌کند — داده را کنترلر آماده کرده و پاس می‌دهد.
-    $badges = collect($badges);
-@endphp
-
-@if($badges->isNotEmpty())
+{{-- داده‌ها (badges) توسط کنترلر آماده می‌شود — ویو فقط رندر است --}}
+@if(count($badges))
     {{-- چیدمان مرکزگرا: با هر تعداد نشان (۱ تا ۶) به‌صورت متقارن وسط‌چین نمایش داده می‌شود --}}
     <div class="trust-strip flex flex-wrap justify-center gap-4">
         @foreach($badges as $i => $badge)

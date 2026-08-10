@@ -68,4 +68,14 @@ return [
     'trust_return_desc' => 'دون أي أسئلة',
     'trust_support' => 'دعم على مدار الساعة',
     'trust_support_desc' => 'نحن هنا دائماً للمساعدة',
+
+    // الهيرو
+    'user_rating' => 'تقييم المستخدمين',
+    'viewing_now' => 'مشاهدون الآن',
+    'no_slides' => 'لا توجد بانرات بعد.',
+    'next_slide' => 'الشريحة التالية',
+    'prev_slide' => 'الشريحة السابقة',
+    'view_products' => 'عرض المنتجات',
+    'special_deals' => 'عروض خاصة 🔥',
+    'discount_off' => 'خصم',
 ];

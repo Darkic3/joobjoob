@@ -75,4 +75,14 @@ return [
     'trust_return_desc' => 'No questions asked',
     'trust_support' => '24/7 Support',
     'trust_support_desc' => 'Always here to help',
+
+    // Hero
+    'user_rating' => 'User Rating',
+    'viewing_now' => 'viewing now',
+    'no_slides' => 'No hero slides available.',
+    'next_slide' => 'Next slide',
+    'prev_slide' => 'Previous slide',
+    'view_products' => 'View Products',
+    'special_deals' => 'Special Deals 🔥',
+    'discount_off' => 'OFF',
 ];

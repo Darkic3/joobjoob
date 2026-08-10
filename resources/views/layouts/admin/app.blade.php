@@ -1,10 +1,4 @@
-@php
-    // زبان و جهت فعال (توسط SetLocale به همه ویوها share می‌شود)
-    $currentLocale = $currentLocale ?? app()->getLocale();
-    $direction = $direction ?? (locale()->isRtl($currentLocale) ? 'rtl' : 'ltr');
-    // خانواده‌ی ارقام برای localize-digits.js (persian | arabic | latin)
-    $digitFamily = locale()->digitFamily($currentLocale);
-@endphp
+{{-- داده‌های زبان/جهت/ارقام توسط LocaleComposer (سراسری) آماده می‌شود --}}
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}">
 <head>
@@ -70,6 +64,7 @@
     <x-admin.mobile-sidebar/>
 </div>
 
+@stack('modals')
 <x-admin.scripts/>
 @stack('scripts')
 </body>

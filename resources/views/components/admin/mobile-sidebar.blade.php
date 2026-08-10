@@ -1,15 +1,4 @@
-@php
-    $u = auth()->user();
-    $can = fn (string $p) => $u->canAccess($p);
-    $showProducts = $can('admin.products.index') || $can('admin.brands.index') || $can('admin.specifications.index');
-    $showBlog = $can('admin.blogs.index') || $can('admin.blog-categories.index');
-    $showContentDivider = $can('admin.hero-slides.index') || $showProducts || $can('admin.product-categories.index') || $showBlog || $can('admin.trust-badges.index');
-    $showSettingsDivider = $can('admin.settings.edit') || $can('admin.roles.index') || $can('admin.users.index') || $can('admin.languages.index');
-    // در موبایل یک لینک برای کل گروه محصولات — به اولین بخش در دسترس برو
-    $productsTarget = $can('admin.products.index') ? 'admin.products.index'
-        : ($can('admin.brands.index') ? 'admin.brands.index' : 'admin.specifications.index');
-@endphp
-
+{{-- دسترسی‌ها و مقصد محصولات در کلاس Admin\MobileSidebar آماده می‌شود --}}
 {{-- Overlay --}}
 <div x-show="mobileSidebar" x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

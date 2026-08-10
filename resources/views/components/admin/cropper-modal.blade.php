@@ -1,22 +1,14 @@
-@php
-    // تنظیم مقادیر پیش‌فرض و ایجاد IDهای منحصربه‌فرد
-    $inputId = $inputId ?? 'image';
-    $aspectWidth = $aspectWidth ?? 1;
-    $aspectHeight = $aspectHeight ?? 1;
-    $outputWidth = $outputWidth ?? 1920;
-    $outputHeight = $outputHeight ?? 1920;
-    $aspectRatio = $aspectWidth / $aspectHeight;
-
-    // ایجاد شناسه‌های یکتا برای هر اینپوت
-    $modalId = "ac-modal-" . $inputId;
-    $imgId = "ac-img-" . $inputId;
-    $confirmBtnId = "ac-confirm-" . $inputId;
-    $cancelBtnId = "ac-cancel-" . $inputId;
-@endphp
+@props([
+    'inputId' => 'image',
+    'aspectWidth' => 1,
+    'aspectHeight' => 1,
+    'outputWidth' => 1920,
+    'outputHeight' => 1920,
+])
 
 @once
     @push('styles')
-        <link rel="stylesheet" href="{{asset('assets/admin/cropper/cropper.min.css')}}" />
+        <link rel="stylesheet" href="{{ asset('assets/admin/cropper/cropper.min.css') }}" />
         <style>
             .ac-cropper-modal-custom {
                 display: none;
@@ -52,21 +44,21 @@
     @endpush
 
     @push('scripts')
-        <script src="{{asset('assets/admin/cropper/cropper.min.js')}}"></script>
+        <script src="{{ asset('assets/admin/cropper/cropper.min.js') }}"></script>
     @endpush
 @endonce
 
 {{-- بخش مدال نباید داخل @once باشد تا برای هر اینپوت یک مدال جداگانه ساخته شود --}}
 @push('modals')
-    <div id="{{ $modalId }}" class="ac-cropper-modal-custom">
+    <div id="ac-modal-{{ $inputId }}" class="ac-cropper-modal-custom">
         <div class="ac-content-box">
             <h3>برش تصویر ({{ $aspectWidth }}x{{ $aspectHeight }})</h3>
             <div class="ac-image-wrapper">
-                <img id="{{ $imgId }}" style="max-width: 100%;">
+                <img id="ac-img-{{ $inputId }}" style="max-width: 100%;">
             </div>
             <div class="ac-buttons">
-                <button type="button" class="ac-btn ac-btn-confirm" id="{{ $confirmBtnId }}">تایید و جایگزینی</button>
-                <button type="button" class="ac-btn ac-btn-cancel" id="{{ $cancelBtnId }}">انصراف</button>
+                <button type="button" class="ac-btn ac-btn-confirm" id="ac-confirm-{{ $inputId }}">تایید و جایگزینی</button>
+                <button type="button" class="ac-btn ac-btn-cancel" id="ac-cancel-{{ $inputId }}">انصراف</button>
             </div>
         </div>
     </div>
@@ -80,10 +72,10 @@
                 let originalName = '';
 
                 const inputEl = document.getElementById('{{ $inputId }}');
-                const modalEl = document.getElementById('{{ $modalId }}');
-                const imageEl = document.getElementById('{{ $imgId }}');
-                const confirmBtn = document.getElementById('{{ $confirmBtnId }}');
-                const cancelBtn = document.getElementById('{{ $cancelBtnId }}');
+                const modalEl = document.getElementById('ac-modal-{{ $inputId }}');
+                const imageEl = document.getElementById('ac-img-{{ $inputId }}');
+                const confirmBtn = document.getElementById('ac-confirm-{{ $inputId }}');
+                const cancelBtn = document.getElementById('ac-cancel-{{ $inputId }}');
 
                 if (!inputEl) return;
 
@@ -103,7 +95,7 @@
                             // ایجاد کراپ‌ر جدید بعد از لود شدن تصویر
                             imageEl.onload = () => {
                                 current_cropper = new Cropper(imageEl, {
-                                    aspectRatio: {{ $aspectRatio }},
+                                    aspectRatio: {{ $aspectWidth / $aspectHeight }},
                                     viewMode: 2,
                                     autoCropArea: 1
                                 });

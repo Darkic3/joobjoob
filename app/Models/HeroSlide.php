@@ -93,6 +93,104 @@ class HeroSlide extends Model
     }
 
     /**
+     * نوع مقصد لینک در فرم ادمین (برای پیش‌انتخاب دراپ‌داون).
+     */
+    public function linkType(): string
+    {
+        if (! $this->linkable_type) {
+            return 'custom';
+        }
+
+        return match (true) {
+            $this->linkable_type === 'url' => 'custom',
+            str_contains($this->linkable_type, 'Product') && ! str_contains($this->linkable_type, 'Category') => 'product',
+            str_contains($this->linkable_type, 'ProductCategory') => 'product_category',
+            str_contains($this->linkable_type, 'Blog') && ! str_contains($this->linkable_type, 'Category') => 'blog',
+            str_contains($this->linkable_type, 'BlogCategory') => 'blog_category',
+            str_contains($this->linkable_type, 'Page') => 'page',
+            default => 'custom',
+        };
+    }
+
+    /**
+     * آیتم‌های اعتماد به فرمت فرم ادمین (icon/fa/en) — از هر دو ساختار ذخیره‌شده پشتیبانی می‌کند.
+     *
+     * @return array<int, array{icon: string, fa: string, en: string}>
+     */
+    public function trustFormSeed(): array
+    {
+        $seed = [];
+        foreach ((array) $this->trusts as $trust) {
+            if (! is_array($trust)) {
+                continue;
+            }
+
+            $trustText = is_array($trust['text'] ?? null) ? $trust['text'] : [];
+            $seed[] = [
+                'icon' => $trust['icon'] ?? '✓',
+                'fa' => $trust['fa'] ?? $trustText['fa'] ?? '',
+                'en' => $trust['en'] ?? $trustText['en'] ?? '',
+            ];
+        }
+
+        return $seed;
+    }
+
+    /**
+     * درصد پر شدن هر ۵ ستارهٔ امتیاز (۰ تا ۱۰۰) — برای نمایش ستارهٔ نیمه‌پر.
+     * مثال: امتیاز ۴.۶ → [100, 100, 100, 100, 60]
+     *
+     * @return array<int, int>
+     */
+    public function ratingStars(): array
+    {
+        $rating = (float) $this->rating;
+        $stars = [];
+
+        for ($s = 1; $s <= 5; $s++) {
+            $stars[] = (int) min(100, max(0, ($rating - ($s - 1)) * 100));
+        }
+
+        return $stars;
+    }
+
+    /**
+     * برچسب واحد پول اسلاید بر اساس زبان جاری.
+     */
+    public function currencyLabel(): string
+    {
+        if ($this->currency === 'IRT') {
+            return app()->getLocale() === 'fa' ? 'تومان' : 'IRT';
+        }
+
+        return (string) ($this->currency ?: 'IRT');
+    }
+
+    /**
+     * درصد تخفیف (قیمت قدیمی → جدید).
+     */
+    public function discountPercent(): int
+    {
+        if ($this->old_price <= $this->price || $this->old_price <= 0) {
+            return 0;
+        }
+
+        return (int) round((($this->old_price - $this->price) / $this->old_price) * 100);
+    }
+
+    /**
+     * آدرس تصویر اسلاید — لینک خارجی یا مسیر آپلود محلی.
+     */
+    public function imageUrl(): string
+    {
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        return asset(config('paths.upload', 'uploads').'/hero-slides/'.$this->image);
+    }
+
+    /**
      * آیتم‌های اعتماد آمادهٔ رندر (با ترجمهٔ زبان جاری).
      *
      * فقط آیتم‌هایی که ادمین برای این اسلاید ذخیره کرده است برمی‌گردد —

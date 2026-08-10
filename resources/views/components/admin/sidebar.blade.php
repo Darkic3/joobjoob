@@ -1,17 +1,4 @@
-@php
-    $u = auth()->user();
-    $can = fn (string $p) => $u->canAccess($p);
-
-    $productsOpen = request()->routeIs('admin.products.*') || request()->routeIs('admin.brands.*') || request()->routeIs('admin.specifications.*');
-    $blogOpen = request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*');
-
-    // نمایش هر لینک فقط با داشتن پرمیشن — کاربرِ بدون دسترسی، لینک را نمی‌بیند
-    $showProducts = $can('admin.products.index') || $can('admin.brands.index') || $can('admin.specifications.index');
-    $showBlog = $can('admin.blogs.index') || $can('admin.blog-categories.index');
-    $showContentDivider = $can('admin.hero-slides.index') || $showProducts || $can('admin.product-categories.index') || $showBlog || $can('admin.trust-badges.index');
-    $showSettingsDivider = $can('admin.settings.edit') || $can('admin.roles.index') || $can('admin.users.index') || $can('admin.languages.index');
-@endphp
-
+{{-- دسترسی‌ها و وضعیت باز بودن منوها در کلاس Admin\Sidebar آماده می‌شود --}}
 <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
        class="hidden lg:flex flex-col bg-white dark:bg-gray-800 border-s border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out fixed inset-y-0 start-0 z-30 shadow-sm">
 

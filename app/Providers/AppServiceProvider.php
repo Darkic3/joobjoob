@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\View\Composers\LocaleComposer;
+use App\View\Composers\SiteLayoutComposer;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::define('admin', fn ($user) => $user->isAdmin());
+        Gate::define('admin', fn ($user) => $user->isAdmin());
+
+        // داده‌های سراسری زبان/جهت/ارقام برای همهٔ ویوها (به‌جای fallback تکراری داخل لایه‌ها)
+        View::composer('*', LocaleComposer::class);
+
+        // نوار اعلان چیدمان سایت
+        View::composer('layouts.site.app', SiteLayoutComposer::class);
     }
 }

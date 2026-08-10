@@ -24,7 +24,7 @@ class HeroSlideController extends Controller
 
     public function create()
     {
-        return view('admin.hero-slides.create');
+        return view('admin.hero-slides.create', ['formData' => $this->formData(null)]);
     }
 
     // ✅ نکته کلیدی: استفاده از HeroSlideRequest به جای Request معمولی
@@ -38,7 +38,39 @@ class HeroSlideController extends Controller
 
     public function edit(HeroSlide $heroSlide)
     {
-        return view('admin.hero-slides.edit', compact('heroSlide'));
+        return view('admin.hero-slides.edit', ['heroSlide' => $heroSlide, 'formData' => $this->formData($heroSlide)]);
+    }
+
+    /**
+     * دادهٔ پیش‌فرض/ذخیره‌شدهٔ فرم (نوع لینک، وضعیت دکمه/امتیاز/بازدیدکننده، آیتم‌های اعتماد)
+     * — منطق فرم از ویو خارج شده و این‌جا آماده می‌شود.
+     *
+     * @return array{linkType: string, linkValue: mixed, hasButton: bool, hasRating: bool, hasViewers: bool, trusts: array}
+     */
+    private function formData(?HeroSlide $slide): array
+    {
+        if ($slide) {
+            return [
+                'linkType' => $slide->linkType(),
+                'linkValue' => $slide->linkable_id,
+                'hasButton' => $slide->hasButton(),
+                'hasRating' => $slide->hasRating(),
+                'hasViewers' => $slide->hasViewers(),
+                'trusts' => $slide->trustFormSeed(),
+            ];
+        }
+
+        // اسلاید جدید — یک آیتم اعتماد پیش‌فرض «+۱۲,۰۰۰ مشتری راضی» از قبل اضافه می‌شود
+        return [
+            'linkType' => 'custom',
+            'linkValue' => null,
+            'hasButton' => false,
+            'hasRating' => false,
+            'hasViewers' => false,
+            'trusts' => [
+                ['icon' => '✓', 'fa' => '+۱۲,۰۰۰ مشتری راضی', 'en' => '+12,000 happy customers'],
+            ],
+        ];
     }
 
     public function update(HeroSlideRequest $request, HeroSlide $heroSlide)

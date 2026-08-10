@@ -1,21 +1,17 @@
-@php
-    $route = $route ?? url()->current();
-
-    $hasTitle = $hasTitle ?? true;
-    $hasCategory = $hasCategory ?? false;
-    $categories = $categories ?? [];
-    $categoryRef = $categoryRef ?? 'category_url';
-    $hasUrl = $hasUrl ?? false;
-
-    $hasStatus = $hasStatus ?? false;
-    $hasShowInFirstPage = $hasShowInFirstPage ?? false;
-
-    $hasReadStatus = $hasReadStatus ?? false;
-    $hasDepartment = $hasDepartment ?? false;
-    $email = $email ?? false;
-
-    $hasDate = $hasDate ?? false;
-@endphp
+@props([
+    'route' => null,
+    'hasTitle' => true,
+    'hasCategory' => false,
+    'categories' => [],
+    'categoryRef' => 'category_url',
+    'hasUrl' => false,
+    'hasStatus' => false,
+    'hasShowInFirstPage' => false,
+    'hasReadStatus' => false,
+    'hasDepartment' => false,
+    'email' => false,
+    'hasDate' => false,
+])
 
 @once
     @push('styles')
@@ -65,7 +61,7 @@
                 </div>
 
                 <div class="modal-body p-4">
-                    <form action="{{ $route }}" method="GET" id="searchForm">
+                    <form action="{{ $route ?? url()->current() }}" method="GET" id="searchForm">
                         <div class="row g-4">
 
                             @if($hasTitle)
@@ -202,7 +198,7 @@
 
                 <div class="modal-footer border-top-0 pt-0 pb-4 justify-content-between px-4">
                     @if(request()->anyFilled(['title', 'name', 'url', 'is_active', 'start_date', 'end_date', $categoryRef, 'department', 'email', 'is_read']))
-                        <a href="{{ $route }}" class="btn btn-light text-danger border hover-shadow btn-sm px-3 rounded-pill transition-all">
+                        <a href="{{ $route ?? url()->current() }}" class="btn btn-light text-danger border hover-shadow btn-sm px-3 rounded-pill transition-all">
                             <i class="bi bi-x-circle me-1"></i> پاک کردن فیلترها
                         </a>
                     @else

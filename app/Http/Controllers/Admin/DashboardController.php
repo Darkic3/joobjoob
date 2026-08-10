@@ -6,11 +6,10 @@ use App\Services\DashboardService;
 
 class DashboardController
 {
-    public function __construct(protected DashboardService $dashboardService){}
+    public function __construct(protected DashboardService $dashboardService) {}
 
     public function index()
     {
-        $content = $this->dashboardService->dashboardIndexContent();
-        return view('admin.dashboard.index', compact('content'));
+        return view('admin.dashboard.index', $this->dashboardService->dashboardIndexContent());
     }
 }

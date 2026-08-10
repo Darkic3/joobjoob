@@ -21,7 +21,7 @@ class RoleController extends Controller
 
     public function create(): View
     {
-        return view('admin.roles.create');
+        return view('admin.roles.create', $this->permissionTree(null));
     }
 
     public function store(RoleRequest $request): RedirectResponse
@@ -39,7 +39,7 @@ class RoleController extends Controller
         $this->authorizeSystemRole($role);
         $role->load('permissions');
 
-        return view('admin.roles.edit', compact('role'));
+        return view('admin.roles.edit', array_merge(compact('role'), $this->permissionTree($role)));
     }
 
     public function update(RoleRequest $request, Role $role): RedirectResponse
@@ -75,6 +75,39 @@ class RoleController extends Controller
         if ($role->is_system && ! auth()->user()->is_admin) {
             abort(403);
         }
+    }
+
+    /**
+     * درخت دسترسی‌های فرم (dedupe بر اساس لیبل) + دسترسی‌های تیک‌خورده و تعداد آن‌ها.
+     * منطق فرم از ویو خارج شده و این‌جا آماده می‌شود.
+     *
+     * @return array{normalized: array, checkedCount: int, oldPerms: array}
+     */
+    private function permissionTree(?Role $role): array
+    {
+        $rolePerms = $role ? $role->permissions->pluck('name')->all() : [];
+        $oldPerms = old('permissions', $rolePerms);
+
+        $tree = config('permissions.permissions', []);
+        $normalized = [];
+        foreach ($tree as $groupKey => $group) {
+            $items = [];
+            foreach ($group['access'] as $access => $label) {
+                $items[$label][] = "admin.{$groupKey}.{$access}";
+            }
+            $normalized[$groupKey] = ['title' => $group['title'], 'items' => $items];
+        }
+
+        $checkedCount = 0;
+        foreach ($normalized as $group) {
+            foreach ($group['items'] as $names) {
+                if (array_intersect($names, $oldPerms)) {
+                    $checkedCount++;
+                }
+            }
+        }
+
+        return compact('normalized', 'checkedCount', 'oldPerms');
     }
 
     /**

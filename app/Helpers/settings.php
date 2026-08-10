@@ -23,3 +23,13 @@ if (! function_exists('settingOverride')) {
         return app(SettingService::class)->getStored($key, $default);
     }
 }
+
+if (! function_exists('trans_or')) {
+    /**
+     * ترجمه با fallback به برچسب کانفیگ — اگر کلید ترجمه نبود، مقدار fallback نمایش داده می‌شود.
+     */
+    function trans_or(string $key, ?string $fallback = null): string
+    {
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : ($fallback ?? $key);
+    }
+}

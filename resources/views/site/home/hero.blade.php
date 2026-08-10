@@ -67,10 +67,7 @@
                                             dir="ltr"
                                         >
                                             {{ number_format($slide->old_price) }}
-                                            {{ $slide->currency === 'IRT'
-                                                ? (app()->getLocale() === 'fa' ? 'تومان' : 'IRT')
-                                                : $slide->currency
-                                            }}
+                                            {{ $slide->currencyLabel() }}
                                         </span>
 
                                     @endif
@@ -88,10 +85,7 @@
                                             class="text-xs md:text-sm font-bold"
                                             style="color: var(--text-secondary);"
                                         >
-                                            {{ $slide->currency === 'IRT'
-                                                ? (app()->getLocale() === 'fa' ? 'تومان' : 'IRT')
-                                                : $slide->currency
-                                            }}
+                                            {{ $slide->currencyLabel() }}
                                         </small>
                                     </span>
 
@@ -112,11 +106,7 @@
                                     href="{{ $slide->url }}"
                                     class="neu-btn neu-btn-primary px-8 py-3.5 font-bold text-sm shadow-lg hover:shadow-xl transition-all"
                                 >
-                                    {{ $slide->trans('btn_text')
-                                        ?: (app()->getLocale() === 'fa'
-                                            ? 'مشاهده محصولات'
-                                            : 'View Products')
-                                    }}
+                                    {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
                                 </a>
 
 
@@ -125,10 +115,7 @@
                                     href="#deals"
                                     class="neu-btn px-8 py-3.5 font-bold text-sm"
                                 >
-                                    {{ app()->getLocale() === 'fa'
-                                        ? 'پیشنهادات ویژه 🔥'
-                                        : 'Special Deals 🔥'
-                                    }}
+                                    {{ __('messages.special_deals') }}
                                 </a>
 
                             </div>
@@ -146,19 +133,17 @@
 
                                     <div class="inline-flex items-center gap-3 neu-flat-sm px-4 py-2.5 rounded-2xl">
 
-                                        {{-- ستاره‌ها --}}
+                                        {{-- ستاره‌ها — درصد پر شدن هر ستاره از HeroSlide::ratingStars() --}}
                                         <div
                                             class="hero-rating-stars flex items-center gap-[3px] text-base leading-none"
                                             aria-hidden="true"
                                         >
-                                            @php($ratingValue = (float) $slide->rating)
-                                            @for($s = 1; $s <= 5; $s++)
-                                                @php($fill = min(100, max(0, ($ratingValue - ($s - 1)) * 100)))
+                                            @foreach($slide->ratingStars() as $fill)
                                                 <span class="hero-star">
                                                     <span class="hero-star-bg">★</span>
                                                     <span class="hero-star-fill" style="width: {{ $fill }}%;">★</span>
                                                 </span>
-                                            @endfor
+                                            @endforeach
                                         </div>
 
                                         <div
@@ -176,10 +161,7 @@
                                                 class="text-[11px] font-bold mb-1 leading-none"
                                                 style="color: var(--text-secondary);"
                                             >
-                                                {{ app()->getLocale() === 'fa'
-                                                    ? 'امتیاز کاربران'
-                                                    : 'User Rating'
-                                                }}
+                                                {{ __('messages.user_rating') }}
                                             </div>
 
                                             <div
@@ -227,10 +209,7 @@
                                         </span>
 
                                         <span>
-                                            {{ app()->getLocale() === 'fa'
-                                                ? 'نفر در حال مشاهده'
-                                                : 'viewing now'
-                                            }}
+                                            {{ __('messages.viewing_now') }}
                                         </span>
 
                                     </div>
@@ -313,13 +292,10 @@
                                     <span aria-hidden="true">🔥</span>
 
                                     <bdi dir="ltr">
-                                        {{ round((($slide->old_price - $slide->price) / $slide->old_price) * 100) }}٪
+                                        {{ $slide->discountPercent() }}٪
                                     </bdi>
 
-                                    {{ app()->getLocale() === 'fa'
-                                        ? 'تخفیف'
-                                        : 'OFF'
-                                    }}
+                                    {{ __('messages.discount_off') }}
 
                                 </span>
 
@@ -333,24 +309,12 @@
                                 class="hero-product-media relative z-10"
                             >
 
-                                @if(filter_var($slide->image, FILTER_VALIDATE_URL))
-
-                                    <img
-                                        src="{{ $slide->image }}"
-                                        class="hero-product-image"
-                                        alt="{{ strip_tags($slide->trans('title')) }}"
-                                    >
-
-                                @else
-
-                                    <img
-                                        src="{{ asset(config('paths.upload', 'uploads') . '/hero-slides/' . $slide->image) }}"
-                                        class="hero-product-image"
-                                        alt="{{ strip_tags($slide->trans('title')) }}"
-                                        onerror="this.src='https://picsum.photos/seed/hero-fallback/600/600'"
-                                    >
-
-                                @endif
+                                <img
+                                    src="{{ $slide->imageUrl() }}"
+                                    class="hero-product-image"
+                                    alt="{{ strip_tags($slide->trans('title')) }}"
+                                    onerror="this.src='https://picsum.photos/seed/hero-fallback/600/600'"
+                                >
 
                             </div>
 
@@ -387,10 +351,7 @@
                                 class="text-sm font-semibold"
                                 style="color: var(--text-secondary);"
                             >
-                                {{ app()->getLocale() === 'fa'
-                                    ? 'هنوز بنری تعریف نشده است.'
-                                    : 'No hero slides available.'
-                                }}
+                                {{ __('messages.no_slides') }}
                             </p>
 
                         </div>
@@ -417,12 +378,12 @@
         ====================================================== --}}
         <div
             class="swiper-button-next hero-navigation"
-            aria-label="{{ app()->getLocale() === 'fa' ? 'اسلاید بعدی' : 'Next slide' }}"
+            aria-label="{{ __('messages.next_slide') }}"
         ></div>
 
         <div
             class="swiper-button-prev hero-navigation"
-            aria-label="{{ app()->getLocale() === 'fa' ? 'اسلاید قبلی' : 'Previous slide' }}"
+            aria-label="{{ __('messages.prev_slide') }}"
         ></div>
 
     </div>

@@ -68,4 +68,14 @@ return [
     'trust_return_desc' => 'Soru sormadan',
     'trust_support' => '7/24 Destek',
     'trust_support_desc' => 'Her zaman yardıma hazırız',
+
+    // Hero
+    'user_rating' => 'Kullanıcı Puanı',
+    'viewing_now' => 'şu an izliyor',
+    'no_slides' => 'Henüz banner tanımlanmadı.',
+    'next_slide' => 'Sonraki slayt',
+    'prev_slide' => 'Önceki slayt',
+    'view_products' => 'Ürünleri Görüntüle',
+    'special_deals' => 'Özel Fırsatlar 🔥',
+    'discount_off' => 'İndirim',
 ];

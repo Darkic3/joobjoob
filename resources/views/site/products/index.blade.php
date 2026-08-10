@@ -25,16 +25,15 @@
 
             <form method="GET" action="{{ localizedRoute('products.index') }}" id="filter-form">
                 {{-- حفظ پارامتر جستجو در فرم --}}
-                @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
+                @if(!empty($filters['q'])) <input type="hidden" name="q" value="{{ $filters['q'] }}"> @endif
 
                 {{-- فیلتر دسته‌بندی --}}
                 <div class="mb-6">
                     <p class="text-xs font-bold mb-3" style="color: var(--text-secondary);">{{ __('messages.categories') }}</p>
                     <div class="space-y-2 text-sm max-h-48 overflow-y-auto custom-scrollbar">
                         @foreach($categories as $cat)
-                            @php $isChecked = in_array($cat->slug, (array) request('category', [])); @endphp
                             <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" name="category[]" value="{{ $cat->slug }}" {{ $isChecked ? 'checked' : '' }}
+                                <input type="checkbox" name="category[]" value="{{ $cat->slug }}" {{ in_array($cat->slug, $selectedCategories, true) ? 'checked' : '' }}
                                 class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--accent)]">
                                 <span class="group-hover:text-[var(--accent)] transition-colors">{{ $cat->trans('name') }}</span>
                                 <span class="mono text-[11px] ms-auto" style="color: var(--text-secondary);">({{ $cat->products_count }})</span>
@@ -47,9 +46,9 @@
                 <div class="mb-6">
                     <p class="text-xs font-bold mb-3" style="color: var(--text-secondary);">{{ __('messages.price') }} (تومان)</p>
                     <div class="flex gap-2 mb-2">
-                        <input type="number" name="min_price" placeholder="از" value="{{ request('min_price') }}"
+                        <input type="number" name="min_price" placeholder="از" value="{{ $filters['min_price'] ?? '' }}"
                                class="neu-input w-1/2 text-xs py-2 px-2 text-center">
-                        <input type="number" name="max_price" placeholder="تا" value="{{ request('max_price') }}"
+                        <input type="number" name="max_price" placeholder="تا" value="{{ $filters['max_price'] ?? '' }}"
                                class="neu-input w-1/2 text-xs py-2 px-2 text-center">
                     </div>
                 </div>
@@ -60,17 +59,16 @@
                     <div class="flex flex-wrap gap-2">
                         {{-- گزینه "همه" برای حذف فیلتر برند --}}
                         <label class="cursor-pointer">
-                            <input type="radio" name="brand" value="" class="hidden" {{ !request('brand') ? 'checked' : '' }}>
-                            <span class="chip px-3 py-1.5 text-[11px] block transition-all {{ !request('brand') ? 'active' : '' }}">
+                            <input type="radio" name="brand" value="" class="hidden" {{ !$selectedBrand ? 'checked' : '' }}>
+                            <span class="chip px-3 py-1.5 text-[11px] block transition-all {{ !$selectedBrand ? 'active' : '' }}">
                                 {{ __('messages.all') }}
                             </span>
                         </label>
 
                         @foreach($brands as $brand)
-                            @php $isActive = request('brand') === $brand->url; @endphp
                             <label class="cursor-pointer">
-                                <input type="radio" name="brand" value="{{ $brand->url }}" class="hidden" {{ $isActive ? 'checked' : '' }}>
-                                <span class="chip px-3 py-1.5 text-[11px] block transition-all {{ $isActive ? 'active' : '' }}">
+                                <input type="radio" name="brand" value="{{ $brand->url }}" class="hidden" {{ $selectedBrand === $brand->url ? 'checked' : '' }}>
+                                <span class="chip px-3 py-1.5 text-[11px] block transition-all {{ $selectedBrand === $brand->url ? 'active' : '' }}">
                                     {{ $brand->trans('title') }}
                                 </span>
                             </label>
@@ -94,7 +92,7 @@
 
                 <form method="GET" action="{{ localizedRoute('products.index') }}" class="flex items-center gap-2">
                     {{-- حفظ فیلترهای فعلی در فرم مرتب‌سازی --}}
-                    @foreach(request()->except('sort', 'page') as $key => $value)
+                    @foreach($filters as $key => $value)
                         @if(is_array($value))
                             @foreach($value as $item)
                                 <input type="hidden" name="{{ $key }}[]" value="{{ $item }}">
@@ -105,10 +103,10 @@
                     @endforeach
 
                     <select name="sort" onchange="this.form.submit()" class="neu-input text-xs py-2 px-3 cursor-pointer">
-                        <option value="default" {{ request('sort') == 'default' || !request('sort') ? 'selected' : '' }}>{{ __('messages.relevance') }}</option>
-                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.price') }} ↑</option>
-                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.price') }} ↓</option>
-                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('messages.newest') }}</option>
+                        <option value="default" {{ $selectedSort === 'default' ? 'selected' : '' }}>{{ __('messages.relevance') }}</option>
+                        <option value="price_asc" {{ $selectedSort === 'price_asc' ? 'selected' : '' }}>{{ __('messages.price') }} ↑</option>
+                        <option value="price_desc" {{ $selectedSort === 'price_desc' ? 'selected' : '' }}>{{ __('messages.price') }} ↓</option>
+                        <option value="newest" {{ $selectedSort === 'newest' ? 'selected' : '' }}>{{ __('messages.newest') }}</option>
                     </select>
                 </form>
             </div>

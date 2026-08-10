@@ -1,73 +1,17 @@
+{{-- دادهٔ فرم (linkType/linkValue/hasButton/hasRating/hasViewers/trusts) در HeroSlideController::formData آماده می‌شود --}}
 @props(['heroSlide' => null])
 
-@php
-    $currentLinkType = 'custom';
-    $currentLinkId = null;
-    $hasButton = false;
-    $hasRating = false;
-    $hasViewers = false;
-
-    if ($heroSlide) {
-        $hasButton = !empty($heroSlide?->btn_text['fa']) || !empty($heroSlide?->linkable_type);
-        $hasRating = !empty($heroSlide?->rating);
-        $hasViewers = !empty($heroSlide?->viewers) && $heroSlide?->viewers > 0;
-
-        if ($heroSlide?->linkable_type) {
-            if ($heroSlide->linkable_type === 'url') {
-                $currentLinkType = 'custom';
-                $currentLinkId = $heroSlide->linkable_id;
-            } elseif (str_contains($heroSlide->linkable_type, 'Product') && !str_contains($heroSlide->linkable_type, 'Category')) {
-                $currentLinkType = 'product';
-                $currentLinkId = $heroSlide->linkable_id;
-            } elseif (str_contains($heroSlide->linkable_type, 'ProductCategory')) {
-                $currentLinkType = 'product_category';
-                $currentLinkId = $heroSlide->linkable_id;
-            } elseif (str_contains($heroSlide->linkable_type, 'Blog') && !str_contains($heroSlide->linkable_type, 'Category')) {
-                $currentLinkType = 'blog';
-                $currentLinkId = $heroSlide->linkable_id;
-            } elseif (str_contains($heroSlide->linkable_type, 'BlogCategory')) {
-                $currentLinkType = 'blog_category';
-                $currentLinkId = $heroSlide->linkable_id;
-            } elseif (str_contains($heroSlide->linkable_type, 'Page')) {
-                $currentLinkType = 'page';
-                $currentLinkId = $heroSlide->linkable_id;
-            }
-        }
-    }
-    $currentLinkType = old('link_type', $currentLinkType);
-    $currentLinkId = old('link_value', $currentLinkId);
-
-    // آیتم‌های اعتماد — از ورودی مجدد (بعد از خطای اعتبارسنجی) یا از مدل؛
-    // هنگام ساخت اسلاید جدید یک آیتم پیش‌فرض «+۱۲,۰۰۰ مشتری راضی» از قبل اضافه می‌شود
-    $trusts = old('trusts', $heroSlide?->trusts ?? ($heroSlide ? [] : [[
-        'icon' => '✓',
-        'fa' => '+۱۲,۰۰۰ مشتری راضی',
-        'en' => '+12,000 happy customers',
-    ]]));
-    $trusts = array_values(is_array($trusts) ? $trusts : []);
-    $trustSeed = [];
-    foreach ($trusts as $trust) {
-        if (!is_array($trust)) continue;
-        $trustText = is_array($trust['text'] ?? null) ? $trust['text'] : [];
-        $trustSeed[] = [
-            'icon' => $trust['icon'] ?? '✓',
-            'fa' => $trust['fa'] ?? $trustText['fa'] ?? '',
-            'en' => $trust['en'] ?? $trustText['en'] ?? '',
-        ];
-    }
-@endphp
-
 <div x-data="{
-    buttonActive: '{{ old('button_active', $hasButton ? '1' : '0') }}' === '1',
-    ratingActive: '{{ old('rating_active', $hasRating ? '1' : '0') }}' === '1',
-    viewersActive: '{{ old('viewers_active', $hasViewers ? '1' : '0') }}' === '1',
-    trusts: {{ json_encode($trustSeed, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
-    linkType: '{{ $currentLinkType }}',
+    buttonActive: '{{ old('button_active', $formData['hasButton'] ? '1' : '0') }}' === '1',
+    ratingActive: '{{ old('rating_active', $formData['hasRating'] ? '1' : '0') }}' === '1',
+    viewersActive: '{{ old('viewers_active', $formData['hasViewers'] ? '1' : '0') }}' === '1',
+    trusts: {{ json_encode(old('trusts', $formData['trusts']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
+    linkType: '{{ old('link_type', $formData['linkType']) }}',
     searchQuery: '',
     searchResults: [],
     isSearching: false,
     selectedModel: null,
-    linkableId: '{{ $currentLinkId }}',
+    linkableId: '{{ old('link_value', $formData['linkValue']) }}',
 
     get isCustomUrl() { return this.linkType === 'custom'; },
     get isStaticPage() { return this.linkType === 'page'; },
@@ -196,7 +140,7 @@
                     {{-- URL دلخواه --}}
                     <div x-show="isCustomUrl" x-transition>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس لینک (URL)</label>
-                        <input type="url" name="link_value" value="{{ old('link_value', $currentLinkType === 'custom' ? $currentLinkId : '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
+                        <input type="url" name="link_value" value="{{ old('link_value', old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '') }}" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
                     </div>
 
                     {{-- صفحات استاتیک --}}
@@ -204,11 +148,11 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">انتخاب صفحه</label>
                         <select name="link_value" class="input-custom">
                             <option value="">-- انتخاب کنید --</option>
-                            <option value="contact" {{ old('link_value', $currentLinkId) === 'contact' ? 'selected' : '' }}>تماس با ما</option>
-                            <option value="about" {{ old('link_value', $currentLinkId) === 'about' ? 'selected' : '' }}>درباره ما</option>
-                            <option value="faq" {{ old('link_value', $currentLinkId) === 'faq' ? 'selected' : '' }}>سوالات متداول</option>
-                            <option value="terms" {{ old('link_value', $currentLinkId) === 'terms' ? 'selected' : '' }}>قوانین و مقررات</option>
-                            <option value="privacy" {{ old('link_value', $currentLinkId) === 'privacy' ? 'selected' : '' }}>حریم خصوصی</option>
+                            <option value="contact" {{ old('link_value', $formData['linkValue']) === 'contact' ? 'selected' : '' }}>تماس با ما</option>
+                            <option value="about" {{ old('link_value', $formData['linkValue']) === 'about' ? 'selected' : '' }}>درباره ما</option>
+                            <option value="faq" {{ old('link_value', $formData['linkValue']) === 'faq' ? 'selected' : '' }}>سوالات متداول</option>
+                            <option value="terms" {{ old('link_value', $formData['linkValue']) === 'terms' ? 'selected' : '' }}>قوانین و مقررات</option>
+                            <option value="privacy" {{ old('link_value', $formData['linkValue']) === 'privacy' ? 'selected' : '' }}>حریم خصوصی</option>
                         </select>
                     </div>
 

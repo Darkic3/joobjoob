@@ -1,18 +1,15 @@
-@php
-    $isEdit = isset($faq) && $faq->exists;
-    $faqId = $isEdit ? $faq->id : 'new';
-@endphp
+@props(['faq' => null])
 
 <div class="card border-0">
     <div class="card-header py-2 bg-light d-flex justify-content-between align-items-center">
         <h6 class="m-0 fw-bold">
-            @if($isEdit)
+            @if($faq)
                 <i class="bi bi-pencil me-1"></i> ویرایش سوال
             @else
                 <i class="bi bi-plus-circle me-1"></i> افزودن سوال جدید
             @endif
         </h6>
-        @if($isEdit)
+        @if($faq)
             <span class="badge bg-{{ $faq->is_active ? 'success' : 'secondary' }}">
                 {{ $faq->is_active ? 'فعال' : 'غیرفعال' }}
             </span>
@@ -20,16 +17,16 @@
     </div>
     <div class="card-body">
         <form id="faqForm{{ $data->id }}" method="POST"
-              action="{{ $isEdit ? route('admin.faqs.update', $faq) : route('admin.faqs.store') }}"
+              action="{{ $faq ? route('admin.faqs.update', $faq) : route('admin.faqs.store') }}"
               class="row g-3">
             @csrf
-            @if($isEdit)
+            @if($faq)
                 @method('PUT')
             @endif
 
             <input type="hidden" name="faqable_id" value="{{ $data->id }}">
             <input type="hidden" name="faqable_type" value="{{ get_class($data) }}">
-            @if($isEdit)
+            @if($faq)
                 <input type="hidden" name="faq_id" value="{{ $faq->id }}">
             @endif
 
@@ -55,7 +52,7 @@
                 <div class="form-check form-switch">
                     <input type="hidden" name="is_active" value="0">
                     <input class="form-check-input" type="checkbox" id="faqActive{{ $data->id }}" name="is_active" value="1"
-                        {{ ($isEdit ? $faq->is_active : true) ? 'checked' : '' }}>
+                        {{ ($faq ? $faq->is_active : true) ? 'checked' : '' }}>
                     <label class="form-check-label" for="faqActive{{ $data->id }}">
                         فعال باشد؟
                     </label>
@@ -63,7 +60,7 @@
             </div>
 
             <div class="col-12 text-end mt-2">
-                @if($isEdit)
+                @if($faq)
                     <button type="button"
                             class="btn btn-outline-danger btn-sm rounded-custom px-3 me-2 delete-faq-btn"
                             data-faq-id="{{ $faq->id }}"
@@ -72,7 +69,7 @@
                     </button>
                 @endif
                 <button type="submit" class="btn btn-custom rounded-custom px-4">
-                    @if($isEdit)
+                    @if($faq)
                         <i class="bi bi-check-lg me-1"></i> به‌روزرسانی
                     @else
                         <i class="bi bi-plus-circle me-1"></i> افزودن

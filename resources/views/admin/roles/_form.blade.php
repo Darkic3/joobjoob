@@ -1,37 +1,5 @@
-@php
-    $role = $role ?? null;
-    $isEdit = $role !== null;
-
-    // دسترسی‌های فعلی نقش (یا old برای بازگشت خطای اعتبارسنجی)
-    $rolePerms = $isEdit ? $role->permissions->pluck('name')->all() : [];
-    $oldPerms  = old('permissions', $rolePerms);
-
-    // درخت کانفیگ → ساختار dedupe شده: هر لیبل یک بار، با همه نام‌هایش (مثل create+store)
-    $tree = config('permissions.permissions', []);
-    $normalized = [];
-    foreach ($tree as $groupKey => $group) {
-        $items = [];
-        foreach ($group['access'] as $access => $label) {
-            $items[$label][] = "admin.{$groupKey}.{$access}";
-        }
-        $normalized[$groupKey] = ['title' => $group['title'], 'items' => $items];
-    }
-
-    $isChecked = function (array $names) use ($oldPerms) {
-        foreach ($names as $n) {
-            if (in_array($n, $oldPerms, true)) return true;
-        }
-        return false;
-    };
-
-    // تعداد دسترسی‌های تیک‌خورده (برای شمارنده زنده)
-    $checkedCount = 0;
-    foreach ($normalized as $group) {
-        foreach ($group['items'] as $names) {
-            if ($isChecked($names)) $checkedCount++;
-        }
-    }
-@endphp
+{{-- درخت دسترسی‌ها (normalized/checkedCount/oldPerms) در RoleController::permissionTree آماده می‌شود --}}
+@props(['role' => null])
 
 <div x-data="{
         search: '',
@@ -52,7 +20,7 @@
             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 {{ __('admin.roles.field_name') }} <span class="text-rose-500">*</span>
             </label>
-            <input type="text" name="name" value="{{ $isEdit ? old('name', $role->name) : old('name') }}"
+            <input type="text" name="name" value="{{ $role ? old('name', $role->name) : old('name') }}"
                    class="input-custom text-sm"
                    placeholder="{{ __('admin.roles.name_ph') }}" dir="ltr" required>
             @error('name') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -108,12 +76,11 @@
                 {{-- چک‌باکس‌های گروه — ردیف‌های بسیار فشرده --}}
                 <div class="p-1.5 grid grid-cols-1 gap-0.5 overflow-y-auto min-h-0">
                     @foreach($group['items'] as $label => $names)
-                        @php $primary = $names[0]; @endphp
                         <label x-show="!search || '{{ addslashes(__($label)) }}'.toLowerCase().includes(search.toLowerCase())"
                                class="flex items-center gap-1.5 cursor-pointer select-none px-1.5 py-[3px] rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
-                            <input type="checkbox" name="permissions[]" value="{{ $primary }}"
+                            <input type="checkbox" name="permissions[]" value="{{ $names[0] }}"
                                    class="perm-check w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 flex-shrink-0"
-                                   {{ $isChecked($names) ? 'checked' : '' }}>
+                                   {{ array_intersect($names, $oldPerms) ? 'checked' : '' }}>
                             <span class="text-xs text-gray-700 dark:text-gray-200 leading-tight truncate">{{ __($label) }}</span>
                             @if(count($names) > 1)
                                 <span class="text-[9px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded px-1 py-px flex-shrink-0">{{ __('admin.roles.plus_save') }}</span>

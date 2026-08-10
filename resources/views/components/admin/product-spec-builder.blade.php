@@ -1,36 +1,4 @@
-@props([
-    'specGroups' => collect(),
-    'textSpecifications' => collect(),
-    'selectedSpecs' => [],
-    'textSpecValues' => [],
-    'existingVariants' => [],
-    'existingProperties' => [],
-])
-
-@php
-    // تبدیل داده‌ها به JSON برای Alpine
-    $payload = [
-        'groups' => $specGroups->map(fn($g) => [
-            'id'       => $g->id,
-            'title'    => $g->trans('title'),
-            'is_color' => (bool) $g->is_color,
-            'children' => $g->children->map(fn($c) => [
-                'id'         => $c->id,
-                'title'      => $c->trans('title'),
-                'color_code' => $c->color_code,
-            ])->values(),
-        ])->values(),
-        'textSpecs' => $textSpecifications->map(fn($s) => [
-            'id'    => $s->id,
-            'title' => $s->trans('title'),
-        ])->values(),
-        'selected'  => array_map(fn($ids) => array_map('intval', $ids), (array) $selectedSpecs),
-        'textValues'=> (object) array_map('strval', (array) $textSpecValues),
-        'variants'  => $existingVariants,
-        'properties'=> $existingProperties,
-    ];
-@endphp
-
+{{-- دادهٔ payload در کلاس Admin\ProductSpecBuilder آماده می‌شود --}}
 <div
     x-data="productSpecBuilder(@js($payload))"
     class="space-y-8"

@@ -1,13 +1,5 @@
 @props(['category' => null, 'parentCategories' => []])
 
-@php
-    // دسترسی امن برای حالت create ($category می‌تواند null باشد)
-    $categoryName = $category?->name ?? [];
-    $categoryDescription = $category?->description ?? [];
-    $categoryMetaTitle = $category?->meta_title ?? [];
-    $categoryMetaDescription = $category?->meta_description ?? [];
-@endphp
-
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- ستون اصلی --}}
@@ -23,13 +15,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.name_fa') }} <span class="text-red-500">*</span></label>
-                    <input type="text" name="name[fa]" value="{{ old('name.fa', $categoryName['fa'] ?? '') }}"
+                    <input type="text" name="name[fa]" value="{{ old('name.fa', $category?->name['fa'] ?? '') }}"
                            class="input-custom @error('name.fa') border-red-500 @enderror" required>
                     @error('name.fa') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.name_en') }} <span class="text-red-500">*</span></label>
-                    <input type="text" name="name[en]" value="{{ old('name.en', $categoryName['en'] ?? '') }}"
+                    <input type="text" name="name[en]" value="{{ old('name.en', $category?->name['en'] ?? '') }}"
                            class="input-custom @error('name.en') border-red-500 @enderror" dir="ltr" required>
                     @error('name.en') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -96,27 +88,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.desc_fa') }}</label>
-                    <textarea name="description[fa]" rows="3" class="input-custom resize-y">{{ old('description.fa', $categoryDescription['fa'] ?? '') }}</textarea>
+                    <textarea name="description[fa]" rows="3" class="input-custom resize-y">{{ old('description.fa', $category?->description['fa'] ?? '') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.desc_en') }}</label>
-                    <textarea name="description[en]" rows="3" class="input-custom resize-y" dir="ltr">{{ old('description.en', $categoryDescription['en'] ?? '') }}</textarea>
+                    <textarea name="description[en]" rows="3" class="input-custom resize-y" dir="ltr">{{ old('description.en', $category?->description['en'] ?? '') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.meta_title_fa') }}</label>
-                    <input type="text" name="meta_title[fa]" value="{{ old('meta_title.fa', $categoryMetaTitle['fa'] ?? '') }}" class="input-custom">
+                    <input type="text" name="meta_title[fa]" value="{{ old('meta_title.fa', $category?->meta_title['fa'] ?? '') }}" class="input-custom">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.meta_title_en') }}</label>
-                    <input type="text" name="meta_title[en]" value="{{ old('meta_title.en', $categoryMetaTitle['en'] ?? '') }}" class="input-custom" dir="ltr">
+                    <input type="text" name="meta_title[en]" value="{{ old('meta_title.en', $category?->meta_title['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.meta_desc_fa') }}</label>
-                    <textarea name="meta_description[fa]" rows="2" class="input-custom resize-y">{{ old('meta_description.fa', $categoryMetaDescription['fa'] ?? '') }}</textarea>
+                    <textarea name="meta_description[fa]" rows="2" class="input-custom resize-y">{{ old('meta_description.fa', $category?->meta_description['fa'] ?? '') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.product_categories.meta_desc_en') }}</label>
-                    <textarea name="meta_description[en]" rows="2" class="input-custom resize-y" dir="ltr">{{ old('meta_description.en', $categoryMetaDescription['en'] ?? '') }}</textarea>
+                    <textarea name="meta_description[en]" rows="2" class="input-custom resize-y" dir="ltr">{{ old('meta_description.en', $category?->meta_description['en'] ?? '') }}</textarea>
                 </div>
             </div>
         </div>
