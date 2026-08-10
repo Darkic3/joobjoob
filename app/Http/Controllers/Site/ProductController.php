@@ -14,10 +14,10 @@ class ProductController extends Controller
     {
         $query = Product::with(['images', 'category', 'brand'])->where('is_active', true);
 
-        // ۱. فیلتر دسته‌بندی
+        // ۱. فیلتر دسته‌بندی — شامل محصولات تمام زیرشاخه‌ها نیز می‌شود
         if ($request->filled('category')) {
-            $categories = is_array($request->category) ? $request->category : [$request->category];
-            $query->whereHas('category', fn ($q) => $q->whereIn('slug', $categories));
+            $slugs = is_array($request->category) ? $request->category : [$request->category];
+            $query->whereIn('product_category_id', $this->categoryIdsWithDescendants($slugs));
         }
 
         // ۲. فیلتر قیمت (بر اساس final_price)
@@ -35,7 +35,7 @@ class ProductController extends Controller
 
         // ۴. جستجو در نام محصول (پشتیبانی از JSON چندزبانه)
         if ($request->filled('q')) {
-            $searchTerm = '%' . $request->q . '%';
+            $searchTerm = '%'.$request->q.'%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name->fa', 'like', $searchTerm)
                     ->orWhere('name->en', 'like', $searchTerm);
@@ -62,6 +62,23 @@ class ProductController extends Controller
         $brands = Brand::where('active', true)->orderBy('id')->get();
 
         return view('site.products.index', compact('products', 'categories', 'brands'));
+    }
+
+    /**
+     * شناسه‌های دسته‌بندی + شناسه‌های تمام زیرشاخه‌ها (در هر عمقی) را برمی‌گرداند،
+     * تا فیلتر دسته‌بندی، محصولات زیرشاخه‌ها را نیز شامل شود.
+     */
+    private function categoryIdsWithDescendants(array $slugs): array
+    {
+        $found = ProductCategory::whereIn('slug', $slugs)->pluck('id')->all();
+        $all = $found;
+
+        while ($found) {
+            $found = ProductCategory::whereIn('parent_id', $found)->pluck('id')->all();
+            $all = array_merge($all, $found);
+        }
+
+        return array_values(array_unique($all));
     }
 
     public function show(Product $product)

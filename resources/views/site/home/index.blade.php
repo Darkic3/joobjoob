@@ -10,10 +10,15 @@
     {{-- ۲. دسته‌بندی‌ها --}}
     @if($categories->isNotEmpty())
         <section class="reveal-on-scroll mt-10 mb-8">
-            <h2 class="text-lg font-extrabold mb-6">{{ setting('home_categories_title', __('messages.categories')) }}</h2>
-            <div class="flex flex-wrap justify-center gap-4">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-extrabold">{{ setting('home_categories_title', __('messages.categories')) }}</h2>
+                <a href="{{ localizedRoute('products.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--accent);">
+                    {{ setting('home_view_all', __('messages.view_all')) }} ←
+                </a>
+            </div>
+            {{-- گرید خودکار: با تعداد کم وسط‌چین و با تعداد زیاد تمام‌عرض --}}
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(130px,150px))] justify-center gap-4">
                 @foreach($categories as $cat)
-                    {{-- فرض بر این است که x-category-card مدل ProductCategory را می‌پذیرد --}}
                     <x-category-card :category="$cat"/>
                 @endforeach
             </div>

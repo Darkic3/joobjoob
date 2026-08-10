@@ -4,6 +4,7 @@ return [
     'site_name' => 'متجري',
     'home' => 'الرئيسية',
     'products' => 'المنتجات',
+    'product' => 'منتج',
     'categories' => 'الفئات',
     'cart' => 'سلة التسوق',
     'checkout' => 'الدفع',

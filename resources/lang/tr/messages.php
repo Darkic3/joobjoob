@@ -4,6 +4,7 @@ return [
     'site_name' => 'Mağazam',
     'home' => 'Ana Sayfa',
     'products' => 'Ürünler',
+    'product' => 'Ürün',
     'categories' => 'Kategoriler',
     'cart' => 'Sepet',
     'checkout' => 'Ödeme',

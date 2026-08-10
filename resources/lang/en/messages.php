@@ -4,6 +4,7 @@ return [
     'site_name' => 'My Shop',
     'home' => 'Home',
     'products' => 'Products',
+    'product' => 'Product',
     'categories' => 'Categories',
     'cart' => 'Cart',
     'checkout' => 'Checkout',
