@@ -79,24 +79,36 @@
     {{-- ۵. محصولات ویژه --}}
     @if($featured->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--featured p-5 md:p-7">
-                <div class="relative z-10">
-                    <div class="section-head mb-7">
-                        <div class="section-head-main">
-                            <span class="section-icon" aria-hidden="true">✦</span>
+            <div class="section-shell section-shell--featured p-5 md:p-7">                    {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
+                    <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+                        <div class="section-head mb-7">
+                            <div class="section-head-main">
+                                <span class="section-icon" aria-hidden="true">✦</span>
                             <div>
                                 <h2 class="section-title">{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</h2>
                                 <p class="section-subtitle">{{ __('messages.featured_subtitle') }}</p>
                             </div>
                         </div>
-                        <a href="{{ localizedRoute('products.index') }}" class="section-link">
-                            {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
+                                <button type="button" class="hscroll-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                                </button>
+                                <button type="button" class="hscroll-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                            <a href="{{ localizedRoute('products.index') }}" class="section-link">
+                                {{ settingOverride('home_view_all', __('messages.view_all')) }}
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    <div class="hscroll-rail">
                         @foreach($featured as $product)
-                            <x-product-card :product="$product" />
+                            <div class="hscroll-item">
+                                <x-product-card :product="$product" />
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -107,32 +119,43 @@
     {{-- ۶. پرفروش‌ترین‌ها --}}
     @if($bestSellers->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--bestsellers p-5 md:p-7">
-                <div class="relative z-10">
-                    <div class="section-head mb-7">
-                        <div class="section-head-main">
-                            <span class="section-icon" aria-hidden="true">🏆</span>
+            <div class="section-shell section-shell--bestsellers p-5 md:p-7">                    {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
+                    <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+                        <div class="section-head mb-7">
+                            <div class="section-head-main">
+                                <span class="section-icon" aria-hidden="true">🏆</span>
                             <div>
                                 <h2 class="section-title">{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
                                 <p class="section-subtitle">{{ __('messages.best_sellers_subtitle') }}</p>
                             </div>
                         </div>
-                        <a href="{{ localizedRoute('products.index') }}" class="section-link">
-                            {{ settingOverride('home_view_all', __('messages.view_all')) }} ←
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
+                                <button type="button" class="hscroll-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                                </button>
+                                <button type="button" class="hscroll-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                            <a href="{{ localizedRoute('products.index') }}" class="section-link">
+                                {{ settingOverride('home_view_all', __('messages.view_all')) }}
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    <div class="hscroll-rail">
                         @foreach($bestSellers as $index => $product)
-                            {{-- استفاده هوشمندانه از کامپوننت product-card با ارسال رتبه --}}
-                            @if($index === 0)
-                                {{-- سکوی طلایی برای رتبهٔ اول --}}
-                                <div class="podium-wrap h-full">
+                            <div class="hscroll-item">
+                                @if($index === 0)
+                                    {{-- سکوی طلایی برای رتبهٔ اول --}}
+                                    <div class="podium-wrap h-full">
+                                        <x-product-card :product="$product" :rank="$index + 1" />
+                                    </div>
+                                @else
                                     <x-product-card :product="$product" :rank="$index + 1" />
-                                </div>
-                            @else
-                                <x-product-card :product="$product" :rank="$index + 1" />
-                            @endif
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>

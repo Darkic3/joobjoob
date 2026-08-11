@@ -60,8 +60,9 @@ class HomeController extends Controller
             ->map(fn ($product) => $product->end_timer ?? $product->deal_ends_at)
             ->filter()
             ->min();
-        $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(4)->get();
-        $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(4)->get();
+        // با تبدیل این بخش‌ها به اسکرول افقی، تعداد بیشتری لازم است تا ریل قابل اسکرول باشد
+        $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(8)->get();
+        $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
         $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
         $slides = $this->heroSlideService->getSlides();
 

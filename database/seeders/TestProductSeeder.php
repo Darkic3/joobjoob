@@ -209,7 +209,9 @@ class TestProductSeeder extends Seeder
     }
 
     /**
-     * ساخت و ذخیرهٔ یک SVG جای‌گذار ساده (گرادینت + ایموجی + شماره) در پوشهٔ آپلود محصولات.
+     * ساخت و ذخیرهٔ یک SVG جای‌گذار «استودیویی» در پوشهٔ آپلود محصولات:
+     * پس‌زمینهٔ رادیال ملایم (روشن از مرکز) + سایهٔ زمینی + ایموجی محصول با سایهٔ معلق —
+     * شبیه عکس محصول واقعی روی پس‌زمینه، نه یک مربع صاف رنگی.
      */
     private function writeSvgPlaceholder(int $index, string $slug, string $emoji): string
     {
@@ -219,20 +221,48 @@ class TestProductSeeder extends Seeder
         }
 
         [$from, $to] = self::PALETTE[($index - 1) % count(self::PALETTE)];
+        $light = $this->lighten($from, 0.55);
 
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">'
-            .'<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-            .'<stop offset="0%" stop-color="'.$from.'"/><stop offset="100%" stop-color="'.$to.'"/>'
-            .'</linearGradient></defs>'
-            .'<rect width="600" height="600" fill="url(#g)"/>'
-            .'<text x="300" y="330" font-family="Segoe UI Emoji, Arial, sans-serif" font-size="150" text-anchor="middle">'.$emoji.'</text>'
-            .'<text x="300" y="440" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="rgba(255,255,255,.85)" text-anchor="middle">'.$index.'</text>'
-            .'<text x="300" y="490" font-family="Arial, sans-serif" font-size="24" fill="rgba(255,255,255,.6)" text-anchor="middle">test-product</text>'
+            .'<defs>'
+            .'<radialGradient id="bg" cx="50%" cy="38%" r="80%">'
+            .'<stop offset="0%" stop-color="#ffffff"/>'
+            .'<stop offset="55%" stop-color="'.$light.'"/>'
+            .'<stop offset="100%" stop-color="'.$from.'"/>'
+            .'</radialGradient>'
+            .'<filter id="ds" x="-30%" y="-30%" width="160%" height="160%">'
+            .'<feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="rgba(0,0,0,.28)"/>'
+            .'</filter>'
+            .'</defs>'
+            .'<rect width="600" height="600" fill="url(#bg)"/>'
+            // سایهٔ زمینی زیر محصول (بیضی نرم)
+            .'<ellipse cx="300" cy="478" rx="165" ry="24" fill="rgba(0,0,0,.10)"/>'
+            // محصول معلق با سایه
+            .'<text x="300" y="410" text-anchor="middle" '
+            .'font-family="\'Segoe UI Emoji\', \'Apple Color Emoji\', \'Noto Color Emoji\', sans-serif" '
+            .'font-size="220" filter="url(#ds)">'.$emoji.'</text>'
             .'</svg>';
 
         $filename = $slug.'.svg';
         file_put_contents($dir.'/'.$filename, $svg);
 
         return $filename;
+    }
+
+    /**
+     * روشن‌کردن یک رنگ hex به سمت سفید (0 = بدون تغییر، 1 = سفید خالص)
+     */
+    private function lighten(string $hex, float $amount): string
+    {
+        $hex = ltrim($hex, '#');
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        $r = (int) round($r + (255 - $r) * $amount);
+        $g = (int) round($g + (255 - $g) * $amount);
+        $b = (int) round($b + (255 - $b) * $amount);
+
+        return sprintf('#%02x%02x%02x', $r, $g, $b);
     }
 }

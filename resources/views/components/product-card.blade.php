@@ -26,7 +26,7 @@
 
     <a href="{{ $url }}" class="block flex-1 flex flex-col">
         {{-- تصویر محصول --}}
-        <div class="relative mb-3 overflow-hidden rounded-xl bg-[var(--bg-elevated)]/50" style="aspect-ratio: 1/1;">
+        <div class="product-image-wrap relative mb-3 overflow-hidden rounded-xl bg-[var(--bg-elevated)]/60" style="aspect-ratio: 1/1;">
             <img src="{{ $imageUrl }}"
                  alt="{{ $name }}"
                  loading="lazy"
