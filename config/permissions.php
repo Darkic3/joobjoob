@@ -183,5 +183,14 @@ return [
                 'destroy' => 'permissions.access.reviews.delete',
             ],
         ],
+
+        'contact' => [
+            'title' => 'permissions.groups.contact',
+            'access' => [
+                'index' => 'permissions.access.contact.index',
+                'show' => 'permissions.access.contact.show',
+                'destroy' => 'permissions.access.contact.delete',
+            ],
+        ],
     ],
 ];

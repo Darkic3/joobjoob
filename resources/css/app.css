@@ -15,16 +15,60 @@
 
 
 /*========================= FOR SCROLL PAGE  =========================*/
-/* حالت اولیه: المان کمی پایین‌تر و نامرئی است */
+/* ورود سنگین و سینمایی: fade-up + blur که با cubic-bezier اکسپو نرم می‌شود.
+   فقط transform/opacity/filter انیمیت می‌شوند (GPU-safe) و prefers-reduced-motion
+   در پایین این فایل همه‌ی آن‌ها را خاموش می‌کند. */
 .reveal-on-scroll {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+    transform: translateY(24px);
+    filter: blur(6px);
+    transition:
+        opacity var(--dur-slow, .8s) var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+        transform var(--dur-slow, .8s) var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+        filter var(--dur-slow, .8s) var(--ease-out, cubic-bezier(.16, 1, .3, 1));
     will-change: opacity, transform;
 }
 
-/* حالت فعال: وقتی کلاس اضافه شد، المان ظاهر می‌شود */
 .reveal-on-scroll.is-visible {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
+}
+
+/* گریدهای پله‌ای (stagger): آیتم‌ها یکی‌یکی با تأخیر پله‌ای وارد می‌شوند.
+   در Blade کافی است روی گرید `data-stagger` بگذاریم. */
+[data-stagger] > * {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity .7s var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+        transform .7s var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+[data-stagger].is-in > * { opacity: 1; transform: translateY(0); }
+
+[data-stagger] > *:nth-child(1) { transition-delay: 0ms; }
+[data-stagger] > *:nth-child(2) { transition-delay: 90ms; }
+[data-stagger] > *:nth-child(3) { transition-delay: 180ms; }
+[data-stagger] > *:nth-child(4) { transition-delay: 270ms; }
+[data-stagger] > *:nth-child(5) { transition-delay: 360ms; }
+[data-stagger] > *:nth-child(6) { transition-delay: 450ms; }
+[data-stagger] > *:nth-child(n+7) { transition-delay: 540ms; }
+
+/* پر شدن نوار فروش همزمان با ورود گرید پله‌ای — scaleX به‌جای width (GPU-safe) */
+[data-stagger] .stock-bar-fill { transform: scaleX(0); }
+[data-stagger].is-in .stock-bar-fill { transform: scaleX(var(--sold, 1)); }
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll, .reveal-on-scroll.is-visible {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    [data-stagger] > *, [data-stagger].is-in > * {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+    .hscroll-cascade .hscroll-item { transform: none !important; }
 }

@@ -17,6 +17,7 @@ return [
         'orders' => 'Siparişler',
         'reviews' => 'Yorumlar',
         'languages' => 'Diller',
+        'contact' => 'İletişim mesajları',
     ],
 
     'access' => [
@@ -96,6 +97,11 @@ return [
             'create' => 'Dil Ekle',
             'edit' => 'Dili Düzenle',
             'delete' => 'Dili Sil',
+        ],
+        'contact' => [
+            'index' => 'İletişim mesajlarını görüntüle',
+            'show' => 'İletişim mesajını oku',
+            'delete' => 'İletişim mesajını sil',
         ],
     ],
 ];

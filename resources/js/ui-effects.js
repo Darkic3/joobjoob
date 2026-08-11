@@ -207,6 +207,26 @@ document.addEventListener('DOMContentLoaded', function () {
             return view * Math.min(1, Math.max(1 / 3, frac));
         }
 
+        // اسکرول نرم دستی با rAF — چون در برخی مرورگرها smooth-scroll + scroll-snap
+        // با هم کار نمی‌کنند (اسکرول لغو می‌شود)، خودمان انیمیشن می‌سازیم.
+        let animId = null;
+        function smoothScrollTo(target) {
+            const start = rail.scrollLeft;
+            const delta = target - start;
+            if (Math.abs(delta) < 1) return;
+            cancelAnimationFrame(animId);
+            const duration = 450;
+            const t0 = performance.now();
+            function step(now) {
+                const t = Math.min(1, (now - t0) / duration);
+                // easeInOutCubic
+                const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                rail.scrollLeft = start + delta * eased;
+                if (t < 1) animId = requestAnimationFrame(step);
+            }
+            animId = requestAnimationFrame(step);
+        }
+
         function move(forward) {
             const step = scrollStep();
             const max = maxScroll();
@@ -220,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // LTR و Safari-RTL: محدودهٔ scrollLeft از 0 تا max
                 target = Math.max(0, Math.min(max, rail.scrollLeft + delta));
             }
-            rail.scrollTo({ left: target, behavior: 'smooth' });
+            smoothScrollTo(target);
         }
 
         if (prev) prev.addEventListener('click', function () { move(false); });
@@ -241,18 +261,27 @@ document.addEventListener('DOMContentLoaded', () => {
         threshold: 0.1 // وقتی ۱۰ درصد المان دیده شد فعال شود
     };
 
-    const scrollObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target); // فقط یک بار اجرا شود تا پرفورمنس حفظ شود
-            }
+    // شبکهٔ اطمینان: اگر IntersectionObserver در دسترس نبود (یا در محیطی که کار نمی‌کند)،
+    // همه‌چیز فوراً نمایان شود تا محتوا هرگز نامرئی نماند.
+    if (typeof IntersectionObserver !== 'function') {
+        document.querySelectorAll('.reveal-on-scroll, [data-stagger]').forEach(el => {
+            el.classList.add(el.hasAttribute('data-stagger') ? 'is-in' : 'is-visible');
         });
-    }, observerOptions);
+    } else {
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // گریدهای پله‌ای (data-stagger) کلاس is-in می‌گیرند؛ بقیه is-visible
+                    entry.target.classList.add(entry.target.hasAttribute('data-stagger') ? 'is-in' : 'is-visible');
+                    observer.unobserve(entry.target); // فقط یک بار اجرا شود تا پرفورمنس حفظ شود
+                }
+            });
+        }, observerOptions);
 
-    // فقط المان‌هایی که کلاس reveal-on-scroll دارند را رصد کن
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
-        scrollObserver.observe(el);
-    });
+        // بخش‌های reveal و گریدهای stagger را رصد کن
+        document.querySelectorAll('.reveal-on-scroll, [data-stagger]').forEach(el => {
+            scrollObserver.observe(el);
+        });
+    }
 });
 //======================================================================================================

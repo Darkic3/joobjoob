@@ -1,272 +1,144 @@
-@extends('layouts.admin.master')
-@section('tab-name','مخاطبین')
+@extends('layouts.admin.app')
+
+@section('tab-name', __('admin.contact.tab'))
+
 @section('content')
-    <div class="body d-flex py-3">
-        <div class="container-fluid">
-            <div class="page-header">
-                <div class="card-header py-3 no-bg bg-transparent border-0 px-0 flex-wrap">
-                    <h3 class="fw-bolder ms-1">
-                        درخواست‌های تماس
-                    </h3>
-                    <div class="d-flex align-items-center">
+    <div class="space-y-6 animate-slide-up">
 
-                        @include('admin.search-modal.search', [
-                            'route' => route('admin.contact.index'),
-                            'hasTitle' => true,
-                            'hasName' => true,
-                            'email' => true,
-                            'hasDepartment' => true,
-                            'hasReadStatus' => true,
-
-                            'hasStatus' => false,
-                            'hasUrl' => false,
-                            'hasShowInFirstPage' => false,
-                            'hasCategory' => false,
-                            'hasDate' => true,
-                        ])
-                    </div>
-                </div>
+        {{-- هدر صفحه --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('admin.contact.title') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.contact.subtitle') }}</p>
             </div>
         </div>
-        <div class="container-fluid">
-            <div class="card-block row">
-                <div class="col-sm-12 col-lg-12 col-xl-12">
-                    <div class="table-responsive d-flex align-items-center">
-                        <table id="myDataTable" class="table align-middle border-custom mb-0">
-                            <thead class="text-center text-light">
-                            <tr>
-                                <th class="fw-bolder">#</th>
-                                <th class="fw-bolder">نام فرستنده</th>
-                                <th class="fw-bolder">ایمیل</th>
-                                <th class="fw-bolder" style="width: 30%;">پیام</th>
-                                <th class="fw-bolder">دپارتمان</th>
-                                <th class="fw-bolder">وضعیت</th>
-                                <th class="fw-bolder">تاریخ ارسال</th>
-                                <th class="fw-bolder">عملیات</th>
-                            </tr>
-                            </thead>
-                            <tbody class="text-center text-light">
-                            @forelse($contacts as $request)
-                                <tr>
-                                    <td>
-                                        {{ $loop->iteration }}
-                                    </td>
-                                    <td>
-                                        {{ $request->name }}
-                                    </td>
-                                    <td>
-                                        {{ $request->email }}
-                                    </td>
-                                    <td>
-                                        <span class="d-inline-block text-truncate" style="max-width: 250px;"
-                                              title=" {{ Str::limit($request->message, 60, '...') }}">
-                                                {{ Str::limit($request->message, 60, '...') }}
+
+        {{-- فیلتر و جستجو --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4">
+            <form action="{{ route('admin.contact.index') }}" method="GET" class="flex flex-wrap gap-3">
+                <div class="flex-1 min-w-[200px]">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="{{ __('admin.contact.search_ph') }}"
+                           class="input-custom w-full">
+                </div>
+                <label class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer select-none">
+                    <input type="checkbox" name="status" value="1"
+                           @checked(request()->boolean('status'))
+                           class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                    <span>{{ __('admin.contact.unread_only') }}</span>
+                </label>
+                <button type="submit" class="btn-primary px-6 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <span class="hidden sm:inline">{{ __('admin.common.search') }}</span>
+                </button>
+            </form>
+        </div>
+
+        {{-- جدول پیام‌ها --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900/40">
+                    <tr>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.sender') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.email') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.department') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.message') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.status') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.contact.sent_at') }}</th>
+                        <th class="px-5 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.common.actions') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($contacts as $contact)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors {{ ! $contact->is_read ? 'bg-primary-50/50 dark:bg-primary-900/10' : '' }}">
+                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $contacts->firstItem() + $loop->index }}</td>
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-gray-800 dark:text-gray-100">{{ $contact->name }}</span>
+                                    @if(! $contact->is_read)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-600 text-white">
+                                            {{ __('admin.contact.unread') }}
                                         </span>
-                                    </td>
-                                    <td>
-                                        @switch($request->department)
-                                            @case('management')
-                                                <span
-                                                    class="badge bg-danger bg-opacity-75 text-white rounded-pill px-3 py-2 fw-normal">
-                                                    <i class="bi bi-shield-lock me-1"></i> مدیریت
-                                                </span>
-                                                @break
-
-                                            @case('support')
-                                                <span
-                                                    class="badge bg-info bg-opacity-75 text-dark rounded-pill px-3 py-2 fw-normal">
-                                                    <i class="bi bi-headset me-1"></i> پشتیبانی
-                                                </span>
-                                                @break
-
-                                            @default
-                                                <span class="badge bg-secondary rounded-pill px-3 py-2 fw-normal">
-                                                    {{ $request->department ?? 'عمومی' }}
-                                                </span>
-                                        @endswitch
-                                    </td>
-                                    <td id="status-cell-contact-{{ $request->id }}">
-                                        <span class="badge {{ $request->is_read ? 'bg-success' : 'bg-danger' }}">
-                                            {{ $request->is_read ? 'خوانده شده' : 'جدید' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {{ show_date($request->created_at, 'Y/m/d') }}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-
-                                            {{--                                            <button type="button"--}}
-                                            {{--                                                    class="list-inline-item btn-custom-b border-0 rounded p-2 m-1"--}}
-                                            {{--                                                    data-bs-toggle="modal"--}}
-                                            {{--                                                    data-bs-target="#messageModal-{{ $request->id }}">--}}
-                                            {{--                                                <i class="d-flex bi bi-eye fs-6"></i>--}}
-                                            {{--                                            </button>--}}
-
-                                            <button type="button"
-                                                    class="list-inline-item btn-custom-b border-0 rounded p-2 m-1"
-                                                    onclick="openContactModal('{{ route('admin.contact.show', $request->id) }}', {{ $request->id }})">
-                                                <i class="d-flex bi bi-eye fs-6"></i>
+                                    @endif
+                                </div>
+                                @if($contact->phone)
+                                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" dir="ltr">{{ $contact->phone }}</div>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300" dir="ltr">{{ $contact->email }}</td>
+                            <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                {{ $contact->department ? __('messages.pages.contact.departments.' . $contact->department, [], $contact->department) : __('admin.contact.no_department') }}
+                            </td>
+                            <td class="px-5 py-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 max-w-xs">{{ $contact->message }}</p>
+                            </td>
+                            <td class="px-5 py-4">
+                                @if($contact->is_read)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        {{ __('admin.contact.read') }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        {{ __('admin.contact.unread') }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ show_date($contact->created_at, 'Y/m/d - H:i') }}</td>
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-1.5">
+                                    @if(auth()->user()->canAccess('admin.contact.show'))
+                                        <a href="{{ route('admin.contact.show', $contact) }}"
+                                           class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
+                                           title="{{ __('admin.contact.view') }}">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/>
+                                            </svg>
+                                        </a>
+                                    @endif
+                                    @if(auth()->user()->canAccess('admin.contact.destroy'))
+                                        <form action="{{ route('admin.contact.destroy', $contact) }}" method="POST" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                                                    title="{{ __('admin.common.delete') }}">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
                                             </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-5 py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-700 mb-4">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.contact.empty') }}</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                                            <form action="{{ route('admin.contact.destroy', $request) }}" method="POST"
-                                                  class="d-inline delete-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="list-inline-item btn-custom-b border-0 rounded p-2 m-1"
-                                                        style="background-color: transparent;">
-                                                    <i class="d-flex bi bi-trash fs-6"></i>
-                                                </button>
-                                            </form>
-
-                                            {{--                                            <div class="modal fade" id="messageModal-{{ $request->id }}" tabindex="-1"--}}
-                                            {{--                                                 aria-hidden="true">--}}
-                                            {{--                                                <div class="modal-dialog modal-dialog-centered">--}}
-                                            {{--                                                    <div class="modal-content text-dark text-start">--}}
-                                            {{--                                                        <div class="modal-header">--}}
-                                            {{--                                                            <h5 class="modal-title fw-bold">پیام--}}
-                                            {{--                                                                از: {{ $request->name }}</h5>--}}
-                                            {{--                                                            <button type="button" class="btn-close m-0"--}}
-                                            {{--                                                                    data-bs-dismiss="modal" aria-label="Close"></button>--}}
-                                            {{--                                                        </div>--}}
-                                            {{--                                                        <div class="modal-body">--}}
-                                            {{--                                                            <div class="mb-3">--}}
-                                            {{--                                                                <label class="fw-bold text-muted small">ایمیل:</label>--}}
-                                            {{--                                                                <p class="mb-0">{{ $request->email }}</p>--}}
-                                            {{--                                                            </div>--}}
-                                            {{--                                                            <hr class="my-2">--}}
-                                            {{--                                                            <div class="mb-3">--}}
-                                            {{--                                                                <label class="fw-bold text-muted small">متن کامل--}}
-                                            {{--                                                                    پیام:</label>--}}
-                                            {{--                                                                <div class="p-3 bg-light rounded border mt-1"--}}
-                                            {{--                                                                     style="white-space: pre-wrap;">{{ $request->message }}</div>--}}
-                                            {{--                                                            </div>--}}
-                                            {{--                                                            <div class="text-end text-muted small">--}}
-                                            {{--                                                                ارسال شده--}}
-                                            {{--                                                                در: {{ jdate_format('Y/m/d H:i', strtotime($request->created_at)) }}--}}
-                                            {{--                                                            </div>--}}
-                                            {{--                                                        </div>--}}
-                                            {{--                                                        <div class="modal-footer">--}}
-                                            {{--                                                            <button type="button" class="btn btn-secondary"--}}
-                                            {{--                                                                    data-bs-dismiss="modal">بستن--}}
-                                            {{--                                                            </button>--}}
-                                            {{--                                                        </div>--}}
-                                            {{--                                                    </div>--}}
-                                            {{--                                                </div>--}}
-                                            {{--                                            </div>--}}
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-3">
-                                        هیچ درخواست تماسی یافت نشد.
-                                    </td>
-                                </tr>
-                            @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
+            @if($contacts->hasPages())
+                <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-700">
                     {{ $contacts->links() }}
-
                 </div>
-            </div>
+            @endif
         </div>
     </div>
-    {{-- Modal with Show - Js --}}
-    <div class="modal fade" id="contactDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-dark text-start">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">جزئیات پیام: <span id="modal-contact-name"></span></h5>
-                    <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="modal-contact-loading" class="modal-body text-center">
-                    <div class="spinner-border text-primary"></div>
-                </div>
-                <div id="modal-contact-content" class="modal-body d-none">
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">ایمیل:</label>
-                        <p id="modal-contact-email" class="mb-0"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">دپارتمان:</label>
-                        <p id="modal-contact-dept" class="mb-0"></p>
-                    </div>
-                    <hr class="my-2">
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">متن کامل پیام:</label>
-                        <div id="modal-contact-message" class="p-3 bg-light rounded border mt-1"
-                             style="white-space: pre-wrap;"></div>
-                    </div>
-                    <div class="text-end text-muted small">
-                        ارسال شده در: <span id="modal-contact-date"></span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-@stop
-
-@push('scripts')
-    <script>
-        function openContactModal(url, id) {
-            const modalElement = document.getElementById('contactDetailsModal');
-            const modal = new bootstrap.Modal(modalElement);
-
-            // ریست کردن نمایش
-            document.getElementById('modal-contact-loading').classList.remove('d-none');
-            document.getElementById('modal-contact-content').classList.add('d-none');
-            modal.show();
-
-            // ۱. دریافت اطلاعات برای نمایش
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('modal-contact-name').innerText = data.name;
-                    document.getElementById('modal-contact-email').innerText = data.email;
-                    document.getElementById('modal-contact-dept').innerText = data.department;
-                    document.getElementById('modal-contact-message').innerText = data.message;
-                    // نمایش تاریخ شمسی (اگر کتابخانه جلالی لود شده باشد)، در غیر این صورت خام میلادی
-                    var rawDate = data.created_at;
-                    if (typeof window.jalaali !== 'undefined' && rawDate) {
-                        var d = new Date(rawDate);
-                        if (!isNaN(d.getTime())) {
-                            var j = window.jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
-                            var pad = function (n) { return String(n).padStart(2, '0'); };
-                            rawDate = j.jy + '/' + pad(j.jm) + '/' + pad(j.jd) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-                        }
-                    }
-                    document.getElementById('modal-contact-date').innerText = rawDate;
-
-                    document.getElementById('modal-contact-loading').classList.add('d-none');
-                    document.getElementById('modal-contact-content').classList.remove('d-none');
-                });
-
-            // ۲. آپدیت وضعیت به خوانده شده
-            fetch(`/admin/contact/${id}/mark-read`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const statusCell = document.getElementById(`status-cell-contact-${id}`);
-                        if (statusCell) {
-                            statusCell.innerHTML = '<span class="badge bg-success">خوانده شده</span>';
-                        }
-                    }
-                });
-        }
-    </script>
-@endpush
+@endsection

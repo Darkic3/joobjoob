@@ -26,7 +26,9 @@
                                 <span
                                     class="hero-anim hero-badge badge-new inline-flex items-center gap-1.5 mb-5 px-4 py-1.5 text-xs"
                                 >
-                                    <span aria-hidden="true">✦</span>
+                                    <span aria-hidden="true">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+                                    </span>
                                     {{ $slide->trans('badge') }}
                                 </span>
                             @endif
@@ -289,7 +291,9 @@
                                     class="badge-urgency neu-pulse absolute top-[10%] start-[5%] z-20"
                                 >
 
-                                    <span aria-hidden="true">🔥</span>
+                                    <span aria-hidden="true">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
+                                    </span>
 
                                     <bdi dir="ltr">
                                         {{ $slide->discountPercent() }}٪
@@ -343,8 +347,8 @@
 
                         <div class="space-y-3">
 
-                            <div class="text-4xl">
-                                ✦
+                            <div class="text-4xl" aria-hidden="true">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
                             </div>
 
                             <p

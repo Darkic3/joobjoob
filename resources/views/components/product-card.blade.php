@@ -4,23 +4,32 @@
     همهٔ محاسبات نمایشی در کلاس کامپوننت انجام می‌شود؛ این ویو فقط رندر است.
 --}}
 
-<div class="neu-card neu-interactive group relative flex flex-col h-full p-4">
+<div class="neu-card product-card neu-interactive group relative flex flex-col h-full p-4">
 
-    {{-- نشان رتبه (فقط برای بخش پرفروش‌ترین‌ها) --}}
+    {{-- نشان رتبه (فقط برای بخش پرفروش‌ترین‌ها) — بزرگ و برجسته، همیشه بالای فید لبه‌ها --}}
     @if($rank)
-        <span class="neu-rank-badge absolute -top-3 -start-3 z-20 w-8 h-8 flex items-center justify-center rounded-full font-black text-sm shadow-md"
-              style="background-color: {{ $rankStyle['color'] }}; color: {{ $rankStyle['text'] }};">
+        <span class="neu-rank-badge"
+              style="--rank-color: {{ $rankStyle['color'] }}; --rank-text: {{ $rankStyle['text'] }};">
             {{ $rank }}
         </span>
     @endif
 
-    {{-- دکمه‌های عملیات سریع --}}
-    <div class="product-actions absolute top-3 end-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]" title="{{ __('messages.wishlist') }}">
-            ♡
+    {{-- دکمه‌های عملیات سریع — آیکون‌های خطی ظریف (z-20 بالاتر از لایهٔ محو لبه‌ها) --}}
+    <div class="product-actions absolute top-3 end-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
+                aria-label="{{ __('messages.wishlist') }}" title="{{ __('messages.wishlist') }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+            </svg>
         </button>
-        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]" title="{{ __('messages.quick_view') }}">
-            👁
+        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
+                aria-label="{{ __('messages.quick_view') }}" title="{{ __('messages.quick_view') }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
         </button>
     </div>
 
@@ -29,8 +38,9 @@
         <div class="product-image-wrap relative mb-3 overflow-hidden rounded-xl bg-[var(--bg-elevated)]/60" style="aspect-ratio: 1/1;">
             <img src="{{ $imageUrl }}"
                  alt="{{ $name }}"
+                 width="400" height="400"
                  loading="lazy"
-                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform">
 
             {{-- نشان‌ها (فقط اگر رتبه‌بندی نباشد) --}}
             @if(!$rank)
@@ -88,29 +98,38 @@
             </div>
         </div>
 
-        {{-- نوار پیشرفت فروش (فقط در صورت ارسال soldPercent) --}}
+        {{-- نوار پیشرفت فروش (فقط در صورت ارسال soldPercent) — پر شدن با scaleX، هماهنگ با ورود پله‌ای گرید --}}
         @if($soldPercent !== null)
             <div class="stock-bar w-full h-1.5 rounded-full bg-[var(--shadow-dark)] mb-1 overflow-hidden">
-                <div class="stock-bar-fill h-full rounded-full bg-[var(--urgency)] transition-all duration-1000"
-                     style="width: {{ $soldPercent }}%;"></div>
+                <div class="stock-bar-fill h-full rounded-full bg-[var(--urgency)]"
+                     style="--sold: {{ $soldPercent / 100 }};"></div>
             </div>
             <p class="text-[10px] font-semibold mb-3" style="color: {{ $soldPercent >= 80 ? 'var(--urgency)' : 'var(--text-secondary)' }};">
                 {{ $soldPercent }}٪ {{ __('messages.sold_percent') }}
             </p>
         @endif
 
-        {{-- دکمه افزودن به سبد خرید --}}
+        {{-- دکمه افزودن به سبد خرید — Button-in-Button: آیکون داخل چیپ دایره‌ای، با تنش جنبشی روی هاور --}}
         <button type="button"
                 class="add-to-cart"
                 @disabled($outOfStock)
-                data-success="{{ __('messages.added_short') }}"
-                onclick="{{ $outOfStock ? '' : '/* منطق افزودن به سبد خرید */' }}">
+                data-success="{{ __('messages.added_short') }}">
 
             @if($outOfStock)
-                <span aria-hidden="true">🚫</span>
+                <span class="add-to-cart-chip" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </span>
                 <span>{{ __('messages.out_of_stock') }}</span>
             @else
-                <span class="add-to-cart-icon" aria-hidden="true">🛒</span>
+                <span class="add-to-cart-chip" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <path d="M3 6h18"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </span>
                 <span>{{ __('messages.add_to_cart') }}</span>
             @endif
         </button>

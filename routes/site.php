@@ -49,6 +49,10 @@ $siteRoutes = function () {
 
     // صفحات استاتیک
     Route::get('/page/{page}', [PageController::class, 'show'])->name('site.page');
+    // فرم تماس — throttle: حداکثر ۵ ارسال در دقیقه برای هر IP
+    Route::post('/contact', [PageController::class, 'sendContact'])
+        ->middleware('throttle:5,1')
+        ->name('site.contact.send');
 
     // سبد خرید
     Route::prefix('cart')->name('cart.')->group(function () {

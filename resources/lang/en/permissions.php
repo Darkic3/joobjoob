@@ -17,6 +17,7 @@ return [
         'orders' => 'Orders',
         'reviews' => 'Reviews',
         'languages' => 'Languages',
+        'contact' => 'Contact messages',
     ],
 
     'access' => [
@@ -95,6 +96,11 @@ return [
             'create' => 'Add language',
             'edit' => 'Edit language',
             'delete' => 'Delete language',
+        ],
+        'contact' => [
+            'index' => 'View contact messages',
+            'show' => 'Read contact message',
+            'delete' => 'Delete contact message',
         ],
     ],
 ];

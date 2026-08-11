@@ -96,20 +96,43 @@
         pointer-events: none;
     }
 
-    /* نشان رتبه (پرفروش‌ترین‌ها): یک کلاس، رنگ از طریق --rank-color پاس داده می‌شود.
-       دیگر هیچ هگز هاردکد یا shadow-lg ناهماهنگ با نئومورفیسم در Blade لازم نیست. */
+    /* نشان رتبه (پرفروش‌ترین‌ها) — بزرگ، گرادینتی و برجسته:
+       رنگ از --rank-color (طلایی/نقره‌ای/برنزی) پاس داده می‌شود.
+       z-index: 20 بالاتر از لایهٔ محو لبه‌ها (z-10) است → هرگز زیر فید نمی‌رود. */
     .neu-rank-badge {
-        position: absolute; top: -10px; inset-inline-start: -10px; z-index: 10;
-        width: 34px; height: 34px; border-radius: 50%;
+        position: absolute; top: -14px; inset-inline-start: -14px; z-index: 20;
+        width: 44px; height: 44px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: .8rem;
-        background: var(--rank-color, var(--bg-elevated));
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1.05rem; line-height: 1;
         color: var(--rank-text, var(--text-secondary));
-        box-shadow: 3px 3px 8px var(--shadow-dark), -2px -2px 6px var(--shadow-light);
+        background: linear-gradient(145deg,
+            var(--rank-color, var(--bg-elevated)) 0%,
+            color-mix(in srgb, var(--rank-color, var(--bg-elevated)) 68%, #000 32%) 100%);
+        border: 2px solid color-mix(in srgb, #fff 45%, transparent);
+        box-shadow: 3px 3px 9px var(--shadow-dark), -2px -2px 6px var(--shadow-light),
+                    inset 0 1px 0 rgba(255, 255, 255, .38),
+                    0 0 16px color-mix(in srgb, var(--rank-color, var(--gold)) 45%, transparent);
+    }
+    /* درخشش مورب روی بج */
+    .neu-rank-badge::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .3) 50%, transparent 60%);
+        pointer-events: none;
     }
 
     .stock-bar { width: 100%; height: 7px; border-radius: 999px; overflow: hidden; background: var(--bg-elevated); box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
-    .stock-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--urgency), var(--gold)); transition: width .6s ease; }
+    /* پر شدن با scaleX (GPU-safe — به‌جای width که layout را انیمیت می‌کند). مقدار از --sold می‌آید. */
+    .stock-bar-fill {
+        height: 100%; border-radius: 999px;
+        background: linear-gradient(90deg, var(--urgency), var(--gold));
+        transform: scaleX(var(--sold, 1));
+        transform-origin: left;
+        transition: transform 1.1s var(--ease-out);
+    }
+    [dir="rtl"] .stock-bar-fill { transform-origin: right; }
 
     /* برچسب تخفیف قیمت — هماهنگ با بج تخفیف */
     .price-off {
@@ -132,13 +155,16 @@
         text-shadow: 0 2px 14px color-mix(in srgb, var(--accent) 35%, transparent);
     }
 
-    /* دکمهٔ افزودن به سبد خرید — گرادینتی باکیفیت با حالت‌های کامل */
+    /* دکمهٔ افزودن به سبد خرید — گرادینتی باکیفیت با حالت‌های کامل.
+       ساختار Button-in-Button: آیکون داخل چیپ دایره‌ای خودش است (نه لخت کنار متن)
+       و روی هاور با فیزیک فنری جابه‌جا/بزرگ می‌شود (تنش جنبشی داخلی). */
     .add-to-cart {
         position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: .5rem;
+        gap: .55rem;
+        padding-inline: .9rem 1.25rem;
         width: 100%;
         min-height: 44px;
         border: none;
@@ -151,7 +177,8 @@
         box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent), inset 0 1px 0 rgba(255, 255, 255, .22);
         cursor: pointer;
         overflow: hidden;
-        transition: transform .15s ease, box-shadow .2s ease, filter .2s ease, opacity .2s ease;
+        transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-med) var(--ease-out),
+                    filter var(--dur-med) var(--ease-out), opacity var(--dur-med) var(--ease-out);
     }
     .add-to-cart:hover:not(:disabled) {
         transform: translateY(-2px);
@@ -166,18 +193,20 @@
         cursor: not-allowed;
         filter: saturate(.35);
     }
-    /* آیکون سبد — پاپ روی هاور */
-    .add-to-cart .add-to-cart-icon {
-        display: inline-block;
-        transition: transform .25s ease;
+    /* چیپ دایره‌ای آیکون — Button-in-Button */
+    .add-to-cart .add-to-cart-chip {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: color-mix(in srgb, #fff 18%, transparent);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28);
+        transition: transform var(--dur-med) var(--ease-spring);
     }
-    .add-to-cart:hover:not(:disabled) .add-to-cart-icon {
-        animation: cartPop .5s ease;
-    }
-    @keyframes cartPop {
-        0%, 100% { transform: scale(1); }
-        40%      { transform: scale(1.3) rotate(-8deg); }
-    }
+    .add-to-cart:hover:not(:disabled) .add-to-cart-chip { transform: translateY(-1px) scale(1.14); }
+    .add-to-cart:active:not(:disabled) .add-to-cart-chip { transform: scale(.92); }
     /* حالت موفقیت (بعد از افزودن) — سبز */
     .add-to-cart.neu-btn-success {
         background: linear-gradient(135deg, var(--success) 0%, color-mix(in srgb, var(--success) 72%, #000 28%) 100%);
@@ -194,7 +223,7 @@
 
     .stars { color: var(--gold); letter-spacing: 1px; }
 
-    .product-actions { position: absolute; top: 10px; inset-inline-end: 10px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transform: translateX(var(--slide, 8px)); transition: opacity .2s ease, transform .2s ease; }
+    .product-actions { position: absolute; top: 10px; inset-inline-end: 10px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transform: translateX(var(--slide, 8px)); transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-med) var(--ease-spring); }
     [dir="rtl"] .product-actions { --slide: -8px; }
     .group:hover .product-actions { opacity: 1; transform: translateX(0); }
 
@@ -465,7 +494,7 @@
     margin-inline: 4px !important;
     opacity: .25;
     background: var(--text-secondary);
-    transition: all .35s cubic-bezier(.2, .8, .2, 1);
+    transition: width .35s var(--ease-out), opacity .35s var(--ease-out), background-color .35s var(--ease-out), box-shadow .35s var(--ease-out);
 }
 .hero-pagination .swiper-pagination-bullet-active {
     width: 34px;
@@ -611,7 +640,8 @@
     .deals-embers span,
     .deals-flame,
     .deals-shell::before,
-    .deals-glow { animation: none; }
+    .deals-glow,
+    .section-shell::before { animation: none; }
 }
 
 /* ==========================================================================
@@ -750,13 +780,18 @@
     color: var(--text-primary);
     background: var(--bg-elevated);
     box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-    transition: box-shadow .2s ease, color .2s ease, transform .2s ease;
+    transition: box-shadow var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .section-link:hover {
     box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
     color: var(--section-accent, var(--accent));
     transform: translateY(-1px);
 }
+
+/* میکرو-تعامل آیکون سربرگ — روی هاور بخش، آیکون با فیزیک فنری می‌چرخد و بزرگ می‌شود */
+.section-icon { transition: transform var(--dur-med) var(--ease-spring); }
+.section-head:hover .section-icon { transform: scale(1.08) rotate(-5deg); }
+[dir="ltr"] .section-head:hover .section-icon { transform: scale(1.08) rotate(5deg); }
 
 /* ==========================================================================
    6.2) پوستهٔ بخش‌های ویژه و پرفروش‌ترین‌ها
@@ -778,8 +813,18 @@
     inset: 0 0 auto 0;
     height: 4px;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    background: linear-gradient(90deg, transparent, var(--section-accent, var(--accent)), transparent);
-    opacity: .5;
+    /* درخشش متحرک (sheen) روی نوار بالا — میکرو-تعامل دائمی ظریف */
+    background: linear-gradient(90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--section-accent, var(--accent)) 55%, transparent) 50%,
+        transparent 100%);
+    background-size: 200% 100%;
+    opacity: .55;
+    animation: shellSheen 5.5s ease-in-out infinite;
+}
+@keyframes shellSheen {
+    0%, 50%  { background-position: 200% 0; }
+    80%, 100% { background-position: -200% 0; }
 }
 .section-shell::after {
     content: '';
@@ -837,6 +882,26 @@
 }
 
 /* ==========================================================================
+   6.32) کارت محصول — لبهٔ ماشینی (Double-Bezel): یک هایلایت مویی داخلی روی لبهٔ بالا
+   که کارت را مثل صفحهٔ شیشه‌ای داخل سینی حس می‌کند. (روی .neu-card.product-card)
+   ========================================================================== */
+.neu-card.product-card { position: relative; }
+.neu-card.product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+    pointer-events: none;
+    z-index: 1;
+}
+[data-theme="dark-neumorphism"] .neu-card.product-card::before,
+[data-theme="blue-theme"] .neu-card.product-card::before,
+[data-theme="green-theme"] .neu-card.product-card::before {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09);
+}
+
+/* ==========================================================================
    6.4) اسکرول افقی بخش‌ها (محصولات ویژه / پرفروش‌ترین‌ها)
    ریل بدون اسکرولبار با snap + دکمه‌های نئومورفیک ناوبری
    ========================================================================== */
@@ -852,11 +917,39 @@
     /* پدینگ استاندارد: ۱۶px کناره‌ها (کارت اول/آخر به لبه نچسبند)،
        ۲۰px بالا (بج رتبه و سایه‌ها) و ۱۶px پایین تا گوشه‌های پوسته خوانا بمانند */
     padding: 1.25rem 16px 1rem;
-    /* محو دائمی دو لبهٔ ریل — همیشه فعال، مستقل از موقعیت اسکرول */
-    mask-image: linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%);
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+}
+
+.hscroll-wrap { position: relative; }
+
+/* محو دائمی لبه‌های ریل به‌صورت لایهٔ رویی (به‌جای mask روی ریل):
+   - رنگش دقیقاً همان پس‌زمینهٔ پوسته است (همان گرادیان) پس بدون درز دیده می‌شود
+   - z-index پایین‌تر از بج‌های رتبه (z-20) است → بج‌ها هرگز زیر فید نمی‌روند
+   - pointer-events: none → کلیک/اسکرول روی کارت‌ها سالم می‌ماند */
+.hscroll-edge-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 56px;
+    z-index: 10;
+    background: linear-gradient(150deg,
+        var(--bg-elevated) 45%,
+        color-mix(in srgb, var(--bg-elevated) 84%, var(--section-accent, var(--accent)) 16%) 100%);
+    pointer-events: none;
+}
+.hscroll-edge-fade--start { inset-inline-start: 0; }
+.hscroll-edge-fade--end   { inset-inline-end: 0; }
+/* جهت محو: از لبهٔ ریل (تیره/مات) به سمت کارت‌ها (شفاف) — آگاه از RTL/LTR */
+[dir="ltr"] .hscroll-edge-fade--start,
+[dir="rtl"] .hscroll-edge-fade--end {
+    mask-image: linear-gradient(to right, #000 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 100%);
+}
+[dir="ltr"] .hscroll-edge-fade--end,
+[dir="rtl"] .hscroll-edge-fade--start {
+    mask-image: linear-gradient(to left, #000 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 100%);
 }
 .hscroll-rail::-webkit-scrollbar { display: none; }
 
@@ -868,6 +961,11 @@
 @media (max-width: 640px) {
     .hscroll-item { flex-basis: 200px; }
 }
+
+/* کاسکید زی-محور (فقط پرفروش‌ها): ردیف‌های فرد/زوج با فرورفتگی پله‌ای —
+   حس کارت‌های فیزیکی با عمق متفاوت، بدون تأثیر روی layout (فقط transform). */
+.hscroll-cascade .hscroll-item:nth-child(2n) { transform: translateY(10px); }
+.hscroll-cascade .hscroll-item:nth-child(3n) { transform: translateY(0); }
 
 /* دکمه‌های ناوبری — گروه دو‌تایی با SVG-chevron و هاور آکسانتی */
 .hscroll-btn {
@@ -882,13 +980,14 @@
     background: var(--bg-elevated);
     box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
     cursor: pointer;
-    transition: color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
 .hscroll-btn svg {
     display: block;
     width: 20px;
     height: 20px;
-    transition: transform .2s ease;
+    transition: transform var(--dur-fast) var(--ease-spring);
 }
 .hscroll-btn:hover:not(:disabled) {
     color: var(--accent-contrast);
@@ -897,7 +996,10 @@
                 0 0 18px color-mix(in srgb, var(--section-accent, var(--accent)) 40%, transparent);
     transform: translateY(-1px);
 }
-.hscroll-btn:active:not(:disabled) { transform: translateY(0) scale(.92); }
+/* شورون روی هاور با فنر بزرگ می‌شود (همراه با چرخش RTL) */
+.hscroll-btn:hover:not(:disabled) svg { transform: scale(1.18); }
+[dir="rtl"] .hscroll-btn:hover:not(:disabled) svg { transform: rotate(180deg) scale(1.18); }
+.hscroll-btn:active:not(:disabled) { transform: translateY(0) scale(.9); }
 .hscroll-btn:disabled { opacity: .32; cursor: not-allowed; }
 .hscroll-btn:focus-visible {
     outline: 2px solid var(--section-accent, var(--accent));
@@ -910,4 +1012,195 @@
 /* فقط در موبایل دکمه‌ها مخفی شوند — اسکرول لمسی طبیعی کافی است */
 @media (max-width: 640px) {
     .hscroll-btn { display: none; }
+}
+
+/* ==========================================================================
+   6.5) صفحات استاتیک (درباره ما / تماس با ما / سوالات متداول / قوانین)
+   هدر سینمایی با حباب‌های رنگی + ورود پله‌ای + فرم و آکاردئون
+   ========================================================================== */
+
+/* ---------- هدر سینمایی ---------- */
+.page-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    padding: 2.25rem 1.5rem 3.25rem;
+    background: linear-gradient(150deg,
+        var(--bg-elevated) 30%,
+        color-mix(in srgb, var(--bg-elevated) 76%, var(--accent) 24%) 100%);
+    box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+}
+.page-hero-blobs { position: absolute; inset: 0; pointer-events: none; }
+.page-blob { position: absolute; border-radius: 50%; opacity: .55; }
+.page-blob--1 {
+    width: 320px; height: 320px; top: -140px; inset-inline-end: -90px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 40%, transparent), transparent 72%);
+    animation: blobFloat 10s ease-in-out infinite;
+}
+.page-blob--2 {
+    width: 260px; height: 260px; bottom: -120px; inset-inline-start: -70px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--gold) 36%, transparent), transparent 72%);
+    animation: blobFloat 12s ease-in-out infinite reverse;
+}
+.page-blob--3 {
+    width: 200px; height: 200px; top: 18%; inset-inline-start: 28%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, var(--gold) 12%, transparent), transparent 72%);
+    animation: blobFloat 9s ease-in-out 1.2s infinite;
+}
+@keyframes blobFloat {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(0, -22px, 0) scale(1.07); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .page-blob { animation: none; }
+}
+
+.page-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    margin-bottom: 1.4rem;
+    font-size: .72rem;
+    color: var(--text-secondary);
+}
+.page-breadcrumb a { transition: color var(--dur-fast) var(--ease-out); }
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    padding: .42rem 1rem;
+    border-radius: 999px;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 9%, var(--bg-elevated));
+    box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+}
+
+.page-title {
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    color: var(--text-primary);
+}
+@media (min-width: 768px) {
+    .page-title { font-size: 2.6rem; }
+}
+.page-desc {
+    margin-top: .8rem;
+    max-width: 56ch;
+    font-size: .92rem;
+    line-height: 1.95;
+    color: var(--text-secondary);
+}
+
+/* ---------- بخش‌ها ---------- */
+.page-section { margin-top: 3.25rem; }
+.page-section-title {
+    font-size: 1.3rem;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 1.1rem;
+    color: var(--text-primary);
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .page-section-title {
+        background: linear-gradient(90deg, var(--text-primary) 10%, var(--accent) 130%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}
+.page-prose { color: var(--text-secondary); font-size: .92rem; line-height: 2; }
+.page-prose p + p { margin-top: 1.1rem; }
+
+/* آمار */
+.page-stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.1;
+}
+.page-stat-label { margin-top: .45rem; font-size: .72rem; font-weight: 700; color: var(--text-secondary); }
+
+/* شماره‌گذاری ارزش‌ها — دایره نئومورفیک */
+.page-num {
+    display: inline-grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--bg-elevated);
+    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+}
+
+/* ---------- فرم تماس ---------- */
+.form-grid { display: grid; gap: 1.15rem; }
+.form-field { display: flex; flex-direction: column; gap: .45rem; }
+.form-label { font-size: .78rem; font-weight: 800; color: var(--text-primary); }
+.form-error { color: var(--danger); font-size: .72rem; font-weight: 600; }
+
+.page-contact-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: var(--accent);
+    background: var(--bg-elevated);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+
+/* ---------- آکاردئون سوالات متداول (<details> — بدون JS) ---------- */
+.faq-item {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+    overflow: hidden;
+}
+.faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem;
+    transition: background-color var(--dur-fast) var(--ease-out);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { background: color-mix(in srgb, var(--accent) 4%, transparent); }
+.faq-item[open] summary { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.faq-plus {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    color: var(--accent);
+    background: var(--bg-elevated);
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    transition: transform var(--dur-med) var(--ease-spring), color var(--dur-fast) var(--ease-out);
+}
+.faq-item[open] .faq-plus { transform: rotate(45deg); color: var(--accent-contrast); background: var(--accent); }
+.faq-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease-out); }
+.faq-item[open] .faq-body { grid-template-rows: 1fr; }
+.faq-body-inner { overflow: hidden; }
+.faq-body-inner p { padding: 0 1.25rem 1.3rem; font-size: .86rem; line-height: 1.95; color: var(--text-secondary); }
+
+/* ---------- صفحات قانونی ---------- */
+.legal-section + .legal-section { margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px solid color-mix(in srgb, var(--shadow-dark) 30%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+    .faq-body { transition: none; }
 }

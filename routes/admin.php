@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CkeditorController;
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\HeroSlideSearchController;
@@ -61,6 +62,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('hero-slides/reorder', [HeroSlideController::class, 'reorder'])->name('hero-slides.reorder');
         Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');
+
+        Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+        Route::get('contact/{contact}', [ContactController::class, 'show'])->name('contact.show');
+        Route::delete('contact/{contact}', [ContactController::class, 'destroy'])->name('contact.destroy');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

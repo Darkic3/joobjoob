@@ -279,7 +279,9 @@
                     </div>
                 @empty
                     <div class="col-span-full neu-flat p-10 text-center">
-                        <p class="text-lg mb-2">💬</p>
+                        <p class="text-lg mb-2" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.6-.7L3 21l1.9-5.3a8 8 0 0 1-.9-3.7A8.4 8.4 0 0 1 12.5 3.5 8.4 8.4 0 0 1 21 11.5z"/></svg>
+                        </p>
                         <p style="color: var(--text-secondary);">{{ __('messages.no_reviews_yet') }}</p>
                     </div>
                 @endforelse
