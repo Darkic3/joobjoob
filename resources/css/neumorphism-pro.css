@@ -1260,3 +1260,167 @@
 @media (prefers-reduced-motion: reduce) {
     .faq-body { transition: none; }
 }
+
+/* ==========================================================================
+   9) نظرات مشتریان — سوشال پروف
+   شل با حباب‌های رنگی شناور + کارت برجسته (Double-Bezel) + کارت‌های ثانویه
+   ========================================================================== */
+
+.reviews-shell {
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 1.25rem 2.25rem;
+    background: var(--bg-elevated);
+    box-shadow: 10px 10px 24px var(--shadow-dark), -10px -10px 24px var(--shadow-light);
+}
+@media (min-width: 768px) { .reviews-shell { padding: 2.25rem 2rem 2.75rem; } }
+
+/* ---------- حباب‌های رنگی شناور پس‌زمینه ---------- */
+.reviews-blobs { position: absolute; inset: 0; pointer-events: none; }
+.reviews-blob { position: absolute; border-radius: 50%; opacity: .5; }
+.reviews-blob--1 {
+    width: 340px; height: 340px; top: -160px; inset-inline-end: -110px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent), transparent 72%);
+    animation: blobFloat 11s ease-in-out infinite;
+}
+.reviews-blob--2 {
+    width: 280px; height: 280px; bottom: -140px; inset-inline-start: -90px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--gold) 30%, transparent), transparent 72%);
+    animation: blobFloat 13s ease-in-out infinite reverse;
+}
+.reviews-blob--3 {
+    width: 180px; height: 180px; top: 30%; inset-inline-start: 24%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, var(--gold) 10%, transparent), transparent 72%);
+    animation: blobFloat 9s ease-in-out 1.1s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .reviews-blob { animation: none; }
+}
+
+/* ---------- خلاصه امتیاز کلی ---------- */
+.reviews-rating {
+    display: flex; align-items: center; gap: .85rem;
+    padding: .65rem 1.1rem .65rem 1.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--bg-elevated);
+    box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+}
+.reviews-rating-value {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 1.9rem; font-weight: 900; line-height: 1;
+    color: var(--gold);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
+}
+.reviews-rating-stars {
+    font-size: .95rem; color: var(--gold); letter-spacing: 2px; line-height: 1.3;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+/* ---------- کارت‌های نظر ---------- */
+.review-card {
+    border-radius: calc(var(--radius-md) + 6px);
+    padding: 6px;
+    background: linear-gradient(150deg,
+        color-mix(in srgb, var(--accent) 14%, transparent),
+        color-mix(in srgb, var(--gold) 8%, transparent) 60%,
+        color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 8px 8px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light);
+    transition: transform var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+}
+.review-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 10px 10px 22px var(--shadow-dark), -10px -10px 22px var(--shadow-light),
+        0 12px 28px -8px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.review-card-inner {
+    height: 100%;
+    display: flex; flex-direction: column;
+    border-radius: var(--radius-md);
+    padding: 1.4rem;
+    background: var(--bg-elevated);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--shadow-light) 70%, transparent);
+    transition: background-color var(--dur-med) var(--ease-out);
+}
+
+/* ---------- کارت برجسته ---------- */
+.review-card--featured { padding: 8px; border-radius: calc(var(--radius-lg) + 4px); }
+.review-card--featured .review-card-inner {
+    position: relative; overflow: hidden;
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.75rem;
+}
+@media (min-width: 768px) {
+    .review-card--featured .review-card-inner { padding: 2.5rem 2.75rem; }
+}
+
+/* کوتیشن تزئینی — محوِ در گوشه */
+.review-quote-mark {
+    position: absolute;
+    inset-inline-start: 12px; top: 14px;
+    color: color-mix(in srgb, var(--accent) 16%, transparent);
+    transform: rotate(8deg);
+    transition: transform var(--dur-slow) var(--ease-out), color var(--dur-slow) var(--ease-out);
+    pointer-events: none;
+}
+.review-card--featured:hover .review-quote-mark {
+    transform: rotate(0deg) scale(1.06);
+    color: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+/* ستاره‌ها */
+.review-stars {
+    color: var(--gold); letter-spacing: 3px; line-height: 1;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 40%, transparent);
+}
+.review-stars--lg { font-size: 1.15rem; margin-bottom: 1rem; }
+
+/* متن نظر */
+.review-quote {
+    font-size: .95rem; line-height: 2.1;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+.review-quote--sm { font-size: .84rem; line-height: 1.95; color: var(--text-secondary); flex: 1; }
+.review-card--featured .review-quote { font-size: 1.05rem; }
+@media (min-width: 768px) { .review-card--featured .review-quote { font-size: 1.15rem; } }
+
+/* ---------- متادیتا: آواتار + نام + تأیید + چیپ محصول ---------- */
+.review-meta { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin-top: 1.6rem; }
+
+.review-avatar {
+    display: grid; place-items: center; flex-shrink: 0;
+    width: 52px; height: 52px; border-radius: 50%;
+    font-size: 1.05rem; font-weight: 800; color: var(--accent-contrast);
+    background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--gold)));
+    box-shadow: 0 0 0 3px var(--bg-elevated), 0 0 0 5px color-mix(in srgb, var(--accent) 35%, transparent),
+        6px 6px 12px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+}
+.review-avatar--sm { width: 42px; height: 42px; font-size: .9rem; }
+
+.review-verified {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .68rem; font-weight: 700; letter-spacing: .2px;
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+    border-radius: var(--radius-pill);
+    padding: .2rem .65rem;
+}
+
+.review-product-chip {
+    display: inline-flex; align-items: center; gap: .45rem;
+    margin-inline-start: auto;
+    font-size: .72rem; font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius: var(--radius-pill);
+    padding: .35rem .85rem;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.review-product-chip:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); transform: translateY(-1px); }
+.review-product-chip--sm { margin-inline-start: 0; align-self: flex-start; }
+
+@media (prefers-reduced-motion: reduce) {
+    .review-card, .review-quote-mark, .review-product-chip { transition: none; }
+}

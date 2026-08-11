@@ -64,12 +64,14 @@ class HomeController extends Controller
         $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(8)->get();
         $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
         $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
+        // میانگین امتیاز نظرات نمایش‌داده‌شده — محاسبه در کنترلر، نه در ویو
+        $reviewsAvg = round($reviews->avg('rating') ?? 0, 1);
         $slides = $this->heroSlideService->getSlides();
 
         // نشان‌های اعتماد فعال — محدودیت و کش داخل سرویس مدیریت می‌شود
         $trustBadges = $this->trustBadgeService->getActiveForSite();
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'slides', 'trustBadges'));
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewsAvg', 'slides', 'trustBadges'));
     }
 
     /**
