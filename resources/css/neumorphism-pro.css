@@ -916,6 +916,17 @@
         0 14px 34px -8px color-mix(in srgb, var(--section-accent, var(--accent)) 32%, transparent);
 }
 
+/* تم تیره: سایه‌های بزرگِ نئومورفیک (طراحی‌شده برای پس‌زمینه روشن) روی پس‌زمینه تیره
+   لبه‌های گل‌آلود و سنگین می‌سازند و درخشش accent را خفه می‌کنند.
+   در این تم سایه‌ها جمع‌وجورتر و درخشش accent پررنگ‌تر می‌شود (ستارهٔ تم تیره). */
+[data-theme="dark-neumorphism"] .hscroll-item .product-card:hover {
+    box-shadow:
+        7px 7px 18px var(--shadow-dark),
+        -7px -7px 14px var(--shadow-light),
+        0 0 0 1px color-mix(in srgb, var(--section-accent, var(--accent)) 36%, transparent),
+        0 12px 32px -6px color-mix(in srgb, var(--section-accent, var(--accent)) 42%, transparent);
+}
+
 /* ==========================================================================
    6.4) اسکرول افقی بخش‌ها (محصولات ویژه / پرفروش‌ترین‌ها)
    ریل بدون اسکرولبار با snap + دکمه‌های نئومورفیک ناوبری
