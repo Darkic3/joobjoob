@@ -192,12 +192,16 @@ document.addEventListener('DOMContentLoaded', function () {
         function atEnd() { return Math.abs(rail.scrollLeft) >= maxScroll() - 1; }
 
         function updateArrows() {
-            if (prev) prev.disabled = atStart();
-            if (next) next.disabled = atEnd();
+            // اگر محتوا در یک عرض ریل جا می‌شود، فلش‌ها مخفی و نوار پیشرفت کامل نشان داده می‌شود
+            const hasScroll = maxScroll() > 1;
+            group.classList.toggle('hscroll-no-scroll', !hasScroll);
+            if (prev) prev.disabled = !hasScroll || atStart();
+            if (next) next.disabled = !hasScroll || atEnd();
             updateProgress();
         }
 
-        // نوار پیشرفت — عرض نسبی با scaleX (GPU-safe)، جهت با RTL خودکار
+        // نوار پیشرفت — عرض نسبی با scaleX (GPU-safe)، جهت با RTL خودکار؛
+        // بدون اسکرول، کامل و ثابت می‌ماند تا مشخص باشد چیزی برای جابه‌جا شدن نیست
         function updateProgress() {
             if (!progress) return;
             const max = maxScroll();

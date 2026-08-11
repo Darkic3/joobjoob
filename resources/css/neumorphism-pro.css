@@ -931,6 +931,13 @@
 .hscroll-rail.hscroll-animating { scroll-snap-type: none; }
 .hscroll-rail img { -webkit-user-drag: none; user-drag: none; }
 
+/* وقتی محتوا کمتر از یک عرض ریل است (بدون اسکرول): فلش‌ها مخفی می‌شوند
+   و نوار پیشرفت کامل/ثابت نشان داده می‌شود تا کاربر بداند چیزی نیست */
+.hscroll-no-scroll .hscroll-btn { display: none; }
+.hscroll-no-scroll .hscroll-progress {
+    background: color-mix(in srgb, var(--section-accent, var(--accent)) 40%, transparent);
+}
+
 .hscroll-wrap { position: relative; }
 
 /* محو دائمی لبه‌های ریل به‌صورت لایهٔ رویی (به‌جای mask روی ریل):
