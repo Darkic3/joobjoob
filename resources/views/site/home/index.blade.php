@@ -86,8 +86,8 @@
             <div class="section-shell section-shell--featured p-5 pb-8 md:p-7 md:pb-10">
                 {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
                 <div class="section-shell-fade" aria-hidden="true"></div>
-                {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
-                <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+                {{-- اسکرول افقی حرفه‌ای: درگ با اینرسی + فلش‌های اسنپ‌به‌کارت؛ data-hscroll-cards="2" تعداد کارت در هر کلیک --}}
+                <div class="relative z-10" data-hscroll>
                         <div class="section-head mb-7">                        <div class="section-head-main">
                             <span class="section-icon" aria-hidden="true">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.4L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.6z"/></svg>
@@ -123,6 +123,8 @@
                         {{-- محو دائمی لبه‌ها — زیر بج‌های رتبه (z پایین‌تر)، بالای کارت‌ها --}}
                         <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
                         <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
+                        {{-- نوار پیشرفت اسکرول --}}
+                        <div class="hscroll-progress-wrap" aria-hidden="true"><div class="hscroll-progress"></div></div>
                     </div>
                 </div>
             </div>
@@ -135,8 +137,8 @@
             <div class="section-shell section-shell--bestsellers p-5 pb-8 md:p-7 md:pb-10">
                 {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
                 <div class="section-shell-fade" aria-hidden="true"></div>
-                {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
-                <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+                {{-- اسکرول افقی حرفه‌ای: درگ با اینرسی + فلش‌های اسنپ‌به‌کارت؛ data-hscroll-cards="2" تعداد کارت در هر کلیک --}}
+                <div class="relative z-10" data-hscroll>
                         <div class="section-head mb-7">                        <div class="section-head-main">
                             <span class="section-icon" aria-hidden="true">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/></svg>
@@ -162,8 +164,7 @@
                     </div>
 
                     <div class="hscroll-wrap">
-                        {{-- کاسکید زی-محور: ردیف‌های زوج کمی فروتر می‌نشینند (حس عمق فیزیکی) --}}
-                        <div class="hscroll-rail hscroll-cascade">
+                        <div class="hscroll-rail">
                             @foreach($bestSellers as $index => $product)
                                 <div class="hscroll-item">
                                     @if($index === 0)
@@ -180,6 +181,8 @@
                         {{-- محو دائمی لبه‌ها — زیر بج‌های رتبه (z پایین‌تر)، بالای کارت‌ها --}}
                         <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
                         <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
+                        {{-- نوار پیشرفت اسکرول --}}
+                        <div class="hscroll-progress-wrap" aria-hidden="true"><div class="hscroll-progress"></div></div>
                     </div>
                 </div>
             </div>

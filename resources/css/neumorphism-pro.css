@@ -919,7 +919,17 @@
     padding: 1.25rem 16px 1rem;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    touch-action: pan-y; /* اسکرول عمودی صفحه سالم بماند؛ افقی با درگ خودمان */
 }
+.hscroll-rail.hscroll-dragging {
+    cursor: grabbing;
+    user-select: none;
+    -webkit-user-select: none;
+    scroll-snap-type: none; /* هنگام درگ دستی، snap مزاحم نشود */
+}
+.hscroll-rail.hscroll-animating { scroll-snap-type: none; }
+.hscroll-rail img { -webkit-user-drag: none; user-drag: none; }
 
 .hscroll-wrap { position: relative; }
 
@@ -931,7 +941,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 56px;
+    width: 40px;
     z-index: 10;
     background: linear-gradient(150deg,
         var(--bg-elevated) 45%,
@@ -962,10 +972,23 @@
     .hscroll-item { flex-basis: 200px; }
 }
 
-/* کاسکید زی-محور (فقط پرفروش‌ها): ردیف‌های فرد/زوج با فرورفتگی پله‌ای —
-   حس کارت‌های فیزیکی با عمق متفاوت، بدون تأثیر روی layout (فقط transform). */
-.hscroll-cascade .hscroll-item:nth-child(2n) { transform: translateY(10px); }
-.hscroll-cascade .hscroll-item:nth-child(3n) { transform: translateY(0); }
+/* نوار پیشرفت اسکرول — زیر ریل؛ رشد با scaleX (GPU-safe) و هم‌راستا با RTL */
+.hscroll-progress-wrap {
+    height: 3px;
+    margin: .2rem 16px .35rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--section-accent, var(--accent)) 14%, transparent);
+    overflow: hidden;
+}
+.hscroll-progress {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--section-accent, var(--accent)), color-mix(in srgb, var(--section-accent, var(--accent)) 55%, var(--gold)));
+    transform: scaleX(var(--prog, 0));
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+[dir="rtl"] .hscroll-progress { transform-origin: right; }
 
 /* دکمه‌های ناوبری — گروه دو‌تایی با SVG-chevron و هاور آکسانتی */
 .hscroll-btn {

@@ -70,5 +70,5 @@
         transform: none !important;
         transition: none !important;
     }
-    .hscroll-cascade .hscroll-item { transform: none !important; }
+    .hscroll-progress { transform: none !important; }
 }

@@ -156,7 +156,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// ---------- اسکرول افقی با فلش (محصولات ویژه / پرفروش‌ترین‌ها) ----------
+// ---------- اسکرول افقی حرفه‌ای (محصولات ویژه / پرفروش‌ترین‌ها) ----------
+// تعامل: درگ با اینرسی + فلش‌هایی که دقیقاً روی مرز کارت می‌ایستند (اسنپ به کارت)
+// + نوار پیشرفت اسکرول. فیزیک خروج اکسپو؛ بدون پریدن نیمه‌کارت.
 document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('[data-hscroll]').forEach(function (group) {
@@ -164,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!rail) return;
         const prev = group.querySelector('[data-hscroll-prev]');
         const next = group.querySelector('[data-hscroll-next]');
+        const progress = group.querySelector('.hscroll-progress');
 
         // تشخیص قرارداد اسکرول RTL روی خودِ ریل (نه یک عنصر آزمایشی جداگانه):
         // Chrome/Firefox مقدار scrollLeft منفی دارند (افزایش +۱ به صفر clamp می‌شود)،
@@ -177,74 +180,178 @@ document.addEventListener('DOMContentLoaded', function () {
             return negative;
         })();
 
+        const PAD = 16; // هماهنگ با padding-inline ریل در CSS
+
         function maxScroll() { return rail.scrollWidth - rail.clientWidth; }
+        function inRange(v) {
+            return rtlNegative
+                ? Math.max(-maxScroll(), Math.min(0, v))
+                : Math.max(0, Math.min(maxScroll(), v));
+        }
         function atStart() { return Math.abs(rail.scrollLeft) <= 1; }
         function atEnd() { return Math.abs(rail.scrollLeft) >= maxScroll() - 1; }
 
         function updateArrows() {
             if (prev) prev.disabled = atStart();
             if (next) next.disabled = atEnd();
+            updateProgress();
         }
 
-        // اندازهٔ اسکرول در هر کلیک — دو روش قابل تنظیم (هر دو بین ۱/۳ و یک عرض کامل قفل می‌شوند):
-        //   ۱) data-hscroll-step="0.5"  → کسری از عرض دید ریل (۰٫۳۳ تا ۱، پیش‌فرض ۰٫۸۵)
-        //   ۲) data-hscroll-cards="2"   → تعداد کارت‌هایی که با هر کلیک جلو می‌روند (بر اساس عرض واقعی کارت)
-        function scrollStep() {
-            const view = rail.clientWidth;
+        // نوار پیشرفت — عرض نسبی با scaleX (GPU-safe)، جهت با RTL خودکار
+        function updateProgress() {
+            if (!progress) return;
+            const max = maxScroll();
+            progress.style.setProperty('--prog', max <= 0 ? 1 : Math.abs(rail.scrollLeft) / max);
+        }
 
-            const cardsAttr = group.getAttribute('data-hscroll-cards');
-            if (cardsAttr !== null && cardsAttr !== '') {
-                const cards = parseFloat(cardsAttr);
-                if (!isNaN(cards) && cards > 0) {
-                    const card = group.querySelector('.hscroll-item');
-                    const cardWidth = card ? card.getBoundingClientRect().width : view / 4;
-                    return Math.min(cards * cardWidth, view);
-                }
+        // هدف اسنپ: کارت را هم‌راستای لبهٔ شروع ریل (با پدینگ ۱۶px) می‌کند
+        function snapTarget(card) {
+            const railRect = rail.getBoundingClientRect();
+            if (rtlNegative) {
+                const delta = railRect.right - card.getBoundingClientRect().right;
+                return Math.max(-maxScroll(), Math.min(0, rail.scrollLeft - delta + PAD));
             }
-
-            let frac = parseFloat(group.getAttribute('data-hscroll-step') || '0.85');
-            if (isNaN(frac) || frac <= 0) frac = 0.85;
-            return view * Math.min(1, Math.max(1 / 3, frac));
+            const delta = card.getBoundingClientRect().left - railRect.left;
+            return Math.max(0, Math.min(maxScroll(), rail.scrollLeft + delta - PAD));
         }
 
-        // اسکرول نرم دستی با rAF — چون در برخی مرورگرها smooth-scroll + scroll-snap
-        // با هم کار نمی‌کنند (اسکرول لغو می‌شود)، خودمان انیمیشن می‌سازیم.
+        // انیمیشن نرم با فیزیک خروج اکسپو — شروع سریع، پایان آرام، بدون پرش
         let animId = null;
-        function smoothScrollTo(target) {
+        function smoothScrollTo(target, duration) {
+            cancelAnimationFrame(animId);
             const start = rail.scrollLeft;
             const delta = target - start;
-            if (Math.abs(delta) < 1) return;
-            cancelAnimationFrame(animId);
-            const duration = 450;
+            if (Math.abs(delta) < 1) { updateArrows(); return; }
+            rail.classList.add('hscroll-animating');
+            const d = duration || 620;
             const t0 = performance.now();
             function step(now) {
-                const t = Math.min(1, (now - t0) / duration);
-                // easeInOutCubic
-                const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                const t = Math.min(1, (now - t0) / d);
+                const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
                 rail.scrollLeft = start + delta * eased;
-                if (t < 1) animId = requestAnimationFrame(step);
+                if (t < 1) {
+                    animId = requestAnimationFrame(step);
+                } else {
+                    rail.classList.remove('hscroll-animating');
+                    updateArrows();
+                }
             }
             animId = requestAnimationFrame(step);
         }
 
-        function move(forward) {
-            const step = scrollStep();
-            const max = maxScroll();
-            // در RTL جهت «بعدی/قبلی» برعکس است (بعدی = به سمت پایان/چپ)
-            const delta = forward ? step : -step;
-            let target;
-            if (rtlNegative) {
-                // Chrome/Firefox: محدودهٔ scrollLeft از 0 تا -max
-                target = Math.max(-max, Math.min(0, rail.scrollLeft - delta));
+        // فلش‌ها: جابه‌جایی به تعداد کارت مشخص (پیش‌فرض ۱) — همیشه روی مرز کارت
+        function moveCards(count) {
+            const items = [...rail.children].filter(el => el.classList.contains('hscroll-item'));
+            if (!items.length) return;
+            const railRect = rail.getBoundingClientRect();
+            const norm = rtlNegative ? (r) => -r.right : (r) => r.left;
+            const viewNorm = rtlNegative ? -(railRect.right - PAD) : railRect.left + PAD;
+            const pos = items.map(it => ({ it, n: norm(it.getBoundingClientRect()) }));
+
+            let targetCard;
+            if (count > 0) {
+                const nexts = pos.filter(p => p.n > viewNorm + 2);
+                const pick = nexts[count - 1] || nexts[nexts.length - 1] || pos[pos.length - 1];
+                targetCard = pick.it;
             } else {
-                // LTR و Safari-RTL: محدودهٔ scrollLeft از 0 تا max
-                target = Math.max(0, Math.min(max, rail.scrollLeft + delta));
+                const prevs = [...pos].reverse().filter(p => p.n < viewNorm - 2);
+                const pick = prevs[Math.abs(count) - 1] || prevs[prevs.length - 1] || pos[0];
+                targetCard = pick.it;
             }
-            smoothScrollTo(target);
+            smoothScrollTo(snapTarget(targetCard));
         }
 
-        if (prev) prev.addEventListener('click', function () { move(false); });
-        if (next) next.addEventListener('click', function () { move(true); });
+        // تعداد کارت در هر کلیک — data-hscroll-cards="2" (پیش‌فرض: ۱)
+        const cardsPerClick = (function () {
+            const attr = group.getAttribute('data-hscroll-cards');
+            const n = parseInt(attr, 10);
+            return !isNaN(n) && n > 0 ? n : 1;
+        })();
+        if (prev) prev.addEventListener('click', function () { moveCards(-cardsPerClick); });
+        if (next) next.addEventListener('click', function () { moveCards(cardsPerClick); });
+
+        // ---------- درگ با اینرسی + اسنپ ----------
+        let pointerId = null, dragStartX = 0, dragStartScroll = 0;
+        let dragLastX = 0, dragLastT = 0, velocity = 0, didDrag = false, inertiaId = null;
+
+        rail.addEventListener('pointerdown', function (e) {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            pointerId = e.pointerId;
+            cancelAnimationFrame(animId);
+            cancelAnimationFrame(inertiaId);
+            dragStartX = dragLastX = e.clientX;
+            dragStartScroll = rail.scrollLeft;
+            dragLastT = performance.now();
+            velocity = 0;
+            didDrag = false;
+            rail.classList.add('hscroll-dragging');
+            try { rail.setPointerCapture(e.pointerId); } catch (_) { /* قدیمی‌تر */ }
+        });
+
+        rail.addEventListener('pointermove', function (e) {
+            if (e.pointerId !== pointerId) return;
+            const dx = e.clientX - dragStartX;
+            if (Math.abs(dx) > 4) didDrag = true;
+            // RTL (منفی): کشیدن به چپ → سمت پایان؛ LTR برعکس
+            rail.scrollLeft = inRange(rtlNegative ? dragStartScroll + dx : dragStartScroll - dx);
+            const now = performance.now();
+            const dt = now - dragLastT;
+            if (dt > 0) velocity = (e.clientX - dragLastX) / dt; // px/ms
+            dragLastX = e.clientX;
+            dragLastT = now;
+        });
+
+        function endDrag(e) {
+            if (e.pointerId !== pointerId) return;
+            pointerId = null;
+            rail.classList.remove('hscroll-dragging');
+            if (!didDrag) return;
+            e.preventDefault();
+            const v = velocity;
+            if (Math.abs(v) > 0.25) {
+                // اینرسی: سرعت با نرخ نمایی می‌میرد، بعد اسنپ به نزدیک‌ترین کارت
+                const t0 = performance.now();
+                let lastT = t0;
+                const sign = rtlNegative ? 1 : -1;
+                function glide(now) {
+                    const dt = Math.min(32, now - lastT);
+                    lastT = now;
+                    const vNow = v * Math.exp(-(now - t0) / 220);
+                    if (Math.abs(vNow) < 0.12) { snap(); return; }
+                    rail.scrollLeft = inRange(rail.scrollLeft + sign * vNow * dt);
+                    inertiaId = requestAnimationFrame(glide);
+                }
+                inertiaId = requestAnimationFrame(glide);
+            } else {
+                snap();
+            }
+        }
+
+        // اسنپ به نزدیک‌ترین کارت (بعد از درگ/اینرسی)
+        function snap() {
+            const items = [...rail.children].filter(el => el.classList.contains('hscroll-item'));
+            if (!items.length) return;
+            const railRect = rail.getBoundingClientRect();
+            const norm = rtlNegative ? (r) => -r.right : (r) => r.left;
+            const viewNorm = rtlNegative ? -(railRect.right - PAD) : railRect.left + PAD;
+            let best = items[0], bestD = Infinity;
+            items.forEach(it => {
+                const d = Math.abs(norm(it.getBoundingClientRect()) - viewNorm);
+                if (d < bestD) { bestD = d; best = it; }
+            });
+            smoothScrollTo(snapTarget(best), 380);
+        }
+
+        rail.addEventListener('pointerup', endDrag);
+        rail.addEventListener('pointercancel', endDrag);
+        // اگر کاربر کارت را کشید، کلیک روی لینک/دکمه اجرا نشود
+        rail.addEventListener('click', function (e) {
+            if (didDrag) {
+                e.preventDefault();
+                e.stopPropagation();
+                didDrag = false;
+            }
+        }, true);
 
         rail.addEventListener('scroll', updateArrows, { passive: true });
         window.addEventListener('resize', updateArrows);
