@@ -797,12 +797,24 @@
 .section-shell--featured { --section-accent: var(--accent); }
 .section-shell--bestsellers { --section-accent: var(--gold); }
 
+/* محو نرم لبهٔ پایین پوسته — لبهٔ سخت/مربعی پایین باکس را به‌سمت پس‌زمینهٔ صفحه گرادیانت‌وار محو می‌کند.
+   از var(--bg) استفاده می‌کند پس در همهٔ تم‌ها (روشن/تیره/آبی/سبز) خودکار هماهنگ است. */
+.section-shell-fade {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: clamp(48px, 14%, 84px);
+    background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
 /* ==========================================================================
    6.3) سکوی رتبهٔ اول پرفروش‌ترین‌ها — حلقهٔ طلایی درخشان
    ========================================================================== */
 
 .podium-wrap {
-    border-radius: calc(var(--radius-lg) + 2px);
+    /* شعاع یکنواخت دور کارت (کارت ۱۸px) تا قاب گرادینتی در گوشه‌ها کلفت و مربعی نشود */
+    border-radius: calc(var(--radius-md) + 4px);
     padding: 3px;
     background: linear-gradient(135deg,
         var(--gold),
@@ -836,10 +848,13 @@
     gap: 1.25rem;
     overflow-x: auto;
     scroll-snap-type: x proximity;
-    scroll-padding-inline: 12px;
-    /* پدینگ کناری تا کارت اول/آخر به لبهٔ پوسته نچسبند + فضای کافی بالای کارت
-       برای بج رتبه و سایهٔ کارت‌ها بدون برخورد با نوار بالای پوسته */
-    padding: 1rem 12px .6rem;
+    scroll-padding-inline: 16px;
+    /* پدینگ استاندارد: ۱۶px کناره‌ها (کارت اول/آخر به لبه نچسبند)،
+       ۲۰px بالا (بج رتبه و سایه‌ها) و ۱۶px پایین تا گوشه‌های پوسته خوانا بمانند */
+    padding: 1.25rem 16px 1rem;
+    /* محو دائمی دو لبهٔ ریل — همیشه فعال، مستقل از موقعیت اسکرول */
+    mask-image: linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%);
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }

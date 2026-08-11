@@ -79,8 +79,11 @@
     {{-- ۵. محصولات ویژه --}}
     @if($featured->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--featured p-5 md:p-7">                    {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
-                    <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+            <div class="section-shell section-shell--featured p-5 pb-8 md:p-7 md:pb-10">
+                {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
+                <div class="section-shell-fade" aria-hidden="true"></div>
+                {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
+                <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
                         <div class="section-head mb-7">
                             <div class="section-head-main">
                                 <span class="section-icon" aria-hidden="true">✦</span>
@@ -119,8 +122,11 @@
     {{-- ۶. پرفروش‌ترین‌ها --}}
     @if($bestSellers->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--bestsellers p-5 md:p-7">                    {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
-                    <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
+            <div class="section-shell section-shell--bestsellers p-5 pb-8 md:p-7 md:pb-10">
+                {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
+                <div class="section-shell-fade" aria-hidden="true"></div>
+                {{-- اسکرول افقی: data-hscroll-step کسر عرض دید (۰٫۳۳ تا ۱) یا data-hscroll-cards تعداد کارت — پیش‌فرض ۰٫۸۵ --}}
+                <div class="relative z-10" data-hscroll data-hscroll-step="0.85">
                         <div class="section-head mb-7">
                             <div class="section-head-main">
                                 <span class="section-icon" aria-hidden="true">🏆</span>
