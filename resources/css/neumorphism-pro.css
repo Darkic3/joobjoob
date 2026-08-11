@@ -901,6 +901,21 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09);
 }
 
+/* حالت hover کارت‌های ریل‌ها (ویژه/پرفروش) — درخشش accent ملایم + سایهٔ عمیق‌تر،
+   هماهنگ با روح بخش پیشنهادهای داغ.
+   رنگ درخشش از --section-accent بخش می‌آید: بنفش برای ویژه، طلایی برای پرفروش‌ها. */
+.hscroll-item .product-card {
+    transition: transform var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+}
+.hscroll-item .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        14px 14px 32px var(--shadow-dark),
+        -12px -12px 26px var(--shadow-light),
+        0 0 0 1px color-mix(in srgb, var(--section-accent, var(--accent)) 28%, transparent),
+        0 14px 34px -8px color-mix(in srgb, var(--section-accent, var(--accent)) 32%, transparent);
+}
+
 /* ==========================================================================
    6.4) اسکرول افقی بخش‌ها (محصولات ویژه / پرفروش‌ترین‌ها)
    ریل بدون اسکرولبار با snap + دکمه‌های نئومورفیک ناوبری
