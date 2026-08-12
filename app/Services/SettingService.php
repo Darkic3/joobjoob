@@ -182,7 +182,9 @@ class SettingService
     private function castValue(mixed $value, string $type): mixed
     {
         return match ($type) {
-            'json', 'select' => json_decode((string) $value, true) ?? [],
+            'json' => json_decode((string) $value, true) ?? [],
+            // سلکت تک‌مقداری: مقدار ذخیره‌شده همان کلید گزینهٔ انتخابی است
+            'select' => (string) $value,
             'boolean' => (bool) $value,
             default => (string) $value,
         };

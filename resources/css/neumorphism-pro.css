@@ -1595,6 +1595,39 @@
     pointer-events: none;
 }
 
+/* ---------- بنر/بج تخفیف جشن روی هیرو ---------- */
+.festive-badge {
+    position: absolute;
+    top: 1.25rem;
+    inset-inline-start: 1.25rem;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem 1.15rem;
+    border-radius: var(--radius-pill);
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .3px;
+    color: #1a202c;
+    background: linear-gradient(120deg, var(--gold), #ffc53d);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--gold) 40%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .5),
+        inset 0 -1px 0 rgba(0, 0, 0, .08);
+    animation: festiveBadgeGlow 2.8s var(--ease-out) infinite;
+}
+.festive-badge-icon { animation: festiveBadgeSpin 3.2s linear infinite; }
+
+@keyframes festiveBadgeGlow {
+    0%, 100% { box-shadow: 0 10px 24px color-mix(in srgb, var(--gold) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .08); }
+    50%      { box-shadow: 0 10px 32px color-mix(in srgb, var(--gold) 60%, transparent), inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .08); }
+}
+@keyframes festiveBadgeSpin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .festive-badge, .festive-badge-icon { animation: none; }
+}
+
 /* ---------- قلب علاقه‌مندی فعال ---------- */
 .wishlist-heart { transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring); }
 .wishlist-heart.active { color: var(--danger); }

@@ -168,6 +168,13 @@ return [
             'footer_newsletter_title' => 'عنوان النشرة في التذييل',
             'default_theme' => 'الثيم الافتراضي للموقع',
             'festive_mode' => 'الوضع الاحتفالي (تساقط قصاصات على الهيرو)',
+            'festive_style' => 'نمط التساقط الاحتفالي',
+            'festive_style_options' => [
+                'gold' => 'ذهبي',
+                'colorful' => 'ملوّن',
+                'snow' => 'ثلجي (النوروز)',
+            ],
+            'festive_badge_text' => 'نص شارة خصم الاحتفال',
         ],
         'saved' => 'تم تحديث الإعدادات بنجاح.',
     ],

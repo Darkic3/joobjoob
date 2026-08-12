@@ -167,6 +167,13 @@ return [
             'footer_newsletter_title' => 'عنوان خبرنامه در فوتر',
             'default_theme' => 'تم پیش‌فرض سایت',
             'festive_mode' => 'حالت جشن (بارش کانفتی روی هیرو)',
+            'festive_style' => 'سبک بارش جشن',
+            'festive_style_options' => [
+                'gold' => 'طلایی',
+                'colorful' => 'رنگارنگ',
+                'snow' => 'برفی نوروزی',
+            ],
+            'festive_badge_text' => 'متن بنر/بج تخفیف جشن',
         ],
         'saved' => 'تنظیمات با موفقیت و با بالاترین سرعت به‌روزرسانی شد.',
     ],

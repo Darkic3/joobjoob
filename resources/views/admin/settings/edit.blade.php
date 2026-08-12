@@ -108,6 +108,19 @@
                                                                    @checked(old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? false))>
                                                         </div>
 
+                                                        {{-- سلکت (گزینه‌ها از کانفیگ فیلد) --}}
+                                                    @elseif(($config['type'] ?? 'text') === 'select')
+                                                        <select name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
+                                                                class="input-custom form-select"
+                                                                @if ($config['required'] ?? false) required @endif>
+                                                            @foreach ($config['options'] ?? [] as $optKey => $optLabel)
+                                                                <option value="{{ $optKey }}"
+                                                                        @selected((string) old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? $config['default'] ?? null) === (string) $optKey)>
+                                                                    {{ trans_or('admin.settings.fields.'.$fieldKey.'_options.'.$optKey, $optLabel) }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
                                                         {{-- اینپوت متنی --}}
                                                     @else
                                                         <input type="{{ $config['type'] ?? 'text' }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"

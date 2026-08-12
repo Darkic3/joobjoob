@@ -1,8 +1,14 @@
 <section class="hero-fullbleed relative mb-12 overflow-hidden">
 
-    {{-- حالت جشن: بارش کانفتی طلایی روی هیرو (از تنظیمات — تنظیم: festive_mode) --}}
+    {{-- حالت جشن: بارش کانفتی روی هیرو + بنر تخفیف (از تنظیمات — festive_mode / festive_style / festive_badge_text) --}}
     @if(setting('festive_mode'))
-        <canvas id="festive-confetti" class="festive-confetti" aria-hidden="true"></canvas>
+        <canvas id="festive-confetti" class="festive-confetti" data-style="{{ setting('festive_style', 'gold') }}" aria-hidden="true"></canvas>
+
+        {{-- بنر/بج تخفیف جشن — متن از تنظیمات، با fallback به زبان جاری --}}
+        <div class="festive-badge" role="status">
+            <svg class="festive-badge-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.1 6.9L21 11l-6.9 2.1L12 20l-2.1-6.9L3 11l6.9-2.1z"/></svg>
+            <span>{{ settingOverride('festive_badge_text', __('messages.festive_badge')) }}</span>
+        </div>
     @endif
 
     {{-- پس‌زمینه: گرید و هاله روی خود .hero-swiper (::before / ::after) پیاده شده — div جدا لازم نیست --}}

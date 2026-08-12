@@ -167,6 +167,13 @@ return [
             'footer_newsletter_title' => 'Alt Bilgi Bülten Başlığı',
             'default_theme' => 'Varsayılan Site Teması',
             'festive_mode' => 'Kutlama Modu (hero üzerinde konfeti yağmuru)',
+            'festive_style' => 'Kutlama yağış stili',
+            'festive_style_options' => [
+                'gold' => 'Altın',
+                'colorful' => 'Renkli',
+                'snow' => 'Karlı (Nevruz)',
+            ],
+            'festive_badge_text' => 'Kutlama indirim rozeti metni',
         ],
         'saved' => 'Ayarlar başarıyla güncellendi.',
     ],

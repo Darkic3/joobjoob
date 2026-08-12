@@ -115,6 +115,7 @@ return [
     'all_posts' => 'Tüm yazılara dön',
     'latest_articles' => 'Son Yazılar',
     'latest_articles_subtitle' => 'Mağazadan taze yazılar ve haberler',
+    'festive_badge' => 'Bayram İndirimi',
 
     // Statik sayfalar
     'pages' => [

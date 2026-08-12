@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// ---------- حالت جشن: بارش کانفتی طلایی روی هیرو ----------
+// ---------- حالت جشن: بارش کانفتی روی هیرو (سبک از تنظیمات: gold | colorful | snow) ----------
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('festive-confetti');
     if (!canvas) return;
@@ -443,22 +443,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const section = canvas.closest('.hero-fullbleed') || canvas.parentElement;
     const ctx = canvas.getContext('2d');
     const DPR = Math.min(2, window.devicePixelRatio || 1);
-    const COLORS = ['#ffd700', '#f5a623', '#ffc53d', '#ffe9a8', '#ffb84d', '#8b83ff', '#ff6b6b'];
+
+    const style = canvas.dataset.style || 'gold';
+    const isSnow = style === 'snow';
+    const PALETTES = {
+        gold: ['#ffd700', '#f5a623', '#ffc53d', '#ffe9a8', '#ffb84d', '#8b83ff', '#ff6b6b'],
+        colorful: ['#ff5252', '#ffd740', '#69f0ae', '#40c4ff', '#b388ff', '#ff8a65', '#f48fb1', '#7c4dff'],
+        snow: ['#ffffff', '#f0f6ff', '#dce8f5', '#e8f0fa'],
+    };
+    const COLORS = PALETTES[style] || PALETTES.gold;
     let particles = [];
     let rafId = null;
     let running = false;
 
     function seed() {
         const area = (canvas.width / DPR) * (canvas.height / DPR);
-        const count = Math.min(140, Math.max(50, Math.round(area / 9000)));
+        // برف ریزتر و کمتر است تا حس آرام‌تری داشته باشد
+        const count = isSnow
+            ? Math.min(120, Math.max(60, Math.round(area / 14000)))
+            : Math.min(140, Math.max(50, Math.round(area / 9000)));
         particles = Array.from({ length: count }, function () {
+            const size = isSnow ? 1.5 + Math.random() * 2.5 : 4 + Math.random() * 5;
             return {
                 x: Math.random() * canvas.width,
                 y: -20 - Math.random() * canvas.height,
-                w: (4 + Math.random() * 5) * DPR,
-                h: (7 + Math.random() * 9) * DPR,
-                vy: (1.1 + Math.random() * 1.9) * DPR,
-                vx: (Math.random() - 0.5) * 0.7 * DPR,
+                w: size * DPR,
+                h: (isSnow ? size : size + 3 + Math.random() * 6) * DPR,
+                // برف آرام‌تر و با تاب‌خوردن نرم‌تر می‌بارد
+                vy: (isSnow ? 0.5 + Math.random() * 0.9 : 1.1 + Math.random() * 1.9) * DPR,
+                vx: (Math.random() - 0.5) * (isSnow ? 0.3 : 0.7) * DPR,
                 rot: Math.random() * Math.PI * 2,
                 vr: (Math.random() - 0.5) * 0.09 * DPR,
                 color: COLORS[(Math.random() * COLORS.length) | 0],
@@ -492,7 +505,16 @@ document.addEventListener('DOMContentLoaded', function () {
             ctx.translate(p.x, p.y);
             ctx.rotate(p.rot);
             ctx.fillStyle = p.color;
-            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            if (isSnow) {
+                // دانه‌های برف گرد با لبه‌ی نرم
+                ctx.globalAlpha = 0.85;
+                ctx.beginPath();
+                ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            } else {
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            }
             ctx.restore();
         }
         rafId = requestAnimationFrame(draw);

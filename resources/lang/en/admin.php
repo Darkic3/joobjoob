@@ -167,6 +167,13 @@ return [
             'footer_newsletter_title' => 'Footer Newsletter Title',
             'default_theme' => 'Default Site Theme',
             'festive_mode' => 'Festive Mode (confetti rain on hero)',
+            'festive_style' => 'Celebration rain style',
+            'festive_style_options' => [
+                'gold' => 'Gold',
+                'colorful' => 'Colorful',
+                'snow' => 'Snowy (Nowruz)',
+            ],
+            'festive_badge_text' => 'Festive discount badge text',
         ],
         'saved' => 'Settings updated successfully.',
     ],

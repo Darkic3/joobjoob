@@ -122,6 +122,7 @@ return [
     'all_posts' => 'Back to all posts',
     'latest_articles' => 'Latest Articles',
     'latest_articles_subtitle' => 'Fresh reads and store news',
+    'festive_badge' => 'Festive Discount',
 
     // Static pages
     'pages' => [

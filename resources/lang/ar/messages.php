@@ -115,6 +115,7 @@ return [
     'all_posts' => 'العودة إلى جميع المقالات',
     'latest_articles' => 'أحدث المقالات',
     'latest_articles_subtitle' => 'أحدث المواضيع وأخبار المتجر',
+    'festive_badge' => 'خصم الاحتفال',
 
     // الصفحات الثابتة
     'pages' => [

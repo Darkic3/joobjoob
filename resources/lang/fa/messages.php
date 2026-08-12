@@ -126,6 +126,7 @@ return [
     'all_posts' => 'بازگشت به همه مقالات',
     'latest_articles' => 'آخرین مقالات',
     'latest_articles_subtitle' => 'جدیدترین مطالب و اخبار فروشگاه',
+    'festive_badge' => 'تخفیف جشن',
 
     // صفحات استاتیک
     'pages' => [
