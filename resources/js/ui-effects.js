@@ -415,6 +415,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         backToTop.style.setProperty('--bt-progress', progress);
         backToTop.classList.toggle('visible', window.scrollY > 300);
+        // وقتی حلقه کامل شد (کاربر به انتهای صفحه رسید) کل دکمه همرنگ حلقه می‌شود
+        backToTop.classList.toggle('complete', progress >= 0.995);
     }
 
     window.addEventListener('scroll', function () {
@@ -427,6 +429,9 @@ document.addEventListener('DOMContentLoaded', function () {
     updateBackToTop();
 
     backToTop.addEventListener('click', function () {
+        // برگشت به حالت اولیه: سفید/نئومورفیک و حلقهٔ خالی
+        backToTop.classList.remove('complete');
+        backToTop.style.setProperty('--bt-progress', 0);
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
 });
