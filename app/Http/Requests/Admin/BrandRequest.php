@@ -47,9 +47,9 @@ class BrandRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.fa.required' => 'نام فارسی برند الزامی است.',
-            'url.required' => 'آدرس (اسلاگ) برند الزامی است.',
-            'image.max' => 'حجم تصویر برند نباید بیشتر از ۲ مگابایت باشد.',
+            'title.fa.required' => __('validation.requests.brand.title_fa_required'),
+            'url.required' => __('validation.requests.brand.url_required'),
+            'image.max' => __('validation.requests.brand.image_max'),
         ];
     }
 }

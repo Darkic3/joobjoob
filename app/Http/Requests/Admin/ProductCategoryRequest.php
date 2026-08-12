@@ -51,12 +51,12 @@ class ProductCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'فیلد نام الزامی است.',
-            'name.fa.required' => 'نام فارسی الزامی است.',
-            'name.en.required' => 'نام انگلیسی الزامی است.',
-            'slug.required' => 'آدرس یکتا (URL) اجباری است.',
-            'image.max' => 'حجم تصویر دسته‌بندی نباید بیشتر از ۲ مگابایت باشد.',
-            'sort_order.integer' => 'ترتیب نمایش باید یک عدد صحیح باشد.',
+            'name.required' => __('validation.requests.category.name_required'),
+            'name.fa.required' => __('validation.requests.category.name_fa_required'),
+            'name.en.required' => __('validation.requests.category.name_en_required'),
+            'slug.required' => __('validation.requests.category.slug_required'),
+            'image.max' => __('validation.requests.category.image_max'),
+            'sort_order.integer' => __('validation.requests.category.sort_integer'),
         ];
     }
 }

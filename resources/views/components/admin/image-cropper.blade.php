@@ -128,7 +128,7 @@
             function cancel() {
                 const reject = rejectFn;
                 close();
-                if (reject) reject(new Error('برش لغو شد'));
+                if (reject) reject(new Error(@json(__('admin.common.crop_cancelled'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)));
             }
 
             function close() {
@@ -184,7 +184,7 @@
                             });
                         };
                     };
-                    reader.onerror = () => { reject(new Error('خطا در خواندن تصویر')); close(); };
+                    reader.onerror = () => { reject(new Error(@json(__('admin.common.read_image_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))); close(); };
                     reader.readAsDataURL(file);
                 });
             }

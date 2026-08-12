@@ -105,12 +105,12 @@ class ProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_category_id.required' => 'انتخاب دسته‌بندی محصول الزامی است.',
-            'name.fa.required' => 'نام فارسی محصول الزامی است.',
-            'name.en.required' => 'نام انگلیسی محصول الزامی است.',
-            'end_timer.after' => 'تاریخ پایان تایمر باید بعد از تاریخ شروع باشد.',
-            'deal_ends_at.after' => 'تاریخ پایان پیشنهاد ویژه باید در آینده باشد.',
-            'images.*.max' => 'حجم هر تصویر محصول نباید بیشتر از ۳ مگابایت باشد.',
+            'product_category_id.required' => __('validation.requests.product.category_required'),
+            'name.fa.required' => __('validation.requests.product.name_fa_required'),
+            'name.en.required' => __('validation.requests.product.name_en_required'),
+            'end_timer.after' => __('validation.requests.product.end_timer_after'),
+            'deal_ends_at.after' => __('validation.requests.product.deal_ends_after'),
+            'images.*.max' => __('validation.requests.product.images_max'),
         ];
     }
 }

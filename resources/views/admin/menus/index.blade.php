@@ -387,14 +387,14 @@
             $(document).on('click', '.delete-menu', function () {
                 const id = $(this).data('id');
                 Swal.fire({
-                    title: 'آیا مطمئن هستید؟',
-                    text: "این آیتم حذف خواهد شد!",
+                    title: @json(__('admin.common.delete_confirm_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    text: @json(__('admin.common.delete_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: 'بله، حذف شود',
-                    cancelButtonText: 'انصراف'
+                    confirmButtonText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -402,13 +402,13 @@
                             type: 'DELETE',
                             data: {_token: "{{ csrf_token() }}"},
                             success: function () {
-                                Swal.fire('حذف شد', '', 'success');
+                                Swal.fire(@json(__('admin.common.deleted'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), '', 'success');
                                 $(`li[data-id="${id}"]`).fadeOut(400, function () {
                                     $(this).remove();
                                 });
                             },
                             error: function () {
-                                Swal.fire('خطا', 'این آیتم سیستمی است و حذف نمی‌شود.', 'error');
+                                Swal.fire(@json(__('admin.common.error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), @json(__('admin.common.system_item_protected'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'error');
                             }
                         });
                     }
@@ -438,7 +438,7 @@
                     _token: "{{ csrf_token() }}",
                     nestable_output: JSON.stringify(data)
                 }, function () {
-                    Toast.fire({icon: 'success', title: 'ترتیب ذخیره شد'});
+                    Toast.fire({icon: 'success', title: @json(__('admin.common.order_saved'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)});
                 });
             });
         });

@@ -16,7 +16,7 @@ class CkeditorController
             $fileName = ImageHandler::handle('ckeditor', $file);
 
             if (! $fileName) {
-                return response()->json(['uploaded' => 0, 'error' => ['message' => 'آپلود تصویر ناموفق بود.']]);
+                return response()->json(['uploaded' => 0, 'error' => ['message' => __('admin.common.upload_failed')]]);
             }
 
             // فرمت پاسخ مورد نیاز CKEditor
@@ -27,6 +27,6 @@ class CkeditorController
             ]);
         }
 
-        return response()->json(['uploaded' => 0, 'error' => ['message' => 'فایل نامعتبر است.']]);
+        return response()->json(['uploaded' => 0, 'error' => ['message' => __('admin.common.invalid_file')]]);
     }
 }

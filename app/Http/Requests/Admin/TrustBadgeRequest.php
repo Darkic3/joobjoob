@@ -30,12 +30,12 @@ class TrustBadgeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'icon.required' => 'فیلد آیکون (ایموجی یا کلاس) الزامی است.',
-            'icon.max' => 'مقدار آیکون نباید بیشتر از 100 کاراکتر باشد.',
-            'title.fa.required' => 'عنوان فارسی الزامی است.',
-            'title.fa.max' => 'عنوان فارسی نباید بیشتر از 255 کاراکتر باشد.',
-            'description.fa.max' => 'توضیحات فارسی نباید بیشتر از 500 کاراکتر باشد.',
-            'is_active.boolean' => 'مقدار وضعیت فعال/غیرفعال باید صحیح باشد.',
+            'icon.required' => __('validation.requests.trust_badge.icon_required'),
+            'icon.max' => __('validation.requests.trust_badge.icon_max'),
+            'title.fa.required' => __('validation.requests.trust_badge.title_fa_required'),
+            'title.fa.max' => __('validation.requests.trust_badge.title_fa_max'),
+            'description.fa.max' => __('validation.requests.trust_badge.description_fa_max'),
+            'is_active.boolean' => __('validation.requests.trust_badge.is_active_boolean'),
         ];
     }
 }

@@ -155,21 +155,21 @@
                         }, 2000);
                     })
                     .catch(error => {
-                        console.error('خطا در درخواست:', error);
+                        console.error(@json(__('admin.common.request_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), error);
 
                         if (error.response) {
                             const status = error.response.status;
                             const data = error.response.data;
 
-                            let msg = `خطا ${status}`;
+                            let msg = @json(__('admin.common.error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + ' ' + status;
                             if (status === 419) {
-                                msg = 'توکن امنیتی منقضی شده یا نامعتبر است. لطفاً صفحه را رفرش کنید.';
+                                msg = @json(__('admin.common.session_expired'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                             } else if (status === 401) {
-                                msg = 'دسترسی غیرمجاز. لطفاً دوباره وارد شوید.';
+                                msg = @json(__('admin.common.unauthorized'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                             } else if (status === 403) {
-                                msg = 'شما دسترسی لازم برای این عملیات را ندارید.';
+                                msg = @json(__('admin.common.forbidden'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                             } else if (status === 500) {
-                                msg = 'خطای داخلی سرور. لطفاً با پشتیبانی تماس بگیرید.';
+                                msg = @json(__('admin.common.internal_server_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                             } else if (data?.message) {
                                 msg = data.message;
                             } else if (data?.error) {
@@ -179,10 +179,10 @@
                             alert(msg);
                             element.style.borderColor = 'red';
                         } else if (error.request) {
-                            alert('اتصال برقرار نشد. ممکن است درخواست به صفحه‌ای غیر از API ریدایرکت شده باشد.');
+                            alert(@json(__('admin.common.no_connection'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                             console.log('Request object:', error.request);
                         } else {
-                            alert('خطا در ارسال درخواست: ' + error.message);
+                            alert(@json(__('admin.common.request_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + error.message);
                         }
                     })
                     .finally(() => {

@@ -72,7 +72,7 @@ class ProductCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.product-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت ایجاد شد.');
+            ->with('success', __('admin.product_categories.created'));
     }
 
     public function edit(ProductCategory $productCategory): View
@@ -122,7 +122,7 @@ class ProductCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.product-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.product_categories.updated'));
     }
 
     public function destroy(ProductCategory $productCategory): RedirectResponse
@@ -130,13 +130,13 @@ class ProductCategoryController extends Controller
         // ⚠️ ستون product_category_id محصولات cascadeOnDelete است — حذف دسته = حذف محصولاتش!
         if ($productCategory->products()->count() > 0) {
             return back()
-                ->with('error', 'نمی‌توان این دسته‌بندی را حذف کرد چون دارای محصول است. ابتدا محصولات آن را جابجا یا حذف کنید.');
+                ->with('error', __('admin.product_categories.has_products_error'));
         }
 
         // زیردسته‌ها هم نباید یتیم بمانند
         if ($productCategory->children()->count() > 0) {
             return back()
-                ->with('error', 'نمی‌توان این دسته‌بندی را حذف کرد چون دارای زیردسته است.');
+                ->with('error', __('admin.product_categories.has_children_error'));
         }
 
         if ($productCategory->image) {
@@ -146,6 +146,6 @@ class ProductCategoryController extends Controller
         $productCategory->delete();
 
         return redirect()->route('admin.product-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت حذف شد.');
+            ->with('success', __('admin.product_categories.deleted'));
     }
 }

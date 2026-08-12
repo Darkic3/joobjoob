@@ -38,10 +38,10 @@
         window.confirmFaqDelete = function(faqId, dataId) {
             Swal.fire({
                 icon: 'warning',
-                text: 'آیا از حذف این سوال پرتکرار اطمینان دارید؟',
+                text: @json(__('admin.common.delete_faq_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 showCancelButton: true,
-                confirmButtonText: 'بله، حذف شود',
-                cancelButtonText: 'لغو',
+                confirmButtonText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {

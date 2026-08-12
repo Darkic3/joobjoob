@@ -6,23 +6,23 @@
                 e.preventDefault();
                 const faqId = deleteBtn.getAttribute('data-faq-id');
                 if (!faqId) {
-                    alert('شناسه سوال یافت نشد!');
+                    alert(@json(__('admin.common.invalid_id'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                     return;
                 }
 
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 if (!csrfToken) {
-                    alert('توکن امنیتی یافت نشد!');
+                    alert(@json(__('admin.common.security_token_missing'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                     return;
                 }
 
                 Swal.fire({
                     icon: 'warning',
-                    title: 'حذف سوال',
-                    text: 'آیا از حذف این سوال پرتکرار اطمینان دارید؟',
+                    title: @json(__('admin.common.delete_faq_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    text: @json(__('admin.common.delete_faq_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     showCancelButton: true,
-                    confirmButtonText: 'بله، حذف شود',
-                    cancelButtonText: 'لغو',
+                    confirmButtonText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
                     reverseButtons: true,
@@ -40,10 +40,10 @@
                                 if (response.ok) {
                                     return response.json().catch(() => ({}));
                                 }
-                                throw new Error('پاسخ ناموفق از سرور');
+                                throw new Error(@json(__('admin.common.delete_failed'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                             })
                             .then(data => {
-                                Swal.fire('حذف شد!', 'در حال بازگشت...', 'success')
+                                Swal.fire(@json(__('admin.common.deleted'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + '!', @json(__('admin.common.deleted_redirecting'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'success')
                                     .then(data => {
                                         if (data.redirect_url) {
                                             window.location.href = data.redirect_url;
@@ -53,8 +53,8 @@
                                     });
                             })
                             .catch(error => {
-                                console.error('خطا در حذف:', error);
-                                Swal.fire('خطا!', 'حذف با خطا مواجه شد.', 'error');
+                                console.error(@json(__('admin.common.delete_failed'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), error);
+                                Swal.fire(@json(__('admin.common.error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + '!', @json(__('admin.common.delete_failed'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'error');
                             });
                     }
                 });

@@ -35,7 +35,7 @@ class SpecificationController extends Controller
         $this->specificationService->store($dto);
 
         return redirect()->route('admin.specifications.index')
-            ->with('success', 'مشخصه با موفقیت ایجاد شد.');
+            ->with('success', __('admin.specifications.created'));
     }
 
     public function edit(Specification $specification): View
@@ -55,7 +55,7 @@ class SpecificationController extends Controller
         $this->specificationService->update($specification, $dto);
 
         return redirect()->route('admin.specifications.index')
-            ->with('success', 'مشخصه با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.specifications.updated'));
     }
 
     public function destroy(Specification $specification)
@@ -63,6 +63,6 @@ class SpecificationController extends Controller
         $this->specificationService->destroy($specification);
 
         return redirect()->route('admin.specifications.index')
-            ->with('success', 'مشخصه با موفقیت حذف شد.');
+            ->with('success', __('admin.specifications.deleted'));
     }
 }

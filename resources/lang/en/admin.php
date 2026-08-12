@@ -168,6 +168,7 @@ return [
             'default_theme' => 'Default Site Theme',
             'festive_mode' => 'Festive Mode (confetti rain on hero)',
         ],
+        'saved' => 'Settings updated successfully.',
     ],
 
     'common' => [
@@ -197,12 +198,38 @@ return [
         'ok' => 'OK',
         'not_an_image' => 'Selected file is not an image',
         'file_too_large' => 'File size exceeds the allowed limit',
+        'crop_cancelled' => 'Crop cancelled',
         'jalali_hint' => 'Jalali date — automatically converted to Gregorian before saving.',
         'gregorian_hint' => 'Gregorian date — saved directly to the database.',
         'slug' => 'URL',
         'featured' => 'Homepage',
         'show' => 'Show',
         'category' => 'Category',
+        'upload_failed' => 'Image upload failed.',
+        'invalid_file' => 'Invalid file.',
+        'delete_confirm_title' => 'Are you sure?',
+        'delete_confirm_text' => 'This action cannot be undone!',
+        'delete_confirm_button' => 'Yes, delete it!',
+        'delete_yes' => 'Yes, delete',
+        'deleted' => 'Deleted',
+        'deleted_redirecting' => 'Redirecting...',
+        'error' => 'Error',
+        'delete_failed' => 'Deletion failed.',
+        'system_item_protected' => 'This item is system-protected and cannot be deleted.',
+        'order_saved' => 'Order saved',
+        'session_expired' => 'Your security token has expired or is invalid. Please refresh the page.',
+        'unauthorized' => 'Unauthorized access. Please sign in again.',
+        'forbidden' => 'You do not have the required permission for this action.',
+        'internal_server_error' => 'Internal server error. Please contact support.',
+        'no_connection' => 'Connection failed. The request may have been redirected to a non-API page.',
+        'request_error' => 'Request error: ',
+        'security_token_missing' => 'Security token not found!',
+        'invalid_id' => 'Item ID not found!',
+        'read_image_error' => 'Error reading the image',
+        'confirm_continue' => 'Confirm & continue',
+        'index_confirm_text' => 'Are you sure you want to change the status of all internal pages from no-index to index?',
+        'delete_faq_title' => 'Delete FAQ',
+        'delete_faq_text' => 'Are you sure you want to delete this FAQ?',
     ],
 
     'trust_badges' => [
@@ -236,6 +263,9 @@ return [
         'edit_btn' => 'Edit Trust Badge',
         'create_btn' => 'Create Trust Badge',
         'tab_edit' => 'Edit Trust Badge: :name',
+        'created' => 'Trust badge created successfully.',
+        'updated' => 'Trust badge updated successfully.',
+        'deleted' => 'Trust badge deleted successfully.',
     ],
 
     'blogs' => [
@@ -268,6 +298,9 @@ return [
         'edit_btn' => 'Edit Article',
         'create_btn' => 'Create Article',
         'count' => ':count articles',
+        'created' => 'Article created successfully.',
+        'updated' => 'Article updated successfully.',
+        'deleted' => 'Article deleted successfully.',
     ],
 
     'blog_categories' => [
@@ -295,6 +328,11 @@ return [
         'active_label' => 'Category is active',
         'show_home' => 'Show on homepage',
         'save_btn' => 'Save Category',
+        'created' => 'Category created successfully.',
+        'updated' => 'Category updated successfully.',
+        'deleted' => 'Category deleted successfully.',
+        'has_blogs_error' => 'This category cannot be deleted because it has articles.',
+        'self_parent_error' => 'You cannot make a category its own parent.',
     ],
 
     'hero_slides' => [
@@ -355,11 +393,23 @@ return [
         'image_hint' => 'Free crop — any size you want | Max size: 20 MB',
         'edit_btn' => 'Edit Slide',
         'create_btn' => 'Create Slide',
+        'created' => 'Slide created successfully.',
+        'updated' => 'Slide updated successfully.',
+        'deleted' => 'Slide deleted successfully.',
         'order_col' => 'Order',
         'sort_hint' => 'Drag rows to change the display order.',
         'save_order' => 'Save Order',
         'order_saved' => 'Order saved successfully.',
         'order_invalid' => 'The list is invalid — refresh the page and try again.',
+        'add_trust_item' => 'Add Item',
+        'item_label' => 'Item',
+        'max_items' => 'Max 5 items — ',
+        'icon_label' => 'Icon (emoji/symbol)',
+        'text_fa' => 'Text (Persian)',
+        'text_en' => 'Text (English)',
+        'trusts_empty' => 'No items added yet — you can add up to 5 items (e.g. “Happy Customers”, “Authenticity Guarantee”, “Fast Shipping”, …). If you add nothing, nothing is shown on the site.',
+        'help' => 'Help',
+        'image_fallback_hint' => 'If you do not choose an image, the product featured image is automatically shown in the hero.',
     ],
 
     'product_categories' => [
@@ -402,6 +452,11 @@ return [
         'save_btn' => 'Save Changes',
         'create_btn' => 'Create Category',
         'count_products' => ':count products',
+        'created' => 'Category created successfully.',
+        'updated' => 'Category updated successfully.',
+        'deleted' => 'Category deleted successfully.',
+        'has_products_error' => 'This category cannot be deleted because it has products. Move or delete its products first.',
+        'has_children_error' => 'This category cannot be deleted because it has subcategories.',
     ],
 
     'brands' => [
@@ -426,6 +481,9 @@ return [
         'url_ph' => 'nike',
         'logo' => 'Brand Logo',
         'logo_formats' => 'Allowed formats: JPG, PNG, WebP | Max 2 MB',
+        'created' => 'Brand created successfully.',
+        'updated' => 'Brand updated successfully.',
+        'deleted' => 'Brand deleted successfully.',
         'desc_fa' => 'Brand Description (Persian)',
         'desc_ph' => 'A short description about the brand...',
         'show_site' => 'Show on site',
@@ -477,6 +535,9 @@ return [
         'active' => 'Active',
         'save_btn' => 'Save Specification',
         'apply_btn' => 'Apply Changes',
+        'created' => 'Specification created successfully.',
+        'updated' => 'Specification updated successfully.',
+        'deleted' => 'Specification deleted successfully.',
     ],
 
     'roles' => [
@@ -512,6 +573,9 @@ return [
         'empty_tree' => 'The permissions tree is empty — see config/permissions.php.',
         'save_btn' => 'Save Role',
         'save_changes' => 'Save Changes',
+        'created' => 'Role created successfully.',
+        'updated' => 'Role updated successfully.',
+        'deleted' => 'Role deleted.',
     ],
 
     'users' => [
@@ -551,6 +615,9 @@ return [
         'is_active' => 'Account is active',
         'create_btn' => 'Create User',
         'save_btn' => 'Save Changes',
+        'created' => 'User created successfully.',
+        'updated' => 'User updated successfully.',
+        'last_super_admin_error' => 'The last active super admin cannot be deactivated.',
     ],
 
     'products' => [
@@ -646,6 +713,9 @@ return [
         'pending_delete' => 'Pending deletion',
         'product_image' => 'Product image',
         'price_unit' => '',
+        'created' => 'Product created successfully.',
+        'updated' => 'Product updated successfully.',
+        'deleted' => 'Product deleted successfully.',
     ],
 
     'product_spec_builder' => [

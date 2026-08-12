@@ -31,7 +31,7 @@ class RoleController extends Controller
 
         User::bumpPermissionsVersion();
 
-        return redirect()->route('admin.roles.index')->with('success', 'نقش با موفقیت ساخته شد.');
+        return redirect()->route('admin.roles.index')->with('success', __('admin.roles.created'));
     }
 
     public function edit(Role $role): View
@@ -51,7 +51,7 @@ class RoleController extends Controller
 
         User::bumpPermissionsVersion();
 
-        return redirect()->route('admin.roles.edit', $role)->with('success', 'نقش با موفقیت به‌روزرسانی شد.');
+        return redirect()->route('admin.roles.edit', $role)->with('success', __('admin.roles.updated'));
     }
 
     public function destroy(Role $role): RedirectResponse
@@ -64,7 +64,7 @@ class RoleController extends Controller
 
         User::bumpPermissionsVersion();
 
-        return redirect()->route('admin.roles.index')->with('success', 'نقش حذف شد.');
+        return redirect()->route('admin.roles.index')->with('success', __('admin.roles.deleted'));
     }
 
     /**

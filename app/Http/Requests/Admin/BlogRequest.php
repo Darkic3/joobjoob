@@ -44,17 +44,17 @@ class BlogRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'فیلد عنوان الزامی است.',
-            'title.max' => 'فیلد عنوان نباید بیشتر از 255 کاراکتر باشد.',
-            'slug.required' => 'آدرس یکتا (URL) اجباری است.',
-            'slug.max' => 'آدرس یکتا حداکثر می‌تواند 255 کاراکتر باشد.',
-            'excerpt.string' => 'فیلد خلاصه باید یک رشته باشد.',
-            'content.required' => 'فیلد محتوا الزامی است.',
-            'blog_category_id.exists' => 'دسته‌بندی انتخاب‌شده معتبر نیست.',
-            'is_active.boolean' => 'مقدار فعال باید صحیح باشد.',
-            'show_in_first_page.boolean' => 'مقدار نمایش در صفحه اول باید صحیح باشد.',
-            'image.max' => 'حجم تصویر نباید بیشتر از 2 مگابایت باشد.',
-            'image.mimes' => 'فرمت تصویر مجاز نیست (فقط jpg, jpeg, png, webp).',
+            'title.required' => __('validation.requests.blog.title_required'),
+            'title.max' => __('validation.requests.blog.title_max'),
+            'slug.required' => __('validation.requests.blog.slug_required'),
+            'slug.max' => __('validation.requests.blog.slug_max'),
+            'excerpt.string' => __('validation.requests.blog.excerpt_string'),
+            'content.required' => __('validation.requests.blog.content_required'),
+            'blog_category_id.exists' => __('validation.requests.blog.category_exists'),
+            'is_active.boolean' => __('validation.requests.blog.is_active_boolean'),
+            'show_in_first_page.boolean' => __('validation.requests.blog.show_first_boolean'),
+            'image.max' => __('validation.requests.blog.image_max'),
+            'image.mimes' => __('validation.requests.blog.image_mimes'),
         ];
     }
 }

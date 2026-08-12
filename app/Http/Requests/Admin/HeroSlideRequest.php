@@ -50,17 +50,17 @@ class HeroSlideRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.fa.required' => 'عنوان فارسی الزامی است.',
-            'btn_text.fa.required_if' => 'متن دکمه فارسی الزامی است.',
-            'link_type.required_if' => 'نوع مقصد لینک الزامی است.',
-            'link_value.required_if' => 'مقدار مقصد لینک الزامی است.',
-            'rating.required_if' => 'مقدار امتیاز الزامی است.',
-            'viewers.required_if' => 'تعداد بازدیدکنندگان الزامی است.',
-            'price.numeric' => 'قیمت باید یک عدد معتبر باشد.',
-            'price.min' => 'قیمت نمی‌تواند منفی باشد.',
-            'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
-            'image.mimes' => 'فرمت تصویر مجاز نیست (فقط jpg, jpeg, png, webp).',
-            'image.max' => 'حجم تصویر نباید بیشتر از ۲۰ مگابایت باشد.',
+            'title.fa.required' => __('validation.requests.hero_slide.title_fa_required'),
+            'btn_text.fa.required_if' => __('validation.requests.hero_slide.btn_text_required_if'),
+            'link_type.required_if' => __('validation.requests.hero_slide.link_type_required_if'),
+            'link_value.required_if' => __('validation.requests.hero_slide.link_value_required_if'),
+            'rating.required_if' => __('validation.requests.hero_slide.rating_required_if'),
+            'viewers.required_if' => __('validation.requests.hero_slide.viewers_required_if'),
+            'price.numeric' => __('validation.requests.hero_slide.price_numeric'),
+            'price.min' => __('validation.requests.hero_slide.price_min'),
+            'image.image' => __('validation.requests.hero_slide.image_image'),
+            'image.mimes' => __('validation.requests.hero_slide.image_mimes'),
+            'image.max' => __('validation.requests.hero_slide.image_max'),
         ];
     }
 }

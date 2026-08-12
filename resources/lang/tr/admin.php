@@ -168,6 +168,7 @@ return [
             'default_theme' => 'Varsayılan Site Teması',
             'festive_mode' => 'Kutlama Modu (hero üzerinde konfeti yağmuru)',
         ],
+        'saved' => 'Ayarlar başarıyla güncellendi.',
     ],
 
     'common' => [
@@ -197,12 +198,38 @@ return [
         'ok' => 'Tamam',
         'not_an_image' => 'Seçilen dosya bir görsel değil',
         'file_too_large' => 'Dosya boyutu izin verilen sınırı aşıyor',
+        'crop_cancelled' => 'Kırpma iptal edildi',
         'jalali_hint' => 'Şemsi tarih — kaydetmeden önce otomatik olarak miladiye dönüştürülür.',
         'gregorian_hint' => 'Miladi tarih — doğrudan veritabanına kaydedilir.',
         'slug' => 'Adres',
         'featured' => 'Ana Sayfa',
         'show' => 'Göster',
         'category' => 'Kategori',
+        'upload_failed' => 'Görsel yükleme başarısız.',
+        'invalid_file' => 'Geçersiz dosya.',
+        'delete_confirm_title' => 'Emin misiniz?',
+        'delete_confirm_text' => 'Bu işlem geri alınamaz!',
+        'delete_confirm_button' => 'Evet, sil!',
+        'delete_yes' => 'Evet, sil',
+        'deleted' => 'Silindi',
+        'deleted_redirecting' => 'Geri dönülüyor...',
+        'error' => 'Hata',
+        'delete_failed' => 'Silme başarısız oldu.',
+        'system_item_protected' => 'Bu öğe sistem tarafından korunuyor ve silinemez.',
+        'order_saved' => 'Sıralama kaydedildi',
+        'session_expired' => 'Güvenlik jetonunuzun süresi doldu veya geçersiz. Lütfen sayfayı yenileyin.',
+        'unauthorized' => 'Yetkisiz erişim. Lütfen tekrar giriş yapın.',
+        'forbidden' => 'Bu işlem için gerekli izne sahip değilsiniz.',
+        'internal_server_error' => 'Sunucu hatası. Lütfen destek ile iletişime geçin.',
+        'no_connection' => 'Bağlantı kurulamadı. İstek API dışı bir sayfaya yönlendirilmiş olabilir.',
+        'request_error' => 'İstek hatası: ',
+        'security_token_missing' => 'Güvenlik jetonu bulunamadı!',
+        'invalid_id' => 'Öğe kimliği bulunamadı!',
+        'read_image_error' => 'Görsel okunurken hata',
+        'confirm_continue' => 'Onayla ve devam et',
+        'index_confirm_text' => 'Tüm iç sayfaların durumunu no-index yerine index olarak değiştirmek istediğinizden emin misiniz?',
+        'delete_faq_title' => 'SSS sil',
+        'delete_faq_text' => 'Bu sık sorulan soruyu silmek istediğinizden emin misiniz?',
     ],
 
     'trust_badges' => [
@@ -236,6 +263,9 @@ return [
         'edit_btn' => 'Güven Rozetini Düzenle',
         'create_btn' => 'Güven Rozeti Oluştur',
         'tab_edit' => 'Güven Rozetini Düzenle: :name',
+        'created' => 'Güven rozeti başarıyla oluşturuldu.',
+        'updated' => 'Güven rozeti başarıyla güncellendi.',
+        'deleted' => 'Güven rozeti başarıyla silindi.',
     ],
 
     'blogs' => [
@@ -268,6 +298,9 @@ return [
         'edit_btn' => 'Makaleyi Düzenle',
         'create_btn' => 'Makale Oluştur',
         'count' => ':count makale',
+        'created' => 'Makale başarıyla oluşturuldu.',
+        'updated' => 'Makale başarıyla güncellendi.',
+        'deleted' => 'Makale başarıyla silindi.',
     ],
 
     'blog_categories' => [
@@ -295,6 +328,11 @@ return [
         'active_label' => 'Kategori aktif',
         'show_home' => 'Ana sayfada göster',
         'save_btn' => 'Kategoriyi Kaydet',
+        'created' => 'Kategori başarıyla oluşturuldu.',
+        'updated' => 'Kategori başarıyla güncellendi.',
+        'deleted' => 'Kategori başarıyla silindi.',
+        'has_blogs_error' => 'Bu kategori silinemez çünkü makaleleri var.',
+        'self_parent_error' => 'Bir kategoriyi kendisinin üstü yapamazsınız.',
     ],
 
     'hero_slides' => [
@@ -355,11 +393,23 @@ return [
         'image_hint' => 'Serbest kırpma — istediğiniz boyutta | Maks boyut: 20 MB',
         'edit_btn' => 'Slaytı Düzenle',
         'create_btn' => 'Slayt Oluştur',
+        'created' => 'Slayt başarıyla oluşturuldu.',
+        'updated' => 'Slayt başarıyla güncellendi.',
+        'deleted' => 'Slayt başarıyla silindi.',
         'order_col' => 'Sıra',
         'sort_hint' => 'Görüntüleme sırasını değiştirmek için satırları sürükleyin.',
         'save_order' => 'Sıralamayı Kaydet',
         'order_saved' => 'Sıralama başarıyla kaydedildi.',
         'order_invalid' => 'Liste geçersiz — sayfayı yenileyip tekrar deneyin.',
+        'add_trust_item' => 'Öğe Ekle',
+        'item_label' => 'Öğe',
+        'max_items' => 'Maks 5 öğe — ',
+        'icon_label' => 'İkon (emoji/sembol)',
+        'text_fa' => 'Metin (Farsça)',
+        'text_en' => 'Metin (İngilizce)',
+        'trusts_empty' => 'Henüz öğe eklenmedi — en fazla 5 öğe ekleyebilirsiniz (örn. «Mutlu Müşteriler», «Ürün Orijinallik Garantisi», «Hızlı Kargo»…). Hiçbir şey eklemezseniz sitede gösterilmez.',
+        'help' => 'Yardım',
+        'image_fallback_hint' => 'Bir görsel seçmezseniz ürünün öne çıkan görseli otomatik olarak heroda gösterilir.',
     ],
 
     'product_categories' => [
@@ -402,6 +452,11 @@ return [
         'save_btn' => 'Değişiklikleri Kaydet',
         'create_btn' => 'Kategori Oluştur',
         'count_products' => ':count ürün',
+        'created' => 'Kategori başarıyla oluşturuldu.',
+        'updated' => 'Kategori başarıyla güncellendi.',
+        'deleted' => 'Kategori başarıyla silindi.',
+        'has_products_error' => 'Bu kategori silinemez çünkü ürünleri var. Önce ürünlerini taşıyın veya silin.',
+        'has_children_error' => 'Bu kategori silinemez çünkü alt kategorileri var.',
     ],
 
     'brands' => [
@@ -426,6 +481,9 @@ return [
         'url_ph' => 'nike',
         'logo' => 'Marka Logosu',
         'logo_formats' => 'İzin verilen biçimler: JPG, PNG, WebP | Maks 2 MB',
+        'created' => 'Marka başarıyla oluşturuldu.',
+        'updated' => 'Marka başarıyla güncellendi.',
+        'deleted' => 'Marka başarıyla silindi.',
         'desc_fa' => 'Marka Açıklaması (Farsça)',
         'desc_ph' => 'Marka hakkında kısa bir açıklama...',
         'show_site' => 'Sitede göster',
@@ -477,6 +535,9 @@ return [
         'active' => 'Aktif',
         'save_btn' => 'Özelliği Kaydet',
         'apply_btn' => 'Değişiklikleri Uygula',
+        'created' => 'Özellik başarıyla oluşturuldu.',
+        'updated' => 'Özellik başarıyla güncellendi.',
+        'deleted' => 'Özellik başarıyla silindi.',
     ],
 
     'roles' => [
@@ -512,6 +573,9 @@ return [
         'empty_tree' => 'İzin ağacı boş — config/permissions.php dosyasına bakın.',
         'save_btn' => 'Rolü Kaydet',
         'save_changes' => 'Değişiklikleri Kaydet',
+        'created' => 'Rol başarıyla oluşturuldu.',
+        'updated' => 'Rol başarıyla güncellendi.',
+        'deleted' => 'Rol silindi.',
     ],
 
     'users' => [
@@ -551,6 +615,9 @@ return [
         'is_active' => 'Hesap aktif',
         'create_btn' => 'Kullanıcı Oluştur',
         'save_btn' => 'Değişiklikleri Kaydet',
+        'created' => 'Kullanıcı başarıyla oluşturuldu.',
+        'updated' => 'Kullanıcı başarıyla güncellendi.',
+        'last_super_admin_error' => 'Son aktif süper yönetici pasifleştirilemez.',
     ],
 
     'products' => [
@@ -646,6 +713,9 @@ return [
         'pending_delete' => 'Silme bekliyor',
         'product_image' => 'Ürün görseli',
         'price_unit' => '',
+        'created' => 'Ürün başarıyla oluşturuldu.',
+        'updated' => 'Ürün başarıyla güncellendi.',
+        'deleted' => 'Ürün başarıyla silindi.',
     ],
 
     'product_spec_builder' => [

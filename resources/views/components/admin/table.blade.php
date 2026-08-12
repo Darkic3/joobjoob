@@ -1,4 +1,4 @@
-@props(['headers', 'emptyMessage' => 'هیچ رکوردی یافت نشد.'])
+@props(['headers', 'emptyMessage' => __('admin.common.no_items')])
 
 <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">

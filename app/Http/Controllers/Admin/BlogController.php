@@ -37,7 +37,7 @@ class BlogController extends Controller
         $this->blogService->store($blogDTO);
 
         return redirect()->route('admin.blogs.index')
-            ->with('success', 'مقاله با موفقیت ایجاد شد.');
+            ->with('success', __('admin.blogs.created'));
     }
 
     public function edit(Blog $blog): View
@@ -53,7 +53,7 @@ class BlogController extends Controller
         $this->blogService->update($blog, $blogDTO);
 
         return redirect()->route('admin.blogs.index')
-            ->with('success', 'مقاله با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.blogs.updated'));
     }
 
     public function destroy(Blog $blog)
@@ -61,6 +61,6 @@ class BlogController extends Controller
         $this->blogService->destroy($blog);
 
         return redirect()->route('admin.blogs.index')
-            ->with('success', 'مقاله با موفقیت حذف شد.');
+            ->with('success', __('admin.blogs.deleted'));
     }
 }

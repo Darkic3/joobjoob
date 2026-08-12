@@ -34,7 +34,7 @@ class TrustBadgeController extends Controller
         $this->trustBadgeService->store($dto);
 
         return redirect()->route('admin.trust-badges.index')
-            ->with('success', 'نشان اعتماد با موفقیت ایجاد شد.');
+            ->with('success', __('admin.trust_badges.created'));
     }
 
     public function edit(TrustBadge $trustBadge): View
@@ -48,7 +48,7 @@ class TrustBadgeController extends Controller
         $this->trustBadgeService->update($trustBadge, $dto);
 
         return redirect()->route('admin.trust-badges.index')
-            ->with('success', 'نشان اعتماد با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.trust_badges.updated'));
     }
 
     public function destroy(TrustBadge $trustBadge)
@@ -56,7 +56,7 @@ class TrustBadgeController extends Controller
         $this->trustBadgeService->destroy($trustBadge);
 
         return redirect()->route('admin.trust-badges.index')
-            ->with('success', 'نشان اعتماد با موفقیت حذف شد.');
+            ->with('success', __('admin.trust_badges.deleted'));
     }
 
     /**

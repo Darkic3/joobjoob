@@ -2,10 +2,10 @@
     function confirmIndex(url) {
         Swal.fire({
             icon: 'warning',
-            text: "آیا از تغییر وضعیت تمامی صفحات داخلی از نوایندکس به ایندکس مطمئن هستید؟",
+            text: @json(__('admin.common.index_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             showCancelButton: true,
-            confirmButtonText: 'تایید و ادامه',
-            cancelButtonText: 'لغو',
+            confirmButtonText: @json(__('admin.common.confirm_continue'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         }).then((result) => {
             if (result.isConfirmed) {
                 location.href = url;

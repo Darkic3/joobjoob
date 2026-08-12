@@ -40,8 +40,8 @@ class UpdateSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'settings.site_name.required' => 'نام سایت الزامی است.',
-            'settings.site_logo.image' => 'فایل لوگو باید یک تصویر معتبر باشد.',
+            'settings.site_name.required' => __('validation.requests.settings.site_name_required'),
+            'settings.site_logo.image' => __('validation.requests.settings.site_logo_image'),
         ];
     }
 }

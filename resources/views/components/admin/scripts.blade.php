@@ -69,13 +69,13 @@
             if (form && typeof Swal !== 'undefined') {
                 e.preventDefault();
                 Swal.fire({
-                    title: 'آیا مطمئن هستید؟',
-                    text: 'این عمل قابل بازگشت نخواهد بود!',
+                    title: @json(__('admin.common.delete_confirm_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    text: @json(__('admin.common.delete_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     icon: 'warning',
                     showCancelButton: true,
                     customClass: { confirmButton: 'fb-swal-danger' },
-                    confirmButtonText: 'بله، حذف کن!',
-                    cancelButtonText: 'انصراف'
+                    confirmButtonText: @json(__('admin.common.delete_confirm_button'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 }).then(function (result) {
                     if (result.isConfirmed) {
                         form.submit();

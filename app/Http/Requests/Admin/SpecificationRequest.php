@@ -29,8 +29,8 @@ class SpecificationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.fa.required' => 'نام فارسی مشخصه الزامی است.',
-            'type.required' => 'نوع مشخصه (نوشتاری/انتخابی) الزامی است.',
+            'title.fa.required' => __('validation.requests.specification.title_fa_required'),
+            'type.required' => __('validation.requests.specification.type_required'),
         ];
     }
 }

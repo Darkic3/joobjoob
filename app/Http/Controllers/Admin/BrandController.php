@@ -34,7 +34,7 @@ class BrandController extends Controller
         $this->brandService->store($dto);
 
         return redirect()->route('admin.brands.index')
-            ->with('success', 'برند با موفقیت ایجاد شد.');
+            ->with('success', __('admin.brands.created'));
     }
 
     public function edit(Brand $brand): View
@@ -48,7 +48,7 @@ class BrandController extends Controller
         $this->brandService->update($brand, $dto);
 
         return redirect()->route('admin.brands.index')
-            ->with('success', 'برند با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.brands.updated'));
     }
 
     public function destroy(Brand $brand)
@@ -56,7 +56,7 @@ class BrandController extends Controller
         $this->brandService->destroy($brand);
 
         return redirect()->route('admin.brands.index')
-            ->with('success', 'برند با موفقیت حذف شد.');
+            ->with('success', __('admin.brands.deleted'));
     }
 
     /**

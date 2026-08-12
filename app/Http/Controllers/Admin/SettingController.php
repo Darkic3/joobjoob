@@ -52,6 +52,6 @@ class SettingController extends Controller
         $this->settingService->updateGroup($group, $validatedData, $files);
 
         return redirect()->route('admin.settings.edit', $group)
-            ->with('success', 'تنظیمات با موفقیت و با بالاترین سرعت به‌روزرسانی شد.');
+            ->with('success', __('admin.settings.saved'));
     }
 }

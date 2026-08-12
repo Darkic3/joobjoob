@@ -117,7 +117,7 @@ class ProductController extends Controller
         $this->productService->store($productDTO);
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'محصول با موفقیت ایجاد شد.');
+            ->with('success', __('admin.products.created'));
     }
 
     public function edit(Product $product): View
@@ -233,7 +233,7 @@ class ProductController extends Controller
         $this->productService->update($product, $productDTO);
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'محصول با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.products.updated'));
     }
 
     public function destroy(Product $product)
@@ -241,6 +241,6 @@ class ProductController extends Controller
         $this->productService->destroy($product);
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'محصول با موفقیت حذف شد.');
+            ->with('success', __('admin.products.deleted'));
     }
 }

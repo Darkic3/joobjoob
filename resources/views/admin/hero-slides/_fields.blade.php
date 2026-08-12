@@ -17,6 +17,12 @@
     price: {{ json_encode(old('price', $heroSlide?->price ?? 0), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
     oldPrice: {{ json_encode(old('old_price', $heroSlide?->old_price ?? 0), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
 
+    // برچسب‌های محلی‌شده (از فایل ترجمه) — برای نمایش در x-text
+    labels: {
+        item: @json(__('admin.hero_slides.item_label'), JSON_UNESCAPED_UNICODE),
+        maxItems: @json(__('admin.hero_slides.max_items'), JSON_UNESCAPED_UNICODE),
+    },
+
     get isCustomUrl() { return this.linkType === 'custom'; },
     get isStaticPage() { return this.linkType === 'page'; },
     get isModel() { return ['product', 'product_category', 'blog', 'blog_category'].includes(this.linkType); },
@@ -301,7 +307,7 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                     <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    آیتم‌های اعتماد
+                    {{ __('admin.hero_slides.trust_items') }}
                 </h3>
                 <button
                     type="button"
@@ -310,30 +316,30 @@
                     class="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    افزودن آیتم
+                    {{ __('admin.hero_slides.add_trust_item') }}
                 </button>
             </div>
 
             <template x-for="(trust, i) in trusts" :key="i">
                 <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="'آیتم ' + (i + 1)"></span>
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="labels.item + ' ' + (i + 1)"></span>
                         <button type="button" @click="trusts.splice(i, 1)" class="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            حذف
+                            {{ __('admin.common.delete') }}
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">آیکون (ایموجی/نماد)</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.icon_label') }}</label>
                             <input type="text" x-model="trust.icon" :name="'trusts[' + i + '][icon]'" class="input-custom" placeholder="✓" maxlength="4">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">متن (فارسی)</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.text_fa') }}</label>
                             <input type="text" x-model="trust.fa" :name="'trusts[' + i + '][fa]'" class="input-custom" placeholder="مثال: +۱۲,۰۰۰ مشتری راضی">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Text (English)</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.text_en') }}</label>
                             <input type="text" x-model="trust.en" :name="'trusts[' + i + '][en]'" class="input-custom" dir="ltr" placeholder="+12,000 happy customers">
                         </div>
                     </div>
@@ -341,9 +347,9 @@
             </template>
 
             <p x-show="trusts.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
-                هنوز آیتمی اضافه نشده است — تا ۵ آیتم (مثل «مشتریان راضی»، «تضمین اصالت کالا»، «ارسال سریع» و…) می‌توانید اضافه کنید. اگر چیزی اضافه نکنید، در سایت نمایش داده نمی‌شود.
+                {{ __('admin.hero_slides.trusts_empty') }}
             </p>
-            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="'حداکثر ۵ آیتم — ' + trusts.length + ' / 5'"></p>
+            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="labels.maxItems + trusts.length + ' / 5'"></p>
         </div>
     </div>
 
@@ -373,10 +379,10 @@
                 تصویر اسلاید
 
                 {{-- راهنمای fallback تصویر — فقط وقتی مدلی (محصول/مقاله/دسته) لینک شده باشد --}}
-                <span x-show="isModel" class="relative inline-flex ms-1 group" aria-label="راهنما">
+                <span x-show="isModel" class="relative inline-flex ms-1 group" aria-label="{{ __('admin.hero_slides.help') }}">
                     <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span class="absolute bottom-full start-1/2 -translate-x-1/2 mb-2 w-64 text-[11px] font-normal leading-relaxed text-white dark:text-gray-100 bg-gray-900 dark:bg-gray-700 rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50 shadow-lg">
-                        اگر تصویری انتخاب نکنید، تصویر شاخص محصول به‌صورت خودکار در هیرو نمایش داده می‌شود.
+                        {{ __('admin.hero_slides.image_fallback_hint') }}
                     </span>
                 </span>
             </h3>
@@ -394,9 +400,9 @@
 
 {{-- دکمه‌های اکشن --}}
 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-700 mt-6">
-    <a href="{{ route('admin.hero-slides.index') }}" class="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium">انصراف</a>
+    <a href="{{ route('admin.hero-slides.index') }}" class="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium">{{ __('admin.common.cancel') }}</a>
     <button type="submit" class="btn-primary flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-        {{ $heroSlide ? 'ویرایش اسلاید' : 'ایجاد اسلاید' }}
+        {{ $heroSlide ? __('admin.hero_slides.edit') : __('admin.hero_slides.create') }}
     </button>
 </div>

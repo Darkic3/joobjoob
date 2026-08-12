@@ -43,7 +43,7 @@ class BlogCategoryRequest extends FormRequest
                 // جلوگیری از انتخاب خودش به عنوان والد
                 function ($attribute, $value, $fail) use ($id) {
                     if ($id && $value == $id) {
-                        $fail('نمی‌توانید یک دسته‌بندی را والد خودش قرار دهید.');
+                        $fail(__('admin.blog_categories.self_parent_error'));
                     }
                 },
             ],
@@ -60,19 +60,19 @@ class BlogCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'فیلد عنوان الزامی است.',
-            'title.string' => 'فیلد عنوان باید یک رشته باشد.',
-            'title.max' => 'فیلد عنوان نباید بیشتر از 255 کاراکتر باشد.',
-            'url.required' => 'URL اجباری است.',
-            'url.max' => 'URL حداکثر می‌تواند 255 کاراکتر باشد.',
-            'description.string' => 'فیلد توضیحات باید یک رشته باشد.',
-            'parent_id.exists' => 'دسته‌بندی والد انتخابی وجود ندارد.',
-            'is_active.boolean' => 'فیلد فعال باید یک مقدار صحیح باشد.',
-            'show_in_first_page.boolean' => 'فیلد نمایش در صفحه ی اول باید یک مقدار صحیح باشد.',
-            'sort_order.integer' => 'ترتیب نمایش باید یک عدد باشد.',
-            'sort_order.min' => 'ترتیب نمایش نمی‌تواند منفی باشد.',
-            'image.max' => 'حجم تصویر نباید بیشتر از 2048 کیلوبایت (2 مگابایت) باشد.',
-            'image.mimes' => 'فرمت تصویر مجاز نمی باشد.',
+            'title.required' => __('validation.requests.blog_category.title_required'),
+            'title.string' => __('validation.requests.blog_category.title_string'),
+            'title.max' => __('validation.requests.blog_category.title_max'),
+            'url.required' => __('validation.requests.blog_category.url_required'),
+            'url.max' => __('validation.requests.blog_category.url_max'),
+            'description.string' => __('validation.requests.blog_category.description_string'),
+            'parent_id.exists' => __('validation.requests.blog_category.parent_exists'),
+            'is_active.boolean' => __('validation.requests.blog_category.is_active_boolean'),
+            'show_in_first_page.boolean' => __('validation.requests.blog_category.show_first_boolean'),
+            'sort_order.integer' => __('validation.requests.blog_category.sort_integer'),
+            'sort_order.min' => __('validation.requests.blog_category.sort_min'),
+            'image.max' => __('validation.requests.blog_category.image_max'),
+            'image.mimes' => __('validation.requests.blog_category.image_mimes'),
         ];
     }
 }

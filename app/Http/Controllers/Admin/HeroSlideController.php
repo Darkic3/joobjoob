@@ -33,7 +33,7 @@ class HeroSlideController extends Controller
         $dto = HeroSlideDTO::fromRequest($request);
         $this->service->store($dto);
 
-        return redirect()->route('admin.hero-slides.index')->with('success', 'اسلاید با موفقیت ایجاد شد.');
+        return redirect()->route('admin.hero-slides.index')->with('success', __('admin.hero_slides.created'));
     }
 
     public function edit(HeroSlide $heroSlide)
@@ -81,14 +81,14 @@ class HeroSlideController extends Controller
         $dto = HeroSlideDTO::fromRequest($request);
         $this->service->update($heroSlide, $dto);
 
-        return redirect()->route('admin.hero-slides.index')->with('success', 'اسلاید با موفقیت به‌روزرسانی شد.');
+        return redirect()->route('admin.hero-slides.index')->with('success', __('admin.hero_slides.updated'));
     }
 
     public function destroy(HeroSlide $heroSlide)
     {
         $this->service->destroy($heroSlide);
 
-        return redirect()->route('admin.hero-slides.index')->with('success', 'اسلاید با موفقیت حذف شد.');
+        return redirect()->route('admin.hero-slides.index')->with('success', __('admin.hero_slides.deleted'));
     }
 
     /**

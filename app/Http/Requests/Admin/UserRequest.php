@@ -31,10 +31,10 @@ class UserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'password.required' => 'رمز عبور برای کاربر جدید اجباری است.',
-            'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
-            'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
-            'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
+            'password.required' => __('validation.requests.user.password_required'),
+            'password.min' => __('validation.requests.user.password_min'),
+            'email.unique' => __('validation.requests.user.email_unique'),
+            'mobile.unique' => __('validation.requests.user.mobile_unique'),
         ];
     }
 }

@@ -48,7 +48,7 @@ class BlogCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.blog-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت ایجاد شد.');
+            ->with('success', __('admin.blog_categories.created'));
     }
 
     public function edit(BlogCategory $blogCategory)
@@ -88,14 +88,14 @@ class BlogCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.blog-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.blog_categories.updated'));
     }
 
     public function destroy(BlogCategory $blogCategory)
     {
         if ($blogCategory->blogs()->count() > 0) {
             return redirect()->route('admin.blog-categories.index')
-                ->with('error', 'نمی‌توان این دسته‌بندی را حذف کرد چون دارای مقاله است.');
+                ->with('error', __('admin.blog_categories.has_blogs_error'));
         }
 
         if ($blogCategory->image) {
@@ -105,6 +105,6 @@ class BlogCategoryController extends Controller
         $blogCategory->delete();
 
         return redirect()->route('admin.blog-categories.index')
-            ->with('success', 'دسته‌بندی با موفقیت حذف شد.');
+            ->with('success', __('admin.blog_categories.deleted'));
     }
 }

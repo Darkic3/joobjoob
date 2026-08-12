@@ -71,7 +71,7 @@ class UserController extends Controller
             ? 'admin.users.index'
             : 'admin.dashboard.index';
 
-        return redirect()->route($redirectTarget)->with('success', 'کاربر با موفقیت ساخته شد.');
+        return redirect()->route($redirectTarget)->with('success', __('admin.users.created'));
     }
 
     public function edit(User $user): View
@@ -112,7 +112,7 @@ class UserController extends Controller
 
             if ($isLastActiveSuperAdmin && (! $newAdmin || ! $newActive)) {
                 return back()
-                    ->withErrors(['is_admin' => 'آخرین مدیر ارشد فعال را نمی‌توان غیرفعال کرد.'])
+                    ->withErrors(['is_admin' => __('admin.users.last_super_admin_error')])
                     ->withInput();
             }
 
@@ -141,6 +141,6 @@ class UserController extends Controller
         $redirectTarget = $losesOwnAccess ? 'admin.dashboard.index' : 'admin.users.edit';
 
         return redirect()->route($redirectTarget, $losesOwnAccess ? [] : [$user])
-            ->with('success', 'کاربر با موفقیت به‌روزرسانی شد.');
+            ->with('success', __('admin.users.updated'));
     }
 }
