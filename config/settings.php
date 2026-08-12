@@ -298,6 +298,7 @@ return [
             'tab' => 'appearance',
             'required' => false,
             'default' => 'gold',
+            'preview' => true,
             'options' => [
                 'gold' => 'طلایی',
                 'colorful' => 'رنگارنگ',

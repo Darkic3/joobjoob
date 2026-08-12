@@ -8,6 +8,9 @@ import 'swiper/css/pagination';
 // بومی‌سازی ارقام بر اساس زبان سایت (fa/ar → فارسی، سایر → انگلیسی)
 import './localize-digits.js';
 
+// پیش‌نمایش زندهٔ سبک‌های بارش جشن در تنظیمات (موتور مشترک با سایت)
+import { createFestiveRain } from './festive-particles.js';
+
 window.Alpine = Alpine;
 
 // پلاگین Collapse — ساب‌منوهای سایدبار از x-collapse استفاده می‌کنند
@@ -593,6 +596,16 @@ window.SlugHelper = {
 
 document.addEventListener('DOMContentLoaded', () => {
     window.SlugHelper.initAll();
+});
+
+// پیش‌نمایش‌های بارش جشن در صفحهٔ تنظیمات — هر canvas با data-style خودش اجرا می‌شود
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('canvas[data-festive-preview]').forEach((canvas) => {
+        createFestiveRain(canvas, canvas.dataset.style || 'gold', {
+            density: 320,          // تراکم بیشتر برای کادر کوچک
+            staticPreview: true,   // در reduced-motion یک قاب ثابت نمایش بده
+        });
+    });
 });
 
 /* ==========================================

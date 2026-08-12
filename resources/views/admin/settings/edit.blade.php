@@ -121,6 +121,18 @@
                                                             @endforeach
                                                         </select>
 
+                                                        {{-- پیش‌نمایش زندهٔ گزینه‌ها (فقط اگر فیلد preview داشته باشد) --}}
+                                                        @if (($config['preview'] ?? false) && !empty($config['options']))
+                                                            <div class="festive-preview-row d-flex gap-2 mt-3 flex-wrap">
+                                                                @foreach ($config['options'] as $optKey => $optLabel)
+                                                                    <div class="festive-preview-item">
+                                                                        <canvas data-festive-preview data-style="{{ $optKey }}" width="96" height="64" aria-hidden="true"></canvas>
+                                                                        <small class="d-block text-muted text-center mt-1" style="font-size: .68rem;">{{ trans_or('admin.settings.fields.'.$fieldKey.'_options.'.$optKey, $optLabel) }}</small>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+
                                                         {{-- اینپوت متنی --}}
                                                     @else
                                                         <input type="{{ $config['type'] ?? 'text' }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
@@ -201,6 +213,23 @@
             }
             [data-bs-theme="dark"] .file-name-display {
                 color: #adb5bd;
+            }
+
+            /* ===== پیش‌نمایش زندهٔ سبک‌های بارش جشن ===== */
+            .festive-preview-item canvas {
+                display: block;
+                width: 96px;
+                height: 64px;
+                border-radius: 12px;
+                border: 1px solid rgba(13, 110, 253, .18);
+                background: rgba(127, 127, 127, .1);
+                box-shadow: inset 2px 2px 5px rgba(0, 0, 0, .08), inset -2px -2px 5px rgba(255, 255, 255, .5);
+            }
+            .festive-preview-item {
+                transition: transform .2s ease;
+            }
+            .festive-preview-item:hover {
+                transform: translateY(-2px);
             }
         </style>
     @endpush
