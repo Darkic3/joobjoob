@@ -17,6 +17,7 @@ use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProductController;
+use App\Http\Controllers\Site\WishlistController;
 
 // الگوی کد زبان برای constraint — امن: فقط کدهای واقعی (کاتالوگ + دیتابیس)
 $catalogCodes = array_diff(array_keys(config('languages', [])), ['_default']);
@@ -40,7 +41,12 @@ $siteRoutes = function () {
     // محصولات
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/{product:slug}/quick-view', [ProductController::class, 'quickView'])->name('products.quick-view');
     Route::get('/product-categories/{category:slug}', [ProductController::class, 'category'])->name('products.category');
+
+    // علاقه‌مندی‌ها (سشن — بدون نیاز به لاگین)
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/toggle/{product:slug}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     // وبلاگ
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');

@@ -16,14 +16,23 @@
 
     {{-- دکمه‌های عملیات سریع — آیکون‌های خطی ظریف (z-20 بالاتر از لایهٔ محو لبه‌ها) --}}
     <div class="product-actions absolute top-3 end-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
-                aria-label="{{ __('messages.wishlist') }}" title="{{ __('messages.wishlist') }}">
+        <button type="button"
+                class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)] wishlist-heart {{ $inWishlist ? 'active' : '' }}"
+                data-wishlist-toggle
+                data-wishlist-url="{{ localizedRoute('wishlist.toggle', ['product' => $product->slug]) }}"
+                data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
+                data-add-label="{{ __('messages.add_to_wishlist') }}"
+                data-remove-label="{{ __('messages.remove_from_wishlist') }}"
+                aria-label="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}"
+                title="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
             </svg>
         </button>
-        <button type="button" class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
+        <button type="button"
+                class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
+                data-quick-view-url="{{ localizedRoute('products.quick-view', ['product' => $product->slug]) }}"
                 aria-label="{{ __('messages.quick_view') }}" title="{{ __('messages.quick_view') }}">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

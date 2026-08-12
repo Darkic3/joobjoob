@@ -49,6 +49,10 @@ return [
     'place_order' => 'ثبت نهایی سفارش',
     'my_orders' => 'سفارشات من',
     'wishlist' => 'علاقه‌مندی‌ها',
+    'add_to_wishlist' => 'افزودن به علاقه‌مندی‌ها',
+    'remove_from_wishlist' => 'حذف از علاقه‌مندی‌ها',
+    'wishlist_empty' => 'علاقه‌مندی‌های شما خالی است',
+    'wishlist_empty_desc' => 'روی قلب کنار محصولات بزن تا اینجا ذخیره شوند',
     'addresses' => 'آدرس‌ها',
     'account_info' => 'اطلاعات حساب',
     'related_products' => 'محصولات مرتبط',
@@ -72,6 +76,8 @@ return [
     'new_badge' => 'جدید',
     'toman' => 'تومان',
     'quick_view' => 'مشاهده سریع',
+    'quick_view_error' => 'خطا در بارگذاری پیش‌نمایش. دوباره تلاش کنید.',
+    'view_details' => 'مشاهده جزئیات',
 
     'verified_purchase' => 'تایید شده',
     'review_average' => 'امتیاز کلی',
@@ -117,6 +123,8 @@ return [
     'views' => 'بازدید',
     'related_posts' => 'مقالات مرتبط',
     'all_posts' => 'بازگشت به همه مقالات',
+    'latest_articles' => 'آخرین مقالات',
+    'latest_articles_subtitle' => 'جدیدترین مطالب و اخبار فروشگاه',
 
     // صفحات استاتیک
     'pages' => [

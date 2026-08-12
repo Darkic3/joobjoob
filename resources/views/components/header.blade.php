@@ -1,4 +1,4 @@
-@props(['cartCount' => 0])
+@props(['cartCount' => 0, 'wishlistCount' => 0])
 
 {{-- locales/currentLocale از LocaleComposer سراسری می‌آید --}}
 <header class="sticky top-0 z-40 backdrop-blur" style="background:color-mix(in srgb, var(--bg) 90%, transparent);">
@@ -42,9 +42,10 @@
                 <span class="neu-toggle-dot"></span>
             </button>
 
-            <button type="button" class="neu-btn neu-btn-icon" title="{{ __('messages.wishlist') }}">
+            <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon relative" title="{{ __('messages.wishlist') }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/></svg>
-            </button>
+                <span id="wishlist-count" class="absolute -top-1 -end-1 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center" style="background:var(--accent); color:var(--accent-contrast);">{{ $wishlistCount }}</span>
+            </a>
 
             <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon relative">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>

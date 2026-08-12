@@ -52,6 +52,10 @@ return [
     'place_order' => 'تأكيد الطلب',
     'my_orders' => 'طلباتي',
     'wishlist' => 'المفضلة',
+    'add_to_wishlist' => 'أضف إلى المفضلة',
+    'remove_from_wishlist' => 'إزالة من المفضلة',
+    'wishlist_empty' => 'قائمة المفضلة فارغة',
+    'wishlist_empty_desc' => 'اضغط على القلب بجانب المنتجات لحفظها هنا',
     'addresses' => 'العناوين',
     'account_info' => 'معلومات الحساب',
     'related_products' => 'منتجات ذات صلة',
@@ -77,6 +81,8 @@ return [
     'dont_miss_out' => 'لا تفوت الفرصة',
     'trust_title' => 'لماذا تتسوق معنا؟',
     'quick_view' => 'عرض سريع',
+    'quick_view_error' => 'تعذر تحميل المعاينة. حاول مرة أخرى.',
+    'view_details' => 'عرض التفاصيل',
 
     'trust_free_shipping' => 'شحن مجاني',
     'trust_free_shipping_desc' => 'للطلبات فوق ٥٠ دولار',
@@ -106,6 +112,8 @@ return [
     'views' => 'مشاهدة',
     'related_posts' => 'مقالات ذات صلة',
     'all_posts' => 'العودة إلى جميع المقالات',
+    'latest_articles' => 'أحدث المقالات',
+    'latest_articles_subtitle' => 'أحدث المواضيع وأخبار المتجر',
 
     // الصفحات الثابتة
     'pages' => [

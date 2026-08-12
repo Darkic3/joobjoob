@@ -52,6 +52,10 @@ return [
     'place_order' => 'Place Order',
     'my_orders' => 'My Orders',
     'wishlist' => 'Wishlist',
+    'add_to_wishlist' => 'Add to wishlist',
+    'remove_from_wishlist' => 'Remove from wishlist',
+    'wishlist_empty' => 'Your wishlist is empty',
+    'wishlist_empty_desc' => 'Tap the heart on any product to save it here',
     'addresses' => 'Addresses',
     'account_info' => 'Account Info',
     'related_products' => 'Related Products',
@@ -77,6 +81,8 @@ return [
     'dont_miss_out' => "Don't miss out",
     'trust_title' => 'Why shop with us?',
     'quick_view' => 'Quick view',
+    'quick_view_error' => 'Could not load the preview. Please try again.',
+    'view_details' => 'View details',
 
     'specifications' => 'Specifications',
     'description' => 'Description',
@@ -113,6 +119,8 @@ return [
     'views' => 'views',
     'related_posts' => 'Related Posts',
     'all_posts' => 'Back to all posts',
+    'latest_articles' => 'Latest Articles',
+    'latest_articles_subtitle' => 'Fresh reads and store news',
 
     // Static pages
     'pages' => [

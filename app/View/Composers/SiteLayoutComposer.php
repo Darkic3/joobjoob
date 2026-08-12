@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Services\CartService;
+use App\Services\WishlistService;
 use Illuminate\View\View;
 
 /**
@@ -10,7 +11,10 @@ use Illuminate\View\View;
  */
 class SiteLayoutComposer
 {
-    public function __construct(protected CartService $cart) {}
+    public function __construct(
+        protected CartService $cart,
+        protected WishlistService $wishlist,
+    ) {}
 
     public function compose(View $view): void
     {
@@ -23,8 +27,9 @@ class SiteLayoutComposer
         $view->with([
             'announceMessages' => $announceMessages,
             'firstAnnounce' => $announceMessages[0] ?? '🚚 '.__('messages.trust_free_shipping_desc'),
-            // شمارندهٔ واقعی سبد (هدر + نوار پایین موبایل)
+            // شمارندهٔ واقعی سبد و علاقه‌مندی‌ها (هدر + نوار پایین موبایل)
             'cartCount' => $this->cart->count(),
+            'wishlistCount' => $this->wishlist->count(),
         ]);
     }
 }

@@ -141,6 +141,7 @@ return [
             'home_best_sellers_title' => 'عنوان بخش پرفروش‌ترین‌ها',
             'home_reviews_title' => 'عنوان بخش نظرات مشتریان',
             'home_view_all' => 'متن «مشاهده همه»',
+            'home_blogs_title' => 'عنوان بخش آخرین مقالات',
             'announce_1' => 'اعلان اول',
             'announce_2' => 'اعلان دوم',
             'announce_3' => 'اعلان سوم',

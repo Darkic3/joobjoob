@@ -110,6 +110,13 @@ return [
             'required' => false,
             'default' => 'مشاهده همه',
         ],
+        'home_blogs_title' => [
+            'label' => 'عنوان بخش آخرین مقالات',
+            'type' => 'text',
+            'tab' => 'home',
+            'required' => false,
+            'default' => 'آخرین مقالات',
+        ],
 
         // ==================== نوار اعلان ====================
         'announce_1' => [

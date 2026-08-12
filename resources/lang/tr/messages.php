@@ -52,6 +52,10 @@ return [
     'place_order' => 'Siparişi Tamamla',
     'my_orders' => 'Siparişlerim',
     'wishlist' => 'İstek Listesi',
+    'add_to_wishlist' => 'İstek listesine ekle',
+    'remove_from_wishlist' => 'İstek listesinden çıkar',
+    'wishlist_empty' => 'İstek listeniz boş',
+    'wishlist_empty_desc' => 'Ürünlerin yanındaki kalbe dokunarak buraya kaydedin',
     'addresses' => 'Adresler',
     'account_info' => 'Hesap Bilgileri',
     'related_products' => 'İlgili Ürünler',
@@ -77,6 +81,8 @@ return [
     'dont_miss_out' => 'Kaçırma',
     'trust_title' => 'Neden bizden alışveriş yapmalısınız?',
     'quick_view' => 'Hızlı Bakış',
+    'quick_view_error' => 'Önizleme yüklenemedi. Lütfen tekrar deneyin.',
+    'view_details' => 'Detayları Gör',
 
     'trust_free_shipping' => 'Ücretsiz Kargo',
     'trust_free_shipping_desc' => '50$ üzeri siparişlerde',
@@ -106,6 +112,8 @@ return [
     'views' => 'görüntülenme',
     'related_posts' => 'İlgili Yazılar',
     'all_posts' => 'Tüm yazılara dön',
+    'latest_articles' => 'Son Yazılar',
+    'latest_articles_subtitle' => 'Mağazadan taze yazılar ve haberler',
 
     // Statik sayfalar
     'pages' => [

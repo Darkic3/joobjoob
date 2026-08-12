@@ -516,6 +516,127 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// ---------- مودال پیش‌نمایش سریع محصول ----------
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('quick-view-modal');
+    if (!modal) return;
+
+    const content = document.getElementById('quick-view-content');
+    const csrfToken = () => { const m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
+
+    function openModal() {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    // کلیک روی دکمهٔ quick-view کارت‌ها → fetch پارشال + تزریق داخل مودال
+    document.addEventListener('click', function (e) {
+        const trigger = e.target.closest('[data-quick-view-url]');
+        if (!trigger) return;
+        e.preventDefault();
+
+        content.innerHTML = '<div class="quick-view-loading" aria-hidden="true"><span class="quick-view-spinner"></span></div>';
+        openModal();
+
+        fetch(trigger.getAttribute('data-quick-view-url'))
+            .then(r => { if (!r.ok) throw new Error('quick-view-failed'); return r.text(); })
+            .then(html => { content.innerHTML = html; })
+            .catch(() => {
+                content.innerHTML = '<div class="quick-view-error">' + (window.quickViewErrorText || 'Error') + '</div>';
+            });
+    });
+
+    // بستن: بکدراپ / دکمهٔ × / Escape
+    modal.querySelectorAll('[data-quick-view-close]').forEach(function (el) {
+        el.addEventListener('click', closeModal);
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+
+    // افزودن به سبد داخل مودال — واقعی (fetch + JSON) بدون رفرش
+    document.addEventListener('submit', function (e) {
+        const form = e.target.closest('[data-quick-view-add]');
+        if (!form) return;
+        e.preventDefault();
+
+        const btn = form.querySelector('button[type="submit"]');
+        const original = btn ? btn.textContent : '';
+        if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' },
+            body: new FormData(form),
+        })
+            .then(r => r.json())
+            .then(function (data) {
+                if (data && data.cart_count !== undefined) {
+                    ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                        const badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = data.cart_count;
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
+                }
+                if (btn) { btn.textContent = window.quickViewAddedText || '✓'; }
+                setTimeout(function () { if (btn) { btn.disabled = false; btn.textContent = original; } }, 1200);
+            })
+            .catch(function () {
+                if (btn) { btn.disabled = false; btn.textContent = original; }
+            });
+    });
+});
+
+
+// ---------- علاقه‌مندی‌ها: toggle قلب روی کارت‌ها ----------
+document.addEventListener('DOMContentLoaded', function () {
+    const csrfToken = () => { const m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
+
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-wishlist-toggle]');
+        if (!btn) return;
+        e.preventDefault();
+        btn.disabled = true;
+
+        fetch(btn.getAttribute('data-wishlist-url'), {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' },
+        })
+            .then(r => r.json())
+            .then(function (data) {
+                const active = !!data.in_wishlist;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('data-wishlist-active', active ? '1' : '0');
+                // وقتی فعال شد، لِیبلِ آینده «حذف» است و برعکس
+                btn.setAttribute('aria-label', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+                btn.setAttribute('title', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+
+                if (data.count !== undefined) {
+                    ['wishlist-count', 'wishlist-count-mobile'].forEach(function (id) {
+                        const badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = data.count;
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
+                }
+            })
+            .finally(function () { btn.disabled = false; });
+    });
+});
+
+
 // ---------- نوار پایین موبایل: شیت جستجو ----------
 document.addEventListener('DOMContentLoaded', function () {
     const sheet = document.querySelector('[data-mobile-search]');

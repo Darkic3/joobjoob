@@ -303,7 +303,72 @@
         </section>
     @endif
 
-    {{-- ۸. بنر خبرنامه یا اخبار --}}
+    {{-- ۸. آخرین مقالات --}}
+    @if($latestBlogs->isNotEmpty())
+        <section class="reveal-on-scroll py-8">
+            <div class="section-head mb-7">
+                <div class="section-head-main">
+                    <span class="section-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 8h8M8 12h5M8 16h3"/></svg>
+                    </span>
+                    <div>
+                        <h2 class="section-title">{{ settingOverride('home_blogs_title', __('messages.latest_articles')) }}</h2>
+                        <p class="section-subtitle">{{ __('messages.latest_articles_subtitle') }}</p>
+                    </div>
+                </div>
+                <a href="{{ localizedRoute('blogs.index') }}" class="section-link">
+                    {{ __('messages.view_all') }}
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-5" data-stagger>
+                @foreach($latestBlogs as $blog)
+                    <article class="blog-card neu-card group overflow-hidden flex flex-col">
+                        <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}" class="block overflow-hidden">
+                            <img src="{{ $blog->image_url ?? 'https://picsum.photos/seed/blog-'.$blog->id.'/600/400' }}"
+                                 alt="{{ $blog->title }}"
+                                 width="600" height="400"
+                                 loading="lazy"
+                                 class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform">
+                        </a>
+                        <div class="p-5 flex flex-col gap-2 flex-1">
+                            @if($blog->category)
+                                <a href="{{ localizedRoute('blogs.category', ['category' => $blog->category->slug]) }}"
+                                   class="text-[11px] font-bold uppercase tracking-wide" style="color: var(--accent);">
+                                    {{ $blog->category->title }}
+                                </a>
+                            @endif
+                            <h3 class="font-extrabold text-sm leading-snug line-clamp-2 min-h-[2.6rem]">
+                                <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}"
+                                   class="hover:text-[var(--accent)] transition-colors">
+                                    {{ $blog->title }}
+                                </a>
+                            </h3>
+                            @if($blog->excerpt)
+                                <p class="text-xs leading-relaxed line-clamp-2" style="color: var(--text-secondary);">
+                                    {{ $blog->excerpt }}
+                                </p>
+                            @endif
+                            <div class="mt-auto pt-3 flex items-center justify-between">
+                                <span class="text-[11px] mono" style="color: var(--text-secondary);">
+                                    {{ $blog->created_at->translatedFormat('d M Y') }}
+                                </span>
+                                <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}"
+                                   class="text-[11px] font-bold inline-flex items-center gap-1 hover:text-[var(--accent)] transition-colors">
+                                    {{ __('messages.read_more') }}
+                                    <svg class="w-3 h-3 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ۹. بنر خبرنامه یا اخبار --}}
     @include('site.home.news')
 
 @endsection

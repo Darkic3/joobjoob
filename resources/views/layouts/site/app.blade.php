@@ -38,7 +38,7 @@
         </span>
 </div>
 
-<x-header :cart-count="$cartCount"/>
+<x-header :cart-count="$cartCount" :wishlist-count="$wishlistCount"/>
 
 <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
     @if (session('success'))
@@ -53,9 +53,11 @@
 
 <x-footer/>
 
-<x-mobile-bar :cart-count="$cartCount"/>
+<x-mobile-bar :cart-count="$cartCount" :wishlist-count="$wishlistCount"/>
 
 <x-back-to-top/>
+
+<x-quick-view-modal/>
 
 <x-social-proof-toast/>
 

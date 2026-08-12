@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Review;
@@ -66,12 +67,14 @@ class HomeController extends Controller
         $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
         // میانگین امتیاز نظرات نمایش‌داده‌شده — محاسبه در کنترلر، نه در ویو
         $reviewsAvg = round($reviews->avg('rating') ?? 0, 1);
+        // آخرین مقالات برای صفحهٔ اصلی (۳ مقالهٔ فعال و جدید)
+        $latestBlogs = Blog::with('category')->active()->latest()->take(3)->get();
         $slides = $this->heroSlideService->getSlides();
 
         // نشان‌های اعتماد فعال — محدودیت و کش داخل سرویس مدیریت می‌شود
         $trustBadges = $this->trustBadgeService->getActiveForSite();
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewsAvg', 'slides', 'trustBadges'));
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges'));
     }
 
     /**

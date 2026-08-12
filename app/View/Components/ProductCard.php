@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\Product;
+use App\Services\WishlistService;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
@@ -31,6 +32,9 @@ class ProductCard extends Component
     public float $rating;
 
     public int $reviewCount;
+
+    /** آیا محصول الان در علاقه‌مندی‌هاست (برای حالت اولیهٔ قلب) */
+    public bool $inWishlist;
 
     /** @var array{color: string, text: string}|null استایل نشان رتبه (فقط بخش پرفروش‌ترین‌ها) */
     public ?array $rankStyle;
@@ -64,6 +68,8 @@ class ProductCard extends Component
         // امتیاز و نظرات (با fallback ایمن)
         $this->rating = round($product->reviews->avg('rating') ?? 0, 1);
         $this->reviewCount = $product->reviews->count();
+
+        $this->inWishlist = app(WishlistService::class)->has($product);
 
         $this->rankStyle = $rank ? (self::RANK_STYLES[$rank] ?? ['color' => 'var(--bg-elevated)', 'text' => 'var(--text-secondary)']) : null;
     }

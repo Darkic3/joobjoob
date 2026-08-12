@@ -1,4 +1,4 @@
-@props(['cartCount' => 0])
+@props(['cartCount' => 0, 'wishlistCount' => 0])
 
 {{--
     نوار پایین موبایل (Sticky Mobile Bar) — فقط زیر lg نمایش داده می‌شود.
@@ -58,14 +58,19 @@
                 <span>{{ __('messages.search') }}</span>
             </button>
 
-            {{-- هماهنگ با هدر: دکمهٔ علاقه‌مندی فعلاً تزئینی است (فیچر wishlist هنوز ساخته نشده) --}}
-            <button type="button" class="mobile-bar-item" title="{{ __('messages.wishlist') }}"
-                    aria-label="{{ __('messages.wishlist') }}">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/>
-                </svg>
+            <a href="{{ localizedRoute('wishlist.index') }}"
+               class="mobile-bar-item {{ request()->routeIs('wishlist.index', 'locale.wishlist.index') ? 'mobile-bar-active' : '' }}"
+               aria-label="{{ __('messages.wishlist') }}">
+                <span class="relative">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/>
+                    </svg>
+                    <span id="wishlist-count-mobile"
+                          class="absolute -top-1.5 -end-2.5 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center"
+                          style="background:var(--accent); color:var(--accent-contrast);">{{ $wishlistCount }}</span>
+                </span>
                 <span>{{ __('messages.wishlist') }}</span>
-            </button>
+            </a>
 
             <a href="{{ localizedRoute('cart.index') }}"
                class="mobile-bar-item {{ request()->routeIs('cart.index', 'locale.cart.index') ? 'mobile-bar-active' : '' }}"

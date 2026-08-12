@@ -141,6 +141,7 @@ return [
             'home_best_sellers_title' => 'Best Sellers Section Title',
             'home_reviews_title' => 'Customer Reviews Section Title',
             'home_view_all' => '“View All” Text',
+            'home_blogs_title' => 'Latest Articles section title',
             'announce_1' => 'Announcement 1',
             'announce_2' => 'Announcement 2',
             'announce_3' => 'Announcement 3',

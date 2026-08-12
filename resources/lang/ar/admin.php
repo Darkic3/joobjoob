@@ -142,6 +142,7 @@ return [
             'home_best_sellers_title' => 'عنوان قسم الأكثر مبيعًا',
             'home_reviews_title' => 'عنوان قسم آراء العملاء',
             'home_view_all' => 'نص «عرض الكل»',
+            'home_blogs_title' => 'عنوان قسم أحدث المقالات',
             'announce_1' => 'الإعلان الأول',
             'announce_2' => 'الإعلان الثاني',
             'announce_3' => 'الإعلان الثالث',

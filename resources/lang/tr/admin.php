@@ -141,6 +141,7 @@ return [
             'home_best_sellers_title' => 'Çok Satanlar Bölüm Başlığı',
             'home_reviews_title' => 'Müşteri Yorumları Bölüm Başlığı',
             'home_view_all' => '“Tümünü Gör” Metni',
+            'home_blogs_title' => 'Son Yazılar bölüm başlığı',
             'announce_1' => 'Duyuru 1',
             'announce_2' => 'Duyuru 2',
             'announce_3' => 'Duyuru 3',

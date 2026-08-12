@@ -89,6 +89,16 @@ class ProductController extends Controller
     }
 
     /**
+     * مودال پیش‌نمایش سریع محصول — فقط پارشال رندر می‌کند (داخل مودال سراسری قرار می‌گیرد).
+     */
+    public function quickView(Product $product)
+    {
+        $product->load(['images', 'category', 'brand', 'reviews']);
+
+        return view('site.products.partials.quick-view', compact('product'));
+    }
+
+    /**
      * صفحهٔ یک دسته‌بندی محصول — محصولات خود دسته + تمام زیرشاخه‌ها.
      */
     public function category(ProductCategory $category)

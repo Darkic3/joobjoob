@@ -1586,3 +1586,113 @@
     z-index: 15;
     pointer-events: none;
 }
+
+/* ---------- قلب علاقه‌مندی فعال ---------- */
+.wishlist-heart { transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring); }
+.wishlist-heart.active { color: var(--danger); }
+.wishlist-heart.active svg { fill: currentColor; }
+.wishlist-heart:active { transform: scale(.85); }
+
+/* ---------- مودال پیش‌نمایش سریع محصول ---------- */
+.quick-view-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    visibility: hidden;
+    pointer-events: none;
+}
+.quick-view-modal.open { visibility: visible; pointer-events: auto; }
+.quick-view-backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--shadow-dark) 45%, transparent);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity .3s var(--ease-out);
+}
+.quick-view-modal.open .quick-view-backdrop { opacity: 1; }
+.quick-view-panel {
+    position: absolute;
+    inset-inline: 1rem;
+    top: 50%;
+    transform: translateY(-50%) scale(.96);
+    margin-inline: auto;
+    max-width: 44rem;
+    max-height: min(90dvh, 42rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 1.5rem;
+    background: var(--bg-elevated);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+    box-shadow: 18px 18px 44px color-mix(in srgb, var(--shadow-dark) 55%, transparent),
+                -14px -14px 36px color-mix(in srgb, var(--shadow-light) 70%, transparent);
+    opacity: 0;
+    transition: transform .4s var(--ease-spring), opacity .25s var(--ease-out);
+}
+.quick-view-modal.open .quick-view-panel { transform: translateY(-50%) scale(1); opacity: 1; }
+.quick-view-close {
+    position: sticky;
+    top: 0;
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+    display: block;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+    z-index: 5;
+    transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
+}
+.quick-view-close:hover { color: var(--danger); }
+.quick-view-close:active { transform: scale(.9); }
+.quick-view-content { padding: 1rem 1.25rem 1.5rem; }
+.quick-view-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+@media (min-width: 640px) {
+    .quick-view-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+    .quick-view-content { padding: 0 1.25rem 1.5rem 0; }
+    .quick-view-close { position: absolute; top: 0.75rem; inset-inline-end: 0.75rem; }
+}
+.quick-view-media img { aspect-ratio: 1/1; object-fit: cover; }
+.quick-view-loading, .quick-view-error {
+    min-height: 260px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+.quick-view-spinner {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 3px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
+    border-top-color: var(--accent);
+    animation: spin .8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .quick-view-modal, .quick-view-panel, .quick-view-close, .quick-view-spinner, .wishlist-heart { transition: none; animation: none; }
+}
+
+/* ---------- کارت مقاله در صفحه اصلی (آخرین مقالات) ---------- */
+.blog-card { position: relative; }
+.blog-card::before {
+    content: '';
+    position: absolute;
+    inset-inline: 1rem;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 45%, transparent), transparent);
+    opacity: 0;
+    transition: opacity var(--dur-med) var(--ease-out);
+    z-index: 2;
+    pointer-events: none;
+}
+.blog-card:hover::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+    .blog-card::before { transition: none; }
+}
