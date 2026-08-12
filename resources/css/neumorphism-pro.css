@@ -1406,6 +1406,14 @@
     padding: .2rem .65rem;
 }
 
+/* تاریخ نظر/مقاله — چیپ کوچک با آیکون تقویم (برای کارت‌های نظرات و مقاله‌های صفحه اصلی) */
+.review-date, .blog-date {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .68rem; font-weight: 600; letter-spacing: .2px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
 .review-product-chip {
     display: inline-flex; align-items: center; gap: .45rem;
     margin-inline-start: auto;

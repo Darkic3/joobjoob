@@ -254,6 +254,10 @@
                                                     {{ __('messages.verified_purchase') }}
                                                 </span>
                                             </div>
+                                            <span class="review-date">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                                                {{ show_date($review->created_at, 'd F Y') }}
+                                            </span>
                                             @if($review->product)
                                                 <a href="{{ localizedRoute('products.show', ['product' => $review->product]) }}" class="review-product-chip">
                                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -273,10 +277,16 @@
                                             </span>
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm font-bold truncate">{{ $review->user->name ?? __('messages.user') }}</p>
-                                                <span class="review-verified">
-                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                                                    {{ __('messages.verified_purchase') }}
-                                                </span>
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="review-verified">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                                        {{ __('messages.verified_purchase') }}
+                                                    </span>
+                                                    <span class="review-date">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                                                        {{ show_date($review->created_at, 'd F Y') }}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <p class="review-stars" aria-hidden="true">
                                                 {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
@@ -331,13 +341,22 @@
                                  loading="lazy"
                                  class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform">
                         </a>
-                        <div class="p-5 flex flex-col gap-2 flex-1">
-                            @if($blog->category)
-                                <a href="{{ localizedRoute('blogs.category', ['category' => $blog->category->slug]) }}"
-                                   class="text-[11px] font-bold uppercase tracking-wide" style="color: var(--accent);">
-                                    {{ $blog->category->title }}
-                                </a>
-                            @endif
+                        <div class="p-5 flex flex-col gap-2.5 flex-1">
+                            {{-- ردیف بالای بدنه: دسته‌بندی + تاریخ مقاله --}}
+                            <div class="flex items-center justify-between gap-3">
+                                @if($blog->category)
+                                    <a href="{{ localizedRoute('blogs.category', ['category' => $blog->category->slug]) }}"
+                                       class="text-[11px] font-bold uppercase tracking-wide truncate" style="color: var(--accent);">
+                                        {{ $blog->category->title }}
+                                    </a>
+                                @endif
+                                <span class="blog-date" title="{{ $blog->localizedDate() }}">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                                    </svg>
+                                    {{ $blog->localizedDate() }}
+                                </span>
+                            </div>
                             <h3 class="font-extrabold text-sm leading-snug line-clamp-2 min-h-[2.6rem]">
                                 <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}"
                                    class="hover:text-[var(--accent)] transition-colors">
@@ -349,28 +368,27 @@
                                     {{ $blog->excerpt }}
                                 </p>
                             @endif
-                            {{-- آمار مقاله: بازدید + زمان مطالعه --}}
-                            <div class="flex items-center gap-4 mt-1 text-[11px] font-semibold" style="color: var(--text-secondary);">
-                                <span class="inline-flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                                    </svg>
-                                    <span class="mono" dir="ltr">{{ number_format($blog->views) }}</span>
-                                </span>
-                                <span class="inline-flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                    </svg>
-                                    {{ __('messages.reading_time', ['minutes' => $blog->readingMinutes()]) }}
-                                </span>
-                            </div>
-                            <div class="mt-auto pt-3 flex items-center justify-between">
-                                <span class="text-[11px] mono" style="color: var(--text-secondary);">
-                                    {{ $blog->localizedDate() }}
-                                </span>
+                            {{-- فوتر فشرده کارت: آمار + ادامه مطلب با خط جداکننده --}}
+                            <div class="mt-auto pt-3 flex items-center justify-between gap-3"
+                                 style="border-top: 1px solid color-mix(in srgb, var(--text-secondary) 20%, transparent);">
+                                <div class="flex items-center gap-2 text-[11px] font-semibold" style="color: var(--text-secondary);">
+                                    <span class="inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                        </svg>
+                                        <span class="mono" dir="ltr">{{ number_format($blog->views) }}</span>
+                                    </span>
+                                    <span aria-hidden="true" style="opacity: .45;">·</span>
+                                    <span class="inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                        {{ __('messages.reading_time', ['minutes' => $blog->readingMinutes()]) }}
+                                    </span>
+                                </div>
                                 <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}"
-                                   class="text-[11px] font-bold inline-flex items-center gap-1 hover:text-[var(--accent)] transition-colors">
+                                   class="text-[11px] font-bold inline-flex items-center gap-1 hover:text-[var(--accent)] transition-colors shrink-0">
                                     {{ __('messages.read_more') }}
                                     <svg class="w-3 h-3 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
