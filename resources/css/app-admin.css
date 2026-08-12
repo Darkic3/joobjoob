@@ -1,4 +1,5 @@
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+@import './promo-preview.css';
 
 @tailwind base;
 @tailwind components;

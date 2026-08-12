@@ -45,108 +45,106 @@
                                     @method('PUT')
 
                                     <div class="row g-4 p-4 p-md-5">
-                                        @forelse ($fieldsByTab[$tabKey] ?? [] as $fieldKey => $config)
-                                            <div class="{{ in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']) ? 'col-12' : 'col-md-6' }}">
-                                                <div class="mb-3">
-                                                    <label for="{{ $fieldKey }}" class="form-label fw-semibold mb-2">
-                                                        {{ trans_or('admin.settings.fields.'.$fieldKey, $config['label'] ?? '') }}
-                                                        @if ($config['required'] ?? false) <span class="text-danger">*</span> @endif
-                                                    </label>
-
-                                                    @if($config['guide'] ?? false)
-                                                        <div class="alert alert-light border d-flex align-items-start py-2 mb-3" role="alert">
-                                                            <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
-                                                            <small class="text-muted">{{ $config['guide'] }}</small>
+                                        @if ($tabKey === 'banners')
+                                            {{-- ===== کرت اختصاصی تنظیمات بنرهای میانی ===== --}}
+                                            <div class="col-12">
+                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                                                    <div class="card-body p-4">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                                            <h5 class="fw-bold mb-0">
+                                                                <i class="bi bi-megaphone-fill me-2 text-primary"></i>
+                                                                {{ trans_or('admin.settings.promo_banners_title', 'پیش‌نمایش زندهٔ بنرها') }}
+                                                            </h5>
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-3 py-2">
+                                                                <i class="bi bi-arrow-repeat me-1"></i>
+                                                                {{ trans_or('admin.settings.promo_banners_live_hint', 'با تایپ کردن زنده آپدیت می‌شود') }}
+                                                            </span>
                                                         </div>
-                                                    @endif
 
-                                                    {{-- آپلود فایل / ویدیو --}}
-                                                    @if (($config['type'] ?? 'text') === 'file' || ($config['type'] ?? 'text') === 'video')
-                                                        <div class="border rounded-3 p-3 bg-light bg-opacity-50 dark:bg-gray-800 dark:border-gray-600">
-                                                            <div class="mb-3">
-                                                                <label class="custom-file-upload-btn w-100 text-center py-3 rounded-3 border border-dashed cursor-pointer hover-bg-light transition-all">
-                                                                    <input type="file" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}" class="d-none"
-                                                                           accept="{{ ($config['type'] ?? 'text') === 'video' ? 'video/mp4,video/x-m4v,video/*' : 'image/*' }}"
-                                                                           @if (($config['required'] ?? false) && empty(old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null))) required @endif
-                                                                           onchange="updateFileName(this)">
-                                                                    <i class="bi bi-cloud-arrow-up fs-4 text-primary mb-2 d-block"></i>
-                                                                    <span class="fw-semibold upload-label-text">{{ __('admin.settings.choose_file') }}</span>
-                                                                    <div class="file-name-display mt-2 text-muted small" id="name_{{ $fieldKey }}">{{ __('admin.settings.no_file') }}</div>
-                                                                </label>
+                                                        {{-- پیش‌نمایش دو بنر با همان کلاس‌های سایت — سبک از سلکت خوانده می‌شود --}}
+                                                        <div id="promo-preview"
+                                                             class="promo-banners promo-banners--{{ $groupsValues['banners']['promo_banners_style'] ?? 'gradient' }}"
+                                                             @if (!($groupsValues['banners']['promo_banners_enabled'] ?? true)) style="opacity: .35" @endif>
+                                                            <div class="promo-banner promo-banner--accent">
+                                                                <span class="promo-banner-icon" aria-hidden="true">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                                                </span>
+                                                                <span class="promo-banner-body">
+                                                                    <span class="promo-banner-title" data-pv="promo_banner_1_title" data-pv-fallback="{{ __('messages.promo_banner_1_title') }}">{{ settingOverride('promo_banner_1_title', __('messages.promo_banner_1_title')) }}</span>
+                                                                    <span class="promo-banner-subtitle" data-pv="promo_banner_1_subtitle" data-pv-fallback="{{ __('messages.promo_banner_1_subtitle') }}">{{ settingOverride('promo_banner_1_subtitle', __('messages.promo_banner_1_subtitle')) }}</span>
+                                                                </span>
                                                             </div>
-
-                                                            @if (old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null))
-                                                                <div class="mt-3 p-2 bg-white rounded-3 border dark:bg-gray-900 dark:border-gray-600">
-                                                                    <p class="small fw-bold text-muted mb-2">{{ __('admin.settings.current_file') }}:</p>
-                                                                    @if (($config['type'] ?? 'text') === 'video')
-                                                                        @if (\App\Models\Setting::videoFile($fieldKey))
-                                                                            <video controls class="w-100 rounded-2" style="max-height: 200px;">
-                                                                                <source src="{{ \App\Models\Setting::videoFile($fieldKey) }}" type="video/mp4">
-                                                                            </video>
-                                                                        @endif
-                                                                    @else
-                                                                        <img src="{{ \App\Models\Setting::imageFile($fieldKey) }}" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;" alt="{{ trans_or('admin.settings.fields.'.$fieldKey, $config['label'] ?? '') }}">
-                                                                    @endif
-
-                                                                    {{-- کراپ تصویر به‌صورت سراسری (هندلر تغییر فایل در app-admin.js) انجام می‌شود --}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-
-                                                        {{-- تکست ایریا / ادیتور --}}
-                                                    @elseif(in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']))
-                                                        <textarea name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                  class="input-custom @if ($config['ckeditor'] ?? false) ckeditor @endif"
-                                                                  rows="5"
-                                                                  @if ($config['required'] ?? false) required @endif>{{ old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null) }}</textarea>
-
-                                                        {{-- سوییچ بولی --}}
-                                                    @elseif(($config['type'] ?? 'text') === 'boolean')
-                                                        <div class="form-check form-switch fs-4">
-                                                            <input type="checkbox" class="form-check-input" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                   value="1"
-                                                                   @checked(old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? false))>
-                                                        </div>
-
-                                                        {{-- سلکت (گزینه‌ها از کانفیگ فیلد) --}}
-                                                    @elseif(($config['type'] ?? 'text') === 'select')
-                                                        <select name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                                class="input-custom form-select"
-                                                                @if ($config['required'] ?? false) required @endif>
-                                                            @foreach ($config['options'] ?? [] as $optKey => $optLabel)
-                                                                <option value="{{ $optKey }}"
-                                                                        @selected((string) old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? $config['default'] ?? null) === (string) $optKey)>
-                                                                    {{ trans_or('admin.settings.fields.'.$fieldKey.'_options.'.$optKey, $optLabel) }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-
-                                                        {{-- پیش‌نمایش زندهٔ گزینه‌ها (فقط اگر فیلد preview داشته باشد) --}}
-                                                        @if (($config['preview'] ?? false) && !empty($config['options']))
-                                                            <div class="festive-preview-row d-flex gap-2 mt-3 flex-wrap">
-                                                                @foreach ($config['options'] as $optKey => $optLabel)
-                                                                    <div class="festive-preview-item">
-                                                                        <canvas data-festive-preview data-style="{{ $optKey }}" width="96" height="64" aria-hidden="true"></canvas>
-                                                                        <small class="d-block text-muted text-center mt-1" style="font-size: .68rem;">{{ trans_or('admin.settings.fields.'.$fieldKey.'_options.'.$optKey, $optLabel) }}</small>
-                                                                    </div>
-                                                                @endforeach
+                                                            <div class="promo-banner promo-banner--gold">
+                                                                <span class="promo-banner-icon" aria-hidden="true">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
+                                                                </span>
+                                                                <span class="promo-banner-body">
+                                                                    <span class="promo-banner-title" data-pv="promo_banner_2_title" data-pv-fallback="{{ __('messages.promo_banner_2_title') }}">{{ settingOverride('promo_banner_2_title', __('messages.promo_banner_2_title')) }}</span>
+                                                                    <span class="promo-banner-subtitle" data-pv="promo_banner_2_subtitle" data-pv-fallback="{{ __('messages.promo_banner_2_subtitle') }}">{{ settingOverride('promo_banner_2_subtitle', __('messages.promo_banner_2_subtitle')) }}</span>
+                                                                </span>
                                                             </div>
-                                                        @endif
-
-                                                        {{-- اینپوت متنی --}}
-                                                    @else
-                                                        <input type="{{ $config['type'] ?? 'text' }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
-                                                               value="{{ old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null) }}" class="input-custom"
-                                                               @if ($config['required'] ?? false) required @endif>
-                                                    @endif
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        @empty
-                                            <div class="col-12 text-center text-muted py-4">
-                                                <i class="bi bi-sliders fs-3 d-block mb-2"></i>
-                                                {{ __('admin.settings.no_fields_in_group') }}
+
+                                            {{-- تنظیمات کلی: نمایش + سبک --}}
+                                            <div class="col-lg-6">
+                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
+                                                        <h6 class="fw-bold mb-0">{{ trans_or('admin.settings.promo_banners_group_general', 'تنظیمات کلی') }}</h6>
+                                                    </div>
+                                                    <div class="card-body p-4">
+                                                        @foreach (['promo_banners_enabled', 'promo_banners_style'] as $fieldKey)
+                                                            @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
+                                                        @endforeach
+                                                    </div>
+                                                </div>
                                             </div>
-                                        @endforelse
+
+                                            {{-- بنر اول --}}
+                                            <div class="col-lg-6">
+                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
+                                                        <h6 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>{{ trans_or('admin.settings.promo_banners_group_1', 'بنر اول') }}</h6>
+                                                    </div>
+                                                    <div class="card-body p-4">
+                                                        @foreach (['promo_banner_1_title', 'promo_banner_1_subtitle', 'promo_banner_1_url'] as $fieldKey)
+                                                            @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- بنر دوم --}}
+                                            <div class="col-12">
+                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
+                                                        <h6 class="fw-bold mb-0"><i class="bi bi-ticket-perforated me-2 text-primary"></i>{{ trans_or('admin.settings.promo_banners_group_2', 'بنر دوم') }}</h6>
+                                                    </div>
+                                                    <div class="card-body p-4">
+                                                        <div class="row g-4">
+                                                            @foreach (['promo_banner_2_title', 'promo_banner_2_subtitle', 'promo_banner_2_url'] as $fieldKey)
+                                                                <div class="col-md-4">
+                                                                    @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            @forelse ($fieldsByTab[$tabKey] ?? [] as $fieldKey => $config)
+                                                <div class="{{ in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']) ? 'col-12' : 'col-md-6' }}">
+                                                    @include('admin.settings._field', compact('fieldKey', 'config', 'tabKey', 'groupsValues'))
+                                                </div>
+                                            @empty
+                                                <div class="col-12 text-center text-muted py-4">
+                                                    <i class="bi bi-sliders fs-3 d-block mb-2"></i>
+                                                    {{ __('admin.settings.no_fields_in_group') }}
+                                                </div>
+                                            @endforelse
+                                        @endif
                                     </div>
 
                                     <!-- دکمه ذخیره این گروه -->
@@ -305,6 +303,44 @@
                     });
                 }
             });
+
+            // ===== پیش‌نمایش زندهٔ بنرهای میانی — همگام‌سازی فیلدها با پیش‌نمایش =====
+            const promoPreview = document.getElementById('promo-preview');
+            if (promoPreview) {
+                const syncText = function (input) {
+                    const target = promoPreview.querySelector('[data-pv="' + input.id + '"]');
+                    if (!target) return;
+                    target.textContent = input.value.trim() || target.getAttribute('data-pv-fallback');
+                };
+
+                ['promo_banner_1_title', 'promo_banner_1_subtitle', 'promo_banner_2_title', 'promo_banner_2_subtitle']
+                    .forEach(function (id) {
+                        const input = document.getElementById(id);
+                        if (input) {
+                            input.addEventListener('input', function () { syncText(input); });
+                        }
+                    });
+
+                // تغییر سبک → کلاس پیش‌نمایش عوض می‌شود
+                const styleInput = document.getElementById('promo_banners_style');
+                if (styleInput) {
+                    styleInput.addEventListener('change', function () {
+                        promoPreview.classList.remove(
+                            'promo-banners--gradient', 'promo-banners--neumorphic',
+                            'promo-banners--minimal', 'promo-banners--dark', 'promo-banners--coupon'
+                        );
+                        promoPreview.classList.add('promo-banners--' + styleInput.value);
+                    });
+                }
+
+                // روشن/خاموش → محو پیش‌نمایش
+                const enabledInput = document.getElementById('promo_banners_enabled');
+                if (enabledInput) {
+                    enabledInput.addEventListener('change', function () {
+                        promoPreview.style.opacity = enabledInput.checked ? '' : '0.35';
+                    });
+                }
+            }
         </script>
     @endpush
 @endsection

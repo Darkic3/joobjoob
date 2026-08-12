@@ -1,0 +1,112 @@
+/* =====================================================================
+   پیش‌نمایش زندهٔ بنرهای میانی در تنظیمات ادمین
+   استایل‌های سایت (neumorphism-pro.css) در پنل لود نمی‌شوند،
+   پس نسخهٔ خلاصه و اسکوپ‌شدهٔ ۵ سبک زیر #promo-preview تعریف می‌شود.
+   ===================================================================== */
+#promo-preview {
+    --promo-accent: #6c63ff;
+    --promo-accent-contrast: #ffffff;
+    --promo-gold: #f5a623;
+    --promo-dark: #1a202c;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: .85rem;
+}
+
+#promo-preview .promo-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    min-height: 84px;
+    padding: 1rem 1.15rem;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: opacity .2s ease;
+}
+#promo-preview .promo-banner-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+#promo-preview .promo-banner-body { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+#promo-preview .promo-banner-title { font-weight: 800; font-size: .9rem; line-height: 1.35; }
+#promo-preview .promo-banner-subtitle { font-size: .72rem; font-weight: 600; opacity: .85; line-height: 1.45; }
+
+/* ---------- سبک گرادیان (پیش‌فرض) ---------- */
+#promo-preview.promo-banners--gradient .promo-banner--accent {
+    background: linear-gradient(135deg, var(--promo-accent), color-mix(in srgb, var(--promo-accent) 55%, var(--promo-gold)));
+    color: var(--promo-accent-contrast);
+}
+#promo-preview.promo-banners--gradient .promo-banner--gold {
+    background: linear-gradient(135deg, var(--promo-gold), #ffc53d);
+    color: var(--promo-dark);
+}
+#promo-preview.promo-banners--gradient .promo-banner-icon,
+#promo-preview.promo-banners--coupon .promo-banner-icon { background: rgba(255, 255, 255, .16); }
+#promo-preview.promo-banners--gradient .promo-banner--gold .promo-banner-icon,
+#promo-preview.promo-banners--coupon .promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); }
+
+/* ---------- سبک نئومورفیک ---------- */
+#promo-preview.promo-banners--neumorphic .promo-banner {
+    background: #e0e5ec;
+    color: #2d3748;
+    box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+}
+#promo-preview.promo-banners--neumorphic .promo-banner--accent .promo-banner-icon { background: rgba(108, 99, 255, .13); color: var(--promo-accent); }
+#promo-preview.promo-banners--neumorphic .promo-banner--gold .promo-banner-icon { background: rgba(245, 166, 35, .16); color: var(--promo-gold); }
+#promo-preview.promo-banners--neumorphic .promo-banner--accent .promo-banner-title { color: var(--promo-accent); }
+#promo-preview.promo-banners--neumorphic .promo-banner--gold .promo-banner-title { color: var(--promo-gold); }
+
+/* ---------- سبک مینیمال ---------- */
+#promo-preview.promo-banners--minimal .promo-banner {
+    background: transparent;
+    color: #2d3748;
+    border-color: rgba(45, 55, 72, .18);
+}
+#promo-preview.promo-banners--minimal .promo-banner--accent .promo-banner-title { color: var(--promo-accent); }
+#promo-preview.promo-banners--minimal .promo-banner--gold .promo-banner-title { color: var(--promo-gold); }
+#promo-preview.promo-banners--minimal .promo-banner-icon { background: transparent; color: #4a5568; }
+#promo-preview.promo-banners--minimal .promo-banner--accent .promo-banner-icon { color: var(--promo-accent); }
+#promo-preview.promo-banners--minimal .promo-banner--gold .promo-banner-icon { color: var(--promo-gold); }
+
+/* ---------- سبک تیره لوکس ---------- */
+#promo-preview.promo-banners--dark .promo-banner {
+    background: linear-gradient(140deg, #171c26, #232c3d);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, .07);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .22);
+}
+#promo-preview.promo-banners--dark .promo-banner--accent { border-color: rgba(108, 99, 255, .45); }
+#promo-preview.promo-banners--dark .promo-banner--gold { border-color: rgba(245, 166, 35, .5); }
+#promo-preview.promo-banners--dark .promo-banner--accent .promo-banner-title { color: #ffffff; }
+#promo-preview.promo-banners--dark .promo-banner--gold .promo-banner-title { color: #ffc53d; }
+#promo-preview.promo-banners--dark .promo-banner-subtitle { color: rgba(255, 255, 255, .72); }
+#promo-preview.promo-banners--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); color: #ffffff; }
+#promo-preview.promo-banners--dark .promo-banner--accent .promo-banner-icon { color: var(--promo-accent); }
+#promo-preview.promo-banners--dark .promo-banner--gold .promo-banner-icon { color: var(--promo-gold); }
+
+/* ---------- سبک کوپنی ---------- */
+#promo-preview.promo-banners--coupon .promo-banner { border-radius: 12px; }
+#promo-preview.promo-banners--coupon .promo-banner--accent {
+    background: linear-gradient(135deg, var(--promo-accent), color-mix(in srgb, var(--promo-accent) 55%, var(--promo-gold)));
+    color: var(--promo-accent-contrast);
+}
+#promo-preview.promo-banners--coupon .promo-banner--gold {
+    background: linear-gradient(135deg, var(--promo-gold), #ffc53d);
+    color: var(--promo-dark);
+}
+#promo-preview.promo-banners--coupon .promo-banner::after {
+    content: '';
+    position: absolute;
+    inset-block: 10px;
+    inset-inline-end: 2.8rem;
+    border-inline-start: 2px dashed rgba(255, 255, 255, .55);
+    pointer-events: none;
+}
+#promo-preview.promo-banners--coupon .promo-banner--gold::after { border-inline-start-color: rgba(26, 32, 44, .28); }

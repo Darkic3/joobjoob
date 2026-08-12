@@ -192,7 +192,7 @@
     {{-- ۶.۵. بنرهای میانی تبلیغاتی — از تنظیمات (تب بنرها)؛ پرکنندهٔ فضای بین بخش‌ها --}}
     @if(setting('promo_banners_enabled') && (setting('promo_banner_1_title') || setting('promo_banner_2_title')))
         <section class="reveal-on-scroll py-6">
-            <div class="grid md:grid-cols-2 gap-5">
+            <div class="promo-banners grid md:grid-cols-2 gap-5 promo-banners--{{ setting('promo_banners_style', 'gradient') }}">
                 @if(setting('promo_banner_1_title'))
                     <a href="{{ setting('promo_banner_1_url') ?: localizedRoute('products.index') }}"
                        class="promo-banner promo-banner--accent group">

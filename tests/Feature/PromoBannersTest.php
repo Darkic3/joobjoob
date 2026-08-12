@@ -74,11 +74,39 @@ class PromoBannersTest extends TestCase
         $html = $this->get(route('admin.settings.edit', 'banners'))->assertOk()->getContent();
 
         $this->assertStringContainsString('name="settings[promo_banners_enabled]"', $html);
+        $this->assertStringContainsString('name="settings[promo_banners_style]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_1_title]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_1_subtitle]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_1_url]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_2_title]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_2_subtitle]"', $html);
         $this->assertStringContainsString('name="settings[promo_banner_2_url]"', $html);
+        $this->assertStringContainsString('value="gradient"', $html);
+        $this->assertStringContainsString('value="neumorphic"', $html);
+        $this->assertStringContainsString('value="minimal"', $html);
+        $this->assertStringContainsString('value="dark"', $html);
+        $this->assertStringContainsString('value="coupon"', $html);
+    }
+
+    public function test_promo_banners_default_to_gradient_style(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('promo-banners--gradient', false);
+    }
+
+    public function test_promo_banners_use_selected_style(): void
+    {
+        app(SettingService::class)->updateGroup('banners', [
+            'promo_banners_enabled' => '1',
+            'promo_banners_style' => 'coupon',
+            'promo_banner_1_title' => 'ارسال رایگان',
+            'promo_banner_2_title' => 'کد تخفیف',
+        ], []);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('promo-banners--coupon', false)
+            ->assertDontSee('promo-banners--gradient', false);
     }
 }

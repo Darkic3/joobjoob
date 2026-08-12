@@ -325,6 +325,21 @@ return [
             'default' => true,
             'guide' => 'دو بنر تبلیغاتی تمام‌عرض بین بخش‌های صفحه اصلی. با این کلید به‌صورت یک‌جا روشن/خاموش می‌شوند.',
         ],
+        'promo_banners_style' => [
+            'label' => 'سبک بنرها',
+            'type' => 'select',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => 'gradient',
+            'options' => [
+                'gradient' => 'گرادیان',
+                'neumorphic' => 'نئومورفیک',
+                'minimal' => 'مینیمال',
+                'dark' => 'تیره لوکس',
+                'coupon' => 'کوپنی',
+            ],
+            'guide' => 'نسخه‌های مختلف طراحی بنرها — تغییر دهید تا روی صفحه اصلی ببینید.',
+        ],
         'promo_banner_1_title' => [
             'label' => 'بنر اول — عنوان',
             'type' => 'text',
