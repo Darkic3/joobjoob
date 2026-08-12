@@ -40,14 +40,17 @@ class CartService
             : null;
 
         if ($cart->has($rowId)) {
-            $cart[$rowId]['qty'] += $qty;
+            $item = $cart[$rowId];
+            $item['qty'] += $qty;
+            $cart[$rowId] = $item;
         } else {
             $cart[$rowId] = [
                 'rowId' => $rowId,
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
                 'variant_label' => $label,
-                'name' => $product->name,
+                'name' => $product->trans('name') ?? $product->name,
+                'slug' => $product->slug,
                 'price' => $price,
                 'qty' => $qty,
                 'stock' => $stock,

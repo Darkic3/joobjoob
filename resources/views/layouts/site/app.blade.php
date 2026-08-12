@@ -38,7 +38,7 @@
         </span>
 </div>
 
-<x-header/>
+<x-header :cart-count="$cartCount"/>
 
 <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
     @if (session('success'))
@@ -52,6 +52,10 @@
 </main>
 
 <x-footer/>
+
+<x-mobile-bar :cart-count="$cartCount"/>
+
+<x-back-to-top/>
 
 <x-social-proof-toast/>
 

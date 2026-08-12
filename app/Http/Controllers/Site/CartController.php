@@ -13,7 +13,7 @@ class CartController extends Controller
 
     public function index()
     {
-        return view('cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart]);
+        return view('site.cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart]);
     }
 
     public function add(Request $request, Product $product)

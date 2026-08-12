@@ -2,13 +2,16 @@
 
 namespace App\View\Composers;
 
+use App\Services\CartService;
 use Illuminate\View\View;
 
 /**
- * داده‌های اختصاصی چیدمان سایت (نوار اعلان) — منطق آماده‌سازی از ویو خارج شده.
+ * داده‌های اختصاصی چیدمان سایت (نوار اعلان + شمارندهٔ سبد) — منطق آماده‌سازی از ویو خارج شده.
  */
 class SiteLayoutComposer
 {
+    public function __construct(protected CartService $cart) {}
+
     public function compose(View $view): void
     {
         $announceMessages = array_values(array_filter([
@@ -20,6 +23,8 @@ class SiteLayoutComposer
         $view->with([
             'announceMessages' => $announceMessages,
             'firstAnnounce' => $announceMessages[0] ?? '🚚 '.__('messages.trust_free_shipping_desc'),
+            // شمارندهٔ واقعی سبد (هدر + نوار پایین موبایل)
+            'cartCount' => $this->cart->count(),
         ]);
     }
 }

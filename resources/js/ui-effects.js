@@ -136,14 +136,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.innerHTML = successText;
                 this.classList.add('neu-btn-success');
 
-                // شمارندهٔ سبد در هدر (اگر وجود داشته باشد)
-                const badge = document.getElementById('cart-count');
-                if (badge) {
+                // شمارندهٔ سبد — هم در هدر و هم در نوار پایین موبایل
+                ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                    const badge = document.getElementById(id);
+                    if (!badge) return;
                     badge.textContent = (parseInt(badge.textContent || '0') + 1);
                     badge.classList.remove('count-pop');
                     void badge.offsetWidth;
                     badge.classList.add('count-pop');
-                }
+                });
 
                 setTimeout(() => {
                     this.innerHTML = originalText;
@@ -396,3 +397,156 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 //======================================================================================================
+
+
+// ---------- دکمهٔ بازگشت به بالا با حلقهٔ پیشرفت ----------
+document.addEventListener('DOMContentLoaded', function () {
+    const backToTop = document.getElementById('back-to-top');
+    if (!backToTop) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let ticking = false;
+
+    function updateBackToTop() {
+        ticking = false;
+        const doc = document.documentElement;
+        const max = doc.scrollHeight - window.innerHeight;
+        const progress = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+
+        backToTop.style.setProperty('--bt-progress', progress);
+        backToTop.classList.toggle('visible', window.scrollY > 300);
+    }
+
+    window.addEventListener('scroll', function () {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateBackToTop);
+        }
+    }, { passive: true });
+    window.addEventListener('resize', updateBackToTop);
+    updateBackToTop();
+
+    backToTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+});
+
+
+// ---------- حالت جشن: بارش کانفتی طلایی روی هیرو ----------
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('festive-confetti');
+    if (!canvas) return;
+
+    // به reduced-motion احترام بگذار — بدون بارش
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const section = canvas.closest('.hero-fullbleed') || canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const DPR = Math.min(2, window.devicePixelRatio || 1);
+    const COLORS = ['#ffd700', '#f5a623', '#ffc53d', '#ffe9a8', '#ffb84d', '#8b83ff', '#ff6b6b'];
+    let particles = [];
+    let rafId = null;
+    let running = false;
+
+    function seed() {
+        const area = (canvas.width / DPR) * (canvas.height / DPR);
+        const count = Math.min(140, Math.max(50, Math.round(area / 9000)));
+        particles = Array.from({ length: count }, function () {
+            return {
+                x: Math.random() * canvas.width,
+                y: -20 - Math.random() * canvas.height,
+                w: (4 + Math.random() * 5) * DPR,
+                h: (7 + Math.random() * 9) * DPR,
+                vy: (1.1 + Math.random() * 1.9) * DPR,
+                vx: (Math.random() - 0.5) * 0.7 * DPR,
+                rot: Math.random() * Math.PI * 2,
+                vr: (Math.random() - 0.5) * 0.09 * DPR,
+                color: COLORS[(Math.random() * COLORS.length) | 0],
+                sway: Math.random() * Math.PI * 2,
+                swaySpeed: 0.015 + Math.random() * 0.035,
+            };
+        });
+    }
+
+    function resize() {
+        const rect = section.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.round(rect.width * DPR));
+        canvas.height = Math.max(1, Math.round(rect.height * DPR));
+        seed();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+            p.sway += p.swaySpeed;
+            p.y += p.vy;
+            p.x += p.vx + Math.sin(p.sway) * 0.7 * DPR;
+            p.rot += p.vr;
+
+            if (p.y - p.h > canvas.height) {
+                p.y = -p.h;
+                p.x = Math.random() * canvas.width;
+            }
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+        }
+        rafId = requestAnimationFrame(draw);
+    }
+
+    function start() { if (!running) { running = true; rafId = requestAnimationFrame(draw); } }
+    function stop() { running = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+
+    // فقط وقتی هیرو در دید است انیمیشن اجرا شود (صرفه‌جویی در پرفورمنس)
+    if (typeof IntersectionObserver === 'function') {
+        const io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) { e.isIntersecting ? start() : stop(); });
+        }, { threshold: 0.05 });
+        io.observe(section);
+    } else {
+        start();
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+});
+
+
+// ---------- نوار پایین موبایل: شیت جستجو ----------
+document.addEventListener('DOMContentLoaded', function () {
+    const sheet = document.querySelector('[data-mobile-search]');
+    const btn = document.querySelector('[data-mobile-search-btn]');
+    if (!sheet || !btn) return;
+
+    const input = sheet.querySelector('[data-mobile-search-input]');
+
+    function openSheet() {
+        sheet.classList.add('open');
+        sheet.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden'; // قفل اسکرول پشت شیت
+        // بعد از شروع انیمیشن، فوکوس روی فیلد جستجو
+        setTimeout(function () { if (input) input.focus(); }, 220);
+    }
+
+    function closeSheet() {
+        sheet.classList.remove('open');
+        sheet.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        btn.focus(); // برگرداندن فوکوس به دکمهٔ جستجو
+    }
+
+    btn.addEventListener('click', openSheet);
+
+    sheet.querySelectorAll('[data-mobile-search-close]').forEach(function (el) {
+        el.addEventListener('click', closeSheet);
+    });
+
+    // بستن با Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet();
+    });
+});

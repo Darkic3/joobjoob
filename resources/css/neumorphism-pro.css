@@ -1424,3 +1424,165 @@
 @media (prefers-reduced-motion: reduce) {
     .review-card, .review-quote-mark, .review-product-chip { transition: none; }
 }
+
+/* ---------- نوار پایین موبایل (Sticky Mobile Bar) ---------- */
+.mobile-bar { pointer-events: none; }
+.mobile-bar-pill {
+    pointer-events: auto;
+    display: flex;
+    align-items: stretch;
+    max-width: 26rem;
+    margin-inline: auto;
+    margin-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+    padding: 6px;
+    gap: 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-elevated) 86%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+    box-shadow: 10px 10px 26px color-mix(in srgb, var(--shadow-dark) 50%, transparent),
+                -8px -8px 20px color-mix(in srgb, var(--shadow-light) 75%, transparent);
+}
+.mobile-bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 9px 6px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-out);
+}
+.mobile-bar-item:active { transform: scale(.93); }
+.mobile-bar-item:hover { color: var(--accent); }
+.mobile-bar-active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    box-shadow: inset 2px 2px 5px color-mix(in srgb, var(--shadow-dark) 30%, transparent),
+                inset -2px -2px 5px color-mix(in srgb, var(--shadow-light) 55%, transparent);
+}
+
+/* شیت جستجو — با visibility تا انیمیشن ورود/خروج اجرا شود */
+.mobile-search-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    visibility: hidden;
+    pointer-events: none;
+}
+.mobile-search-sheet.open { visibility: visible; pointer-events: auto; }
+.mobile-search-backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--shadow-dark) 40%, transparent);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity .3s var(--ease-out);
+}
+.mobile-search-sheet.open .mobile-search-backdrop { opacity: 1; }
+.mobile-search-panel {
+    position: absolute;
+    inset-inline: 0.75rem;
+    bottom: max(env(safe-area-inset-bottom), 5.5rem);
+    margin-inline: auto;
+    max-width: 30rem;
+    padding: 10px;
+    border-radius: 1.25rem;
+    background: var(--bg-elevated);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+    box-shadow: 12px 12px 28px color-mix(in srgb, var(--shadow-dark) 50%, transparent),
+                -10px -10px 22px color-mix(in srgb, var(--shadow-light) 70%, transparent);
+    transform: translateY(140%) scale(.96);
+    opacity: 0;
+    transition: transform .45s var(--ease-spring), opacity .25s var(--ease-out);
+}
+.mobile-search-sheet.open .mobile-search-panel { transform: translateY(0) scale(1); opacity: 1; }
+
+/* فضای خالی زیر محتوا در موبایل تا نوار روی فوتر/محتوا نیفتد */
+@media (max-width: 1023px) {
+    body { padding-bottom: 5.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-bar-item, .mobile-search-backdrop, .mobile-search-panel { transition: none; }
+}
+
+/* ---------- دکمهٔ بازگشت به بالا با حلقهٔ پیشرفت ---------- */
+.back-to-top {
+    position: fixed;
+    inset-inline-end: 1rem;
+    bottom: max(env(safe-area-inset-bottom), 6.5rem); /* بالای نوار پایین موبایل */
+    z-index: 30;
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    background: var(--bg-elevated);
+    box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-spring),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+.back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.back-to-top:hover { box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light); }
+.back-to-top:active { transform: translateY(0) scale(.94); box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light); }
+.back-to-top:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.back-to-top-ring { position: absolute; inset: 0; transform: rotate(-90deg); }
+.back-to-top-track {
+    fill: none;
+    stroke: color-mix(in srgb, var(--text-primary) 12%, transparent);
+    stroke-width: 3;
+}
+.back-to-top-progress {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 125.66;
+    stroke-dashoffset: calc(125.66px * (1 - var(--bt-progress, 0)));
+    transition: stroke-dashoffset .1s linear;
+}
+.back-to-top-arrow {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 18px;
+    height: 18px;
+    color: var(--accent);
+}
+
+/* در دسکتاپ (بدون نوار موبایل) پایین گوشه */
+@media (min-width: 1024px) {
+    .back-to-top { bottom: max(env(safe-area-inset-bottom), 1.25rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back-to-top, .back-to-top-progress { transition: none; }
+}
+
+/* ---------- حالت جشن: بارش کانفتی روی هیرو ---------- */
+.festive-confetti {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+}
