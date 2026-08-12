@@ -125,7 +125,7 @@ return [
             'about' => 'من نحن',
             'footer' => 'التذييل',
             'pages' => 'عناوين الصفحات',
-            'appearance' => 'المظهر والثيم',
+            'appearance' => 'الاحتفالات والمظهر',
         ],
 
         'fields' => [
@@ -166,13 +166,13 @@ return [
             'footer_description' => 'وصف التذييل',
             'footer_copyright' => 'نص حقوق التذييل',
             'footer_newsletter_title' => 'عنوان النشرة في التذييل',
-            'default_theme' => 'الثيم الافتراضي للموقع',
             'festive_mode' => 'الوضع الاحتفالي (تساقط قصاصات على الهيرو)',
             'festive_style' => 'نمط التساقط الاحتفالي',
             'festive_style_options' => [
                 'gold' => 'ذهبي',
                 'colorful' => 'ملوّن',
                 'snow' => 'ثلجي (النوروز)',
+                'hearts' => 'قلوب (رومانسي)',
             ],
             'festive_badge_text' => 'نص شارة خصم الاحتفال',
         ],

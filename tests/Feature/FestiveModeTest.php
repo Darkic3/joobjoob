@@ -104,6 +104,7 @@ class FestiveModeTest extends TestCase
         $this->assertStringContainsString('value="gold"', $html);
         $this->assertStringContainsString('value="colorful"', $html);
         $this->assertStringContainsString('value="snow"', $html);
+        $this->assertStringContainsString('value="hearts"', $html);
     }
 
     public function test_home_hero_shows_festive_badge_when_enabled(): void

@@ -125,7 +125,7 @@ return [
             'about' => 'About Us',
             'footer' => 'Footer',
             'pages' => 'Page Titles',
-            'appearance' => 'Appearance & Theme',
+            'appearance' => 'Festive & Appearance',
         ],
         'fields' => [
             'site_name' => 'Site Name',
@@ -165,13 +165,13 @@ return [
             'footer_description' => 'Footer Description',
             'footer_copyright' => 'Footer Copyright Text',
             'footer_newsletter_title' => 'Footer Newsletter Title',
-            'default_theme' => 'Default Site Theme',
             'festive_mode' => 'Festive Mode (confetti rain on hero)',
             'festive_style' => 'Celebration rain style',
             'festive_style_options' => [
                 'gold' => 'Gold',
                 'colorful' => 'Colorful',
                 'snow' => 'Snowy (Nowruz)',
+                'hearts' => 'Hearts (Romantic)',
             ],
             'festive_badge_text' => 'Festive discount badge text',
         ],

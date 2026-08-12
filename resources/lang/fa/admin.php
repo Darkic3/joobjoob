@@ -125,7 +125,7 @@ return [
             'about' => 'درباره ما',
             'footer' => 'فوتر',
             'pages' => 'عناوین صفحات',
-            'appearance' => 'ظاهر و تم',
+            'appearance' => 'جشن و ظاهر سایت',
         ],
         'fields' => [
             'site_name' => 'نام سایت',
@@ -165,13 +165,13 @@ return [
             'footer_description' => 'توضیحات فوتر',
             'footer_copyright' => 'متن کپی‌رایت فوتر',
             'footer_newsletter_title' => 'عنوان خبرنامه در فوتر',
-            'default_theme' => 'تم پیش‌فرض سایت',
             'festive_mode' => 'حالت جشن (بارش کانفتی روی هیرو)',
             'festive_style' => 'سبک بارش جشن',
             'festive_style_options' => [
                 'gold' => 'طلایی',
                 'colorful' => 'رنگارنگ',
                 'snow' => 'برفی نوروزی',
+                'hearts' => 'قلبی (عاشقانه)',
             ],
             'festive_badge_text' => 'متن بنر/بج تخفیف جشن',
         ],

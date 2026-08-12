@@ -125,7 +125,7 @@ return [
             'about' => 'Hakkımızda',
             'footer' => 'Alt Bilgi',
             'pages' => 'Sayfa Başlıkları',
-            'appearance' => 'Görünüm ve Tema',
+            'appearance' => 'Kutlama ve Görünüm',
         ],
         'fields' => [
             'site_name' => 'Site Adı',
@@ -165,13 +165,13 @@ return [
             'footer_description' => 'Alt Bilgi Açıklaması',
             'footer_copyright' => 'Alt Bilgi Telif Metni',
             'footer_newsletter_title' => 'Alt Bilgi Bülten Başlığı',
-            'default_theme' => 'Varsayılan Site Teması',
             'festive_mode' => 'Kutlama Modu (hero üzerinde konfeti yağmuru)',
             'festive_style' => 'Kutlama yağış stili',
             'festive_style_options' => [
                 'gold' => 'Altın',
                 'colorful' => 'Renkli',
                 'snow' => 'Karlı (Nevruz)',
+                'hearts' => 'Kalpler (Romantik)',
             ],
             'festive_badge_text' => 'Kutlama indirim rozeti metni',
         ],
