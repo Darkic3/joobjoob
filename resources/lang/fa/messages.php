@@ -128,6 +128,12 @@ return [
     'latest_articles_subtitle' => 'جدیدترین مطالب و اخبار فروشگاه',
     'festive_badge' => 'تخفیف جشن',
 
+    // بنرهای میانی تبلیغاتی
+    'promo_banner_1_title' => 'ارسال رایگان',
+    'promo_banner_1_subtitle' => 'برای خرید بالای ۵۰۰ هزار تومان',
+    'promo_banner_2_title' => 'کد تخفیف WELCOME10',
+    'promo_banner_2_subtitle' => '۱۰٪ تخفیف اولین خرید شما',
+
     // صفحات استاتیک
     'pages' => [
         'about' => [

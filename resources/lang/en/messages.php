@@ -124,6 +124,12 @@ return [
     'latest_articles_subtitle' => 'Fresh reads and store news',
     'festive_badge' => 'Festive Discount',
 
+    // Mid-page promo banners
+    'promo_banner_1_title' => 'Free Shipping',
+    'promo_banner_1_subtitle' => 'On orders over 500K',
+    'promo_banner_2_title' => 'WELCOME10 Code',
+    'promo_banner_2_subtitle' => '10% off your first order',
+
     // Static pages
     'pages' => [
         'about' => [

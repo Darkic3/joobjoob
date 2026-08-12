@@ -316,5 +316,59 @@ return [
             'guide' => 'این متن وقتی حالت جشن فعال است روی هیرو نمایش داده می‌شود. اگر خالی بماند، متن پیش‌فرضِ زبان جاری سایت نمایش داده می‌شود.',
         ],
 
+        // ==================== بنرهای میانی تبلیغاتی (Promo Banners) ====================
+        'promo_banners_enabled' => [
+            'label' => 'نمایش بنرهای میانی',
+            'type' => 'boolean',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => true,
+            'guide' => 'دو بنر تبلیغاتی تمام‌عرض بین بخش‌های صفحه اصلی. با این کلید به‌صورت یک‌جا روشن/خاموش می‌شوند.',
+        ],
+        'promo_banner_1_title' => [
+            'label' => 'بنر اول — عنوان',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => 'ارسال رایگان',
+            'guide' => 'مثال: ارسال رایگان. اگر خالی بماند، متن پیش‌فرضِ زبان جاری نمایش داده می‌شود.',
+        ],
+        'promo_banner_1_subtitle' => [
+            'label' => 'بنر اول — متن زیرین',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => 'برای خرید بالای ۵۰۰ هزار تومان',
+        ],
+        'promo_banner_1_url' => [
+            'label' => 'بنر اول — لینک',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => '',
+            'guide' => 'اگر خالی باشد، به صفحهٔ محصولات لینک می‌شود.',
+        ],
+        'promo_banner_2_title' => [
+            'label' => 'بنر دوم — عنوان',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => 'کد تخفیف WELCOME10',
+        ],
+        'promo_banner_2_subtitle' => [
+            'label' => 'بنر دوم — متن زیرین',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => '۱۰٪ تخفیف اولین خرید شما',
+        ],
+        'promo_banner_2_url' => [
+            'label' => 'بنر دوم — لینک',
+            'type' => 'text',
+            'tab' => 'banners',
+            'required' => false,
+            'default' => '',
+        ],
+
     ],
 ];

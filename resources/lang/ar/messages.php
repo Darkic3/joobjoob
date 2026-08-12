@@ -117,6 +117,12 @@ return [
     'latest_articles_subtitle' => 'أحدث المواضيع وأخبار المتجر',
     'festive_badge' => 'خصم الاحتفال',
 
+    // لافتات ترويجية وسط الصفحة
+    'promo_banner_1_title' => 'شحن مجاني',
+    'promo_banner_1_subtitle' => 'للطلبات فوق ٥٠٠ ألف',
+    'promo_banner_2_title' => 'كود الخصم WELCOME10',
+    'promo_banner_2_subtitle' => 'خصم ١٠٪ على طلبك الأول',
+
     // الصفحات الثابتة
     'pages' => [
         'about' => [

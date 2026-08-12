@@ -1605,6 +1605,78 @@
     .back-to-top.complete { animation: none; }
 }
 
+/* ---------- بنرهای میانی تبلیغاتی (تب بنرها در تنظیمات) ---------- */
+.promo-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    min-height: 118px;
+    padding: 1.4rem 1.6rem;
+    border-radius: calc(var(--radius-md) + 4px);
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+}
+.promo-banner--accent {
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--gold)));
+    color: var(--accent-contrast);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 28%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.promo-banner--gold {
+    background: linear-gradient(135deg, var(--gold), #ffc53d);
+    color: #1a202c;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--gold) 30%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+.promo-banner:hover { transform: translateY(-3px); }
+.promo-banner--accent:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.promo-banner--gold:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4); }
+@media (prefers-reduced-motion: reduce) {
+    .promo-banner { transition: none; }
+}
+.promo-banner-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, .16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+.promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
+.promo-banner-body { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.promo-banner-title {
+    font-weight: 800;
+    font-size: 1.02rem;
+    line-height: 1.35;
+}
+.promo-banner-subtitle {
+    font-size: .78rem;
+    font-weight: 600;
+    opacity: .85;
+    line-height: 1.5;
+}
+.promo-banner-arrow {
+    display: grid;
+    place-items: center;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .18);
+    transition: transform var(--dur-med) var(--ease-out), background-color var(--dur-med) var(--ease-out);
+}
+.promo-banner--gold .promo-banner-arrow { background: rgba(26, 32, 44, .1); }
+.promo-banner:hover .promo-banner-arrow { transform: translateX(3px); }
+[dir="rtl"] .promo-banner:hover .promo-banner-arrow { transform: translateX(-3px); }
+@media (prefers-reduced-motion: reduce) {
+    .promo-banner-arrow { transition: none; }
+}
+
 /* ---------- حالت جشن: بارش کانفتی روی هیرو ---------- */
 .festive-confetti {
     position: absolute;
