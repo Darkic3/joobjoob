@@ -52,6 +52,18 @@ class Blog extends Model
         $this->increment('views');
     }
 
+    /**
+     * زمان تقریبی مطالعه (دقیقه) — بر اساس تعداد واژهٔ متن (بدون تگ‌ها) و سرعت ۲۰۰ واژه/دقیقه.
+     * برای متن‌های فارسی هم همین هیوریستیک ساده کافی است.
+     */
+    public function readingMinutes(): int
+    {
+        $text = strip_tags((string) $this->content);
+        $words = count(preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY));
+
+        return max(1, (int) ceil($words / 200));
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         return $this->image

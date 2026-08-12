@@ -121,6 +121,7 @@ return [
     'read_more' => 'ادامه مطلب',
     'no_blogs_found' => 'هنوز مقاله‌ای منتشر نشده است.',
     'views' => 'بازدید',
+    'reading_time' => ':minutes دقیقه مطالعه',
     'related_posts' => 'مقالات مرتبط',
     'all_posts' => 'بازگشت به همه مقالات',
     'latest_articles' => 'آخرین مقالات',

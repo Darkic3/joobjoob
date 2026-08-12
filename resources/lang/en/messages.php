@@ -117,6 +117,7 @@ return [
     'read_more' => 'Read More',
     'no_blogs_found' => 'No posts published yet.',
     'views' => 'views',
+    'reading_time' => ':minutes min read',
     'related_posts' => 'Related Posts',
     'all_posts' => 'Back to all posts',
     'latest_articles' => 'Latest Articles',

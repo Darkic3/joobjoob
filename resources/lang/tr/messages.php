@@ -110,6 +110,7 @@ return [
     'read_more' => 'Devamını Oku',
     'no_blogs_found' => 'Henüz yazı yayınlanmadı.',
     'views' => 'görüntülenme',
+    'reading_time' => ':minutes dk okuma',
     'related_posts' => 'İlgili Yazılar',
     'all_posts' => 'Tüm yazılara dön',
     'latest_articles' => 'Son Yazılar',

@@ -110,6 +110,7 @@ return [
     'read_more' => 'اقرأ المزيد',
     'no_blogs_found' => 'لا توجد مقالات منشورة بعد.',
     'views' => 'مشاهدة',
+    'reading_time' => ':minutes دقيقة قراءة',
     'related_posts' => 'مقالات ذات صلة',
     'all_posts' => 'العودة إلى جميع المقالات',
     'latest_articles' => 'أحدث المقالات',

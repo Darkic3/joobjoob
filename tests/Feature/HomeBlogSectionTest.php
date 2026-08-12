@@ -18,7 +18,7 @@ class HomeBlogSectionTest extends TestCase
         $this->seed(LanguageSeeder::class);
     }
 
-    private function makeBlog(string $slug, string $title, int $daysAgo = 0, bool $active = true): Blog
+    private function makeBlog(string $slug, string $title, int $daysAgo = 0, bool $active = true, ?string $content = null, int $views = 0): Blog
     {
         $category = BlogCategory::firstOrCreate(['slug' => 'blog-cat'], [
             'title' => 'دسته مقالات',
@@ -30,7 +30,8 @@ class HomeBlogSectionTest extends TestCase
             'title' => $title,
             'slug' => $slug,
             'excerpt' => 'خلاصه‌ای از این مقاله برای نمایش در کارت',
-            'content' => 'متن کامل مقاله',
+            'content' => $content ?? 'متن کامل مقاله',
+            'views' => $views,
             'is_active' => $active,
         ]);
 
@@ -84,5 +85,32 @@ class HomeBlogSectionTest extends TestCase
             ->assertOk()
             ->assertSee('مقاله فعال')
             ->assertDontSee('مقاله غیرفعال');
+    }
+
+    // ==========================================
+    // بازدید و زمان مطالعه
+    // ==========================================
+
+    public function test_reading_minutes_estimates_from_content_length(): void
+    {
+        // متن کوتاه → حداقل ۱ دقیقه
+        $short = $this->makeBlog('short-post', 'مقاله کوتاه');
+        $this->assertSame(1, $short->readingMinutes());
+
+        // ~۵۰۰ واژه → ۳ دقیقه (ceil(500/200))
+        $longContent = implode(' ', array_fill(0, 500, 'واژه'));
+        $long = $this->makeBlog('long-post', 'مقاله بلند', 0, true, $longContent);
+        $this->assertSame(3, $long->readingMinutes());
+    }
+
+    public function test_home_blog_card_shows_views_and_reading_time(): void
+    {
+        $longContent = implode(' ', array_fill(0, 500, 'واژه'));
+        $this->makeBlog('stats-post', 'مقاله با آمار', 0, true, $longContent, 12345);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('12,345', false)
+            ->assertSee(__('messages.reading_time', ['minutes' => 3]));
     }
 }
