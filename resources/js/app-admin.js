@@ -598,12 +598,50 @@ document.addEventListener('DOMContentLoaded', () => {
     window.SlugHelper.initAll();
 });
 
-// پیش‌نمایش‌های بارش جشن در صفحهٔ تنظیمات — هر canvas با data-style خودش اجرا می‌شود
+// پیش‌نمایش‌های بارش جشن در تنظیمات — قاب ثابت به‌صورت پیش‌فرض، اجرای زنده هنگام هاور
+// (هاور روی هر سبک → فقط همان سبک اجرا می‌شود؛ خروج از هاور → قاب ثابت تازه)
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('canvas[data-festive-preview]').forEach((canvas) => {
-        createFestiveRain(canvas, canvas.dataset.style || 'gold', {
-            density: 320,          // تراکم بیشتر برای کادر کوچک
-            staticPreview: true,   // در reduced-motion یک قاب ثابت نمایش بده
+    const items = [...document.querySelectorAll('.festive-preview-item')];
+    if (!items.length) return;
+
+    const engines = new Map(); // canvas → cleanup
+    let liveCanvas = null;
+
+    const renderStatic = (canvas, style) => {
+        createFestiveRain(canvas, style, { staticOnly: true, density: 320, seedInView: true });
+    };
+
+    const freezeAll = () => {
+        engines.forEach((cleanup) => cleanup());
+        engines.clear();
+        liveCanvas = null;
+        items.forEach((el) => el.classList.remove('playing'));
+    };
+
+    items.forEach((item) => {
+        const canvas = item.querySelector('canvas[data-festive-preview]');
+        if (!canvas) return;
+        const style = canvas.dataset.style || 'gold';
+
+        // قاب ثابت اولیه تا کادرها خالی نمانند
+        renderStatic(canvas, style);
+
+        item.addEventListener('mouseenter', () => {
+            if (liveCanvas === canvas) return;
+            freezeAll();
+            liveCanvas = canvas;
+            item.classList.add('playing');
+            engines.set(canvas, createFestiveRain(canvas, style, { density: 320, seedInView: true }));
+        });
+
+        item.addEventListener('mouseleave', () => {
+            if (liveCanvas !== canvas) return;
+            const cleanup = engines.get(canvas);
+            if (cleanup) cleanup();
+            engines.delete(canvas);
+            liveCanvas = null;
+            item.classList.remove('playing');
+            renderStatic(canvas, style);
         });
     });
 });

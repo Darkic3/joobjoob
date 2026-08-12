@@ -226,10 +226,19 @@
                 box-shadow: inset 2px 2px 5px rgba(0, 0, 0, .08), inset -2px -2px 5px rgba(255, 255, 255, .5);
             }
             .festive-preview-item {
+                cursor: pointer;
                 transition: transform .2s ease;
             }
             .festive-preview-item:hover {
                 transform: translateY(-2px);
+            }
+            .festive-preview-item.playing canvas {
+                border-color: rgba(13, 110, 253, .6);
+                box-shadow: 0 0 0 2px rgba(13, 110, 253, .18), inset 2px 2px 5px rgba(0, 0, 0, .08), inset -2px -2px 5px rgba(255, 255, 255, .5);
+            }
+            .festive-preview-item.playing small {
+                color: #0d6efd;
+                font-weight: 600;
             }
         </style>
     @endpush

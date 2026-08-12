@@ -5,7 +5,8 @@
 //
 //   style: gold | colorful | snow | hearts
 //   options.density:  تراکم (px² به ازای هر ذره) — برای پیش‌نمایش‌های کوچک کوچک‌تر
-//   options.staticPreview: اگر true و reduced-motion فعال باشد، فقط یک قاب ثابت رسم می‌شود
+//   options.staticOnly: فقط یک قاب ثابت رسم کن (بدون حلقه) — برای قاب اولیهٔ پیش‌نمایش‌ها
+//   options.staticPreview: در reduced-motion (برای پیش‌نمایش‌ها) یک قاب ثابت رسم شود
 // =====================================================================
 export function createFestiveRain(canvas, style, options = {}) {
     if (!canvas || typeof canvas.getContext !== 'function') return () => {};
@@ -82,7 +83,10 @@ export function createFestiveRain(canvas, style, options = {}) {
             const size = (cfg.size + Math.random() * cfg.sizeVar) * DPR;
             return {
                 x: Math.random() * canvas.width,
-                y: -20 - Math.random() * canvas.height,
+                // در پیش‌نمایش‌ها ذرات داخل کادر شروع می‌شوند تا قاب اول هم پر باشد
+                y: options.seedInView
+                    ? Math.random() * canvas.height
+                    : -20 - Math.random() * canvas.height,
                 size,
                 vy: (cfg.speed[0] + Math.random() * (cfg.speed[1] - cfg.speed[0])) * DPR,
                 vx: (Math.random() - 0.5) * cfg.sway * DPR,
@@ -152,7 +156,7 @@ export function createFestiveRain(canvas, style, options = {}) {
         ctx.fillRect(-s, -s, s * 2, s * 1.8);
     }
 
-    function draw() {
+    function renderFrame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (const p of particles) {
             p.sway += p.swaySpeed;
@@ -171,22 +175,27 @@ export function createFestiveRain(canvas, style, options = {}) {
             drawShape(p);
             ctx.restore();
         }
+    }
+
+    function draw() {
+        renderFrame();
         rafId = requestAnimationFrame(draw);
     }
 
     function start() { if (!running) { running = true; rafId = requestAnimationFrame(draw); } }
     function stop() { running = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
 
-    // به reduced-motion احترام بگذار
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        // در پیش‌نمایش‌های ادمین یک قاب ثابت رسم می‌کنیم تا باکس خالی نماند
-        if (options.staticPreview) {
-            resize();
-            stop();
-            draw();
-        }
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // قاب ثابت (پیش‌نمایش‌های ادمین یا reduced-motion در پیش‌نمایش) — بدون حلقه
+    if (options.staticOnly || (reducedMotion && options.staticPreview)) {
+        resize();
+        renderFrame();
         return () => {};
     }
+
+    // reduced-motion در سایت: بدون بارش
+    if (reducedMotion) return () => {};
 
     let io = null;
     // فقط وقتی در دید است انیمیشن اجرا شود (صرفه‌جویی در پرفورمنس)
