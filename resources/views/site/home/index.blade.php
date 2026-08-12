@@ -414,6 +414,6 @@
     @endif
 
     {{-- ۹. بنر خبرنامه یا اخبار --}}
-    @include('site.home.news')
+    @include('site.home.socials')
 
 @endsection

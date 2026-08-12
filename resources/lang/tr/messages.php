@@ -117,6 +117,25 @@ return [
     'latest_articles_subtitle' => 'Mağazadan taze yazılar ve haberler',
     'festive_badge' => 'Bayram İndirimi',
 
+    // Sosyal medya + kayıt
+    'socials' => [
+        'instagram' => 'Instagram',
+        'telegram' => 'Telegram',
+        'whatsapp' => 'WhatsApp',
+        'twitter' => 'Twitter / X',
+        'youtube' => 'YouTube',
+    ],
+    'join_section_title' => 'Bizi Takip Edin',
+    'join_section_desc' => 'Özel fırsatlar ve yeni ürünlerden haberdar olun',
+    'register_title' => 'Hemen kayıt ol, %10 indirim kazan',
+    'register_desc' => 'Ücretsiz kayıt ol ve ilk siparişin için %10 indirim kodunu hemen al',
+    'register_name_ph' => 'Ad Soyad',
+    'register_email_ph' => 'E-postanız',
+    'register_btn' => 'Kayıt Ol ve İndirim Kodu Al',
+    'register_agree' => 'Kayıt olarak şartları ve gizlilik politikasını kabul ediyorsunuz.',
+    'already_member_title' => 'Zaten üyesiniz',
+    'already_member_desc' => 'İndirim kodlarınız yakında kullanıcı panelinizde erişilebilir olacak.',
+
     // Statik sayfalar
     'pages' => [
         'about' => [
