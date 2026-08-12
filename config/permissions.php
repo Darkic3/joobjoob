@@ -119,6 +119,19 @@ return [
             ],
         ],
 
+        'promo-banners' => [
+            'title' => 'permissions.groups.promo-banners',
+            'access' => [
+                'index' => 'permissions.access.promo-banners.index',
+                'create' => 'permissions.access.promo-banners.create',
+                'store' => 'permissions.access.promo-banners.create',
+                'edit' => 'permissions.access.promo-banners.edit',
+                'update' => 'permissions.access.promo-banners.edit',
+                'reorder' => 'permissions.access.promo-banners.edit',
+                'destroy' => 'permissions.access.promo-banners.delete',
+            ],
+        ],
+
         'settings' => [
             'title' => 'permissions.groups.settings',
             'access' => [

@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\PromoBanner;
 use App\Models\User;
-use App\Services\SettingService;
 use Database\Seeders\LanguageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * بنرهای میانی صفحهٔ اصلی — مدل مستقل PromoBanner (۱ تا ۴ بنر با سبک/رنگ دلخواه).
+ */
 class PromoBannersTest extends TestCase
 {
     use RefreshDatabase;
@@ -23,90 +26,189 @@ class PromoBannersTest extends TestCase
         $this->actingAs(User::factory()->create(['is_admin' => true, 'is_active' => true]));
     }
 
-    public function test_promo_banners_visible_by_default_with_translated_fallbacks(): void
+    private function makeBanner(array $overrides = []): PromoBanner
     {
-        // پیش‌فرض: بنرها روشن و عنوان‌ها از کانفیگ → نمایش
-        $this->get('/')
-            ->assertOk()
-            ->assertSee('promo-banner promo-banner--accent', false)
-            ->assertSee('promo-banner promo-banner--gold', false)
-            // fallback ترجمه‌شدهٔ زبان جاری
-            ->assertSee(__('messages.promo_banner_1_title'))
-            ->assertSee(__('messages.promo_banner_2_title'));
+        return PromoBanner::create(array_merge([
+            'title' => ['fa' => 'ارسال رایگان', 'en' => 'Free Shipping'],
+            'subtitle' => ['fa' => 'برای خرید بالای ۵۰۰ هزار تومان', 'en' => 'On orders over 500K'],
+            'url' => null,
+            'style' => 'gradient',
+            'tone' => 'accent',
+            'sort_order' => (int) PromoBanner::max('sort_order') + 1,
+            'is_active' => true,
+        ], $overrides));
     }
 
-    public function test_promo_banners_hidden_when_disabled(): void
-    {
-        app(SettingService::class)->updateGroup('banners', ['promo_banners_enabled' => '0'], []);
+    // ── نمایش در سایت ──────────────────────────────────────────
 
-        $this->get('/')
-            ->assertOk()
-            ->assertDontSee('promo-banner', false);
+    public function test_home_shows_only_active_banners_in_order(): void
+    {
+        $this->makeBanner(['title' => ['fa' => 'بنر اول'], 'sort_order' => 2]);
+        $this->makeBanner(['title' => ['fa' => 'بنر دوم'], 'sort_order' => 1]);
+        $this->makeBanner(['title' => ['fa' => 'بنر مخفی'], 'is_active' => false, 'sort_order' => 3]);
+
+        $response = $this->get('/')->assertOk();
+
+        $response->assertSee('promo-banner', false);
+        // ترتیب نمایش: بنر دوم (sort 1) قبل از بنر اول (sort 2)
+        $this->assertLessThan(
+            strpos($response->getContent(), 'بنر اول'),
+            strpos($response->getContent(), 'بنر دوم'),
+            'بنر با sort_order کمتر باید زودتر نمایش داده شود'
+        );
+        $response->assertDontSee('بنر مخفی');
     }
 
-    public function test_promo_banners_use_custom_text_and_link_from_settings(): void
+    public function test_each_banner_uses_its_own_style_and_tone(): void
     {
-        app(SettingService::class)->updateGroup('banners', [
-            'promo_banners_enabled' => '1',
-            'promo_banner_1_title' => 'جشنواره پاییز',
-            'promo_banner_1_subtitle' => 'تا ۴۰٪ تخفیف',
-            'promo_banner_1_url' => 'https://example.com/sale',
-        ], []);
+        $this->makeBanner(['style' => 'gradient', 'tone' => 'accent']);
+        $this->makeBanner(['style' => 'coupon', 'tone' => 'gold']);
 
-        $this->get('/')
-            ->assertOk()
-            ->assertSee('جشنواره پاییز')
-            ->assertSee('تا ۴۰٪ تخفیف')
-            ->assertSee('https://example.com/sale', false);
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('promo-banner--gradient promo-banner--accent', $html);
+        $this->assertStringContainsString('promo-banner--coupon promo-banner--gold', $html);
     }
 
-    public function test_promo_banners_fallback_link_to_products_index(): void
+    public function test_banner_fallback_link_to_products_index(): void
     {
-        $this->get('/')
-            ->assertOk()
-            ->assertSee(localizedRoute('products.index'), false);
+        $this->makeBanner();
+
+        $this->get('/')->assertOk()->assertSee(localizedRoute('products.index'), false);
     }
 
-    public function test_settings_banners_page_renders_promo_fields(): void
+    public function test_banner_uses_custom_url(): void
+    {
+        $this->makeBanner(['url' => 'https://example.com/sale']);
+
+        $this->get('/')->assertOk()->assertSee('https://example.com/sale', false);
+    }
+
+    public function test_title_translates_per_locale(): void
+    {
+        $this->makeBanner(['title' => ['fa' => 'عبارت فارسی یکتا', 'en' => 'Unique English Phrase']]);
+
+        $this->get('/en')->assertOk()->assertSee('Unique English Phrase')->assertDontSee('عبارت فارسی یکتا');
+    }
+
+    public function test_missing_locale_falls_back_to_fa(): void
+    {
+        $this->makeBanner(['title' => ['fa' => 'عبارت فارسی یکتا', 'en' => '']]);
+
+        $this->get('/en')->assertOk()->assertSee('عبارت فارسی یکتا');
+    }
+
+    public function test_site_shows_max_four_banners(): void
+    {
+        foreach (range(1, 5) as $i) {
+            $this->makeBanner(['title' => ['fa' => "بنر $i"], 'sort_order' => $i]);
+        }
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertSame(4, substr_count($html, 'promo-banner promo-banner--'));
+    }
+
+    // ── CRUD ادمین ─────────────────────────────────────────────
+
+    public function test_admin_can_create_banner(): void
     {
         $this->actingAsSuperAdmin();
 
-        $html = $this->get(route('admin.settings.edit', 'banners'))->assertOk()->getContent();
+        $this->post(route('admin.promo-banners.store'), [
+            'title' => ['fa' => 'جشنواره پاییز', 'en' => 'Autumn Sale'],
+            'subtitle' => ['fa' => 'تا ۴۰٪ تخفیف', 'en' => 'Up to 40% off'],
+            'url' => 'https://example.com/sale',
+            'style' => 'dark',
+            'tone' => 'gold',
+            'is_active' => '1',
+        ])->assertRedirect(route('admin.promo-banners.index'));
 
-        $this->assertStringContainsString('name="settings[promo_banners_enabled]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banners_style]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_1_title]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_1_subtitle]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_1_url]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_2_title]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_2_subtitle]"', $html);
-        $this->assertStringContainsString('name="settings[promo_banner_2_url]"', $html);
-        $this->assertStringContainsString('value="gradient"', $html);
-        $this->assertStringContainsString('value="neumorphic"', $html);
-        $this->assertStringContainsString('value="minimal"', $html);
-        $this->assertStringContainsString('value="dark"', $html);
-        $this->assertStringContainsString('value="coupon"', $html);
+        $this->assertDatabaseHas('promo_banners', [
+            'style' => 'dark',
+            'tone' => 'gold',
+            'url' => 'https://example.com/sale',
+            'is_active' => 1,
+        ]);
     }
 
-    public function test_promo_banners_default_to_gradient_style(): void
+    public function test_admin_create_requires_fa_title(): void
     {
-        $this->get('/')
-            ->assertOk()
-            ->assertSee('promo-banners--gradient', false);
+        $this->actingAsSuperAdmin();
+
+        $this->post(route('admin.promo-banners.store'), [
+            'title' => ['fa' => '', 'en' => 'Autumn Sale'],
+            'style' => 'gradient',
+            'tone' => 'accent',
+        ])->assertSessionHasErrors('title.fa');
     }
 
-    public function test_promo_banners_use_selected_style(): void
+    public function test_admin_can_update_banner(): void
     {
-        app(SettingService::class)->updateGroup('banners', [
-            'promo_banners_enabled' => '1',
-            'promo_banners_style' => 'coupon',
-            'promo_banner_1_title' => 'ارسال رایگان',
-            'promo_banner_2_title' => 'کد تخفیف',
-        ], []);
+        $this->actingAsSuperAdmin();
+        $banner = $this->makeBanner();
 
-        $this->get('/')
+        $this->put(route('admin.promo-banners.update', $banner), [
+            'title' => ['fa' => 'بنر به‌روز شده', 'en' => 'Updated Banner'],
+            'subtitle' => ['fa' => 'زیرنویس جدید', 'en' => 'New subtitle'],
+            'url' => '',
+            'style' => 'minimal',
+            'tone' => 'gold',
+            'is_active' => '0',
+        ])->assertRedirect(route('admin.promo-banners.index'));
+
+        $banner->refresh();
+        $this->assertSame('بنر به‌روز شده', $banner->title['fa']);
+        $this->assertSame('minimal', $banner->style);
+        $this->assertSame('gold', $banner->tone);
+        $this->assertFalse($banner->is_active);
+        $this->assertNull($banner->url);
+    }
+
+    public function test_admin_can_delete_banner(): void
+    {
+        $this->actingAsSuperAdmin();
+        $banner = $this->makeBanner();
+
+        $this->delete(route('admin.promo-banners.destroy', $banner))
+            ->assertRedirect(route('admin.promo-banners.index'));
+
+        $this->assertDatabaseMissing('promo_banners', ['id' => $banner->id]);
+    }
+
+    public function test_admin_can_reorder_banners(): void
+    {
+        $this->actingAsSuperAdmin();
+        $b1 = $this->makeBanner(['sort_order' => 1]);
+        $b2 = $this->makeBanner(['sort_order' => 2]);
+        $b3 = $this->makeBanner(['sort_order' => 3]);
+
+        $this->postJson(route('admin.promo-banners.reorder'), [
+            'ids' => [$b3->id, $b1->id, $b2->id],
+        ])->assertOk()->assertJson(['ok' => true]);
+
+        $this->assertSame(1, (int) PromoBanner::find($b3->id)->sort_order);
+        $this->assertSame(2, (int) PromoBanner::find($b1->id)->sort_order);
+        $this->assertSame(3, (int) PromoBanner::find($b2->id)->sort_order);
+    }
+
+    public function test_admin_index_renders_banners(): void
+    {
+        $this->actingAsSuperAdmin();
+        $this->makeBanner(['title' => ['fa' => 'بنر تست']]);
+
+        $this->get(route('admin.promo-banners.index'))
             ->assertOk()
-            ->assertSee('promo-banners--coupon', false)
-            ->assertDontSee('promo-banners--gradient', false);
+            ->assertSee('بنر تست');
+    }
+
+    public function test_settings_page_has_no_banner_fields_anymore(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $html = $this->get(route('admin.settings.edit', 'general'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('promo_banners_enabled', $html);
+        $this->assertStringNotContainsString('promo_banner_1_title', $html);
     }
 }

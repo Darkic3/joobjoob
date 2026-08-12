@@ -1605,7 +1605,13 @@
     .back-to-top.complete { animation: none; }
 }
 
-/* ---------- بنرهای میانی تبلیغاتی (تب بنرها در تنظیمات — ۵ سبک) ---------- */
+/* ---------- بنرهای میانی تبلیغاتی صفحهٔ اصلی (مدل PromoBanner — ۵ سبک × ۲ رنگ، مستقل برای هر بنر) ---------- */
+.promo-banners {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+
 .promo-banner {
     position: relative;
     display: flex;
@@ -1651,119 +1657,119 @@
 }
 
 /* ---------- سبک ۱: گرادیان (پیش‌فرض) ---------- */
-.promo-banners--gradient .promo-banner--accent {
+.promo-banner--gradient.promo-banner--accent {
     background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--gold)));
     color: var(--accent-contrast);
     box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 28%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25);
 }
-.promo-banners--gradient .promo-banner--gold {
+.promo-banner--gradient.promo-banner--gold {
     background: linear-gradient(135deg, var(--gold), #ffc53d);
     color: #1a202c;
     box-shadow: 0 10px 24px color-mix(in srgb, var(--gold) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4);
 }
-.promo-banners--gradient .promo-banner--accent:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25); }
-.promo-banners--gradient .promo-banner--gold:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4); }
-.promo-banners--gradient .promo-banner-icon { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); }
-.promo-banners--gradient .promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
-.promo-banners--gradient .promo-banner-arrow { background: rgba(255, 255, 255, .18); }
-.promo-banners--gradient .promo-banner--gold .promo-banner-arrow { background: rgba(26, 32, 44, .1); }
+.promo-banner--gradient.promo-banner--accent:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.promo-banner--gradient.promo-banner--gold:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4); }
+.promo-banner--gradient .promo-banner-icon { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); }
+.promo-banner--gradient.promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
+.promo-banner--gradient .promo-banner-arrow { background: rgba(255, 255, 255, .18); }
+.promo-banner--gradient.promo-banner--gold .promo-banner-arrow { background: rgba(26, 32, 44, .1); }
 
 /* ---------- سبک ۲: نئومورفیک ---------- */
-.promo-banners--neumorphic .promo-banner {
+.promo-banner--neumorphic {
     background: var(--bg-elevated);
     color: var(--text-primary);
     box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
 }
-.promo-banners--neumorphic .promo-banner:hover { box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light); }
-.promo-banners--neumorphic .promo-banner--accent .promo-banner-icon {
+.promo-banner--neumorphic:hover { box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light); }
+.promo-banner--neumorphic.promo-banner--accent .promo-banner-icon {
     background: color-mix(in srgb, var(--accent) 13%, transparent);
     color: var(--accent);
     box-shadow: inset 3px 3px 6px color-mix(in srgb, var(--shadow-dark) 60%, transparent), inset -3px -3px 6px var(--shadow-light);
 }
-.promo-banners--neumorphic .promo-banner--gold .promo-banner-icon {
+.promo-banner--neumorphic.promo-banner--gold .promo-banner-icon {
     background: color-mix(in srgb, var(--gold) 15%, transparent);
     color: var(--gold);
     box-shadow: inset 3px 3px 6px color-mix(in srgb, var(--shadow-dark) 55%, transparent), inset -3px -3px 6px var(--shadow-light);
 }
-.promo-banners--neumorphic .promo-banner--accent .promo-banner-title { color: var(--accent); }
-.promo-banners--neumorphic .promo-banner--gold .promo-banner-title { color: var(--gold); }
-.promo-banners--neumorphic .promo-banner-arrow {
+.promo-banner--neumorphic.promo-banner--accent .promo-banner-title { color: var(--accent); }
+.promo-banner--neumorphic.promo-banner--gold .promo-banner-title { color: var(--gold); }
+.promo-banner--neumorphic .promo-banner-arrow {
     background: var(--bg-elevated);
     color: var(--accent);
     box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
 }
-.promo-banners--neumorphic .promo-banner--gold .promo-banner-arrow { color: var(--gold); }
+.promo-banner--neumorphic.promo-banner--gold .promo-banner-arrow { color: var(--gold); }
 
 /* ---------- سبک ۳: مینیمال ---------- */
-.promo-banners--minimal .promo-banner {
+.promo-banner--minimal {
     background: transparent;
     color: var(--text-primary);
     border: 1px solid color-mix(in srgb, var(--text-primary) 14%, transparent);
     box-shadow: none;
 }
-.promo-banners--minimal .promo-banner:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: none; }
-.promo-banners--minimal .promo-banner--accent .promo-banner-title { color: var(--accent); }
-.promo-banners--minimal .promo-banner--gold .promo-banner-title { color: var(--gold); }
-.promo-banners--minimal .promo-banner-icon { background: transparent; box-shadow: none; color: var(--text-secondary); }
-.promo-banners--minimal .promo-banner--accent .promo-banner-icon { color: var(--accent); }
-.promo-banners--minimal .promo-banner--gold .promo-banner-icon { color: var(--gold); }
-.promo-banners--minimal .promo-banner-arrow { background: transparent; color: var(--text-secondary); box-shadow: none; }
-.promo-banners--minimal .promo-banner--accent .promo-banner-arrow { color: var(--accent); }
-.promo-banners--minimal .promo-banner--gold .promo-banner-arrow { color: var(--gold); }
+.promo-banner--minimal:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: none; }
+.promo-banner--minimal.promo-banner--accent .promo-banner-title { color: var(--accent); }
+.promo-banner--minimal.promo-banner--gold .promo-banner-title { color: var(--gold); }
+.promo-banner--minimal .promo-banner-icon { background: transparent; box-shadow: none; color: var(--text-secondary); }
+.promo-banner--minimal.promo-banner--accent .promo-banner-icon { color: var(--accent); }
+.promo-banner--minimal.promo-banner--gold .promo-banner-icon { color: var(--gold); }
+.promo-banner--minimal .promo-banner-arrow { background: transparent; color: var(--text-secondary); box-shadow: none; }
+.promo-banner--minimal.promo-banner--accent .promo-banner-arrow { color: var(--accent); }
+.promo-banner--minimal.promo-banner--gold .promo-banner-arrow { color: var(--gold); }
 
 /* ---------- سبک ۴: تیره لوکس ---------- */
-.promo-banners--dark .promo-banner {
+.promo-banner--dark {
     background: linear-gradient(140deg, #171c26, #232c3d);
     color: #fff;
     box-shadow: 0 14px 28px rgba(0, 0, 0, .22);
     border: 1px solid rgba(255, 255, 255, .07);
 }
-.promo-banners--dark .promo-banner--accent {
+.promo-banner--dark.promo-banner--accent {
     border-color: color-mix(in srgb, var(--accent) 40%, transparent);
     box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 22%, transparent), inset 0 0 30px color-mix(in srgb, var(--accent) 8%, transparent);
 }
-.promo-banners--dark .promo-banner--gold {
+.promo-banner--dark.promo-banner--gold {
     border-color: color-mix(in srgb, var(--gold) 42%, transparent);
     box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 22%, transparent), inset 0 0 30px color-mix(in srgb, var(--gold) 8%, transparent);
 }
-.promo-banners--dark .promo-banner--accent:hover { box-shadow: 0 16px 34px color-mix(in srgb, var(--accent) 35%, transparent), inset 0 0 30px color-mix(in srgb, var(--accent) 8%, transparent); }
-.promo-banners--dark .promo-banner--gold:hover { box-shadow: 0 16px 34px color-mix(in srgb, var(--gold) 32%, transparent), inset 0 0 30px color-mix(in srgb, var(--gold) 8%, transparent); }
-.promo-banners--dark .promo-banner--accent .promo-banner-title { color: #fff; }
-.promo-banners--dark .promo-banner--gold .promo-banner-title { color: #ffc53d; }
-.promo-banners--dark .promo-banner-subtitle { color: rgba(255, 255, 255, .72); }
-.promo-banners--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
-.promo-banners--dark .promo-banner--accent .promo-banner-icon { color: var(--accent); }
-.promo-banners--dark .promo-banner--gold .promo-banner-icon { color: var(--gold); }
-.promo-banners--dark .promo-banner-arrow { background: rgba(255, 255, 255, .1); color: #fff; }
-.promo-banners--dark .promo-banner--accent .promo-banner-arrow { color: var(--accent); }
-.promo-banners--dark .promo-banner--gold .promo-banner-arrow { color: var(--gold); }
+.promo-banner--dark.promo-banner--accent:hover { box-shadow: 0 16px 34px color-mix(in srgb, var(--accent) 35%, transparent), inset 0 0 30px color-mix(in srgb, var(--accent) 8%, transparent); }
+.promo-banner--dark.promo-banner--gold:hover { box-shadow: 0 16px 34px color-mix(in srgb, var(--gold) 32%, transparent), inset 0 0 30px color-mix(in srgb, var(--gold) 8%, transparent); }
+.promo-banner--dark.promo-banner--accent .promo-banner-title { color: #fff; }
+.promo-banner--dark.promo-banner--gold .promo-banner-title { color: #ffc53d; }
+.promo-banner--dark .promo-banner-subtitle { color: rgba(255, 255, 255, .72); }
+.promo-banner--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
+.promo-banner--dark.promo-banner--accent .promo-banner-icon { color: var(--accent); }
+.promo-banner--dark.promo-banner--gold .promo-banner-icon { color: var(--gold); }
+.promo-banner--dark .promo-banner-arrow { background: rgba(255, 255, 255, .1); color: #fff; }
+.promo-banner--dark.promo-banner--accent .promo-banner-arrow { color: var(--accent); }
+.promo-banner--dark.promo-banner--gold .promo-banner-arrow { color: var(--gold); }
 
 /* ---------- سبک ۵: کوپنی (بلیت/کوپن با خط چین) ---------- */
-.promo-banners--coupon .promo-banner {
+.promo-banner--coupon {
     border-radius: 14px;
 }
-.promo-banners--coupon .promo-banner--accent {
+.promo-banner--coupon.promo-banner--accent {
     background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--gold)));
     color: var(--accent-contrast);
     box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 28%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25);
 }
-.promo-banners--coupon .promo-banner--gold {
+.promo-banner--coupon.promo-banner--gold {
     background: linear-gradient(135deg, var(--gold), #ffc53d);
     color: #1a202c;
     box-shadow: 0 10px 24px color-mix(in srgb, var(--gold) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4);
 }
-.promo-banners--coupon .promo-banner--accent:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25); }
-.promo-banners--coupon .promo-banner--gold:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4); }
-.promo-banners--coupon .promo-banner-icon { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); border-radius: 999px; }
-.promo-banners--coupon .promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
-.promo-banners--coupon .promo-banner-arrow {
+.promo-banner--coupon.promo-banner--accent:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.promo-banner--coupon.promo-banner--gold:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4); }
+.promo-banner--coupon .promo-banner-icon { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); border-radius: 999px; }
+.promo-banner--coupon.promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
+.promo-banner--coupon .promo-banner-arrow {
     width: 46px;
     height: 46px;
     background: rgba(255, 255, 255, .24);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
 }
-.promo-banners--coupon .promo-banner--gold .promo-banner-arrow { background: rgba(26, 32, 44, .14); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); }
-.promo-banners--coupon .promo-banner::after {
+.promo-banner--coupon.promo-banner--gold .promo-banner-arrow { background: rgba(26, 32, 44, .14); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); }
+.promo-banner--coupon::after {
     content: '';
     position: absolute;
     inset-block: 12px;
@@ -1771,7 +1777,7 @@
     border-inline-start: 2px dashed rgba(255, 255, 255, .55);
     pointer-events: none;
 }
-.promo-banners--coupon .promo-banner--gold::after { border-inline-start-color: rgba(26, 32, 44, .28); }
+.promo-banner--coupon.promo-banner--gold::after { border-inline-start-color: rgba(26, 32, 44, .28); }
 
 /* ---------- حالت جشن: بارش کانفتی روی هیرو ---------- */
 .festive-confetti {

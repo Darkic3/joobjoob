@@ -280,6 +280,14 @@ return [
             'description_fa_max' => 'The Persian description must not be greater than 500 characters.',
             'is_active_boolean' => 'The active status value must be true or false.',
         ],
+        'promo_banner' => [
+            'title_fa_required' => 'The Persian banner title is required.',
+            'title_fa_max' => 'The Persian banner title must not exceed 255 characters.',
+            'url_url' => 'The banner link must be a valid URL.',
+            'style_in' => 'The selected banner style is invalid.',
+            'tone_in' => 'The selected banner color is invalid.',
+            'is_active_boolean' => 'The active status value must be true or false.',
+        ],
         'settings' => [
             'site_name_required' => 'The site name is required.',
             'site_logo_image' => 'The logo file must be a valid image.',

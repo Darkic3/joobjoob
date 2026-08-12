@@ -11,6 +11,7 @@ return [
         'blog-categories' => 'Blog Categories',
         'hero-slides' => 'Main Slider',
         'trust-badges' => 'Trust Badges',
+        'promo-banners' => 'Promo Banners',
         'settings' => 'Settings',
         'users' => 'Users',
         'roles' => 'Roles & Permissions',
@@ -68,6 +69,12 @@ return [
             'create' => 'Add badge',
             'edit' => 'Edit badge',
             'delete' => 'Delete badge',
+        ],
+        'promo-banners' => [
+            'index' => 'View banners',
+            'create' => 'Add banner',
+            'edit' => 'Edit banner',
+            'delete' => 'Delete banner',
         ],
         'settings' => [
             'edit' => 'Edit settings',

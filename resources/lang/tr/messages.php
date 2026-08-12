@@ -117,12 +117,6 @@ return [
     'latest_articles_subtitle' => 'Mağazadan taze yazılar ve haberler',
     'festive_badge' => 'Bayram İndirimi',
 
-    // Orta sayfa tanıtım afişleri
-    'promo_banner_1_title' => 'Ücretsiz Kargo',
-    'promo_banner_1_subtitle' => '500 bin üzeri siparişlerde',
-    'promo_banner_2_title' => 'WELCOME10 Kodu',
-    'promo_banner_2_subtitle' => 'İlk siparişinizde %10 indirim',
-
     // Statik sayfalar
     'pages' => [
         'about' => [

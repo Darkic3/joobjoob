@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\HeroSlideSearchController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\PromoBannerController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
@@ -38,6 +39,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('hero-slides', HeroSlideController::class)->except('show');
         Route::get('hero-slides/search-model', [HeroSlideSearchController::class, 'searchModel'])->name('hero-slides.search-model');
         Route::resource('trust-badges', TrustBadgeController::class);
+        // بنرهای میانی صفحهٔ اصلی — show عمداً حذف شده (کنترلر متد show ندارد)
+        Route::resource('promo-banners', PromoBannerController::class)->except('show');
         Route::resource('products', ProductController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
         Route::resource('product-categories', ProductCategoryController::class)->except('show');
@@ -61,6 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
         Route::post('hero-slides/reorder', [HeroSlideController::class, 'reorder'])->name('hero-slides.reorder');
         Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
+        Route::post('promo-banners/reorder', [PromoBannerController::class, 'reorder'])->name('promo-banners.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');
 
         Route::get('contact', [ContactController::class, 'index'])->name('contact.index');

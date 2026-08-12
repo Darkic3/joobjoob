@@ -43,7 +43,8 @@ class Sidebar extends Component
             || $this->showProducts
             || ($this->can)('admin.product-categories.index')
             || $this->showBlog
-            || ($this->can)('admin.trust-badges.index');
+            || ($this->can)('admin.trust-badges.index')
+            || ($this->can)('admin.promo-banners.index');
         $this->showSettingsDivider = ($this->can)('admin.settings.edit')
             || ($this->can)('admin.roles.index')
             || ($this->can)('admin.users.index')

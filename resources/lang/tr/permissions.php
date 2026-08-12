@@ -11,6 +11,7 @@ return [
         'blog-categories' => 'Blog Kategorileri',
         'hero-slides' => 'Ana Slider',
         'trust-badges' => 'Güven Rozetleri',
+        'promo-banners' => 'Tanıtım Afişleri',
         'settings' => 'Ayarlar',
         'users' => 'Kullanıcılar',
         'roles' => 'Roller ve İzinler',
@@ -68,6 +69,12 @@ return [
             'create' => 'Rozet ekle',
             'edit' => 'Rozeti düzenle',
             'delete' => 'Rozeti sil',
+        ],
+        'promo-banners' => [
+            'index' => 'Afişleri görüntüle',
+            'create' => 'Afiş ekle',
+            'edit' => 'Afişi düzenle',
+            'delete' => 'Afişi sil',
         ],
         'settings' => [
             'edit' => 'Ayarları düzenle',

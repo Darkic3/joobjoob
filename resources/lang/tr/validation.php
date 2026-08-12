@@ -279,6 +279,14 @@ return [
             'description_fa_max' => 'Farsça açıklama 500 karakterden büyük olmamalıdır.',
             'is_active_boolean' => 'Aktiflik durumu değeri doğru veya yanlış olmalıdır.',
         ],
+        'promo_banner' => [
+            'title_fa_required' => 'Farsça afiş başlığı zorunludur.',
+            'title_fa_max' => 'Farsça afiş başlığı 255 karakteri aşmamalıdır.',
+            'url_url' => 'Afiş bağlantısı geçerli bir URL olmalıdır.',
+            'style_in' => 'Seçilen afiş stili geçersiz.',
+            'tone_in' => 'Seçilen afiş rengi geçersiz.',
+            'is_active_boolean' => 'Aktiflik durumu değeri doğru veya yanlış olmalıdır.',
+        ],
         'settings' => [
             'site_name_required' => 'Site adı zorunludur.',
             'site_logo_image' => 'Logo dosyası geçerli bir görsel olmalıdır.',

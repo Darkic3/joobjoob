@@ -45,96 +45,7 @@
                                     @method('PUT')
 
                                     <div class="row g-4 p-4 p-md-5">
-                                        @if ($tabKey === 'banners')
-                                            {{-- ===== کرت اختصاصی تنظیمات بنرهای میانی ===== --}}
-                                            <div class="col-12">
-                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                                    <div class="card-body p-4">
-                                                        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                                                            <h5 class="fw-bold mb-0">
-                                                                <i class="bi bi-megaphone-fill me-2 text-primary"></i>
-                                                                {{ trans_or('admin.settings.promo_banners_title', 'پیش‌نمایش زندهٔ بنرها') }}
-                                                            </h5>
-                                                            <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-3 py-2">
-                                                                <i class="bi bi-arrow-repeat me-1"></i>
-                                                                {{ trans_or('admin.settings.promo_banners_live_hint', 'با تایپ کردن زنده آپدیت می‌شود') }}
-                                                            </span>
-                                                        </div>
-
-                                                        {{-- پیش‌نمایش دو بنر با همان کلاس‌های سایت — سبک از سلکت خوانده می‌شود --}}
-                                                        <div id="promo-preview"
-                                                             class="promo-banners promo-banners--{{ $groupsValues['banners']['promo_banners_style'] ?? 'gradient' }}"
-                                                             @if (!($groupsValues['banners']['promo_banners_enabled'] ?? true)) style="opacity: .35" @endif>
-                                                            <div class="promo-banner promo-banner--accent">
-                                                                <span class="promo-banner-icon" aria-hidden="true">
-                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                                                                </span>
-                                                                <span class="promo-banner-body">
-                                                                    <span class="promo-banner-title" data-pv="promo_banner_1_title" data-pv-fallback="{{ __('messages.promo_banner_1_title') }}">{{ settingOverride('promo_banner_1_title', __('messages.promo_banner_1_title')) }}</span>
-                                                                    <span class="promo-banner-subtitle" data-pv="promo_banner_1_subtitle" data-pv-fallback="{{ __('messages.promo_banner_1_subtitle') }}">{{ settingOverride('promo_banner_1_subtitle', __('messages.promo_banner_1_subtitle')) }}</span>
-                                                                </span>
-                                                            </div>
-                                                            <div class="promo-banner promo-banner--gold">
-                                                                <span class="promo-banner-icon" aria-hidden="true">
-                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
-                                                                </span>
-                                                                <span class="promo-banner-body">
-                                                                    <span class="promo-banner-title" data-pv="promo_banner_2_title" data-pv-fallback="{{ __('messages.promo_banner_2_title') }}">{{ settingOverride('promo_banner_2_title', __('messages.promo_banner_2_title')) }}</span>
-                                                                    <span class="promo-banner-subtitle" data-pv="promo_banner_2_subtitle" data-pv-fallback="{{ __('messages.promo_banner_2_subtitle') }}">{{ settingOverride('promo_banner_2_subtitle', __('messages.promo_banner_2_subtitle')) }}</span>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- تنظیمات کلی: نمایش + سبک --}}
-                                            <div class="col-lg-6">
-                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
-                                                        <h6 class="fw-bold mb-0">{{ trans_or('admin.settings.promo_banners_group_general', 'تنظیمات کلی') }}</h6>
-                                                    </div>
-                                                    <div class="card-body p-4">
-                                                        @foreach (['promo_banners_enabled', 'promo_banners_style'] as $fieldKey)
-                                                            @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- بنر اول --}}
-                                            <div class="col-lg-6">
-                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
-                                                        <h6 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>{{ trans_or('admin.settings.promo_banners_group_1', 'بنر اول') }}</h6>
-                                                    </div>
-                                                    <div class="card-body p-4">
-                                                        @foreach (['promo_banner_1_title', 'promo_banner_1_subtitle', 'promo_banner_1_url'] as $fieldKey)
-                                                            @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- بنر دوم --}}
-                                            <div class="col-12">
-                                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                                    <div class="card-header bg-light border-0 py-3 px-4 dark:bg-gray-800">
-                                                        <h6 class="fw-bold mb-0"><i class="bi bi-ticket-perforated me-2 text-primary"></i>{{ trans_or('admin.settings.promo_banners_group_2', 'بنر دوم') }}</h6>
-                                                    </div>
-                                                    <div class="card-body p-4">
-                                                        <div class="row g-4">
-                                                            @foreach (['promo_banner_2_title', 'promo_banner_2_subtitle', 'promo_banner_2_url'] as $fieldKey)
-                                                                <div class="col-md-4">
-                                                                    @include('admin.settings._field', ['fieldKey' => $fieldKey, 'config' => $fieldsByTab['banners'][$fieldKey] ?? [], 'tabKey' => $tabKey, 'groupsValues' => $groupsValues])
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @else
-                                            @forelse ($fieldsByTab[$tabKey] ?? [] as $fieldKey => $config)
+                                        @forelse ($fieldsByTab[$tabKey] ?? [] as $fieldKey => $config)
                                                 <div class="{{ in_array($config['type'] ?? 'text', ['textarea', 'ckeditor']) ? 'col-12' : 'col-md-6' }}">
                                                     @include('admin.settings._field', compact('fieldKey', 'config', 'tabKey', 'groupsValues'))
                                                 </div>
@@ -144,7 +55,6 @@
                                                     {{ __('admin.settings.no_fields_in_group') }}
                                                 </div>
                                             @endforelse
-                                        @endif
                                     </div>
 
                                     <!-- دکمه ذخیره این گروه -->
@@ -304,43 +214,6 @@
                 }
             });
 
-            // ===== پیش‌نمایش زندهٔ بنرهای میانی — همگام‌سازی فیلدها با پیش‌نمایش =====
-            const promoPreview = document.getElementById('promo-preview');
-            if (promoPreview) {
-                const syncText = function (input) {
-                    const target = promoPreview.querySelector('[data-pv="' + input.id + '"]');
-                    if (!target) return;
-                    target.textContent = input.value.trim() || target.getAttribute('data-pv-fallback');
-                };
-
-                ['promo_banner_1_title', 'promo_banner_1_subtitle', 'promo_banner_2_title', 'promo_banner_2_subtitle']
-                    .forEach(function (id) {
-                        const input = document.getElementById(id);
-                        if (input) {
-                            input.addEventListener('input', function () { syncText(input); });
-                        }
-                    });
-
-                // تغییر سبک → کلاس پیش‌نمایش عوض می‌شود
-                const styleInput = document.getElementById('promo_banners_style');
-                if (styleInput) {
-                    styleInput.addEventListener('change', function () {
-                        promoPreview.classList.remove(
-                            'promo-banners--gradient', 'promo-banners--neumorphic',
-                            'promo-banners--minimal', 'promo-banners--dark', 'promo-banners--coupon'
-                        );
-                        promoPreview.classList.add('promo-banners--' + styleInput.value);
-                    });
-                }
-
-                // روشن/خاموش → محو پیش‌نمایش
-                const enabledInput = document.getElementById('promo_banners_enabled');
-                if (enabledInput) {
-                    enabledInput.addEventListener('change', function () {
-                        promoPreview.style.opacity = enabledInput.checked ? '' : '0.35';
-                    });
-                }
-            }
         </script>
     @endpush
 @endsection

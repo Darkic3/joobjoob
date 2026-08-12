@@ -11,6 +11,7 @@ return [
         'blog-categories' => 'دسته‌بندی وبلاگ',
         'hero-slides' => 'اسلایدر اصلی',
         'trust-badges' => 'نشان‌های اعتماد',
+        'promo-banners' => 'بنرهای میانی',
         'settings' => 'تنظیمات',
         'users' => 'کاربران',
         'roles' => 'نقش‌ها و دسترسی‌ها',
@@ -68,6 +69,12 @@ return [
             'create' => 'افزودن نشان',
             'edit' => 'ویرایش نشان',
             'delete' => 'حذف نشان',
+        ],
+        'promo-banners' => [
+            'index' => 'مشاهده بنرها',
+            'create' => 'افزودن بنر',
+            'edit' => 'ویرایش بنر',
+            'delete' => 'حذف بنر',
         ],
         'settings' => [
             'edit' => 'ویرایش تنظیمات',
