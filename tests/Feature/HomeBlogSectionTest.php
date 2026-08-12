@@ -25,15 +25,20 @@ class HomeBlogSectionTest extends TestCase
             'is_active' => true,
         ]);
 
-        return Blog::create([
+        $blog = Blog::create([
             'blog_category_id' => $category->id,
             'title' => $title,
             'slug' => $slug,
             'excerpt' => 'خلاصه‌ای از این مقاله برای نمایش در کارت',
             'content' => 'متن کامل مقاله',
             'is_active' => $active,
-            'created_at' => now()->subDays($daysAgo),
         ]);
+
+        // created_at در fillable نیست — بعد از ساخت تنظیم می‌شود
+        $blog->created_at = now()->subDays($daysAgo);
+        $blog->save();
+
+        return $blog;
     }
 
     public function test_home_page_shows_latest_articles_section(): void
