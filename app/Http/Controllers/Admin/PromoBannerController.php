@@ -25,7 +25,10 @@ class PromoBannerController extends Controller
 
     public function create(): View
     {
-        return view('admin.promo-banners.create');
+        return view('admin.promo-banners.create', [
+            'bannerIcons' => PromoBanner::ICONS,
+            'bannerTones' => PromoBanner::TONES,
+        ]);
     }
 
     public function store(PromoBannerRequest $request)
@@ -39,7 +42,11 @@ class PromoBannerController extends Controller
 
     public function edit(PromoBanner $promoBanner): View
     {
-        return view('admin.promo-banners.edit', compact('promoBanner'));
+        return view('admin.promo-banners.edit', [
+            'promoBanner' => $promoBanner,
+            'bannerIcons' => PromoBanner::ICONS,
+            'bannerTones' => PromoBanner::TONES,
+        ]);
     }
 
     public function update(PromoBannerRequest $request, PromoBanner $promoBanner)

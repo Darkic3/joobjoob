@@ -95,6 +95,7 @@ class PromoBannerService
     private function prepareData(PromoBannerDTO $dto): array
     {
         return [
+            'icon' => $dto->getIcon(),
             'title' => $dto->getTitle(),
             'subtitle' => $dto->getSubtitle(),
             'url' => $dto->getUrl(),

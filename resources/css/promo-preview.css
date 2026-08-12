@@ -1,13 +1,23 @@
 /* =====================================================================
-   پیش‌نمایش زندهٔ بنرهای میانی در فرم ادمین (create/edit)
+   پیش‌نمایش زندهٔ بنرهای میانی در فرم ادمین (create/edit) + چیپ‌های ایندکس
    استایل‌های سایت (neumorphism-pro.css) در پنل لود نمی‌شوند،
-   پس نسخهٔ خلاصه و اسکوپ‌شدهٔ ۵ سبک × ۲ رنگ تعریف می‌شود.
+   پس نسخهٔ خلاصه و اسکوپ‌شدهٔ ۵ سبک × ۷ رنگ تعریف می‌شود.
+
+   ⚠️ کلاس‌های رنگ (.promo-banner--{tone}) عمداً در سطح عمومی هستند
+   تا چیپ‌های ایندکس هم بتوانند از var(--banner-tone) استفاده کنند.
    ===================================================================== */
+
+/* ---------- رنگ‌ها (tone) — فقط متغیرها ---------- */
+.promo-banner--accent  { --banner-tone: #6c63ff; --banner-tone-end: #8f7dff;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+.promo-banner--gold    { --banner-tone: #f5a623; --banner-tone-end: #ffc53d;  --banner-on: #1a202c; --banner-title-bright: #ffc53d; }
+.promo-banner--emerald { --banner-tone: #10b981; --banner-tone-end: #34d399;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+.promo-banner--rose    { --banner-tone: #f43f5e; --banner-tone-end: #fb7185;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+.promo-banner--blue    { --banner-tone: #3b82f6; --banner-tone-end: #60a5fa;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+.promo-banner--orange  { --banner-tone: #f97316; --banner-tone-end: #fb923c;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+.promo-banner--violet  { --banner-tone: #8b5cf6; --banner-tone-end: #a78bfa;  --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+
+/* ---------- پایهٔ پیش‌نمایش ---------- */
 .promo-banner-preview {
-    --promo-accent: #6c63ff;
-    --promo-accent-contrast: #ffffff;
-    --promo-gold: #f5a623;
-    --promo-dark: #1a202c;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: .85rem;
@@ -39,18 +49,12 @@
 .promo-banner-preview .promo-banner-subtitle { font-size: .72rem; font-weight: 600; opacity: .85; line-height: 1.45; }
 
 /* ---------- سبک گرادیان (پیش‌فرض) ---------- */
-.promo-banner-preview .promo-banner--gradient.promo-banner--accent {
-    background: linear-gradient(135deg, var(--promo-accent), color-mix(in srgb, var(--promo-accent) 55%, var(--promo-gold)));
-    color: var(--promo-accent-contrast);
-}
-.promo-banner-preview .promo-banner--gradient.promo-banner--gold {
-    background: linear-gradient(135deg, var(--promo-gold), #ffc53d);
-    color: var(--promo-dark);
+.promo-banner-preview .promo-banner--gradient {
+    background: linear-gradient(135deg, var(--banner-tone), var(--banner-tone-end));
+    color: var(--banner-on);
 }
 .promo-banner-preview .promo-banner--gradient .promo-banner-icon,
-.promo-banner-preview .promo-banner--coupon .promo-banner-icon { background: rgba(255, 255, 255, .16); }
-.promo-banner-preview .promo-banner--gradient.promo-banner--gold .promo-banner-icon,
-.promo-banner-preview .promo-banner--coupon.promo-banner--gold .promo-banner-icon { background: rgba(26, 32, 44, .08); }
+.promo-banner-preview .promo-banner--coupon .promo-banner-icon { background: color-mix(in srgb, var(--banner-on) 16%, transparent); }
 
 /* ---------- سبک نئومورفیک ---------- */
 .promo-banner-preview .promo-banner--neumorphic {
@@ -58,10 +62,8 @@
     color: #2d3748;
     box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
 }
-.promo-banner-preview .promo-banner--neumorphic.promo-banner--accent .promo-banner-icon { background: rgba(108, 99, 255, .13); color: var(--promo-accent); }
-.promo-banner-preview .promo-banner--neumorphic.promo-banner--gold .promo-banner-icon { background: rgba(245, 166, 35, .16); color: var(--promo-gold); }
-.promo-banner-preview .promo-banner--neumorphic.promo-banner--accent .promo-banner-title { color: var(--promo-accent); }
-.promo-banner-preview .promo-banner--neumorphic.promo-banner--gold .promo-banner-title { color: var(--promo-gold); }
+.promo-banner-preview .promo-banner--neumorphic .promo-banner-icon { background: color-mix(in srgb, var(--banner-tone) 13%, transparent); color: var(--banner-tone); }
+.promo-banner-preview .promo-banner--neumorphic .promo-banner-title { color: var(--banner-tone); }
 
 /* ---------- سبک مینیمال ---------- */
 .promo-banner-preview .promo-banner--minimal {
@@ -69,44 +71,31 @@
     color: #2d3748;
     border-color: rgba(45, 55, 72, .18);
 }
-.promo-banner-preview .promo-banner--minimal.promo-banner--accent .promo-banner-title { color: var(--promo-accent); }
-.promo-banner-preview .promo-banner--minimal.promo-banner--gold .promo-banner-title { color: var(--promo-gold); }
-.promo-banner-preview .promo-banner--minimal .promo-banner-icon { background: transparent; color: #4a5568; }
-.promo-banner-preview .promo-banner--minimal.promo-banner--accent .promo-banner-icon { color: var(--promo-accent); }
-.promo-banner-preview .promo-banner--minimal.promo-banner--gold .promo-banner-icon { color: var(--promo-gold); }
+.promo-banner-preview .promo-banner--minimal .promo-banner-title { color: var(--banner-tone); }
+.promo-banner-preview .promo-banner--minimal .promo-banner-icon { background: transparent; color: var(--banner-tone); }
 
 /* ---------- سبک تیره لوکس ---------- */
 .promo-banner-preview .promo-banner--dark {
     background: linear-gradient(140deg, #171c26, #232c3d);
     color: #ffffff;
-    border-color: rgba(255, 255, 255, .07);
+    border-color: color-mix(in srgb, var(--banner-tone) 45%, transparent);
     box-shadow: 0 8px 18px rgba(0, 0, 0, .22);
 }
-.promo-banner-preview .promo-banner--dark.promo-banner--accent { border-color: rgba(108, 99, 255, .45); }
-.promo-banner-preview .promo-banner--dark.promo-banner--gold { border-color: rgba(245, 166, 35, .5); }
-.promo-banner-preview .promo-banner--dark.promo-banner--accent .promo-banner-title { color: #ffffff; }
-.promo-banner-preview .promo-banner--dark.promo-banner--gold .promo-banner-title { color: #ffc53d; }
+.promo-banner-preview .promo-banner--dark .promo-banner-title { color: var(--banner-title-bright); }
 .promo-banner-preview .promo-banner--dark .promo-banner-subtitle { color: rgba(255, 255, 255, .72); }
-.promo-banner-preview .promo-banner--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); color: #ffffff; }
-.promo-banner-preview .promo-banner--dark.promo-banner--accent .promo-banner-icon { color: var(--promo-accent); }
-.promo-banner-preview .promo-banner--dark.promo-banner--gold .promo-banner-icon { color: var(--promo-gold); }
+.promo-banner-preview .promo-banner--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); color: var(--banner-tone); }
 
 /* ---------- سبک کوپنی ---------- */
-.promo-banner-preview .promo-banner--coupon { border-radius: 12px; }
-.promo-banner-preview .promo-banner--coupon.promo-banner--accent {
-    background: linear-gradient(135deg, var(--promo-accent), color-mix(in srgb, var(--promo-accent) 55%, var(--promo-gold)));
-    color: var(--promo-accent-contrast);
-}
-.promo-banner-preview .promo-banner--coupon.promo-banner--gold {
-    background: linear-gradient(135deg, var(--promo-gold), #ffc53d);
-    color: var(--promo-dark);
+.promo-banner-preview .promo-banner--coupon {
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--banner-tone), var(--banner-tone-end));
+    color: var(--banner-on);
 }
 .promo-banner-preview .promo-banner--coupon::after {
     content: '';
     position: absolute;
     inset-block: 10px;
     inset-inline-end: 2.8rem;
-    border-inline-start: 2px dashed rgba(255, 255, 255, .55);
+    border-inline-start: 2px dashed color-mix(in srgb, var(--banner-on) 55%, transparent);
     pointer-events: none;
 }
-.promo-banner-preview .promo-banner--coupon.promo-banner--gold::after { border-inline-start-color: rgba(26, 32, 44, .28); }

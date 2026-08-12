@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\PromoBannerRequest;
 readonly class PromoBannerDTO
 {
     public function __construct(
+        private string $icon,
         private array $title,
         private ?array $subtitle,
         private ?string $url,
@@ -21,6 +22,7 @@ readonly class PromoBannerDTO
         $subtitleEn = trim((string) $request->validated('subtitle.en', ''));
 
         return new self(
+            icon: $request->validated('icon', 'megaphone'),
             title: [
                 'fa' => (string) $request->validated('title.fa', ''),
                 'en' => (string) $request->validated('title.en', ''),
@@ -36,6 +38,11 @@ readonly class PromoBannerDTO
     }
 
     // Getters
+    public function getIcon(): string
+    {
+        return $this->icon;
+    }
+
     public function getTitle(): array
     {
         return $this->title;

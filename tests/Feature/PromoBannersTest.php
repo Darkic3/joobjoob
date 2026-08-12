@@ -29,6 +29,7 @@ class PromoBannersTest extends TestCase
     private function makeBanner(array $overrides = []): PromoBanner
     {
         return PromoBanner::create(array_merge([
+            'icon' => 'megaphone',
             'title' => ['fa' => 'ارسال رایگان', 'en' => 'Free Shipping'],
             'subtitle' => ['fa' => 'برای خرید بالای ۵۰۰ هزار تومان', 'en' => 'On orders over 500K'],
             'url' => null,
@@ -98,6 +99,17 @@ class PromoBannersTest extends TestCase
         $this->get('/en')->assertOk()->assertSee('عبارت فارسی یکتا');
     }
 
+    public function test_banner_renders_its_icon(): void
+    {
+        $this->makeBanner(['icon' => 'gift']);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        // آیکون باید در کامپوننت SVG رندر شود — مسیر مخصوص آیکون هدیه
+        $this->assertStringContainsString('stroke-linecap="round"', $html);
+        $this->assertStringContainsString('rect x="3" y="8" width="18"', $html);
+    }
+
     public function test_site_shows_max_four_banners(): void
     {
         foreach (range(1, 5) as $i) {
@@ -111,25 +123,67 @@ class PromoBannersTest extends TestCase
 
     // ── CRUD ادمین ─────────────────────────────────────────────
 
-    public function test_admin_can_create_banner(): void
+    public function test_admin_can_create_banner_with_icon_and_tone(): void
     {
         $this->actingAsSuperAdmin();
 
         $this->post(route('admin.promo-banners.store'), [
+            'icon' => 'fire',
             'title' => ['fa' => 'جشنواره پاییز', 'en' => 'Autumn Sale'],
             'subtitle' => ['fa' => 'تا ۴۰٪ تخفیف', 'en' => 'Up to 40% off'],
             'url' => 'https://example.com/sale',
             'style' => 'dark',
-            'tone' => 'gold',
+            'tone' => 'violet',
             'is_active' => '1',
         ])->assertRedirect(route('admin.promo-banners.index'));
 
         $this->assertDatabaseHas('promo_banners', [
+            'icon' => 'fire',
             'style' => 'dark',
-            'tone' => 'gold',
+            'tone' => 'violet',
             'url' => 'https://example.com/sale',
             'is_active' => 1,
         ]);
+    }
+
+    public function test_admin_create_rejects_invalid_icon(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $this->post(route('admin.promo-banners.store'), [
+            'icon' => 'spaceship',
+            'title' => ['fa' => 'بنر تست'],
+            'style' => 'gradient',
+            'tone' => 'accent',
+        ])->assertSessionHasErrors('icon');
+    }
+
+    public function test_admin_create_rejects_invalid_tone(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $this->post(route('admin.promo-banners.store'), [
+            'icon' => 'megaphone',
+            'title' => ['fa' => 'بنر تست'],
+            'style' => 'gradient',
+            'tone' => 'rainbow',
+        ])->assertSessionHasErrors('tone');
+    }
+
+    public function test_all_new_tones_are_accepted(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        foreach (['emerald', 'rose', 'blue', 'orange', 'violet'] as $tone) {
+            $this->post(route('admin.promo-banners.store'), [
+                'icon' => 'truck',
+                'title' => ['fa' => "بنر $tone"],
+                'style' => 'gradient',
+                'tone' => $tone,
+            ])->assertRedirect(route('admin.promo-banners.index'));
+        }
+
+        $this->assertSame(5, PromoBanner::whereIn('tone', ['emerald', 'rose', 'blue', 'orange', 'violet'])->count());
     }
 
     public function test_admin_create_requires_fa_title(): void
@@ -149,6 +203,7 @@ class PromoBannersTest extends TestCase
         $banner = $this->makeBanner();
 
         $this->put(route('admin.promo-banners.update', $banner), [
+            'icon' => 'star',
             'title' => ['fa' => 'بنر به‌روز شده', 'en' => 'Updated Banner'],
             'subtitle' => ['fa' => 'زیرنویس جدید', 'en' => 'New subtitle'],
             'url' => '',

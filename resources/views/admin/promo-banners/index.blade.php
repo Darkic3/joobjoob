@@ -128,6 +128,7 @@
                         @if(auth()->user()->canAccess('admin.promo-banners.reorder'))
                             <th class="px-3 py-4 w-10 text-center">{{ __('admin.promo_banners.order_col') }}</th>
                         @endif
+                        <th class="px-6 py-4 w-14 text-center">{{ __('admin.promo_banners.icon') }}</th>
                         <th class="px-6 py-4">{{ __('admin.promo_banners.title_subtitle') }}</th>
                         <th class="px-6 py-4 w-32">{{ __('admin.promo_banners.style') }}</th>
                         <th class="px-6 py-4 w-28">{{ __('admin.promo_banners.tone') }}</th>
@@ -154,6 +155,12 @@
                                 </td>
                             @endif
 
+                            <td class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                <span class="inline-grid place-items-center w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700/60">
+                                    <x-promo-banner-icon :icon="$banner->icon" :size="18"/>
+                                </span>
+                            </td>
+
                             <td class="px-6 py-4">
                                 <div class="font-bold text-gray-800 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                     {{ Str::limit($banner->trans('title'), 40) }}
@@ -172,8 +179,8 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg {{ $banner->tone === 'gold' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400' : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400' }}">
-                                    <span class="w-2 h-2 rounded-full {{ $banner->tone === 'gold' ? 'bg-amber-500' : 'bg-indigo-500' }}"></span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                    <span class="promo-banner--{{ $banner->tone }} w-2 h-2 rounded-full" style="background: var(--banner-tone)"></span>
                                     {{ __('admin.promo_banners.tone_options.'.$banner->tone) }}
                                 </span>
                             </td>
@@ -213,7 +220,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->canAccess('admin.promo-banners.reorder') ? 7 : 6 }}" class="px-6 py-16 text-center">
+                            <td colspan="{{ auth()->user()->canAccess('admin.promo-banners.reorder') ? 8 : 7 }}" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
                                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

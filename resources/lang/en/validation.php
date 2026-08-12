@@ -281,6 +281,7 @@ return [
             'is_active_boolean' => 'The active status value must be true or false.',
         ],
         'promo_banner' => [
+            'icon_in' => 'The selected banner icon is invalid.',
             'title_fa_required' => 'The Persian banner title is required.',
             'title_fa_max' => 'The Persian banner title must not exceed 255 characters.',
             'url_url' => 'The banner link must be a valid URL.',

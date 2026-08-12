@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\PromoBanner;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PromoBannerRequest extends FormRequest
@@ -14,6 +15,7 @@ class PromoBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'icon' => 'required|string|in:'.implode(',', PromoBanner::ICONS),
             'title' => 'required|array',
             'title.fa' => 'required|string|max:255',
             'title.en' => 'nullable|string|max:255',
@@ -22,7 +24,7 @@ class PromoBannerRequest extends FormRequest
             'subtitle.en' => 'nullable|string|max:500',
             'url' => 'nullable|url|max:500',
             'style' => 'required|in:gradient,neumorphic,minimal,dark,coupon',
-            'tone' => 'required|in:accent,gold',
+            'tone' => 'required|in:'.implode(',', PromoBanner::TONES),
             'is_active' => 'boolean',
         ];
     }
@@ -30,6 +32,7 @@ class PromoBannerRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'icon.in' => __('validation.requests.promo_banner.icon_in'),
             'title.fa.required' => __('validation.requests.promo_banner.title_fa_required'),
             'title.fa.max' => __('validation.requests.promo_banner.title_fa_max'),
             'url.url' => __('validation.requests.promo_banner.url_url'),

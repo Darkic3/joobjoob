@@ -7,7 +7,23 @@ use Illuminate\Support\Facades\Cache;
 
 class PromoBanner extends Model
 {
+    /**
+     * آیکون‌های از پیش‌طراحی‌شده برای بنرها (منبع واحد حقیقت — برای فرم و اعتبارسنجی)
+     */
+    public const ICONS = [
+        'megaphone', 'truck', 'ticket', 'gift', 'percent',
+        'star', 'fire', 'lightning', 'heart', 'sparkles',
+    ];
+
+    /**
+     * رنگ‌های مجاز هر بنر (کلاس .promo-banner--{tone} متغیرهای رنگ را تعریف می‌کند)
+     */
+    public const TONES = [
+        'accent', 'gold', 'emerald', 'rose', 'blue', 'orange', 'violet',
+    ];
+
     protected $fillable = [
+        'icon',
         'title',
         'subtitle',
         'url',

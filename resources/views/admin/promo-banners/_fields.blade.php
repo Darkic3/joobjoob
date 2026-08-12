@@ -1,4 +1,10 @@
-@props(['promoBanner' => null])
+@props([
+    'promoBanner' => null,
+    'bannerIcons' => \App\Models\PromoBanner::ICONS,
+    'bannerTones' => \App\Models\PromoBanner::TONES,
+])
+
+@php($currentIcon = old('icon', $promoBanner->icon ?? 'megaphone'))
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-5">
@@ -12,8 +18,8 @@
             <div class="promo-banner-preview">
                 <div id="pb-live-preview"
                      class="promo-banner promo-banner--{{ old('style', $promoBanner->style ?? 'gradient') }} promo-banner--{{ old('tone', $promoBanner->tone ?? 'accent') }}">
-                    <span class="promo-banner-icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
+                    <span class="promo-banner-icon" id="pb-preview-icon" aria-hidden="true">
+                        <x-promo-banner-icon :icon="$currentIcon" :size="22"/>
                     </span>
                     <span class="promo-banner-body">
                         <span class="promo-banner-title" data-digit-raw>{{ old('title.fa', $promoBanner->title['fa'] ?? '') ?: __('admin.promo_banners.title_ph') }}</span>
@@ -87,6 +93,27 @@
             </h3>
 
             <div class="space-y-4">
+                {{-- آیکون (از پیش‌طراحی‌شده) --}}
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.promo_banners.field_icon') }}</label>
+                    <input type="hidden" name="icon" id="pb_icon" value="{{ $currentIcon }}">
+                    <div class="grid grid-cols-5 gap-2" id="pb-icon-picker" role="radiogroup" aria-label="{{ __('admin.promo_banners.field_icon') }}">
+                        @foreach($bannerIcons as $iconKey)
+                            <button type="button" role="radio" data-banner-icon="{{ $iconKey }}"
+                                    aria-checked="{{ $currentIcon === $iconKey ? 'true' : 'false' }}"
+                                    title="{{ __('admin.promo_banners.icons.'.$iconKey) }}"
+                                    class="flex items-center justify-center w-full aspect-square rounded-xl border transition-all duration-150 {{ $currentIcon === $iconKey
+                                        ? 'border-primary-500 text-primary-600 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500/30'
+                                        : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-primary-400 hover:text-primary-600' }}">
+                                <x-promo-banner-icon :icon="$iconKey" :size="20"/>
+                            </button>
+                        @endforeach
+                    </div>
+                    @error('icon')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 {{-- سبک طراحی --}}
                 <div class="space-y-1.5">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.promo_banners.field_style') }}</label>
@@ -106,7 +133,7 @@
                 <div class="space-y-1.5">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.promo_banners.field_tone') }}</label>
                     <select id="pb_tone" name="tone" class="input-custom w-full">
-                        @foreach(['accent', 'gold'] as $toneKey)
+                        @foreach($bannerTones as $toneKey)
                             <option value="{{ $toneKey }}" @selected(old('tone', $promoBanner->tone ?? 'accent') === $toneKey)>
                                 {{ __('admin.promo_banners.tone_options.'.$toneKey) }}
                             </option>
@@ -149,7 +176,7 @@
 
 @push('scripts')
     <script>
-        // پیش‌نمایش زنده — همگام‌سازی متن و کلاس‌های سبک/رنگ با فرم
+        // پیش‌نمایش زنده — همگام‌سازی متن، آیکون و کلاس‌های سبک/رنگ با فرم
         document.addEventListener('DOMContentLoaded', function () {
             const preview = document.getElementById('pb-live-preview');
             if (!preview) return;
@@ -160,6 +187,9 @@
             const subEn = document.getElementById('pb_subtitle_en');
             const styleSel = document.getElementById('pb_style');
             const toneSel = document.getElementById('pb_tone');
+            const iconInput = document.getElementById('pb_icon');
+            const iconPicker = document.getElementById('pb-icon-picker');
+            const previewIcon = document.getElementById('pb-preview-icon');
 
             const titleEl = preview.querySelector('.promo-banner-title');
             const subEl = preview.querySelector('.promo-banner-subtitle');
@@ -180,7 +210,7 @@
                     preview.classList.add('promo-banner--' + styleSel.value);
                 }
                 if (toneSel) {
-                    preview.classList.remove('promo-banner--accent', 'promo-banner--gold');
+                    preview.classList.remove('promo-banner--accent', 'promo-banner--gold', 'promo-banner--emerald', 'promo-banner--rose', 'promo-banner--blue', 'promo-banner--orange', 'promo-banner--violet');
                     preview.classList.add('promo-banner--' + toneSel.value);
                 }
             };
@@ -190,6 +220,27 @@
             });
             if (styleSel) styleSel.addEventListener('change', sync);
             if (toneSel) toneSel.addEventListener('change', sync);
+
+            // انتخابگر آیکون — کلیک روی هر دکمه: انتخاب + تعویض آیکون پیش‌نمایش
+            if (iconPicker && iconInput && previewIcon) {
+                const buttons = [...iconPicker.querySelectorAll('[data-banner-icon]')];
+                const select = function (btn) {
+                    buttons.forEach(function (b) {
+                        b.classList.remove('border-primary-500', 'text-primary-600', 'bg-primary-50', 'dark:bg-primary-900/20', 'ring-2', 'ring-primary-500/30');
+                        b.classList.add('border-gray-200', 'dark:border-gray-700', 'text-gray-500', 'dark:text-gray-400', 'hover:border-primary-400', 'hover:text-primary-600');
+                        b.setAttribute('aria-checked', 'false');
+                    });
+                    btn.classList.remove('border-gray-200', 'dark:border-gray-700', 'text-gray-500', 'dark:text-gray-400', 'hover:border-primary-400', 'hover:text-primary-600');
+                    btn.classList.add('border-primary-500', 'text-primary-600', 'bg-primary-50', 'dark:bg-primary-900/20', 'ring-2', 'ring-primary-500/30');
+                    btn.setAttribute('aria-checked', 'true');
+                    iconInput.value = btn.dataset.bannerIcon;
+                    const svg = btn.querySelector('svg');
+                    if (svg && previewIcon) previewIcon.innerHTML = svg.outerHTML;
+                };
+                buttons.forEach(function (btn) {
+                    btn.addEventListener('click', function () { select(btn); });
+                });
+            }
         });
     </script>
 @endpush

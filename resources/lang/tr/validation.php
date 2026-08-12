@@ -280,6 +280,7 @@ return [
             'is_active_boolean' => 'Aktiflik durumu değeri doğru veya yanlış olmalıdır.',
         ],
         'promo_banner' => [
+            'icon_in' => 'Seçilen afiş simgesi geçersiz.',
             'title_fa_required' => 'Farsça afiş başlığı zorunludur.',
             'title_fa_max' => 'Farsça afiş başlığı 255 karakteri aşmamalıdır.',
             'url_url' => 'Afiş bağlantısı geçerli bir URL olmalıdır.',
