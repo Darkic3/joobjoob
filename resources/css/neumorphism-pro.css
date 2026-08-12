@@ -1634,6 +1634,9 @@ html, body {
                 background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
 }
 .promo-banner:hover { transform: translateY(-3px); }
+/* بنر بدون لینک — اصلاً کلیک‌پذیر نیست: بدون لیفت هاور و بدون نشانگر دست */
+.promo-banner--static:hover { transform: none; }
+.promo-banner--static { cursor: default; }
 .promo-banner-body { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
 .promo-banner-title { font-weight: 800; font-size: 1.02rem; line-height: 1.35; }
 .promo-banner-subtitle { font-size: .78rem; font-weight: 600; opacity: .85; line-height: 1.5; }

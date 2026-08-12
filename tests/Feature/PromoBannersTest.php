@@ -71,11 +71,15 @@ class PromoBannersTest extends TestCase
         $this->assertStringContainsString('promo-banner--coupon promo-banner--gold', $html);
     }
 
-    public function test_banner_fallback_link_to_products_index(): void
+    public function test_banner_without_url_is_not_clickable(): void
     {
         $this->makeBanner();
 
-        $this->get('/')->assertOk()->assertSee(localizedRoute('products.index'), false);
+        $html = $this->get('/')->assertOk()->getContent();
+
+        // بدون لینک: به جای <a> یک <div> رندر می‌شود (کلاس promo-banner--static) و لینک پیش‌فرض به محصولات ندارد
+        $this->assertStringContainsString('promo-banner--static', $html);
+        $this->assertStringNotContainsString('<a href="'.localizedRoute('products.index').'" class="promo-banner', $html);
     }
 
     public function test_banner_uses_custom_url(): void
