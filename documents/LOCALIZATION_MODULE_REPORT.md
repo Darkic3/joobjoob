@@ -104,11 +104,11 @@
 | 2 | جهت صفحه (RTL/LTR) | `dir` روی `<html>` و `direction` در ویوها | `layouts/admin/app.blade.php`، `layouts/site/app.blade.php`، `errors/429`، `admin/auth/login` | `LocaleService::dir($locale)` به‌جای `config('app.rtl_locales')` |
 | 3 | رشته‌های UI | ترجمه‌ی متن‌های رابط کاربری | `resources/lang/{code}/*.php` | پوشه برای هر زبان؛ زبان جدید = پوشه جدید (کامند `lang:new`) |
 | 4 | دیتای ترجمه‌پذیر مدل‌ها | ستون‌های JSON با کلید کد زبان | ستون‌های `json` مدل‌ها (Product, Brand, …) + متد `trans()`/accessor | fallback `$value[locale] ?? $value['fa'] ?? null` (موجود — بدون تغییر) |
-| 5 | تاریخ/تقویم | شمسی برای fa/ar، میلادی برای بقیه | `app/Helpers/date.php` → `show_date()` | بر اساس `LocaleService::isJalali($locale)` به‌جای `in_array($locale, ['fa','ar'])` |
+| 5 | تاریخ/تقویم | شمسی برای fa، قمری برای ar، میلادی برای بقیه | `app/Helpers/date.php` → `show_date()` | بر اساس `LocaleService::calendar($locale)` (jalali/hijri/gregorian) — داده‌درایو |
 | 6 | اعداد/ارقام | ارقام فارسی/عربی/لاتین + جداکننده‌ی هزارگان | `resources/js/localize-digits.js` | بر اساس `lang` روی `<html>` (موجود)؛ برچسب `data-digits` اختیاری برای override |
 | 7 | نام ماه/روز میلادی | نام محلی ماه‌ها در زبان‌های غیرفارسی | `show_date()` → `Carbon->translatedFormat()` | `->locale($locale)` (موجود — برای زبان جدید خودکار است) |
-| 8 | پیکر تقویم شمسی | fa/ar → جلالی‌پیکر، بقیه → `datetime-local` | `resources/views/components/admin/jalali-datetime.blade.php` | `LocaleService::isJalali()` به‌جای `in_array(['fa','ar'])` |
-| 9 | تایمر شمارش معکوس | ارقام اولیه‌ی `۰۰` | `resources/views/components/countdown-timer.blade.php` | `LocaleService::isJalali()` (یا خانواده‌ی رقمی) |
+| 8 | پیکر تقویم شمسی | fa → جلالی‌پیکر، بقیه (شامل ar) → `datetime-local` | `resources/views/components/admin/jalali-datetime.blade.php` | `LocaleService::isJalali()` به‌جای `in_array(['fa','ar'])` |
+| 9 | تایمر شمارش معکوس | ارقام اولیه‌ی `۰۰` | `resources/views/components/countdown-timer.blade.php` | خانواده‌ی رقمی (`localize-digits.js`) — بدون وابستگی به تقویم |
 | 10 | سوییچر زبان سایت | لیست زبان‌های قابل انتخاب | `resources/views/components/header.blade.php` + `resources/js/language.js` | `LocaleService::active()`؛ مخفی وقتی تک‌زبانه |
 | 11 | سوییچر زبان ادمین | لیست زبان‌های قابل انتخاب | `resources/views/components/admin/header.blade.php` + صفحه‌ی login | `LocaleService::active()` |
 | 12 | زبان کاربر | ترجیح هر کاربر | ستون `users.locale` | بدون تغییر (میدلور می‌خواند؛ مقدار غیرفعال → fallback) |
@@ -133,13 +133,13 @@ return [
     // پیش‌فرض زبان‌های ناشناخته (خارج از کاتالوگ) — منطقی و امن
     '_default' => [
         'dir'      => 'ltr',
-        'calendar' => 'gregorian',   // jalali | gregorian
+        'calendar' => 'gregorian',   // jalali | hijri | gregorian
         'digits'   => 'latin',       // persian | arabic | latin
     ],
 
     // کاتالوگ زبان‌های شناخته‌شده
     'fa' => ['native' => 'فارسی',   'dir' => 'rtl',  'calendar' => 'jalali',    'digits' => 'persian'],
-    'ar' => ['native' => 'العربية',  'dir' => 'rtl',  'calendar' => 'jalali',    'digits' => 'arabic'],
+    'ar' => ['native' => 'العربية',  'dir' => 'rtl',  'calendar' => 'hijri',     'digits' => 'arabic'],
     'en' => ['native' => 'English',  'dir' => 'ltr',  'calendar' => 'gregorian', 'digits' => 'latin'],
     'tr' => ['native' => 'Türkçe',   'dir' => 'ltr',  'calendar' => 'gregorian', 'digits' => 'latin'],
     // زبان جدید شناخته‌شده را اینجا اضافه کنید (مثلاً de/ru/…)
@@ -312,13 +312,14 @@ class LocaleService
 
     public function isRtl(string $code): bool { return $this->dir($code) === 'rtl'; }
 
-    /** تقویم: jalali | gregorian (از کاتالوگ) */
+    /** تقویم: jalali | hijri | gregorian (از کاتالوگ) */
     public function calendar(string $code): string
     {
         return config("languages.{$code}.calendar", config('languages._default.calendar', 'gregorian'));
     }
 
     public function isJalali(string $code): bool { return $this->calendar($code) === 'jalali'; }
+    public function isHijri(string $code): bool  { return $this->calendar($code) === 'hijri'; }
 
     /** خانواده‌ی رقمی: persian | arabic | latin */
     public function digitFamily(string $code): string
@@ -454,7 +455,10 @@ class SetLocale
 ## ۱۱) تاریخ و تقویم (`show_date`)
 
 **قبل (هاردکد):** `in_array($locale, ['fa', 'ar'])` → شمسی.
-**بعد (داده‌محور):** `LocaleService::isJalali($locale)` → شمسی، وگرنه میلادی با `Carbon::translatedFormat` به زبان محلی.
+**بعد (داده‌محور):** `LocaleService::calendar($locale)` → سه شاخه:
+  - `jalali` (fa) → `jdate_format` — ارقام فارسی + تقویم شمسی
+  - `hijri` (ar) → `hijri_date` (هِلپر `app/Helpers/hijri.php`) — تقویم اسلامیِ مدنی/جدولی با نام ماه عربی و ارقام عربی
+  - `gregorian` → `Carbon::translatedFormat` به زبان محلی
 
 ```php
 function show_date(string|int|DateTimeInterface|null $timestamp = null, string $format = 'Y/m/d H:i'): string
@@ -462,8 +466,13 @@ function show_date(string|int|DateTimeInterface|null $timestamp = null, string $
     $locale = app()->getLocale();
     // … (پارس timestamp به همان روش فعلی) …
 
-    if (app(LocaleService::class)->isJalali($locale) && function_exists('jdate_format')) {
-        return jdate_format($format, $ts);   // خروجی: ارقام فارسی + تقویم شمسی
+    $calendar = locale()->calendar($locale);
+
+    if ($calendar === 'jalali' && function_exists('jdate_format')) {
+        return jdate_format($format, $ts);   // شمسی با ارقام فارسی
+    }
+    if ($calendar === 'hijri' && function_exists('hijri_date')) {
+        return hijri_date($format, $ts);     // قمری با نام ماه عربی و ارقام عربی
     }
 
     return Carbon::createFromTimestamp($ts, 'Asia/Tehran')
@@ -472,7 +481,9 @@ function show_date(string|int|DateTimeInterface|null $timestamp = null, string $
 }
 ```
 
-> نتیجه برای زبان جدید `de` (در کاتالوگ ناشناخته): `_default` → میلادی + لاتین + نام ماه انگلیسی (اگر فایل locale موریانه نباشد، Carbon به `en` fallback می‌کند) — بدون هیچ کد اضافه.
+> نتیجه برای زبان جدید `de` (در کاتالوگ ناشناخته): `_default` → میلادی + لاتین + نام ماه انگلیسی (اگر فایل locale نباشد، Carbon به `en` fallback می‌کند) — بدون هیچ کد اضافه. اگر یک زبانِ قمریِ جدید بخواهید، کافی است `calendar => 'hijri'` در کاتالوگ ثبت کنید.
+
+**الگوریتم قمری (`hijri_date`):** تقویم اسلامیِ مدنی (Islamic civil / tabular) با الگوریتم قطعی و بدون ICU — `1 محرم 1445 = 19 ژوئیهٔ 2023`. نمایش در `Asia/Tehran` مثل jdate.
 
 **نکته‌ی منطقه زمانی:** دیتابیس همیشه میلادی/UTC است؛ نمایش در `Asia/Tehran`. `jdate_format` همیشه تهران است — این هماهنگی عمدی است (از قبل مستند شده).
 
@@ -501,8 +512,8 @@ function show_date(string|int|DateTimeInterface|null $timestamp = null, string $
 ## ۱۳) کامپوننت‌های وابسته به تقویم
 
 ### ۱۳.۱) `jalali-datetime` (پیکر شمسی)
-- **fa/ar (isJalali):** input شمسی + `jalalidatepicker.min.js` + فیلد hidden میلادی → دیتابیس همیشه میلادی.
-- **سایر:** `datetime-local` مستقیم.
+- **fa (isJalali):** input شمسی + `jalalidatepicker.min.js` + فیلد hidden میلادی → دیتابیس همیشه میلادی.
+- **سایر (شامل ar که حالا قمری است):** `datetime-local` مستقیم — مقدار همان میلادیِ دیتابیس است، امن و بدون تبدیل.
 - تغییر: به‌جای `in_array(app()->getLocale(), ['fa','ar'])` → `app(LocaleService::class)->isJalali(app()->getLocale())`.
 
 ### ۱۳.۲) `countdown-timer`

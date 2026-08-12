@@ -137,7 +137,11 @@ class LocaleService
     }
 
     /**
-     * خانواده‌ی تقویم: jalali | gregorian (از کاتالوگ).
+     * خانواده‌ی تقویم: jalali | hijri | gregorian (از کاتالوگ).
+     *
+     *   - jalali → شمسی (fa و هر زبانِ شمسیِ ثبت‌شده) — jdate_format
+     *   - hijri  → قمری (ar و هر زبانِ قمریِ ثبت‌شده) — hijri_date
+     *   - gregorian → میلادی (پیش‌فرض) — Carbon::translatedFormat
      */
     public function calendar(string $code): string
     {
@@ -147,6 +151,11 @@ class LocaleService
     public function isJalali(string $code): bool
     {
         return $this->calendar($code) === 'jalali';
+    }
+
+    public function isHijri(string $code): bool
+    {
+        return $this->calendar($code) === 'hijri';
     }
 
     /**

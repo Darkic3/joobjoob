@@ -88,8 +88,12 @@ class LocaleServiceTest extends TestCase
         $this->seedLanguages();
 
         $this->assertTrue(app(LocaleService::class)->isJalali('fa'));
-        $this->assertTrue(app(LocaleService::class)->isJalali('ar'));
+        $this->assertFalse(app(LocaleService::class)->isJalali('ar'));
         $this->assertFalse(app(LocaleService::class)->isJalali('en'));
+
+        $this->assertTrue(app(LocaleService::class)->isHijri('ar'));
+        $this->assertFalse(app(LocaleService::class)->isHijri('fa'));
+        $this->assertFalse(app(LocaleService::class)->isHijri('en'));
 
         $this->assertSame('persian', app(LocaleService::class)->digitFamily('fa'));
         $this->assertSame('arabic', app(LocaleService::class)->digitFamily('ar'));
@@ -97,7 +101,23 @@ class LocaleServiceTest extends TestCase
 
         // زبان ناشناخته → _default (gregorian/latin)
         $this->assertFalse(app(LocaleService::class)->isJalali('xx'));
+        $this->assertFalse(app(LocaleService::class)->isHijri('xx'));
         $this->assertSame('latin', app(LocaleService::class)->digitFamily('xx'));
+    }
+
+    public function test_show_date_renders_hijri_for_arabic(): void
+    {
+        $this->seedLanguages();
+        app()->setLocale('ar');
+
+        $ts = strtotime('2026-08-06 12:00:00');
+
+        // تقویم قمری + نام ماه عربی + ارقام عربی
+        $this->assertSame('٢١ صفر ١٤٤٨', show_date($ts, 'd F Y'));
+        $this->assertSame('١٤٤٨/٠٢/٢١', show_date($ts, 'Y/m/d'));
+
+        // عربی هنوز میلادی نیست — فقط تقویم عوض شده
+        $this->assertStringNotContainsString('August', show_date($ts, 'd F Y'));
     }
 
     public function test_single_language_mode_when_at_most_one_active(): void

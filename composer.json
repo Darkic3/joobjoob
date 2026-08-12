@@ -26,6 +26,7 @@
         },
         "files": [
             "app/Helpers/jdate.php",
+            "app/Helpers/hijri.php",
             "app/Helpers/date.php",
             "app/Helpers/settings.php",
             "app/Helpers/locale.php"

@@ -131,5 +131,10 @@ class HomeBlogSectionTest extends TestCase
         $this->get('/en')
             ->assertOk()
             ->assertSee('August 2026');
+
+        // عربی (پیشوند /ar) → تقویم قمری با نام ماه عربی و ارقام عربی
+        $this->get('/ar')
+            ->assertOk()
+            ->assertSee('٢١ صفر ١٤٤٨');
     }
 }

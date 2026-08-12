@@ -13,9 +13,11 @@
 |
 | کلیدها:
 |   dir      → rtl | ltr
-|   calendar → jalali | gregorian
+|   calendar → jalali | hijri | gregorian
 |   digits   → persian | arabic | latin
 */
+
+// تقویم‌ها: fa → شمسی (jdate)، ar → قمری (hijri)، بقیه → میلادی
 
 return [
     '_default' => [
@@ -25,7 +27,7 @@ return [
     ],
 
     'fa' => ['native' => 'فارسی',   'dir' => 'rtl',  'calendar' => 'jalali',    'digits' => 'persian'],
-    'ar' => ['native' => 'العربية',  'dir' => 'rtl',  'calendar' => 'jalali',    'digits' => 'arabic'],
+    'ar' => ['native' => 'العربية',  'dir' => 'rtl',  'calendar' => 'hijri',     'digits' => 'arabic'],
     'en' => ['native' => 'English',  'dir' => 'ltr',  'calendar' => 'gregorian', 'digits' => 'latin'],
     'tr' => ['native' => 'Türkçe',   'dir' => 'ltr',  'calendar' => 'gregorian', 'digits' => 'latin'],
 ];

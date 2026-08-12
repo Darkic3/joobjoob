@@ -256,11 +256,12 @@ badge (0.1s) → title (0.2s) → desc (0.3s) → image (0.3s) → btns (0.4s)
 - نکتهٔ ضد-حلقه: فقط وقتی متن واقعاً تغییر کرده بازنویسی می‌شود
 - API عمومی: `window.localizeDigits = { convert, isPersian, walk, digitFamily }`
 
-### ۹.۲ تاریخ (show_date + jdate)
-- دیتابیس همیشه میلادی/UTC — نمایش بر اساس زبان:
-  - تقویم `jalali` (فارسی/عربی/زبان‌های شمسی ثبت‌شده) → `jdate_format` با ارقام فارسی
+### ۹.۲ تاریخ (show_date + jdate + hijri)
+- دیتابیس همیشه میلادی/UTC — نمایش بر اساس تقویم زبان (`LocaleService::calendar`):
+  - تقویم `jalali` (فارسی و زبان‌های شمسی ثبت‌شده) → `jdate_format` با ارقام فارسی
+  - تقویم `hijri` (عربی) → `hijri_date` — تقویم اسلامیِ مدنی با نام ماه عربی و ارقام عربی (مثل `٢١ صفر ١٤٤٨`)
   - تقویم `gregorian` → `Carbon::translatedFormat` با نام ماهِ زبان محلی (en → English)
-- هر دو در timezone تهران تفسیر می‌شوند
+- هر سه در timezone تهران تفسیر می‌شوند
 - در جزئیات محصول: `show_date($review->created_at, 'd F Y')`
 
 ### ۹.۳ جهت (RTL/LTR)

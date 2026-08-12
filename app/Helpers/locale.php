@@ -8,6 +8,7 @@ if (! function_exists('locale')) {
      *     locale()->active()          // زبان‌های فعال
      *     locale()->defaultCode()     // کد زبان پیش‌فرض
      *     locale()->isJalali('fa')    // آیا تقویم شمسی؟
+     *     locale()->isHijri('ar')     // آیا تقویم قمری؟
      *     locale()->singleLanguageMode()
      */
     function locale(): LocaleService
