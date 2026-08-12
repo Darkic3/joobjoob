@@ -31,7 +31,7 @@
                         </a>
                         <span class="w-px h-3" style="background: var(--shadow-dark);"></span>
                     @endif
-                    <span class="mono">{{ $blog->created_at->translatedFormat('d M Y') }}</span>
+                    <span class="mono">{{ $blog->localizedDate() }}</span>
                     <span class="w-px h-3" style="background: var(--shadow-dark);"></span>
                     <span>{{ number_format($blog->views) }} {{ __('messages.views') }}</span>
                 </div>

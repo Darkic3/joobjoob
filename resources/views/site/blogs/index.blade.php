@@ -69,7 +69,7 @@
                             @endif
                             <div class="mt-auto pt-3 flex items-center justify-between">
                                 <span class="text-[11px] mono" style="color: var(--text-secondary);">
-                                    {{ $blog->created_at->translatedFormat('d M Y') }}
+                                    {{ $blog->localizedDate() }}
                                 </span>
                                 <a href="{{ localizedRoute('blogs.show', ['blog' => $blog->slug]) }}"
                                    class="text-[11px] font-bold hover:text-[var(--accent)] transition-colors">

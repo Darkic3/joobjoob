@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use Carbon\Carbon;
 use Database\Seeders\LanguageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -112,5 +113,23 @@ class HomeBlogSectionTest extends TestCase
             ->assertOk()
             ->assertSee('12,345', false)
             ->assertSee(__('messages.reading_time', ['minutes' => 3]));
+    }
+
+    public function test_blog_date_is_localized_per_active_language(): void
+    {
+        $blog = $this->makeBlog('date-post', 'مقاله با تاریخ');
+        $blog->created_at = Carbon::parse('2026-08-06 12:00:00');
+        $blog->save();
+
+        // فارسی (پیش‌فرض، بدون پیشوند) → تقویم جلالی با نام ماه فارسی
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('مرداد')
+            ->assertSee('۱۴۰۵');
+
+        // انگلیسی (پیشوند /en) → میلادی با نام ماه انگلیسی
+        $this->get('/en')
+            ->assertOk()
+            ->assertSee('August 2026');
     }
 }
