@@ -166,6 +166,7 @@ return [
             'footer_copyright' => 'نص حقوق التذييل',
             'footer_newsletter_title' => 'عنوان النشرة في التذييل',
             'default_theme' => 'الثيم الافتراضي للموقع',
+            'festive_mode' => 'الوضع الاحتفالي (تساقط قصاصات على الهيرو)',
         ],
     ],
 

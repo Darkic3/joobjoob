@@ -165,6 +165,7 @@ return [
             'footer_copyright' => 'متن کپی‌رایت فوتر',
             'footer_newsletter_title' => 'عنوان خبرنامه در فوتر',
             'default_theme' => 'تم پیش‌فرض سایت',
+            'festive_mode' => 'حالت جشن (بارش کانفتی روی هیرو)',
         ],
     ],
 

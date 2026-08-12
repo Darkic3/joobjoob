@@ -100,6 +100,14 @@
                                                                   rows="5"
                                                                   @if ($config['required'] ?? false) required @endif>{{ old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? null) }}</textarea>
 
+                                                        {{-- سوییچ بولی --}}
+                                                    @elseif(($config['type'] ?? 'text') === 'boolean')
+                                                        <div class="form-check form-switch fs-4">
+                                                            <input type="checkbox" class="form-check-input" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"
+                                                                   value="1"
+                                                                   @checked(old("settings.$fieldKey", $groupsValues[$tabKey][$fieldKey] ?? false))>
+                                                        </div>
+
                                                         {{-- اینپوت متنی --}}
                                                     @else
                                                         <input type="{{ $config['type'] ?? 'text' }}" name="settings[{{ $fieldKey }}]" id="{{ $fieldKey }}"

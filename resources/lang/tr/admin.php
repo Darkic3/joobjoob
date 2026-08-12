@@ -165,6 +165,7 @@ return [
             'footer_copyright' => 'Alt Bilgi Telif Metni',
             'footer_newsletter_title' => 'Alt Bilgi Bülten Başlığı',
             'default_theme' => 'Varsayılan Site Teması',
+            'festive_mode' => 'Kutlama Modu (hero üzerinde konfeti yağmuru)',
         ],
     ],
 

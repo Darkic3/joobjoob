@@ -284,6 +284,14 @@ return [
             'required' => false,
             'default' => 'light-neumorphism',
         ],
+        'festive_mode' => [
+            'label' => 'حالت جشن (بارش کانفتی روی هیرو)',
+            'type' => 'boolean',
+            'tab' => 'appearance',
+            'required' => false,
+            'default' => false,
+            'guide' => 'برای بلک فرایدی، نوروز و جشن‌ها بارش کانفتی طلایی روی اسلایدر هیرو فعال می‌شود.',
+        ],
 
     ],
 ];

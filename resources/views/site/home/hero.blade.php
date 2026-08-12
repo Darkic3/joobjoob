@@ -1,5 +1,10 @@
 <section class="hero-fullbleed relative mb-12 overflow-hidden">
 
+    {{-- حالت جشن: بارش کانفتی طلایی روی هیرو (از تنظیمات — تنظیم: festive_mode) --}}
+    @if(setting('festive_mode'))
+        <canvas id="festive-confetti" class="festive-confetti" aria-hidden="true"></canvas>
+    @endif
+
     {{-- پس‌زمینه: گرید و هاله روی خود .hero-swiper (::before / ::after) پیاده شده — div جدا لازم نیست --}}
 
     <div class="swiper hero-swiper relative z-10">

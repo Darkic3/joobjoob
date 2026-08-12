@@ -165,6 +165,7 @@ return [
             'footer_copyright' => 'Footer Copyright Text',
             'footer_newsletter_title' => 'Footer Newsletter Title',
             'default_theme' => 'Default Site Theme',
+            'festive_mode' => 'Festive Mode (confetti rain on hero)',
         ],
     ],
 
