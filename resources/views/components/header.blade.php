@@ -94,6 +94,21 @@
                 <span id="cart-count" class="site-badge">{{ $cartCount }}</span>
             </a>
 
+            {{-- حساب کاربری: مهمان → لاگین، عضو → پنل کاربری --}}
+            @auth
+                <a href="{{ localizedRoute('dashboard') }}" class="site-action-btn relative hidden lg:inline-flex"
+                   title="{{ auth()->user()->name }}" aria-label="{{ __('messages.dashboard') }}">
+                    <span class="site-account-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                </a>
+            @else
+                <a href="{{ localizedRoute('login') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+                   title="{{ __('messages.login') }}" aria-label="{{ __('messages.login') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0 18.9 18.9 0 0 1-3.55 2.55H8.05A18.9 18.9 0 0 1 4.5 20.25Z"/>
+                    </svg>
+                </a>
+            @endauth
+
             {{-- همبرگر مورف — فقط موبایل/تبلت --}}
             <button type="button" class="site-hamburger lg:hidden" data-menu-btn
                     aria-label="{{ __('messages.menu') }}" aria-expanded="false" aria-controls="site-menu">
@@ -125,6 +140,37 @@
                 <span class="site-menu-label">{{ __('messages.special_offers') }}</span>
             </a>
         </nav>
+
+        {{-- حساب کاربری — مهمان → لاگین، عضو → پنل کاربری --}}
+        <div class="site-menu-account">
+            @auth
+                <a href="{{ localizedRoute('dashboard') }}" class="site-menu-account-link">
+                    <span class="site-menu-account-icon">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                    <span class="site-menu-account-body">
+                        <span class="site-menu-account-title">{{ auth()->user()->name }}</span>
+                        <span class="site-menu-account-sub">{{ __('messages.dashboard') }}</span>
+                    </span>
+                    <svg class="site-menu-account-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            @else
+                <a href="{{ localizedRoute('login') }}" class="site-menu-account-link">
+                    <span class="site-menu-account-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0 18.9 18.9 0 0 1-3.55 2.55H8.05A18.9 18.9 0 0 1 4.5 20.25Z"/>
+                        </svg>
+                    </span>
+                    <span class="site-menu-account-body">
+                        <span class="site-menu-account-title">{{ __('messages.login') }}</span>
+                        <span class="site-menu-account-sub">{{ __('messages.login_subtitle') }}</span>
+                    </span>
+                    <svg class="site-menu-account-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            @endauth
+        </div>
 
         <div class="site-menu-footer">
             @if (count($locales) > 1)

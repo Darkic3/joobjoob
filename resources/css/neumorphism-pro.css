@@ -2240,12 +2240,101 @@ html, body {
     opacity: .85;
 }
 .site-menu-label { line-height: 1.15; }
+
+/* ردیف حساب کاربری در منوی موبایل — بین لینک‌ها و فوتر، با ورود پله‌ای */
+.site-menu-account {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .5s var(--ease-out), transform .5s var(--ease-spring);
+}
+.site-menu.open .site-menu-account { opacity: 1; transform: translateY(0); transition-delay: .28s; }
+.site-menu-account-link {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: .85rem 1.05rem;
+    border-radius: 1.25rem;
+    background: var(--bg-elevated);
+    box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light),
+                inset 0 1px 0 rgba(255, 255, 255, .4);
+    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+[data-theme="dark-neumorphism"] .site-menu-account-link,
+[data-theme="blue-theme"] .site-menu-account-link,
+[data-theme="green-theme"] .site-menu-account-link {
+    box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light),
+                inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+.site-menu-account-link:hover { transform: translateY(-2px); }
+.site-menu-account-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+}
+.site-menu-account-body {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    min-width: 0;
+}
+.site-menu-account-title {
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.site-menu-account-sub {
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.site-menu-account-arrow {
+    margin-inline-start: auto;
+    color: var(--text-secondary);
+    opacity: .7;
+    transition: transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-out);
+}
+.site-menu-account-link:hover .site-menu-account-arrow { transform: translateX(-3px); color: var(--accent); }
+[dir="ltr"] .site-menu-account-link:hover .site-menu-account-arrow { transform: translateX(3px); }
+
+/* آواتار حساب دسکتاپ — دایرهٔ گرادینتی با حرف اول نام */
+.site-account-avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--accent-contrast);
+    background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 62%, var(--gold)) 100%);
+    box-shadow:
+        0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+    transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
+}
+.site-action-btn:hover .site-account-avatar {
+    transform: scale(1.08) rotate(-4deg);
+    box-shadow:
+        0 8px 20px color-mix(in srgb, var(--accent) 52%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
 .site-menu-footer {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity .5s var(--ease-out), transform .5s var(--ease-spring);
 }
-.site-menu.open .site-menu-footer { opacity: 1; transform: translateY(0); transition-delay: .32s; }
+.site-menu.open .site-menu-footer { opacity: 1; transform: translateY(0); transition-delay: .38s; }
 .site-menu-langs { display: flex; flex-wrap: wrap; gap: .55rem; }
 .site-menu-lang {
     padding: .5rem 1.15rem;
@@ -2280,8 +2369,9 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .site-header, .site-logo-mark, .site-nav-link, .site-nav-link::after, .site-search-input,
     .site-lang-btn, .site-lang-chevron, .site-action-btn, .site-hamburger, .site-hamburger span,
-    .site-menu-backdrop, .site-menu-link, .site-menu-footer, .site-menu-lang {
+    .site-menu-backdrop, .site-menu-link, .site-menu-footer, .site-menu-lang, .site-menu-account,
+    .site-menu-account-link, .site-menu-account-arrow, .site-account-avatar {
         transition: none;
     }
-    .site-menu-link, .site-menu-footer { opacity: 1; transform: none; }
+    .site-menu-link, .site-menu-footer, .site-menu-account { opacity: 1; transform: none; }
 }

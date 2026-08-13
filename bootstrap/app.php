@@ -26,11 +26,11 @@ return Application::configure(basePath: dirname(__DIR__))
             SetTheme::class,
         ]);
 
-        // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین ادمین
+        // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین (ادمین یا سایت)
         $middleware->redirectGuestsTo(function (Request $request) {
             return str_starts_with($request->path(), 'admin')
                 ? route('admin.login')
-                : url('/');
+                : route('login');
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {

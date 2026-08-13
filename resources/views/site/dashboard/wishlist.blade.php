@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.site.app')
 @section('title', __('messages.wishlist'))
 @section('content')
 <h1 class="text-xl font-bold mb-6">{{ __('messages.wishlist') }}</h1>

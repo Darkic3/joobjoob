@@ -138,6 +138,17 @@ return [
     'register_agree' => 'Kayıt olarak şartları ve gizlilik politikasını kabul ediyorsunuz.',
     'already_member_title' => 'Zaten üyesiniz',
     'already_member_desc' => 'İndirim kodlarınız yakında kullanıcı panelinizde erişilebilir olacak.',
+    'login' => 'Giriş Yap',
+    'register' => 'Kayıt Ol',
+    'login_title' => 'Tekrar hoş geldiniz!',
+    'login_subtitle' => 'Devam etmek için hesabınıza giriş yapın',
+    'email' => 'E-posta',
+    'password' => 'Şifre',
+    'remember_me' => 'Beni hatırla',
+    'login_failed' => 'Kimlik bilgileri eşleşmiyor',
+    'logout' => 'Çıkış Yap',
+    'account' => 'Hesap',
+    'no_account_hint' => 'Henüz hesabınız yok mu? %10 indirim koduyla kayıt yakında gelecek',
 
     // Statik sayfalar
     'pages' => [

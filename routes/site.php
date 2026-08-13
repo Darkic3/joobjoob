@@ -14,9 +14,11 @@
 
 use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\CartController;
+use App\Http\Controllers\Site\DashboardController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProductController;
+use App\Http\Controllers\Site\SiteAuthController;
 use App\Http\Controllers\Site\WishlistController;
 
 // الگوی کد زبان برای constraint — امن: فقط کدهای واقعی (کاتالوگ + دیتابیس)
@@ -67,6 +69,18 @@ $siteRoutes = function () {
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
+    });
+
+    // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
+    Route::get('/login', [SiteAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [SiteAuthController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [SiteAuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/account/orders', [DashboardController::class, 'orders'])->name('dashboard.orders');
+        Route::get('/account/wishlist', [DashboardController::class, 'wishlist'])->name('dashboard.wishlist');
+        Route::get('/account/addresses', [DashboardController::class, 'addresses'])->name('dashboard.addresses');
     });
 };
 
