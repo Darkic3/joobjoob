@@ -4,16 +4,15 @@ import './localize-digits.js';
 document.addEventListener('DOMContentLoaded', function () {
 
     // ---------- تاگل تم: فقط data-theme را عوض می‌کنیم، بقیه (موقعیت دات) با CSS خودکار است ----------
+    // دو نمونه دارد: یکی در هدر دسکتاپ و یکی داخل منوی موبایل
     const root = document.documentElement;
-    const toggle = document.getElementById('theme-toggle');
-
-    if (toggle) {
+    document.querySelectorAll('#theme-toggle, #theme-toggle-menu').forEach(function (toggle) {
         toggle.addEventListener('click', function () {
             const next = root.getAttribute('data-theme') === 'dark-neumorphism' ? 'light-neumorphism' : 'dark-neumorphism';
             root.setAttribute('data-theme', next);
             localStorage.setItem('site_theme', next);
         });
-    }
+    });
 
     // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success (هندلر اصلی پایین است) ----------
 
@@ -51,13 +50,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     }
 
-    // ---------- دراپ‌داون زبان ----------
+    // ---------- دراپ‌داون زبان (aria-expanded برای چرخش شورون) ----------
     const langBtn = document.querySelector('[data-lang-dropdown-btn]');
     const langMenu = document.querySelector('[data-lang-dropdown-menu]');
     if (langBtn && langMenu) {
-        langBtn.addEventListener('click', () => langMenu.classList.toggle('hidden'));
+        langBtn.addEventListener('click', function () {
+            const nowHidden = langMenu.classList.toggle('hidden');
+            langBtn.setAttribute('aria-expanded', String(!nowHidden));
+        });
         document.addEventListener('click', function (e) {
-            if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) langMenu.classList.add('hidden');
+            if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) {
+                langMenu.classList.add('hidden');
+                langBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // ---------- منوی موبایل (همبرگر مورف) ----------
+    // با JS خالص: باز/بسته با کلاس open، قفل اسکرول بدنه، بستن با کلیک/اسکیپ.
+    // انیمیشن ورود پله‌ای لینک‌ها در CSS است (تأخیرهای nth-child).
+    const menuBtn = document.querySelector('[data-menu-btn]');
+    const siteMenu = document.querySelector('[data-site-menu]');
+    if (menuBtn && siteMenu) {
+        function setMenu(open) {
+            siteMenu.classList.toggle('open', open);
+            menuBtn.classList.toggle('is-open', open);
+            menuBtn.setAttribute('aria-expanded', String(open));
+            siteMenu.setAttribute('aria-hidden', String(!open));
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
+        menuBtn.addEventListener('click', function () {
+            setMenu(!siteMenu.classList.contains('open'));
+        });
+        // بستن با کلیک روی پس‌زمینه یا هر لینک داخل منو
+        siteMenu.querySelectorAll('[data-menu-close], a').forEach(function (el) {
+            el.addEventListener('click', function () { setMenu(false); });
+        });
+        // بستن با Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') setMenu(false);
         });
     }
     document.querySelectorAll('[data-lang-select]').forEach(function (el) {

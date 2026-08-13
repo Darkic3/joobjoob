@@ -1906,3 +1906,382 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .blog-card::before { transition: none; }
 }
+
+/* ==========================================================================
+   8) هدر شناور (Fluid Island) — دسکتاپ + موبایل
+   --------------------------------------------------------------------------
+   الگو: جزیرهٔ شیشه‌ای شناور (از بالای صفحه جدا، چسبان با فاصله) + هامبرگر مورف
+   + منوی تمام‌صفحهٔ موبایل با ورود پله‌ای. تمام انیمیشن‌ها transform/opacity هستند.
+   ========================================================================== */
+
+/* ---------- 8.1) جزیرهٔ شناور ---------- */
+.site-header-wrap {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem .6rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 9%, transparent);
+    box-shadow:
+        8px 8px 24px color-mix(in srgb, var(--shadow-dark) 42%, transparent),
+        -8px -8px 20px color-mix(in srgb, var(--shadow-light) 72%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .45);
+    transition: box-shadow var(--dur-med) var(--ease-out), background-color var(--dur-med) var(--ease-out);
+}
+[data-theme="dark-neumorphism"] .site-header,
+[data-theme="blue-theme"] .site-header,
+[data-theme="green-theme"] .site-header {
+    box-shadow:
+        8px 8px 24px color-mix(in srgb, var(--shadow-dark) 42%, transparent),
+        -8px -8px 20px color-mix(in srgb, var(--shadow-light) 72%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+@media (min-width: 768px) {
+    .site-header { gap: .75rem; padding: .6rem .85rem; }
+}
+
+/* ---------- 8.2) لوگو: مارک گرادینتی + نام ---------- */
+.site-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    min-width: 0;
+    text-decoration: none;
+}
+.site-logo-mark {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-size: 1.02rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent-contrast);
+    background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 62%, var(--gold)) 100%);
+    box-shadow:
+        0 6px 16px color-mix(in srgb, var(--accent) 42%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+    transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
+}
+.site-logo:hover .site-logo-mark {
+    transform: scale(1.06) rotate(-4deg);
+    box-shadow:
+        0 8px 20px color-mix(in srgb, var(--accent) 52%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+[dir="ltr"] .site-logo:hover .site-logo-mark { transform: scale(1.06) rotate(4deg); }
+.site-logo-text {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: -.01em;
+    color: var(--text-primary);
+    max-width: 11rem;
+}
+
+/* ---------- 8.3) لینک‌های ناو ---------- */
+.site-nav-link {
+    position: relative;
+    padding: .5rem 1.05rem;
+    border-radius: 999px;
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+.site-nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 1.05rem;
+    bottom: 5px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--dur-med) var(--ease-spring);
+}
+.site-nav-link:hover { color: var(--accent); }
+.site-nav-link:hover::after { transform: scaleX(1); }
+.site-nav-link.is-active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    box-shadow:
+        inset 2px 2px 5px color-mix(in srgb, var(--shadow-dark) 22%, transparent),
+        inset -2px -2px 5px color-mix(in srgb, var(--shadow-light) 55%, transparent);
+}
+.site-nav-link.is-active::after { transform: scaleX(1); }
+
+/* ---------- 8.4) جستجو ---------- */
+.site-search { position: relative; }
+.site-search-input {
+    width: 100%;
+    padding-block: .72rem;
+    padding-inline-start: 2.6rem;
+    padding-inline-end: 1.2rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: .82rem;
+    box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+    outline: none;
+    transition: box-shadow var(--dur-med) var(--ease-out);
+}
+.site-search-input::placeholder { color: var(--text-secondary); }
+.site-search-input:focus {
+    box-shadow:
+        inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light),
+        0 0 0 2px color-mix(in srgb, var(--accent) 42%, transparent),
+        0 6px 20px -6px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.site-search-icon {
+    position: absolute;
+    inset-inline-start: .95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* ---------- 8.5) سوییچر زبان ---------- */
+.site-lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    min-height: 44px;
+    padding: 0 .9rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+    cursor: pointer;
+    transition: box-shadow var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+}
+.site-lang-btn:hover {
+    color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow:
+        8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light),
+        0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.site-lang-btn:active { transform: translateY(0) scale(.96); }
+.site-lang-chevron { transition: transform var(--dur-fast) var(--ease-spring); }
+.site-lang-btn[aria-expanded="true"] .site-lang-chevron { transform: rotate(180deg); }
+.site-lang-menu {
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 9%, transparent);
+    box-shadow:
+        8px 8px 24px color-mix(in srgb, var(--shadow-dark) 40%, transparent),
+        -6px -6px 18px color-mix(in srgb, var(--shadow-light) 70%, transparent);
+}
+.site-lang-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .55rem .7rem;
+    border-radius: .7rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.site-lang-item:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+.site-lang-item.is-active { color: var(--accent); font-weight: 800; }
+.site-lang-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: .22rem .42rem;
+    border-radius: .4rem;
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    color: var(--accent);
+}
+
+/* ---------- 8.6) دکمه‌های اکشن + بج ---------- */
+.site-action-btn:hover {
+    color: var(--accent);
+    box-shadow:
+        6px 6px 14px var(--shadow-dark),
+        -6px -6px 14px var(--shadow-light),
+        0 0 0 1px color-mix(in srgb, var(--accent) 26%, transparent),
+        0 6px 18px -6px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.site-badge {
+    position: absolute;
+    top: -3px;
+    inset-inline-end: -3px;
+    min-width: 19px;
+    height: 19px;
+    padding-inline: 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    font-size: .6rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent-contrast);
+    background: var(--accent);
+    border: 2px solid var(--bg-elevated);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ---------- 8.7) هامبرگر مورف (۳ خط → X) ---------- */
+.site-hamburger {
+    position: relative;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+    cursor: pointer;
+    transition: box-shadow var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.site-hamburger:hover {
+    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    transform: translateY(-1px);
+}
+.site-hamburger:active { transform: translateY(0) scale(.94); }
+.site-hamburger span {
+    position: absolute;
+    inset-inline-start: 13px;
+    width: 20px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--text-primary);
+    transition: top var(--dur-med) var(--ease-spring), transform var(--dur-med) var(--ease-spring),
+                opacity var(--dur-fast) var(--ease-out);
+}
+.site-hamburger span:nth-child(1) { top: 16px; }
+.site-hamburger span:nth-child(2) { top: 22px; }
+.site-hamburger span:nth-child(3) { top: 28px; }
+.site-hamburger.is-open span:nth-child(1) { top: 22px; transform: rotate(45deg); }
+.site-hamburger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(.5); }
+.site-hamburger.is-open span:nth-child(3) { top: 22px; transform: rotate(-45deg); }
+
+/* ---------- 8.8) منوی تمام‌صفحه موبایل ----------
+   z بین نوار پایین موبایل (۴۰) و هدر (۵۰) است تا هامبرگر مورف‌شده بالای منو
+   دیده و قابل کلیک بماند. ورود لینک‌ها پله‌ای با تأخیر است. */
+.site-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    visibility: hidden;
+    pointer-events: none;
+}
+.site-menu.open { visibility: visible; pointer-events: auto; }
+.site-menu-backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--bg) 42%, transparent);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    opacity: 0;
+    transition: opacity .45s var(--ease-out);
+}
+.site-menu.open .site-menu-backdrop { opacity: 1; }
+.site-menu-panel {
+    position: relative;
+    height: 100%;
+    max-width: 32rem;
+    margin-inline: auto;
+    padding: 6.5rem 2.25rem 2.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.75rem;
+    overflow-y: auto;
+}
+.site-menu-nav { display: flex; flex-direction: column; }
+.site-menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 1.1rem;
+    padding: .85rem .1rem;
+    font-size: 1.75rem;
+    font-weight: 900;
+    letter-spacing: -.01em;
+    color: var(--text-primary);
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .55s var(--ease-out), transform .55s var(--ease-spring),
+                color var(--dur-fast) var(--ease-out);
+}
+.site-menu.open .site-menu-link { opacity: 1; transform: translateY(0); }
+.site-menu.open .site-menu-link:nth-child(1) { transition-delay: .08s; }
+.site-menu.open .site-menu-link:nth-child(2) { transition-delay: .16s; }
+.site-menu.open .site-menu-link:nth-child(3) { transition-delay: .24s; }
+.site-menu-link:hover { color: var(--accent); }
+.site-menu-link.is-active { color: var(--accent); }
+.site-menu-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: .85;
+}
+.site-menu-label { line-height: 1.15; }
+.site-menu-footer {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .5s var(--ease-out), transform .5s var(--ease-spring);
+}
+.site-menu.open .site-menu-footer { opacity: 1; transform: translateY(0); transition-delay: .32s; }
+.site-menu-langs { display: flex; flex-wrap: wrap; gap: .55rem; }
+.site-menu-lang {
+    padding: .5rem 1.15rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+    transition: color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+}
+.site-menu-lang:hover { color: var(--accent); transform: translateY(-1px); }
+.site-menu-lang.is-active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    box-shadow:
+        inset 2px 2px 5px color-mix(in srgb, var(--shadow-dark) 22%, transparent),
+        inset -2px -2px 5px color-mix(in srgb, var(--shadow-light) 55%, transparent);
+}
+.site-menu-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid color-mix(in srgb, var(--text-primary) 9%, transparent);
+}
+.site-menu-theme-label { font-size: .85rem; font-weight: 700; color: var(--text-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+    .site-header, .site-logo-mark, .site-nav-link, .site-nav-link::after, .site-search-input,
+    .site-lang-btn, .site-lang-chevron, .site-action-btn, .site-hamburger, .site-hamburger span,
+    .site-menu-backdrop, .site-menu-link, .site-menu-footer, .site-menu-lang {
+        transition: none;
+    }
+    .site-menu-link, .site-menu-footer { opacity: 1; transform: none; }
+}

@@ -1,56 +1,150 @@
 @props(['cartCount' => 0, 'wishlistCount' => 0])
 
-{{-- locales/currentLocale از LocaleComposer سراسری می‌آید --}}
-<header class="sticky top-0 z-40 backdrop-blur" style="background:color-mix(in srgb, var(--bg) 90%, transparent);">
-    <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center gap-4">
+@php
+    $siteName = setting('site_name', __('messages.site_name'));
+@endphp
 
-        <a href="{{ localizedRoute('home') }}" class="neu-flat-sm px-4 py-2 font-black text-lg shrink-0" style="color:var(--accent);">
-            {{ setting('site_name', __('messages.site_name')) }}
+{{-- هدر شناور (Fluid Island) — دسکتاپ: نوار قرصی شیشه‌ای شناور؛ موبایل: لوگو + همبرگر مورف --}}
+<header class="site-header-wrap sticky top-3 z-50 px-3 md:px-5">
+    <div class="site-header max-w-7xl mx-auto">
+
+        {{-- لوگو: مارک گرادینتی (Double-Bezel) + نام --}}
+        <a href="{{ localizedRoute('home') }}" class="site-logo shrink-0" aria-label="{{ $siteName }}">
+            <span class="site-logo-mark" aria-hidden="true">{{ mb_substr($siteName, 0, 1) }}</span>
+            <span class="site-logo-text truncate">{{ $siteName }}</span>
         </a>
 
-        <nav class="hidden lg:flex items-center gap-1 ms-2">
-            <a href="{{ localizedRoute('home') }}" class="px-4 py-2 rounded-full text-sm font-medium hover:opacity-70">{{ __('messages.home') }}</a>
-            <a href="{{ localizedRoute('products.index') }}" class="px-4 py-2 rounded-full text-sm font-medium hover:opacity-70">{{ __('messages.products') }}</a>
-            <a href="{{ localizedRoute('products.index') }}#deals" class="px-4 py-2 rounded-full text-sm font-medium hover:opacity-70">{{ __('messages.special_offers') }}</a>
+        {{-- ناو دسکتاپ --}}
+        <nav class="hidden lg:flex items-center gap-1 ms-3" aria-label="{{ __('messages.navigation') }}">
+            <a href="{{ localizedRoute('home') }}"
+               class="site-nav-link {{ request()->routeIs('home', 'locale.home') ? 'is-active' : '' }}">
+                {{ __('messages.home') }}
+            </a>
+            <a href="{{ localizedRoute('products.index') }}"
+               class="site-nav-link {{ request()->routeIs('products.index', 'locale.products.index', 'products.category', 'locale.products.category') ? 'is-active' : '' }}">
+                {{ __('messages.products') }}
+            </a>
+            <a href="{{ localizedRoute('products.index') }}#deals" class="site-nav-link">
+                {{ __('messages.special_offers') }}
+            </a>
         </nav>
 
-        <form action="{{ localizedRoute('products.index') }}" method="GET" class="hidden md:flex flex-1 max-w-md relative">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="{{ __('messages.search_placeholder') }}" class="neu-input ps-11 pe-4 text-sm">
-            <svg class="absolute top-1/2 -translate-y-1/2 start-4 w-4 h-4" style="color:var(--text-secondary)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{-- جستجو (md به بالا) --}}
+        <form action="{{ localizedRoute('products.index') }}" method="GET" role="search"
+              class="site-search hidden md:flex flex-1 max-w-md ms-auto me-3">
+            <input type="text" name="q" value="{{ request('q') }}"
+                   placeholder="{{ __('messages.search_placeholder') }}" class="site-search-input"
+                   autocomplete="off">
+            <svg class="site-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5A6.5 6.5 0 1 1 4 10.5a6.5 6.5 0 0 1 13 0Z"/>
             </svg>
         </form>
 
-        <div class="flex items-center gap-2 ms-auto">
+        {{-- اکشن‌ها — در موبایل فقط هامبرگر می‌ماند (زبان/تم داخل منو، سبد/علاقه‌مندی در نوار پایین) --}}
+        <div class="flex items-center gap-2 ms-auto lg:ms-0">
+
             @if (count($locales) > 1)
-                <div class="relative">
-                    <button type="button" data-lang-dropdown-btn class="neu-btn neu-btn-icon text-xs font-bold">
-                        {{ strtoupper($currentLocale) }}
+                <div class="relative hidden lg:block">
+                    <button type="button" data-lang-dropdown-btn
+                            class="site-lang-btn text-xs font-bold"
+                            title="{{ __('messages.language') }}" aria-haspopup="true" aria-expanded="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ strtoupper($currentLocale) }}</span>
+                        <svg class="w-3 h-3 site-lang-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="m6 9 6 6 6-6"/>
+                        </svg>
                     </button>
-                    <div data-lang-dropdown-menu class="hidden absolute end-0 mt-2 neu-flat-sm p-2 w-32 text-sm z-50">
+                    <div data-lang-dropdown-menu class="site-lang-menu hidden absolute end-0 top-full mt-2 p-2 w-44 z-50">
                         @foreach($locales as $code => $lang)
-                            <a href="{{ localizedUrl($code) }}" class="block w-full text-start px-3 py-2 rounded-lg hover:opacity-70 {{ $currentLocale === $code ? 'font-bold' : '' }}">
-                                {{ $lang->localizedName() }}
+                            <a href="{{ localizedUrl($code) }}"
+                               class="site-lang-item {{ $currentLocale === $code ? 'is-active' : '' }}">
+                                <span class="site-lang-code">{{ strtoupper($code) }}</span>
+                                <span class="flex-1">{{ $lang->localizedName() }}</span>
+                                @if ($currentLocale === $code)
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6" d="m5 13 4 4L19 7"/>
+                                    </svg>
+                                @endif
                             </a>
                         @endforeach
                     </div>
                 </div>
             @endif
 
-            {{-- دات دیگر نیازی به id ندارد؛ موقعیتش را CSS بر اساس data-theme خودکار مدیریت می‌کند --}}
-            <button type="button" id="theme-toggle" class="neu-toggle" title="{{ __('messages.dark_mode') }}">
+            <button type="button" id="theme-toggle" class="neu-toggle hidden lg:block" title="{{ __('messages.dark_mode') }}">
                 <span class="neu-toggle-dot"></span>
             </button>
 
-            <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon relative" title="{{ __('messages.wishlist') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/></svg>
-                <span id="wishlist-count" class="absolute -top-1 -end-1 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center" style="background:var(--accent); color:var(--accent-contrast);">{{ $wishlistCount }}</span>
+            <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+               title="{{ __('messages.wishlist') }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/>
+                </svg>
+                <span id="wishlist-count" class="site-badge">{{ $wishlistCount }}</span>
             </a>
 
-            <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon relative">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
-                <span id="cart-count" class="absolute -top-1 -end-1 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center" style="background:var(--accent); color:var(--accent-contrast);">{{ $cartCount }}</span>
+            <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+               title="{{ __('messages.cart') }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                </svg>
+                <span id="cart-count" class="site-badge">{{ $cartCount }}</span>
             </a>
+
+            {{-- همبرگر مورف — فقط موبایل/تبلت --}}
+            <button type="button" class="site-hamburger lg:hidden" data-menu-btn
+                    aria-label="{{ __('messages.menu') }}" aria-expanded="false" aria-controls="site-menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </div>
 </header>
+
+{{-- منوی تمام‌صفحه موبایل — z پایین‌تر از هدر تا همبرگر مورف‌شده روی آن دیده شود --}}
+<div class="site-menu lg:hidden" id="site-menu" data-site-menu
+     role="dialog" aria-modal="true" aria-label="{{ __('messages.navigation') }}" aria-hidden="true">
+    <div class="site-menu-backdrop" data-menu-close></div>
+    <div class="site-menu-panel">
+
+        <nav class="site-menu-nav" aria-label="{{ __('messages.navigation') }}">
+            <a href="{{ localizedRoute('home') }}"
+               class="site-menu-link {{ request()->routeIs('home', 'locale.home') ? 'is-active' : '' }}">
+                <span class="site-menu-num">01</span>
+                <span class="site-menu-label">{{ __('messages.home') }}</span>
+            </a>
+            <a href="{{ localizedRoute('products.index') }}"
+               class="site-menu-link {{ request()->routeIs('products.*', 'locale.products.*') ? 'is-active' : '' }}">
+                <span class="site-menu-num">02</span>
+                <span class="site-menu-label">{{ __('messages.products') }}</span>
+            </a>
+            <a href="{{ localizedRoute('products.index') }}#deals" class="site-menu-link">
+                <span class="site-menu-num">03</span>
+                <span class="site-menu-label">{{ __('messages.special_offers') }}</span>
+            </a>
+        </nav>
+
+        <div class="site-menu-footer">
+            @if (count($locales) > 1)
+                <div class="site-menu-langs" aria-label="{{ __('messages.language') }}">
+                    @foreach($locales as $code => $lang)
+                        <a href="{{ localizedUrl($code) }}"
+                           class="site-menu-lang {{ $currentLocale === $code ? 'is-active' : '' }}">
+                            {{ $lang->localizedName() }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
+            <div class="site-menu-theme">
+                <span class="site-menu-theme-label">{{ __('messages.dark_mode') }}</span>
+                <button type="button" id="theme-toggle-menu" class="neu-toggle"
+                        title="{{ __('messages.dark_mode') }}" aria-label="{{ __('messages.dark_mode') }}">
+                    <span class="neu-toggle-dot"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
