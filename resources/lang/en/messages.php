@@ -91,6 +91,7 @@ return [
     'description' => 'Description',
     'login' => 'login',
     'register' => 'register',
+    'login_register' => 'Login / Register',
     'login_title' => 'Welcome back!',
     'login_subtitle' => 'Sign in to your account to continue',
     'email' => 'Email',

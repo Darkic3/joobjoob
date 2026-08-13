@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\User;
 use App\Services\WishlistService;
 use Database\Seeders\LanguageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,8 +70,22 @@ class WishlistTest extends TestCase
             ->assertSee(__('messages.wishlist_empty'));
     }
 
-    public function test_header_and_mobile_bar_badges_show_count(): void
+    public function test_guest_sees_only_mobile_bar_badge(): void
     {
+        // مهمان: هدر دسکتاپ سبد/علاقه‌مندی را نشان نمی‌دهد — فقط بج نوار پایین موبایل
+        $product = $this->makeProduct();
+        $this->post(route('wishlist.toggle', ['product' => $product->slug]));
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="wishlist-count-mobile"', false)
+            ->assertDontSee('id="wishlist-count"', false);
+    }
+
+    public function test_header_and_mobile_bar_badges_show_count_for_user(): void
+    {
+        // عضو: هم هدر دسکتاپ و هم نوار پایین موبایل بج را نشان می‌دهند
+        $this->actingAs(User::factory()->create());
         $product = $this->makeProduct();
         $this->post(route('wishlist.toggle', ['product' => $product->slug]));
 

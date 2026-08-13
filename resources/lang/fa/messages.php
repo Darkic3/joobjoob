@@ -95,6 +95,7 @@ return [
     'all' => 'همه',
     'login' => 'ورود',
     'register' => 'ثبت نام',
+    'login_register' => 'ورود / ثبت نام',
     'login_title' => 'خوش آمدید!',
     'login_subtitle' => 'برای ادامه، وارد حساب کاربری خود شوید',
     'email' => 'ایمیل',

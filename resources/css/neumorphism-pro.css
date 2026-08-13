@@ -2306,7 +2306,9 @@ html, body {
 .site-menu-account-link:hover .site-menu-account-arrow { transform: translateX(-3px); color: var(--accent); }
 [dir="ltr"] .site-menu-account-link:hover .site-menu-account-arrow { transform: translateX(3px); }
 
-/* آواتار حساب دسکتاپ — دایرهٔ گرادینتی با حرف اول نام */
+/* آواتار حساب دسکتاپ — دایرهٔ گرادینتی با حرف اول نام.
+   لینکِ خودش دایره است (site-account-btn) تا هاور فقط درخششِ دایره‌ای بدهد،
+   نه حلقهٔ مربعیِ site-action-btn. */
 .site-account-avatar {
     display: grid;
     place-items: center;
@@ -2322,12 +2324,44 @@ html, body {
         inset 0 1px 0 rgba(255, 255, 255, .3);
     transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
 }
-.site-action-btn:hover .site-account-avatar {
-    transform: scale(1.08) rotate(-4deg);
-    box-shadow:
-        0 8px 20px color-mix(in srgb, var(--accent) 52%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, .3);
+.site-account-btn {
+    border-radius: 50%;
+    transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
 }
+.site-account-btn:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 8px 22px color-mix(in srgb, var(--accent) 45%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.site-account-btn:hover .site-account-avatar {
+    transform: scale(1.06) rotate(-4deg);
+}
+
+/* دکمهٔ ورود/ثبت‌نام — فقط برای مهمان‌ها (قرص گرادینتی هم‌خانواده با لوگو) */
+.site-login-btn {
+    align-items: center;
+    gap: .45rem;
+    min-height: 44px;
+    padding: 0 1.15rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--accent-contrast);
+    background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, var(--gold)) 100%);
+    box-shadow:
+        0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .25);
+    transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
+}
+.site-login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 8px 22px color-mix(in srgb, var(--accent) 52%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.site-login-btn:active { transform: translateY(0) scale(.96); }
 
 .site-menu-footer {
     opacity: 0;

@@ -78,34 +78,35 @@
                 <span class="neu-toggle-dot"></span>
             </button>
 
-            <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
-               title="{{ __('messages.wishlist') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/>
-                </svg>
-                <span id="wishlist-count" class="site-badge">{{ $wishlistCount }}</span>
-            </a>
+            {{-- سبد/علاقه‌مندی/حساب فقط برای اعضا؛ مهمان فقط دکمهٔ ورود/ثبت‌نام --}}
+            @auth
+                <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+                   title="{{ __('messages.wishlist') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 21l-7.682-7.682a4.5 4.5 0 0 1 0-6.364Z"/>
+                    </svg>
+                    <span id="wishlist-count" class="site-badge">{{ $wishlistCount }}</span>
+                </a>
 
-            <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
-               title="{{ __('messages.cart') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+                   title="{{ __('messages.cart') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                 </svg>
                 <span id="cart-count" class="site-badge">{{ $cartCount }}</span>
             </a>
 
-            {{-- حساب کاربری: مهمان → لاگین، عضو → پنل کاربری --}}
-            @auth
-                <a href="{{ localizedRoute('dashboard') }}" class="site-action-btn relative hidden lg:inline-flex"
+                <a href="{{ localizedRoute('dashboard') }}" class="site-account-btn relative hidden lg:inline-flex"
                    title="{{ auth()->user()->name }}" aria-label="{{ __('messages.dashboard') }}">
                     <span class="site-account-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                 </a>
             @else
-                <a href="{{ localizedRoute('login') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
-                   title="{{ __('messages.login') }}" aria-label="{{ __('messages.login') }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <a href="{{ localizedRoute('login') }}" class="site-login-btn hidden lg:inline-flex"
+                   title="{{ __('messages.login_register') }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0 18.9 18.9 0 0 1-3.55 2.55H8.05A18.9 18.9 0 0 1 4.5 20.25Z"/>
                     </svg>
+                    <span>{{ __('messages.login_register') }}</span>
                 </a>
             @endauth
 

@@ -140,6 +140,7 @@ return [
     'already_member_desc' => 'İndirim kodlarınız yakında kullanıcı panelinizde erişilebilir olacak.',
     'login' => 'Giriş Yap',
     'register' => 'Kayıt Ol',
+    'login_register' => 'Giriş Yap / Kayıt Ol',
     'login_title' => 'Tekrar hoş geldiniz!',
     'login_subtitle' => 'Devam etmek için hesabınıza giriş yapın',
     'email' => 'E-posta',

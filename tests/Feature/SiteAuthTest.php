@@ -123,20 +123,24 @@ class SiteAuthTest extends TestCase
             ->assertSee('name="email"', false);
     }
 
-    public function test_header_shows_login_icon_for_guest_and_dashboard_for_user(): void
+    public function test_header_shows_login_button_for_guest_and_full_actions_for_user(): void
     {
-        // مهمان → لینک لاگین
+        // مهمان → فقط دکمهٔ ورود/ثبت‌نام در هدر (بدون آواتار عضو)
         $this->get('/')
             ->assertOk()
+            ->assertSee('site-login-btn', false)
+            ->assertSee(__('messages.login_register'))
             ->assertSee('href="'.route('login').'"', false)
-            ->assertSee(__('messages.login_subtitle'));
+            ->assertDontSee('site-account-btn', false);
 
-        // عضو → لینک پنل کاربری + حرف اول نام
+        // عضو → سبد/علاقه‌مندی/آواتار (لینک پنل کاربری + حرف اول نام)
         $user = User::factory()->create(['name' => 'نگار احمدی']);
         $this->actingAs($user)
             ->get('/')
             ->assertOk()
+            ->assertSee('site-account-btn', false)
             ->assertSee('href="'.route('dashboard').'"', false)
-            ->assertSee(mb_substr('نگار احمدی', 0, 1));
+            ->assertSee(mb_substr('نگار احمدی', 0, 1))
+            ->assertDontSee('site-login-btn', false);
     }
 }
