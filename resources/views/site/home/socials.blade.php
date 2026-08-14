@@ -10,50 +10,29 @@
         - در صورت لاگین بودن (@auth) نمایش کدهای تخفیف واقعی کاربر
     ============================================================================ --}}
 @php
-    // شبکه‌های اجتماعی فعال (از تنظیمات) — همان الگوی فوتر
-    $socialLinks = collect([
-        'social_instagram' => __('messages.socials.instagram'),
-        'social_telegram' => __('messages.socials.telegram'),
-        'social_whatsapp' => __('messages.socials.whatsapp'),
-        'social_twitter' => __('messages.socials.twitter'),
-        'social_youtube' => __('messages.socials.youtube'),
-    ])->filter(fn ($label, $key) => setting($key))->all();
-
-    // آیکون اختصاصی هر شبکه
-    $socialIcons = [
-        'social_instagram' => '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>',
-        'social_telegram' => '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
-        'social_whatsapp' => '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/>',
-        'social_twitter' => '<path fill="currentColor" stroke="none" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Z"/>',
-        'social_youtube' => '<rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none"/>',
-    ];
+    // آیا شبکه‌ای از تنظیمات فعال است؟ (رندر خودِ دکمه‌ها در کامپوننت <x-social-links />)
+    $hasSocials = collect([
+        'social_instagram', 'social_telegram', 'social_whatsapp', 'social_twitter', 'social_youtube',
+    ])->contains(fn ($key) => setting($key));
 @endphp
 
 <section class="reveal-on-scroll py-6 mb-4">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {{-- ستون ۱: شبکه‌های اجتماعی (فقط اگر از تنظیمات پر شده باشند) --}}
-        @if($socialLinks)
+        @if($hasSocials)
             <div class="neu-flat-lg p-8 md:p-9 flex flex-col justify-center">
                 <span class="section-icon mb-4" aria-hidden="true">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                 </span>
                 <h3 class="font-extrabold text-lg mb-2">{{ __('messages.join_section_title') }}</h3>
                 <p class="text-xs mb-5" style="color: var(--text-secondary);">{{ __('messages.join_section_desc') }}</p>
-                <div class="flex flex-wrap gap-2.5">
-                    @foreach($socialLinks as $key => $label)
-                        <a href="{{ setting($key) }}" target="_blank" rel="noopener" title="{{ $label }}"
-                           class="neu-interactive inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $socialIcons[$key] !!}</svg>
-                            {{ $label }}
-                        </a>
-                    @endforeach
-                </div>
+                <x-social-links />
             </div>
         @endif
 
         {{-- ستون ۲: باکس ثبت‌نام + کد تخفیف ۱۰٪ (فقط مهمان‌ها) --}}
-        <div class="neu-flat-lg p-8 md:p-9 relative overflow-hidden {{ $socialLinks ? '' : 'lg:col-span-2' }}">
+        <div class="neu-flat-lg p-8 md:p-9 relative overflow-hidden {{ $hasSocials ? '' : 'lg:col-span-2' }}">
             {{-- هالهٔ ملایم اکنت در پس‌زمینه --}}
             <div aria-hidden="true"
                  style="position: absolute; inset-inline-end: -60px; top: -60px; width: 200px; height: 200px; border-radius: 999px;
