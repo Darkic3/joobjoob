@@ -200,124 +200,131 @@
         </section>
     @endif
 
-    {{-- ۷. نظرات مشتریان — سوشال پروف: خلاصه امتیاز + کارت برجسته (Double-Bezel) + کارت‌های ثانویه --}}
+    {{-- ۷. نظرات مشتریان — سوشال پروف: شل + کور Double-Bezel + ورود پله‌ای در دو لایه --}}
     @if($reviews->isNotEmpty())
         <section class="reveal-on-scroll py-8">
-            <div class="reviews-shell relative overflow-hidden">
-                {{-- حباب‌های رنگی شناور پس‌زمینه --}}
-                <div class="reviews-blobs" aria-hidden="true">
-                    <span class="reviews-blob reviews-blob--1"></span>
-                    <span class="reviews-blob reviews-blob--2"></span>
-                    <span class="reviews-blob reviews-blob--3"></span>
-                </div>
+            {{-- شل بیرونی: قاب گرادینتی دورِ کور --}}
+            <div class="reviews-shell">
+                {{-- کور داخلی: محتوای اصلی --}}
+                <div class="reviews-core relative overflow-hidden">
+                    {{-- حباب‌های رنگی شناور پس‌زمینه --}}
+                    <div class="reviews-blobs" aria-hidden="true">
+                        <span class="reviews-blob reviews-blob--1"></span>
+                        <span class="reviews-blob reviews-blob--2"></span>
+                        <span class="reviews-blob reviews-blob--3"></span>
+                    </div>
 
-                <div class="relative z-10">
-                    {{-- سربرگ: عنوان + خلاصه امتیاز کلی --}}
-                    <div class="flex flex-wrap items-end justify-between gap-5 mb-8">
-                        <div class="section-head-main">
-                            <span class="section-icon" aria-hidden="true">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.6-.7L3 21l1.9-5.3a8 8 0 0 1-.9-3.7A8.4 8.4 0 0 1 12.5 3.5 8.4 8.4 0 0 1 21 11.5z"/></svg>
-                            </span>
-                            <div>
+                    <div class="relative z-10">
+                        {{-- سربرگ: برچسب + عنوان + خلاصه امتیاز کلی — ورود پله‌ای --}}
+                        <div class="reviews-head" data-stagger>
+                            <div class="reviews-head-main">
+                                <span class="reviews-eyebrow">
+                                    <span class="live-dot" aria-hidden="true"></span>
+                                    {{ __('messages.reviews_eyebrow') }}
+                                </span>
                                 <h2 class="section-title">{{ settingOverride('home_reviews_title', __('messages.customer_reviews')) }}</h2>
                                 <p class="section-subtitle">{{ __('messages.review_average') }}</p>
                             </div>
-                        </div>
-                        {{-- عدد میانگین + ستاره‌ها --}}
-                        <div class="reviews-rating">
-                            <span class="reviews-rating-value">{{ $reviewsAvg }}</span>
-                            <div>
-                                <p class="reviews-rating-stars" aria-hidden="true">
-                                    {{ str_repeat('★', (int) round($reviewsAvg)) }}{{ str_repeat('☆', 5 - (int) round($reviewsAvg)) }}
-                                </p>
-                                <p class="text-[11px] font-semibold" style="color: var(--text-secondary);">
-                                    {{ __('messages.based_on_recent', ['count' => $reviews->count()]) }}
-                                </p>
+                            {{-- عدد میانگین + ستاره‌ها --}}
+                            <div class="reviews-rating">
+                                <span class="reviews-rating-value">{{ $reviewsAvg }}</span>
+                                <div>
+                                    <p class="reviews-rating-stars" aria-hidden="true">
+                                        {{ str_repeat('★', (int) round($reviewsAvg)) }}{{ str_repeat('☆', 5 - (int) round($reviewsAvg)) }}
+                                    </p>
+                                    <p class="text-[11px] font-semibold" style="color: var(--text-secondary);">
+                                        {{ __('messages.based_on_recent', ['count' => $reviews->count()]) }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- گرید: کارت برجسته تمام‌عرض + بقیه دوتایی — ورود پله‌ای --}}
-                    <div class="grid lg:grid-cols-2 gap-5" data-stagger>
-                        @foreach($reviews as $review)
-                            @if($loop->first)
-                                {{-- کارت برجسته (سوشال پروف اصلی) — Double-Bezel --}}
-                                <div class="review-card review-card--featured lg:col-span-2 group">
-                                    <div class="review-card-inner">
-                                        {{-- کوتیشن تزئینی بزرگ --}}
-                                        <svg class="review-quote-mark" viewBox="0 0 24 24" width="92" height="92" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 11H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/><path d="M20 11h-4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/></svg>
+                        {{-- گرید کارت‌ها — ورود پله‌ای (خود کارت‌ها) + لایهٔ دوم: محتوای کارت برجسته --}}
+                        <div class="grid lg:grid-cols-2 gap-5" data-stagger>
+                            @foreach($reviews as $review)
+                                @if($loop->first)
+                                    {{-- کارت برجسته (سوشال پروف اصلی) — Double-Bezel کامل --}}
+                                    <div class="review-card review-card--featured lg:col-span-2 group">
+                                        <div class="review-card-inner">
+                                            {{-- نوار گرادینتی بالای کور --}}
+                                            <span class="review-card-accent" aria-hidden="true"></span>
+                                            {{-- کوتیشن تزئینی بزرگ --}}
+                                            <svg class="review-quote-mark" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 11H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/><path d="M20 11h-4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/></svg>
 
-                                        <p class="review-stars review-stars--lg" aria-hidden="true">
-                                            {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
-                                        </p>
-                                        <blockquote class="review-quote">
-                                            «{{ $review->comment }}»
-                                        </blockquote>
+                                            <div class="review-card-content" data-stagger>
+                                                <p class="review-stars review-stars--lg" aria-hidden="true">
+                                                    {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                                                </p>
+                                                <blockquote class="review-quote">
+                                                    «{{ $review->comment }}»
+                                                </blockquote>
 
-                                        <div class="review-meta">
-                                            <span class="review-avatar" aria-hidden="true">
-                                                {{ mb_substr($review->user->name ?? __('messages.user'), 0, 1) }}
-                                            </span>
-                                            <div>
-                                                <p class="text-sm font-bold">{{ $review->user->name ?? __('messages.user') }}</p>
-                                                <span class="review-verified">
-                                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                                                    {{ __('messages.verified_purchase') }}
-                                                </span>
+                                                <div class="review-meta">
+                                                    <span class="review-avatar" aria-hidden="true">
+                                                        {{ mb_substr($review->user->name ?? __('messages.user'), 0, 1) }}
+                                                    </span>
+                                                    <div>
+                                                        <p class="text-sm font-bold">{{ $review->user->name ?? __('messages.user') }}</p>
+                                                        <span class="review-verified">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                                            {{ __('messages.verified_purchase') }}
+                                                        </span>
+                                                    </div>
+                                                    <span class="review-date">
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                                                        {{ show_date($review->created_at, 'd F Y') }}
+                                                    </span>
+                                                    @if($review->product)
+                                                        <a href="{{ localizedRoute('products.show', ['product' => $review->product]) }}" class="review-product-chip">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                                            {{ mb_strimwidth($review->product->trans('name'), 0, 42, '…') }}
+                                                        </a>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <span class="review-date">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                                                {{ show_date($review->created_at, 'd F Y') }}
-                                            </span>
+                                        </div>
+                                    </div>
+                                @else
+                                    {{-- کارت‌های ثانویه — Double-Bezel --}}
+                                    <div class="review-card group">
+                                        <div class="review-card-inner">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <span class="review-avatar review-avatar--sm" aria-hidden="true">
+                                                    {{ mb_substr($review->user->name ?? __('messages.user'), 0, 1) }}
+                                                </span>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-bold truncate">{{ $review->user->name ?? __('messages.user') }}</p>
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span class="review-verified">
+                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                                            {{ __('messages.verified_purchase') }}
+                                                        </span>
+                                                        <span class="review-date">
+                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                                                            {{ show_date($review->created_at, 'd F Y') }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <p class="review-stars" aria-hidden="true">
+                                                    {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                                                </p>
+                                            </div>
+
+                                            <p class="review-quote review-quote--sm">
+                                                «{{ $review->comment }}»
+                                            </p>
+
                                             @if($review->product)
-                                                <a href="{{ localizedRoute('products.show', ['product' => $review->product]) }}" class="review-product-chip">
+                                                <a href="{{ localizedRoute('products.show', ['product' => $review->product]) }}" class="review-product-chip review-product-chip--sm mt-4">
                                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                                    {{ mb_strimwidth($review->product->trans('name'), 0, 42, '…') }}
+                                                    {{ __('messages.about_product') }}: {{ mb_strimwidth($review->product->trans('name'), 0, 42, '…') }}
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
-                                </div>
-                            @else
-                                {{-- کارت‌های ثانویه --}}
-                                <div class="review-card group">
-                                    <div class="review-card-inner">
-                                        <div class="flex items-center gap-3 mb-4">
-                                            <span class="review-avatar review-avatar--sm" aria-hidden="true">
-                                                {{ mb_substr($review->user->name ?? __('messages.user'), 0, 1) }}
-                                            </span>
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-sm font-bold truncate">{{ $review->user->name ?? __('messages.user') }}</p>
-                                                <div class="flex items-center gap-2 flex-wrap">
-                                                    <span class="review-verified">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                                                        {{ __('messages.verified_purchase') }}
-                                                    </span>
-                                                    <span class="review-date">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                                                        {{ show_date($review->created_at, 'd F Y') }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <p class="review-stars" aria-hidden="true">
-                                                {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
-                                            </p>
-                                        </div>
-
-                                        <p class="review-quote review-quote--sm">
-                                            «{{ $review->comment }}»
-                                        </p>
-
-                                        @if($review->product)
-                                            <a href="{{ localizedRoute('products.show', ['product' => $review->product]) }}" class="review-product-chip review-product-chip--sm mt-4">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                                {{ __('messages.about_product') }}: {{ mb_strimwidth($review->product->trans('name'), 0, 42, '…') }}
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
+                                @endif
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>

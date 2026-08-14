@@ -33,6 +33,7 @@ return [
     'best_sellers_subtitle' => 'محبوب‌ترین‌ها به انتخاب مشتریان',
     'special_offers' => 'پیشنهادات ویژه',
     'customer_reviews' => 'نظرات مشتریان',
+    'reviews_eyebrow' => 'صدای واقعی مشتریان',
     'view_all' => 'مشاهده همه',
     'scroll_prev' => 'اسکرول به قبلی',
     'scroll_next' => 'اسکرول به بعدی',

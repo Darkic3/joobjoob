@@ -1,13 +1,3 @@
-@php
-    $socialLinks = collect([
-        'social_instagram' => 'اینستاگرام',
-        'social_telegram' => 'تلگرام',
-        'social_whatsapp' => 'واتساپ',
-        'social_twitter' => 'توییتر',
-        'social_youtube' => 'یوتیوب',
-    ])->filter(fn ($label, $key) => setting($key))->all();
-@endphp
-
 <footer class="mt-16 py-10" style="background: var(--bg-elevated);">
     <div class="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div class="neu-card">
@@ -37,15 +27,10 @@
                     @endif
                 </ul>
             @endif
-            {{-- لینک‌های شبکهٔ اجتماعی فعال (از تنظیمات) --}}
-            @if($socialLinks)
-                <div class="flex items-center gap-2 mt-3">
-                    @foreach($socialLinks as $key => $label)
-                        <a href="{{ setting($key) }}" target="_blank" rel="noopener" title="{{ $label }}"
-                           class="neu-btn neu-btn-icon w-8 h-8 text-xs hover:opacity-70">{{ $label[0] }}</a>
-                    @endforeach
-                </div>
-            @endif
+            {{-- لینک‌های شبکهٔ اجتماعی فعال (از تنظیمات) — دکمه‌های دایرهای برند --}}
+            <div class="mt-4">
+                <x-social-links compact />
+            </div>
         </div>
 
         <div class="neu-card">

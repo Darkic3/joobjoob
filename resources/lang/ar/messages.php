@@ -32,6 +32,7 @@ return [
     'best_sellers_subtitle' => 'الأكثر تفضيلاً لدى عملائنا',
     'special_offers' => 'عروض خاصة',
     'customer_reviews' => 'آراء العملاء',
+    'reviews_eyebrow' => 'أصوات العملاء الحقيقية',
     'review_average' => 'التقييم العام',
     'based_on_recent' => 'بناءً على :count مراجعة حديثة',
     'about_product' => 'حول',

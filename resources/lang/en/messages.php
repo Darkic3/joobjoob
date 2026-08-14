@@ -32,6 +32,7 @@ return [
     'best_sellers_subtitle' => 'Most loved by our customers',
     'special_offers' => 'Special Offers',
     'customer_reviews' => 'Customer Reviews',
+    'reviews_eyebrow' => 'Real customer voices',
     'review_average' => 'Overall rating',
     'based_on_recent' => 'Based on :count recent reviews',
     'about_product' => 'About',

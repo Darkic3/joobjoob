@@ -1270,17 +1270,66 @@ html, body {
 }
 
 /* ==========================================================================
-   9) نظرات مشتریان — سوشال پروف
-   شل با حباب‌های رنگی شناور + کارت برجسته (Double-Bezel) + کارت‌های ثانویه
+   9) نظرات مشتریان — سوشال پروف سینمایی
+   شل بیرونی (قاب گرادینتی) + کور داخلی + کارت‌های Double-Bezel
+   ورود پله‌ای دو لایه: اول خودِ کارت‌ها (data-stagger روی گرید)،
+   بعد محتوای کارت برجسته (data-stagger داخلی روی .review-card-content)
    ========================================================================== */
 
+/* ---------- شل بیرونی: قاب گرادینتی دورِ کور ---------- */
 .reviews-shell {
-    border-radius: var(--radius-lg);
-    padding: 1.75rem 1.25rem 2.25rem;
-    background: var(--bg-elevated);
-    box-shadow: 10px 10px 24px var(--shadow-dark), -10px -10px 24px var(--shadow-light);
+    border-radius: calc(var(--radius-lg) + 10px);
+    padding: 10px;
+    background: linear-gradient(150deg,
+        color-mix(in srgb, var(--accent) 16%, transparent),
+        color-mix(in srgb, var(--gold) 10%, transparent) 55%,
+        color-mix(in srgb, var(--accent) 7%, transparent));
+    box-shadow: 12px 12px 26px var(--shadow-dark), -12px -12px 26px var(--shadow-light);
 }
-@media (min-width: 768px) { .reviews-shell { padding: 2.25rem 2rem 2.75rem; } }
+
+/* ---------- کور داخلی: محتوای اصلی ---------- */
+.reviews-core {
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem 2.5rem;
+    background: var(--bg-elevated);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--shadow-light) 75%, transparent),
+                inset 0 -1px 0 color-mix(in srgb, var(--shadow-dark) 20%, transparent);
+}
+@media (min-width: 768px) { .reviews-core { padding: 2.75rem 2.5rem 3.25rem; } }
+
+/* ---------- سربرگ: برچسب + عنوان + امتیاز ---------- */
+.reviews-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-bottom: 2rem;
+}
+.reviews-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+}
+
+/* برچسب کوچک بالای عنوان (Eyebrow Tag) — قرص با نقطهٔ زنده */
+.reviews-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    align-self: flex-start;
+    padding: .32rem .85rem;
+    border-radius: 999px;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--shadow-light) 70%, transparent);
+}
+.reviews-eyebrow .live-dot { width: 7px; height: 7px; }
 
 /* ---------- حباب‌های رنگی شناور پس‌زمینه ---------- */
 .reviews-blobs { position: absolute; inset: 0; pointer-events: none; }
@@ -1304,14 +1353,16 @@ html, body {
     .reviews-blob { animation: none; }
 }
 
-/* ---------- خلاصه امتیاز کلی ---------- */
+/* خلاصه امتیاز کلی — قرص فرورفته با لبهٔ طلایی */
 .reviews-rating {
     display: flex; align-items: center; gap: .85rem;
     padding: .65rem 1.1rem .65rem 1.25rem;
     border-radius: var(--radius-pill);
     background: var(--bg-elevated);
-    box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+    box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light),
+        0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
 }
+
 .reviews-rating-value {
     font-family: ui-monospace, 'JetBrains Mono', monospace;
     font-size: 1.9rem; font-weight: 900; line-height: 1;
@@ -1325,19 +1376,20 @@ html, body {
 
 /* ---------- کارت‌های نظر ---------- */
 .review-card {
-    border-radius: calc(var(--radius-md) + 6px);
+    border-radius: calc(var(--radius-md) + 8px);
     padding: 6px;
     background: linear-gradient(150deg,
-        color-mix(in srgb, var(--accent) 14%, transparent),
-        color-mix(in srgb, var(--gold) 8%, transparent) 60%,
-        color-mix(in srgb, var(--accent) 4%, transparent));
+        color-mix(in srgb, var(--accent) 16%, transparent),
+        color-mix(in srgb, var(--gold) 9%, transparent) 60%,
+        color-mix(in srgb, var(--accent) 5%, transparent));
     box-shadow: 8px 8px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light);
     transition: transform var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
 }
 .review-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
     box-shadow: 10px 10px 22px var(--shadow-dark), -10px -10px 22px var(--shadow-light),
-        0 12px 28px -8px color-mix(in srgb, var(--accent) 30%, transparent);
+        0 14px 30px -10px color-mix(in srgb, var(--accent) 38%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--accent) 26%, transparent);
 }
 .review-card-inner {
     height: 100%;
@@ -1350,15 +1402,41 @@ html, body {
 }
 
 /* ---------- کارت برجسته ---------- */
-.review-card--featured { padding: 8px; border-radius: calc(var(--radius-lg) + 4px); }
+.review-card--featured { padding: 8px; border-radius: calc(var(--radius-lg) + 6px); }
 .review-card--featured .review-card-inner {
     position: relative; overflow: hidden;
     border-radius: var(--radius-lg);
-    padding: 2rem 1.75rem;
+    padding: 2.25rem 1.75rem 2rem;
 }
 @media (min-width: 768px) {
-    .review-card--featured .review-card-inner { padding: 2.5rem 2.75rem; }
+    .review-card--featured .review-card-inner { padding: 2.75rem 2.75rem 2.5rem; }
 }
+
+/* نوار گرادینتی بالای کور — حرکتِ آرامِ رنگ‌ها (GPU-safe: background-position) */
+.review-card-accent {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent));
+    background-size: 200% 100%;
+    animation: reviewAccentShift 7s linear infinite;
+}
+@keyframes reviewAccentShift {
+    from { background-position: 0 0; }
+    to   { background-position: 200% 0; }
+}
+
+/* محتوای کارت برجسته — لایهٔ دوم ورود پله‌ای (بعد از ورود خود کارت) */
+.review-card-content { position: relative; z-index: 1; }
+.review-card-content[data-stagger] > * {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .6s var(--ease-out), transform .6s var(--ease-out);
+}
+.review-card-content[data-stagger].is-in > * { opacity: 1; transform: translateY(0); }
+.review-card-content[data-stagger] > *:nth-child(1) { transition-delay: .12s; }
+.review-card-content[data-stagger] > *:nth-child(2) { transition-delay: .24s; }
+.review-card-content[data-stagger] > *:nth-child(3) { transition-delay: .36s; }
 
 /* کوتیشن تزئینی — محوِ در گوشه */
 .review-quote-mark {
@@ -1439,6 +1517,13 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
     .review-card, .review-quote-mark, .review-product-chip { transition: none; }
+    .review-card-accent { animation: none; }
+    .review-card-content[data-stagger] > *,
+    .review-card-content[data-stagger].is-in > * {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
 }
 
 /* ---------- نوار پایین موبایل (Sticky Mobile Bar) ---------- */
@@ -2363,6 +2448,81 @@ html, body {
 }
 .site-login-btn:active { transform: translateY(0) scale(.96); }
 
+/* ---------- 8.9) شبکه‌های اجتماعی — دکمه‌های دایره‌ای برند ----------
+   حالت پایه: چیپ نئومورفیک تک‌رنگ؛ هاور: با رنگ برند همان شبکه پر می‌شود
+   (هر شبکه متغیرهای --brand / --brand-bg خودش را دارد). */
+.site-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+}
+.site-social--compact { gap: .55rem; }
+.site-social-btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    box-shadow:
+        5px 5px 12px var(--shadow-dark),
+        -5px -5px 12px var(--shadow-light),
+        inset 0 1px 0 rgba(255, 255, 255, .35);
+    transition:
+        transform var(--dur-med) var(--ease-spring),
+        box-shadow var(--dur-med) var(--ease-out),
+        color var(--dur-fast) var(--ease-out),
+        background-color var(--dur-med) var(--ease-out);
+}
+.site-social--compact .site-social-btn {
+    width: 40px;
+    height: 40px;
+}
+.site-social-btn svg {
+    width: 23px;
+    height: 23px;
+    transition: transform var(--dur-med) var(--ease-spring);
+}
+.site-social--compact .site-social-btn svg { width: 18px; height: 18px; }
+.site-social-btn:hover svg { transform: scale(1.12); }
+.site-social-btn:active { transform: translateY(0) scale(.94); }
+
+/* رنگ برند هر شبکه — هاور با گرادیان/رنگ خود شبکه پر می‌شود */
+.site-social--instagram { --brand: #e1306c; --brand-bg: linear-gradient(45deg, #f58529 0%, #dd2a7b 52%, #8134af 100%); }
+.site-social--telegram  { --brand: #229ed9; --brand-bg: linear-gradient(135deg, #43c6f6 0%, #1d9fd8 100%); }
+.site-social--whatsapp  { --brand: #1da851; --brand-bg: linear-gradient(135deg, #43e97b 0%, #1fa855 100%); }
+.site-social--twitter   { --brand: #0f1419; --brand-bg: #0f1419; }
+.site-social--youtube   { --brand: #f00; --brand-bg: linear-gradient(135deg, #ff6a3d 0%, #f70000 100%); }
+
+.site-social-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    color: #fff;
+    background: var(--brand-bg, var(--brand));
+    box-shadow:
+        0 12px 24px color-mix(in srgb, var(--brand) 45%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--brand) 32%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+/* ایکس/توییتر: در هر دو تم، دایرهٔ سفید با X مشکی خواناتر است */
+.site-social--twitter:hover {
+    color: var(--brand);
+    background: #fff;
+    box-shadow:
+        0 12px 24px color-mix(in srgb, var(--brand) 40%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+/* دارک‌مود: هایلایت داخلی ملایم‌تر */
+[data-theme="dark-neumorphism"] .site-social-btn,
+[data-theme="blue-theme"] .site-social-btn,
+[data-theme="green-theme"] .site-social-btn {
+    box-shadow:
+        5px 5px 12px var(--shadow-dark),
+        -5px -5px 12px var(--shadow-light),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
 .site-menu-footer {
     opacity: 0;
     transform: translateY(20px);
@@ -2404,7 +2564,8 @@ html, body {
     .site-header, .site-logo-mark, .site-nav-link, .site-nav-link::after, .site-search-input,
     .site-lang-btn, .site-lang-chevron, .site-action-btn, .site-hamburger, .site-hamburger span,
     .site-menu-backdrop, .site-menu-link, .site-menu-footer, .site-menu-lang, .site-menu-account,
-    .site-menu-account-link, .site-menu-account-arrow, .site-account-avatar {
+    .site-menu-account-link, .site-menu-account-arrow, .site-account-avatar,
+    .site-social-btn, .site-social-btn svg, .site-login-btn {
         transition: none;
     }
     .site-menu-link, .site-menu-footer, .site-menu-account { opacity: 1; transform: none; }

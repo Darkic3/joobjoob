@@ -32,6 +32,7 @@ return [
     'best_sellers_subtitle' => 'Müşterilerimizin en çok sevdiği ürünler',
     'special_offers' => 'Özel Teklifler',
     'customer_reviews' => 'Müşteri Yorumları',
+    'reviews_eyebrow' => 'Gerçek müşteri sesleri',
     'review_average' => 'Genel puan',
     'based_on_recent' => ':count son yoruma göre',
     'about_product' => 'Hakkında',
