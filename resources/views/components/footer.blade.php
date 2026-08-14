@@ -55,57 +55,84 @@
                     </div>
                 </div>
 
-                {{-- ستون دسترسی سریع --}}
-                <nav class="site-footer-col" aria-label="{{ __('messages.quick_links') }}">
-                    <h4 class="site-footer-heading">
-                        <span class="site-footer-heading-dot" aria-hidden="true"></span>
-                        {{ __('messages.quick_links') }}
-                    </h4>
-                    <ul class="site-footer-links">
-                        <li><a href="{{ localizedRoute('products.index') }}">{{ __('messages.products') }}</a></li>
-                        <li><a href="{{ localizedRoute('site.page', ['page' => 'about']) }}">{{ __('messages.pages.about.title') }}</a></li>
-                        <li><a href="{{ localizedRoute('site.page', ['page' => 'contact']) }}">{{ __('messages.pages.contact.title') }}</a></li>
-                        <li><a href="{{ localizedRoute('site.page', ['page' => 'faq']) }}">{{ __('messages.pages.faq.title') }}</a></li>
-                        <li><a href="{{ localizedRoute('site.page', ['page' => 'terms']) }}">{{ __('messages.pages.terms.title') }}</a></li>
-                        <li><a href="{{ localizedRoute('site.page', ['page' => 'privacy']) }}">{{ __('messages.pages.privacy.title') }}</a></li>
-                    </ul>
+                {{-- ستون دسترسی سریع — آکاردئون در موبایل (بدون JS: همیشه باز) --}}
+                <nav class="site-footer-col site-footer-acc" data-footer-acc aria-label="{{ __('messages.quick_links') }}">
+                    <button type="button" class="site-footer-acc-btn"
+                            aria-expanded="false" aria-controls="footer-acc-quick"
+                            data-footer-acc-toggle>
+                        <h4 class="site-footer-heading">
+                            <span class="site-footer-heading-dot" aria-hidden="true"></span>
+                            {{ __('messages.quick_links') }}
+                        </h4>
+                        <svg class="site-footer-acc-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="site-footer-acc-body" id="footer-acc-quick">
+                        <div class="site-footer-acc-inner">
+                        <ul class="site-footer-links">
+                            <li><a href="{{ localizedRoute('products.index') }}">{{ __('messages.products') }}</a></li>
+                            <li><a href="{{ localizedRoute('site.page', ['page' => 'about']) }}">{{ __('messages.pages.about.title') }}</a></li>
+                            <li><a href="{{ localizedRoute('site.page', ['page' => 'contact']) }}">{{ __('messages.pages.contact.title') }}</a></li>
+                            <li><a href="{{ localizedRoute('site.page', ['page' => 'faq']) }}">{{ __('messages.pages.faq.title') }}</a></li>
+                            <li><a href="{{ localizedRoute('site.page', ['page' => 'terms']) }}">{{ __('messages.pages.terms.title') }}</a></li>
+                            <li><a href="{{ localizedRoute('site.page', ['page' => 'privacy']) }}">{{ __('messages.pages.privacy.title') }}</a></li>
+                        </ul>
+                        </div>
+                    </div>
                 </nav>
 
-                {{-- ستون اطلاعات حساب --}}
-                <nav class="site-footer-col" aria-label="{{ __('messages.account_info') }}">
-                    <h4 class="site-footer-heading">
-                        <span class="site-footer-heading-dot" aria-hidden="true"></span>
-                        {{ __('messages.account_info') }}
-                    </h4>
-                    <ul class="site-footer-links">
-                        @auth
-                            <li><a href="{{ localizedRoute('dashboard') }}">{{ __('messages.dashboard') }}</a></li>
-                            <li><a href="{{ localizedRoute('dashboard.orders') }}">{{ __('messages.my_orders') }}</a></li>
-                            <li><a href="{{ localizedRoute('dashboard.wishlist') }}">{{ __('messages.wishlist') }}</a></li>
-                        @else
-                            <li><a href="{{ localizedRoute('login') }}">{{ __('messages.login') }}</a></li>
-                            {{-- ثبت‌نام هنوز ساخته نشده — با فعال‌شدن، روت واقعی اینجا قرار می‌گیرد --}}
-                            <li><a href="{{ localizedRoute('login') }}">{{ __('messages.register') }}</a></li>
-                        @endauth
-                        <li><a href="{{ localizedRoute('cart.index') }}">{{ __('messages.cart') }}</a></li>
-                    </ul>
+                {{-- ستون اطلاعات حساب — آکاردئون در موبایل --}}
+                <nav class="site-footer-col site-footer-acc" data-footer-acc aria-label="{{ __('messages.account_info') }}">
+                    <button type="button" class="site-footer-acc-btn"
+                            aria-expanded="false" aria-controls="footer-acc-account"
+                            data-footer-acc-toggle>
+                        <h4 class="site-footer-heading">
+                            <span class="site-footer-heading-dot" aria-hidden="true"></span>
+                            {{ __('messages.account_info') }}
+                        </h4>
+                        <svg class="site-footer-acc-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="site-footer-acc-body" id="footer-acc-account">
+                        <div class="site-footer-acc-inner">
+                        <ul class="site-footer-links">
+                            @auth
+                                <li><a href="{{ localizedRoute('dashboard') }}">{{ __('messages.dashboard') }}</a></li>
+                                <li><a href="{{ localizedRoute('dashboard.orders') }}">{{ __('messages.my_orders') }}</a></li>
+                                <li><a href="{{ localizedRoute('dashboard.wishlist') }}">{{ __('messages.wishlist') }}</a></li>
+                            @else
+                                <li><a href="{{ localizedRoute('login') }}">{{ __('messages.login') }}</a></li>
+                                {{-- ثبت‌نام هنوز ساخته نشده — با فعال‌شدن، روت واقعی اینجا قرار می‌گیرد --}}
+                                <li><a href="{{ localizedRoute('login') }}">{{ __('messages.register') }}</a></li>
+                            @endauth
+                            <li><a href="{{ localizedRoute('cart.index') }}">{{ __('messages.cart') }}</a></li>
+                        </ul>
+                        </div>
+                    </div>
                 </nav>
 
-                {{-- ستون خبرنامه — کارت فرورفته با فرم قرصی --}}
-                <div class="site-footer-col">
-                    <h4 class="site-footer-heading">
-                        <span class="site-footer-heading-dot" aria-hidden="true"></span>
-                        {{ setting('footer_newsletter_title', __('messages.newsletter') ?? 'خبرنامه') }}
-                    </h4>
-                    <p class="site-footer-newsletter-sub">{{ __('messages.newsletter_subtitle') }}</p>
-                    <form class="site-footer-newsletter" action="#" method="post" onsubmit="return false;">
-                        <input type="email" name="email" required
-                               placeholder="{{ setting('newsletter_placeholder', __('messages.search_placeholder') ?? 'you@example.com') }}"
-                               class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}">
-                        <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-                        </button>
-                    </form>
+                {{-- ستون خبرنامه — آکاردئون در موبایل --}}
+                <div class="site-footer-col site-footer-acc" data-footer-acc>
+                    <button type="button" class="site-footer-acc-btn"
+                            aria-expanded="false" aria-controls="footer-acc-newsletter"
+                            data-footer-acc-toggle>
+                        <h4 class="site-footer-heading">
+                            <span class="site-footer-heading-dot" aria-hidden="true"></span>
+                            {{ setting('footer_newsletter_title', __('messages.newsletter') ?? 'خبرنامه') }}
+                        </h4>
+                        <svg class="site-footer-acc-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="site-footer-acc-body" id="footer-acc-newsletter">
+                        <div class="site-footer-acc-inner">
+                            <p class="site-footer-newsletter-sub">{{ __('messages.newsletter_subtitle') }}</p>
+                            <form class="site-footer-newsletter" action="#" method="post" onsubmit="return false;">
+                                <input type="email" name="email" required
+                                       placeholder="{{ setting('newsletter_placeholder', __('messages.search_placeholder') ?? 'you@example.com') }}"
+                                       class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}">
+                                <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 

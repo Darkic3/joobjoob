@@ -2877,6 +2877,61 @@ html, body {
 .site-footer-newsletter-btn:active { transform: translateY(0) scale(.94); }
 [dir="ltr"] .site-footer-newsletter-btn:hover { --footer-arrow-rotate: 6deg; }
 
+/* ---------- 11.6.1) آکاردئون ستون‌ها (موبایل) ----------
+   پیش‌فرض بدون JS: همه‌چیز باز (progressive enhancement).
+   وقتی JS کلاس is-open را مدیریت می‌کند، فقط زیر ۷۶۸px بسته‌شدنی است؛
+   در دسکتاپ با media query همیشه باز می‌ماند (حتی اگر is-open نباشد). */
+.site-footer-acc { position: relative; }
+
+/* دکمهٔ هدر آکاردئون — فقط در موبایل شبیه دکمه است */
+.site-footer-acc-btn {
+    display: none;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .35rem 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: start;
+    color: var(--text-primary);
+}
+.site-footer-acc-chevron {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    transition: transform var(--dur-med) var(--ease-spring);
+}
+
+/* بدنهٔ آکاردئون: انیمیشن grid-template-rows (GPU-friendly، بدون پرش layout) */
+.site-footer-acc-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows .5s var(--ease-out);
+}
+.site-footer-acc-inner { overflow: hidden; }
+
+/* در موبایل: هدر به‌صورت دکمه + شورون چرخان + بستن نرم.
+   بسته‌شدن فقط وقتی JS فعال است (کلاس js-footer-acc روی فوتر) — بدون JS همه‌چیز باز می‌ماند. */
+@media (max-width: 767px) {
+    .site-footer-acc-btn { display: flex; }
+    .site-footer-acc-btn:hover .site-footer-acc-heading { color: var(--accent); }
+    .js-footer-acc .site-footer-acc.is-open .site-footer-acc-chevron { transform: rotate(180deg); }
+    .js-footer-acc .site-footer-acc:not(.is-open) .site-footer-acc-body { grid-template-rows: 0fr; }
+    /* فاصلهٔ بین آکاردئون‌ها در موبایل کمتر می‌شود تا حس فشردهٔ موبایل بماند */
+    .site-footer-grid { gap: 1.75rem; }
+    .site-footer-acc-btn .site-footer-heading { margin-bottom: 0; }
+}
+
+/* در دسکتاپ: هیچ‌وقت بسته نشود، شورون و دکمه مخفی */
+@media (min-width: 768px) {
+    .site-footer-acc-btn { display: none; }
+    .site-footer-acc-body, .js-footer-acc .site-footer-acc.is-open .site-footer-acc-body,
+    .js-footer-acc .site-footer-acc:not(.is-open) .site-footer-acc-body {
+        grid-template-rows: 1fr;
+    }
+}
+
 /* ---------- 11.7) نوار پایین ---------- */
 .site-footer-bottom {
     margin-top: 3rem;
@@ -2890,4 +2945,5 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
     .site-footer-links a, .site-footer-newsletter-btn, .site-footer-newsletter-input { transition: none; }
+    .site-footer-acc-body, .site-footer-acc-chevron { transition: none; }
 }

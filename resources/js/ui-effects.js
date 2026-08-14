@@ -699,6 +699,53 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// ---------- فوتر: آکاردئون ستون‌ها در موبایل ----------
+// فقط زیر ۷۶۸px فعال است؛ در دسکتاپ کلاس باز به‌زور زده می‌شود تا ستون‌ها همیشه باز بمانند.
+// بدون JS هم همه‌چیز باز است (CSS پیش‌فرض باز) — این کد فقط حالت بسته‌شونده را فعال می‌کند.
+document.addEventListener('DOMContentLoaded', function () {
+    const footerAccs = [...document.querySelectorAll('[data-footer-acc]')];
+    if (!footerAccs.length) return;
+
+    // فقط وقتی JS اجرا می‌شود بستن فعال است (بدون JS: همیشه باز — progressive enhancement)
+    const footerEl = footerAccs[0].closest('.site-footer');
+    (footerEl || document.body).classList.add('js-footer-acc');
+
+    const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
+
+    // در موبایل شروع بسته؛ در دسکتاپ همیشه باز
+    footerAccs.forEach(acc => {
+        const toggle = acc.querySelector('[data-footer-acc-toggle]');
+        const body = acc.querySelector('.site-footer-acc-body');
+        if (!toggle || !body) return;
+
+        const setOpen = (open) => {
+            acc.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+            body.setAttribute('aria-hidden', String(!open));
+        };
+
+        setOpen(isDesktop());
+
+        toggle.addEventListener('click', () => {
+            if (isDesktop()) return;
+            setOpen(!acc.classList.contains('is-open'));
+        });
+    });
+
+    // با تغییر سایز بین دسکتاپ و موبایل، وضعیت را هماهنگ کن
+    const mq = window.matchMedia('(min-width: 768px)');
+    const sync = () => footerAccs.forEach(acc => {
+        const toggle = acc.querySelector('[data-footer-acc-toggle]');
+        const body = acc.querySelector('.site-footer-acc-body');
+        if (!toggle || !body) return;
+        acc.classList.toggle('is-open', isDesktop());
+        toggle.setAttribute('aria-expanded', String(isDesktop()));
+        body.setAttribute('aria-hidden', String(!isDesktop()));
+    });
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', sync);
+});
+
+
 // ---------- نوار پایین موبایل: شیت جستجو ----------
 document.addEventListener('DOMContentLoaded', function () {
     const sheet = document.querySelector('[data-mobile-search]');
