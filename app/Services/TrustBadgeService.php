@@ -19,6 +19,11 @@ class TrustBadgeService
      */
     public const SITE_MAX_BADGES = 6;
 
+    /**
+     * حداکثر تعداد نشان‌هایی که در نوار پایین فوتر نمایش داده می‌شود
+     */
+    public const FOOTER_MAX_BADGES = 6;
+
     public function store(TrustBadgeDTO $dto): TrustBadge
     {
         $data = $this->prepareData($dto);
@@ -58,16 +63,38 @@ class TrustBadgeService
     }
 
     /**
-     * نشان‌های فعال برای نمایش در سایت (صفحهٔ اصلی) — با کش و محدودیت.
+     * نشان‌های فعال برای نمایش در سایت (صفحهٔ اصلی) — فقط placementهای site/both.
      *
-     * همهٔ نشان‌ها با یک کوئری از دیتابیس خوانده می‌شود (اگر کش موجود نباشد)
-     * و برای ۱ ساعت کش می‌ماند؛ هر تغییری در پنل ادمین کش را پاک می‌کند.
-     * محدودیت نمایش (SITE_MAX_BADGES) این‌جا اعمال می‌شود تا ویو فقط مصرف‌کننده باشد.
+     * همهٔ نشان‌های فعال با یک کوئری خوانده و برای ۱ ساعت کش می‌شوند؛
+     * فیلتر محل نمایش (placement) روی مجموعهٔ کش‌شده اعمال می‌شود تا
+     * سایت و فوتر یک کش مشترک داشته باشند و هر تغییری در ادمین هر دو را به‌روز کند.
      */
     public function getActiveForSite(int $limit = self::SITE_MAX_BADGES): Collection
     {
-        return Cache::remember(self::CACHE_KEY, 3600, function () use ($limit) {
-            return TrustBadge::activeOrdered()->limit($limit)->get();
+        return $this->activeCached()
+            ->whereIn('placement', ['site', 'both'])
+            ->take($limit)
+            ->values();
+    }
+
+    /**
+     * نشان‌های فعال برای نوار پایین فوتر (اینماد، درگاه پرداخت و…) — فقط placementهای footer/both.
+     */
+    public function getActiveForFooter(int $limit = self::FOOTER_MAX_BADGES): Collection
+    {
+        return $this->activeCached()
+            ->whereIn('placement', ['footer', 'both'])
+            ->take($limit)
+            ->values();
+    }
+
+    /**
+     * همهٔ نشان‌های فعال به ترتیب نمایش — کش‌شده برای ۱ ساعت.
+     */
+    private function activeCached(): Collection
+    {
+        return Cache::remember(self::CACHE_KEY, 3600, function () {
+            return TrustBadge::activeOrdered()->get();
         });
     }
 
@@ -105,6 +132,7 @@ class TrustBadgeService
             'title' => $dto->getTitle(),
             'description' => $dto->getDescription(),
             'is_active' => $dto->getIsActive(),
+            'placement' => $dto->getPlacement(),
         ];
     }
 

@@ -91,6 +91,7 @@ return [
 
     'trust_free_shipping' => 'Ücretsiz Kargo',
     'trust_free_shipping_desc' => '50$ üzeri siparişlerde',
+    'trust_badges' => 'Güven rozetleri',
     'trust_authenticity' => 'Orijinallik Garantisi',
     'trust_authenticity_desc' => '%100 orijinal ürünler',
     'trust_return' => '7 Günde İade',

@@ -11,6 +11,7 @@ readonly class TrustBadgeDTO
         private array $title,
         private ?array $description,
         private bool $isActive,
+        private string $placement = 'site',
     ) {}
 
     public static function fromRequest(TrustBadgeRequest $request): self
@@ -26,6 +27,7 @@ readonly class TrustBadgeDTO
             ],
             description: ($fa === '' && $en === '') ? null : ['fa' => $fa, 'en' => $en],
             isActive: $request->boolean('is_active'),
+            placement: $request->validated('placement', 'site'),
         );
     }
 
@@ -48,5 +50,10 @@ readonly class TrustBadgeDTO
     public function getIsActive(): bool
     {
         return $this->isActive;
+    }
+
+    public function getPlacement(): string
+    {
+        return $this->placement;
     }
 }

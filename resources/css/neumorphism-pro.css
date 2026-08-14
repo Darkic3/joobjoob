@@ -2943,7 +2943,70 @@ html, body {
     color: var(--text-secondary);
 }
 
+/* ---------- 11.8) نشان‌های اعتماد نوار پایین ---------- */
+.site-footer-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: .55rem;
+    margin-bottom: 1.4rem;
+}
+
+.site-footer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .35rem .9rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text-primary) 4%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+    transition: transform var(--dur-fast) var(--ease-spring),
+                border-color var(--dur-fast) var(--ease-out),
+                background var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.site-footer-badge-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.55rem;
+    height: 1.55rem;
+    padding: 0 .25rem;
+    border-radius: 999px;
+    font-size: .95rem;
+    line-height: 1;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    box-shadow: inset 0 1px 1px color-mix(in srgb, #fff 35%, transparent);
+}
+
+.site-footer-badge-title {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.site-footer-badge:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    box-shadow: 0 6px 14px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.site-footer-copy {
+    line-height: 1.7;
+}
+
+@media (max-width: 767px) {
+    .site-footer-badges { gap: .45rem; }
+    .site-footer-badge { padding: .3rem .65rem .3rem .7rem; }
+    .site-footer-badge-title { font-size: .68rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .site-footer-links a, .site-footer-newsletter-btn, .site-footer-newsletter-input { transition: none; }
     .site-footer-acc-body, .site-footer-acc-chevron { transition: none; }
+    .site-footer-badge { transition: none; }
 }

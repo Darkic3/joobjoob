@@ -24,6 +24,7 @@ class TrustBadgeRequest extends FormRequest
             'description.fa' => 'nullable|string|max:500',
             'description.en' => 'nullable|string|max:500',
             'is_active' => 'boolean',
+            'placement' => 'nullable|string|in:site,footer,both',
         ];
     }
 

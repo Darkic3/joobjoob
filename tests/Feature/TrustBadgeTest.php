@@ -31,6 +31,7 @@ class TrustBadgeTest extends TestCase
 
         $this->assertSame(['fa' => 'ارسال سریع', 'en' => 'Fast Shipping'], $badge->title);
         $this->assertSame(['fa' => 'تحویل ۲۴ ساعته', 'en' => '24h delivery'], $badge->description);
+        $this->assertSame('site', $badge->placement); // پیش‌فرض: نوار صفحهٔ اصلی
 
         app()->setLocale('en');
         $this->assertSame('Fast Shipping', $badge->trans('title'));
@@ -38,6 +39,32 @@ class TrustBadgeTest extends TestCase
 
         app()->setLocale('fa');
         $this->assertSame('ارسال سریع', $badge->trans('title'));
+    }
+
+    public function test_trust_badge_stores_placement(): void
+    {
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.trust-badges.store'), [
+                'icon' => '🛡️',
+                'title' => ['fa' => 'درگاه پرداخت امن', 'en' => 'Secure Payment'],
+                'is_active' => '1',
+                'placement' => 'footer',
+            ])
+            ->assertRedirect(route('admin.trust-badges.index'));
+
+        $this->assertSame('footer', TrustBadge::latest('id')->first()->placement);
+    }
+
+    public function test_trust_badge_rejects_invalid_placement(): void
+    {
+        $this->actingAs($this->superAdmin())
+            ->post(route('admin.trust-badges.store'), [
+                'icon' => '🛡️',
+                'title' => ['fa' => 'نامعتبر'],
+                'is_active' => '1',
+                'placement' => 'sidebar',
+            ])
+            ->assertSessionHasErrors('placement');
     }
 
     public function test_trust_badge_trans_falls_back_to_fa_when_current_locale_empty(): void

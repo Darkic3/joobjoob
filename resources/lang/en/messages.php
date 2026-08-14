@@ -128,6 +128,7 @@ return [
 
     'trust_free_shipping' => 'Free Shipping',
     'trust_free_shipping_desc' => 'On orders over $50',
+    'trust_badges' => 'Trust badges',
     'trust_authenticity' => 'Authenticity Guarantee',
     'trust_authenticity_desc' => '100% genuine products',
     'trust_return' => '7-Day Returns',

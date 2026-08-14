@@ -91,6 +91,7 @@ return [
 
     'trust_free_shipping' => 'شحن مجاني',
     'trust_free_shipping_desc' => 'للطلبات فوق ٥٠ دولار',
+    'trust_badges' => 'شارات الثقة',
     'trust_authenticity' => 'ضمان الأصالة',
     'trust_authenticity_desc' => 'منتجات أصلية ١٠٠٪',
     'trust_return' => 'إرجاع خلال ٧ أيام',

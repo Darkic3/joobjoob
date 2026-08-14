@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\View\Composers\FooterComposer;
 use App\View\Composers\LocaleComposer;
 use App\View\Composers\SiteLayoutComposer;
 use Illuminate\Support\Facades\Gate;
@@ -30,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
 
         // نوار اعلان چیدمان سایت
         View::composer('layouts.site.app', SiteLayoutComposer::class);
+
+        // نشان‌های اعتماد نوار پایین فوتر (اینماد، درگاه پرداخت و…)
+        View::composer('components.footer', FooterComposer::class);
     }
 }

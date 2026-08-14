@@ -132,6 +132,7 @@ return [
 
     'trust_free_shipping' => 'ارسال رایگان',
     'trust_free_shipping_desc' => 'بالای ۵۰۰ هزار تومان',
+    'trust_badges' => 'نشان‌های اعتماد',
     'trust_authenticity' => 'ضمانت اصالت کالا',
     'trust_authenticity_desc' => '۱۰۰٪ اورجینال',
     'trust_return' => '۷ روز ضمانت بازگشت',

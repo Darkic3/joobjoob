@@ -136,9 +136,19 @@
                 </div>
             </div>
 
-            {{-- نوار پایین: حق‌کپی با خط مویی جداکننده --}}
+            {{-- نوار پایین: نشان‌های اعتماد + حق‌کپی با خط مویی جداکننده --}}
             <div class="site-footer-bottom">
-                <p>&copy; {{ show_date(null, 'Y') }} {{ setting('site_name', __('messages.site_name')) }} — {{ setting('footer_copyright', '') }}</p>
+                @if(count($footerTrustBadges))
+                    <ul class="site-footer-badges" aria-label="{{ __('messages.trust_badges') }}">
+                        @foreach($footerTrustBadges as $badge)
+                            <li class="site-footer-badge">
+                                <span class="site-footer-badge-icon" aria-hidden="true">{{ $badge->icon }}</span>
+                                <span class="site-footer-badge-title">{{ $badge->trans('title') }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <p class="site-footer-copy">&copy; {{ show_date(null, 'Y') }} {{ setting('site_name', __('messages.site_name')) }} — {{ setting('footer_copyright', '') }}</p>
             </div>
         </div>
     </div>
