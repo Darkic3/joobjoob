@@ -35,6 +35,7 @@ return [
     'reviews_eyebrow' => 'Gerçek müşteri sesleri',
     'review_average' => 'Genel puan',
     'based_on_recent' => ':count son yoruma göre',
+    'review_batch' => 'Yorumlar — grup :num',
     'about_product' => 'Hakkında',
     'verified_purchase' => 'Doğrulanmış',
     'view_all' => 'Tümünü Gör',

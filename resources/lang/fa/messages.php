@@ -86,6 +86,7 @@ return [
     'verified_purchase' => 'تایید شده',
     'review_average' => 'امتیاز کلی',
     'based_on_recent' => 'بر اساس :count نظر اخیر',
+    'review_batch' => 'نظرات — گروه :num',
     'about_product' => 'درباره',
     'dont_miss_out' => 'از دستش نده',
     'trust_title' => 'چرا از ما خرید کنید؟',

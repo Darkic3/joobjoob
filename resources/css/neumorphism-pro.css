@@ -1438,6 +1438,80 @@ html, body {
 .review-card-content[data-stagger] > *:nth-child(2) { transition-delay: .24s; }
 .review-card-content[data-stagger] > *:nth-child(3) { transition-delay: .36s; }
 
+/* ---------- چرخش بچ‌ها (rotator) ---------- */
+/* همهٔ بچ‌ها در یک سلول گرید روی هم می‌نشینند تا ارتفاع بخش ثابت بماند
+   (بلندترین بچ ارتفاع را تعیین می‌کند — بدون پرش لایه‌اوت هنگام تعویض). */
+.reviews-rotator {
+    display: grid;
+    grid-template-columns: 1fr;
+    --rev-interval: 6000ms;
+}
+.reviews-batch {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(18px) scale(.985);
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+        opacity .7s var(--ease-out),
+        transform .7s var(--ease-out),
+        visibility 0s linear .7s;
+    will-change: opacity, transform;
+}
+.reviews-batch.is-active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+    transition:
+        opacity .7s var(--ease-out),
+        transform .7s var(--ease-out),
+        visibility 0s;
+}
+
+/* ---------- دات‌های پیشرفت بچ‌ها ---------- */
+.reviews-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    margin-top: 1.9rem;
+}
+.reviews-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text-secondary) 26%, transparent);
+    cursor: pointer;
+    overflow: hidden;
+    transition: width .45s var(--ease-out), background-color .45s var(--ease-out), box-shadow .45s var(--ease-out);
+}
+.reviews-dot.is-active {
+    width: 34px;
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+/* فیل پیشرفت — هماهنگ با فاصلهٔ چرخش (--rev-interval) */
+.reviews-dot-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--gold)));
+    transform: scaleX(0);
+    transform-origin: left;
+}
+[dir="rtl"] .reviews-dot-fill { transform-origin: right; }
+.reviews-dot.is-active .reviews-dot-fill {
+    animation: reviewsDotFill var(--rev-interval, 6000ms) linear forwards;
+}
+@keyframes reviewsDotFill {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
 /* کوتیشن تزئینی — محوِ در گوشه */
 .review-quote-mark {
     position: absolute;
@@ -1524,6 +1598,8 @@ html, body {
         transform: none !important;
         transition: none !important;
     }
+    .reviews-batch, .reviews-batch.is-active { transition: none; }
+    .reviews-dot-fill { animation: none; }
 }
 
 /* ---------- نوار پایین موبایل (Sticky Mobile Bar) ---------- */

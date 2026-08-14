@@ -600,6 +600,105 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// ---------- چرخش نظرات مشتریان (rotator) ----------
+// بچ‌های ۳تایی (۱ کارت برجسته + ۲ ثانویه) هر چند ثانیه با کراس‌فید عوض می‌شوند.
+// مکث با هاور/فوکوس، چرخش فقط وقتی بخش در دید است؛ در reduced-motion فقط دات‌ها کار می‌کنند.
+document.addEventListener('DOMContentLoaded', function () {
+    const rotator = document.querySelector('[data-reviews-rotator]');
+    if (!rotator) return;
+
+    const batches = [...rotator.querySelectorAll('[data-reviews-batch]')];
+    const dots = [...rotator.querySelectorAll('[data-reviews-dot]')];
+    if (batches.length < 2) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const interval = parseInt(rotator.getAttribute('data-reviews-interval'), 10) || 6000;
+    // برای هماهنگی نوار پیشرفت دات‌ها با زمان‌بندی چرخش
+    rotator.style.setProperty('--rev-interval', interval + 'ms');
+
+    let current = 0;
+    let timer = null;
+    let paused = false;
+
+    // ریپلی ورود پله‌ای محتوای بچ تازه فعال‌شده
+    function replayStagger(container) {
+        container.querySelectorAll('[data-stagger]').forEach(el => {
+            el.classList.remove('is-in');
+            void el.offsetWidth; // reflow تا transition دوباره اجرا شود
+            el.classList.add('is-in');
+        });
+    }
+
+    function activate(index, userInitiated) {
+        const same = index === current;
+        current = index;
+
+        batches.forEach((b, i) => {
+            const on = i === index;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-hidden', on ? 'false' : 'true');
+        });
+
+        // دات‌ها: حذف کلاس از همه + reflow + افزودن به دات هدف → انیمیشن پیشرفت ریستart می‌شود
+        dots.forEach(d => d.classList.remove('is-active'));
+        void dots[0].offsetWidth;
+        dots.forEach((d, i) => {
+            const on = i === index;
+            d.classList.toggle('is-active', on);
+            d.setAttribute('aria-selected', on ? 'true' : 'false');
+            d.setAttribute('tabindex', on ? '0' : '-1');
+        });
+
+        if (same) {
+            replayStagger(batches[index]);
+        } else {
+            requestAnimationFrame(() => replayStagger(batches[index]));
+        }
+        if (userInitiated) restartTimer();
+    }
+
+    function stopTimer() {
+        if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function startTimer() {
+        stopTimer();
+        if (reduceMotion || paused) return;
+        timer = setInterval(() => activate((current + 1) % batches.length, false), interval);
+    }
+
+    function restartTimer() { startTimer(); }
+
+    // کلیک روی دات‌ها
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => activate(i, true));
+    });
+
+    // مکث با هاور / فوکوس
+    rotator.addEventListener('mouseenter', () => { paused = true; stopTimer(); });
+    rotator.addEventListener('mouseleave', () => { paused = false; startTimer(); });
+    rotator.addEventListener('focusin', () => { paused = true; stopTimer(); });
+    rotator.addEventListener('focusout', (e) => {
+        if (rotator.contains(e.relatedTarget)) return;
+        paused = false;
+        startTimer();
+    });
+
+    // فقط وقتی بخش در دید است بچرخد (صرفه‌جویی در پرفورمنس)
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !paused && !reduceMotion) startTimer();
+                else if (!entry.isIntersecting) stopTimer();
+            });
+        }, { threshold: 0.2 });
+        io.observe(rotator);
+    } else {
+        startTimer();
+    }
+});
+
+
 // ---------- نوار پایین موبایل: شیت جستجو ----------
 document.addEventListener('DOMContentLoaded', function () {
     const sheet = document.querySelector('[data-mobile-search]');

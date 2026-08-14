@@ -66,8 +66,10 @@ class HomeController extends Controller
         // با تبدیل این بخش‌ها به اسکرول افقی، تعداد بیشتری لازم است تا ریل قابل اسکرول باشد
         $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(8)->get();
         $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
-        $reviews = Review::with(['user', 'product'])->approved()->latest()->take(3)->get();
-        // میانگین امتیاز نظرات نمایش‌داده‌شده — محاسبه در کنترلر، نه در ویو
+        // نظرات مشتریان برای چرخش (rotator): بچ‌های ۳تایی = ۱ کارت برجسته + ۲ ثانویه
+        $reviews = Review::with(['user', 'product'])->approved()->latest()->take(12)->get();
+        $reviewBatches = $reviews->chunk(3);
+        // میانگین امتیاز همهٔ نظرات نمایش‌داده‌شده — محاسبه در کنترلر، نه در ویو
         $reviewsAvg = round($reviews->avg('rating') ?? 0, 1);
         // آخرین مقالات برای صفحهٔ اصلی (۳ مقالهٔ فعال و جدید)
         $latestBlogs = Blog::with('category')->active()->latest()->take(3)->get();
@@ -79,7 +81,7 @@ class HomeController extends Controller
         // بنرهای میانی فعال — از ۱ تا ۴ بنر، کش و محدودیت داخل سرویس
         $promoBanners = $this->promoBannerService->getActiveForSite();
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners'));
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners'));
     }
 
     /**
