@@ -104,6 +104,8 @@ return [
     'account' => 'Account',
     'no_account_hint' => "Don't have an account yet? Registration with a 10% discount code is coming soon.",
     'footer_desc' => 'footer_description',
+    'footer_brand_tag' => 'Online store with the best quality and prices',
+    'newsletter_subtitle' => 'Be the first to hear about special offers and new arrivals.',
     'newsletter' => 'newsletter',
 
     'socials' => [

@@ -248,4 +248,6 @@ return [
     ],
     'breadcrumb' => 'Sayfa yolu',
     'quick_links' => 'Hızlı bağlantılar',
+    'newsletter_subtitle' => 'Özel fırsatlardan ve yeni ürünlerden ilk siz haberdar olun.',
+    'footer_brand_tag' => 'En iyi kalite ve fiyatlarla online mağaza',
 ];
