@@ -264,6 +264,9 @@ html, body {
     position: relative;
     width: 100%;
     min-height: clamp(600px, 76vh, 760px);
+    /* نوار پایین محفوظ برای دات‌های صفحه‌بندی — حتی هنگام انیمیشن ورود (translateY 30px)
+       محتوای بلند اسلاید هرگز به دات‌ها نمی‌رسد */
+    padding-bottom: 4.25rem;
     overflow: hidden;
     isolation: isolate;
     background:
@@ -514,7 +517,8 @@ html, body {
 
 /* ---------- 4.9) ریسپانسیو ---------- */
 @media (max-width: 767px) {
-    .hero-swiper { min-height: 680px; }
+    /* موبایل: ارتفاع با autoHeight به محتوای اسلاید فعال می‌چسبد — بدون فضای خالی بزرگ */
+    .hero-swiper { min-height: 0; }
     .hero-product-image { width: min(320px, 82vw); max-height: 320px; }
     .hero-product-glow { width: 300px; height: 300px; }
 }

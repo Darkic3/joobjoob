@@ -22,7 +22,7 @@
                 <div class="swiper-slide">
 
                     <div
-                        class="grid lg:grid-cols-[55fr_45fr] items-center gap-[var(--gap)] p-[var(--gap)] md:p-10 lg:p-14 min-h-[600px] md:min-h-[680px] lg:min-h-[720px]"
+                        class="grid lg:grid-cols-[55fr_45fr] items-center gap-[var(--gap)] p-[var(--gap)] md:p-10 lg:p-14 min-h-0 md:min-h-[680px] lg:min-h-[720px]"
                     >
 
                         {{-- =====================================================
@@ -417,6 +417,8 @@
                         effect: 'fade',
                         fadeEffect: {crossFade: true},
                         speed: 900, // کمی سریع‌تر برای حس پویایی بیشتر
+                        // ارتفاع هر اسلاید را به محتوای خودش می‌چسباند — اسلاید کوتاه فضای خالی بزرگ زیرش نمی‌گذارد
+                        autoHeight: true,
                         loop: true,
                         autoplay: {
                             delay: 6500,
