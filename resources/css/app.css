@@ -11,7 +11,7 @@
 @tailwind utilities;
 
 * { font-family: 'Vazirmatn', sans-serif; }
-.mono { font-family: 'JetBrains Mono', monospace; }
+.mono { font-family: 'JetBrains Mono', 'Vazirmatn', monospace; }
 
 
 /*========================= FOR SCROLL PAGE  =========================*/

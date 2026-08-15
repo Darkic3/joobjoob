@@ -71,12 +71,11 @@
                                     class="hero-anim hero-price flex items-end justify-center lg:justify-start gap-3 mb-7"
                                 >
 
-                                    {{-- Old Price --}}
+                                    {{-- Old Price — Vazirmatn برای ارقام فارسی (مونو گلیف فارسی ندارد) --}}
                                     @if($slide->old_price > $slide->price)
 
                                         <span
-                                            class="mono text-sm md:text-base line-through mb-1"
-                                            style="color: var(--text-secondary);"
+                                            class="hero-old-price mb-1"
                                             dir="ltr"
                                         >
                                             {{ number_format($slide->old_price) }}
@@ -86,18 +85,14 @@
                                     @endif
 
 
-                                    {{-- Current Price --}}
+                                    {{-- Current Price — Vazirmatn 900، بزرگ‌ترین عنصر متن در حالت میانه --}}
                                     <span
-                                        class="mono font-black text-3xl md:text-4xl"
-                                        style="color: var(--accent);"
+                                        class="hero-price-num"
                                         dir="ltr"
                                     >
                                         {{ number_format($slide->price) }}
 
-                                        <small
-                                            class="text-xs md:text-sm font-bold"
-                                            style="color: var(--text-secondary);"
-                                        >
+                                        <small>
                                             {{ $slide->currencyLabel() }}
                                         </small>
                                     </span>
@@ -114,21 +109,33 @@
                                 class="hero-anim hero-btns flex flex-wrap items-center justify-center lg:justify-start gap-4"
                             >
 
-                                {{-- Primary CTA --}}
+                                {{-- Primary CTA — معماری Button-in-Button: فلش در دایرهٔ داخلی + گرادیان/شیین --}}
                                 <a
                                     href="{{ $slide->url }}"
-                                    class="neu-btn neu-btn-primary px-8 py-3.5 font-bold text-sm shadow-lg hover:shadow-xl transition-all"
+                                    class="neu-btn neu-btn-primary hero-cta hero-cta--primary font-bold text-sm shadow-lg hover:shadow-xl transition-all group"
                                 >
-                                    {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
+                                    <span class="hero-cta-label">
+                                        {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
+                                    </span>
+
+                                    <span class="hero-cta-icon" aria-hidden="true">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>
+                                    </span>
                                 </a>
 
 
-                                {{-- Secondary CTA --}}
+                                {{-- Secondary CTA — همان معماری با حلقهٔ رنگی و تنت آکسانت --}}
                                 <a
                                     href="#deals"
-                                    class="neu-btn px-8 py-3.5 font-bold text-sm"
+                                    class="neu-btn hero-cta hero-cta--secondary font-bold text-sm"
                                 >
-                                    {{ __('messages.special_deals') }}
+                                    <span class="hero-cta-label">
+                                        {{ __('messages.special_deals') }}
+                                    </span>
+
+                                    <span class="hero-cta-icon" aria-hidden="true">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>
+                                    </span>
                                 </a>
 
                             </div>
