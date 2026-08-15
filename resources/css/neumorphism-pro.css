@@ -489,23 +489,24 @@ html, body {
     color: var(--gold);
 }
 
-/* ---------- 4.6.3) CTA هیرو — معماری Button-in-Button (فلش در دایرهٔ داخلی) ---------- */
+/* ---------- 4.6.3) CTA Ring — کامپوننت دکمهٔ حلقه‌دار «بازهٔ اعتماد» (قابل استفاده در هر جای سایت) ----------
+   معماری Button-in-Button: فلش در دایرهٔ داخلی + حلقهٔ پالسی روی هاور.
+   رنگ/شدت تم از توکن‌های --ring-* و تاکید هر دکمه از --ring-emphasis می‌آید. */
 /* اختصاصیت دوکلاسه تا بر .neu-btn پایه غلبه کند (در کاسکید لایه‌ها ترتیب متفاوت می‌شود) */
-.neu-btn.hero-cta {
+.neu-btn.cta-ring {
     min-height: 58px;
     gap: .9rem;
     padding-block: .6rem;
     padding-inline: 1.6rem .5rem;
     position: relative;
-    overflow: hidden;
     isolation: isolate;
 }
-.hero-cta-label {
+.cta-ring-label {
     display: inline-flex;
     align-items: center;
     line-height: 1.15;
 }
-.hero-cta-icon {
+.cta-ring-icon {
     display: grid;
     place-items: center;
     width: 40px;
@@ -515,8 +516,8 @@ html, body {
     transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-out);
 }
 
-/* Primary — گرادیان عمق + شیین + سایهٔ رنگی آکسانت */
-.hero-cta.hero-cta--primary {
+/* Primary — گرادیان عمق + سایهٔ رنگی آکسانت */
+.cta-ring.cta-ring--primary {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--accent) 82%, #fff 18%) 0%,
         var(--accent) 48%,
@@ -528,20 +529,29 @@ html, body {
         inset 0 -2px 5px color-mix(in srgb, #000 18%, transparent);
     transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out);
 }
-.hero-cta.hero-cta--primary::after {
+/* حلقهٔ «بازهٔ اعتماد» — پایهٔ مشترک؛ شدت هر دکمه از --ring-emphasis */
+.cta-ring::after {
     content: "";
     position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(115deg, transparent 32%, color-mix(in srgb, #fff 38%, transparent) 50%, transparent 68%);
-    transform: translateX(-130%);
-    transition: transform .9s var(--ease-out);
+    inset: calc(-6px * var(--ring-emphasis, 1));
+    border-radius: inherit;
+    border: calc(2px * var(--ring-emphasis, 1)) solid color-mix(in srgb, var(--ring-color) calc(55% * var(--ring-strength) * var(--ring-emphasis, 1)), transparent);
+    opacity: 0;
+    transform: scale(.98);
+    transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
     pointer-events: none;
+    z-index: -1;
 }
-.hero-cta.hero-cta--primary:hover::after { transform: translateX(130%); }
-[dir="rtl"] .hero-cta.hero-cta--primary::after { transform: translateX(130%); }
-[dir="rtl"] .hero-cta.hero-cta--primary:hover::after { transform: translateX(-130%); }
-.hero-cta.hero-cta--primary:hover {
+.cta-ring:hover::after {
+    opacity: 1;
+    transform: scale(1);
+    animation: heroCtaPulse var(--ring-duration, 2s) ease-in-out infinite;
+}
+@keyframes heroCtaPulse {
+    0%, 100% { opacity: calc(var(--ring-pulse-low) * var(--ring-strength) * var(--ring-emphasis, 1)); transform: scale(1); }
+    50%      { opacity: calc(var(--ring-pulse-high) * var(--ring-strength) * var(--ring-emphasis, 1)); transform: scale(calc(1 + .045 * var(--ring-emphasis, 1))); }
+}
+.cta-ring.cta-ring--primary:hover {
     transform: translateY(-2px);
     box-shadow:
         0 18px 34px -16px color-mix(in srgb, var(--accent) 80%, transparent),
@@ -549,14 +559,14 @@ html, body {
         inset 0 1px 0 color-mix(in srgb, #fff 34%, transparent),
         inset 0 -2px 5px color-mix(in srgb, #000 20%, transparent);
 }
-.hero-cta--primary .hero-cta-icon {
+.cta-ring--primary .cta-ring-icon {
     color: inherit;
     background: color-mix(in srgb, #000 16%, transparent);
     box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent);
 }
 
 /* Secondary — حاشیهٔ رنگی + تنت آکسانت؛ هاور → بنفش‌مزه */
-.hero-cta.hero-cta--secondary {
+.cta-ring.cta-ring--secondary {
     background: linear-gradient(150deg,
         color-mix(in srgb, var(--bg-elevated) 88%, var(--accent) 12%),
         var(--bg-elevated) 55%);
@@ -568,7 +578,7 @@ html, body {
     color: var(--text-primary);
     transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
-.hero-cta.hero-cta--secondary:hover {
+.cta-ring.cta-ring--secondary:hover {
     color: var(--accent);
     border-color: color-mix(in srgb, var(--accent) 48%, transparent);
     box-shadow:
@@ -577,23 +587,28 @@ html, body {
         inset 0 1px 0 color-mix(in srgb, #fff 50%, transparent),
         0 8px 22px -12px color-mix(in srgb, var(--accent) 40%, transparent);
 }
-.hero-cta--secondary .hero-cta-icon {
+.cta-ring--secondary .cta-ring-icon {
     background: color-mix(in srgb, var(--accent) 13%, transparent);
     box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 30%, transparent);
 }
+/* دکمهٔ ثانویه — فقط یک متغیر: تاکید ۰.۷۵ → حاشیهٔ ۱.۵px، پالس ملایم‌تر، چرخهٔ آرام‌تر */
+.cta-ring--secondary.cta-ring {
+    --ring-emphasis: .75;
+    --ring-duration: 2.4s;
+}
 
 /* جنبش فنری: دایره به سمت «جلو» + بزرگ‌تر */
-.hero-cta:hover .hero-cta-icon { transform: translateX(-5px) translateY(-1px) scale(1.1); }
-[dir="ltr"] .hero-cta:hover .hero-cta-icon { transform: translateX(5px) translateY(-1px) scale(1.1); }
-.hero-cta-icon svg { display: block; }
-[dir="ltr"] .hero-cta-icon svg { transform: scaleX(-1); }
+.cta-ring:hover .cta-ring-icon { transform: translateX(-5px) translateY(-1px) scale(1.1); }
+[dir="ltr"] .cta-ring:hover .cta-ring-icon { transform: translateX(5px) translateY(-1px) scale(1.1); }
+.cta-ring-icon svg { display: block; }
+[dir="ltr"] .cta-ring-icon svg { transform: scaleX(-1); }
 
 /* فشردن فیزیکی */
-.neu-btn.hero-cta:active { transform: scale(.98); }
+.neu-btn.cta-ring:active { transform: scale(.98); }
 @media (prefers-reduced-motion: reduce) {
-    .hero-cta.hero-cta--primary::after,
-    .hero-cta:hover .hero-cta-icon,
-    [dir="ltr"] .hero-cta:hover .hero-cta-icon { transform: none; }
+    .cta-ring:hover::after { animation: none !important; transform: scale(1); opacity: 1; }
+    .cta-ring:hover .cta-ring-icon,
+    [dir="ltr"] .cta-ring:hover .cta-ring-icon { transform: none; }
 }
 
 /* ---------- 4.7) ناوبری اسلایدر (داخل هیرو) ---------- */

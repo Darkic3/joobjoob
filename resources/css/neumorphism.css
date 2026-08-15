@@ -13,6 +13,11 @@
     --accent-contrast: #ffffff;
     --danger: #e53e5c;
     --success: #38a169;
+    /* حلقهٔ «بازهٔ اعتماد» CTA هیرو — هر تم رنگ و شدت خودش را تعریف می‌کند */
+    --ring-color: #6c63ff;
+    --ring-strength: 1;
+    --ring-pulse-low: .55;
+    --ring-pulse-high: 1;
     --radius-sm: 12px;
     --radius-md: 18px;
     --radius-lg: 28px;
@@ -33,6 +38,11 @@
     --text-primary: #edf2f7; --text-secondary: #a0aec0;
     --accent: #8b83ff; --accent-contrast: #1a202c;
     --danger: #fc8181; --success: #68d391;
+    /* حلقه — رنگ روشن‌تر و شدت کمی پایین‌تر: رنگ روشن روی پس‌زمینهٔ تیره بیشتر می‌پرد */
+    --ring-color: #a59dff;
+    --ring-strength: .85;
+    --ring-pulse-low: .5;
+    --ring-pulse-high: .92;
 }
 [data-theme="blue-theme"] {
     --bg: #dde9f7; --bg-elevated: #dde9f7;
@@ -40,6 +50,10 @@
     --text-primary: #1a365d; --text-secondary: #4a6584;
     --accent: #3182ce; --accent-contrast: #ffffff;
     --danger: #e53e5c; --success: #38a169;
+    --ring-color: #3182ce;
+    --ring-strength: 1;
+    --ring-pulse-low: .55;
+    --ring-pulse-high: 1;
 }
 [data-theme="green-theme"] {
     --bg: #e2ece3; --bg-elevated: #e2ece3;
@@ -47,6 +61,10 @@
     --text-primary: #1c3a24; --text-secondary: #4d6b53;
     --accent: #38a169; --accent-contrast: #ffffff;
     --danger: #e53e5c; --success: #2f855a;
+    --ring-color: #38a169;
+    --ring-strength: 1;
+    --ring-pulse-low: .55;
+    --ring-pulse-high: 1;
 }
 
 body {

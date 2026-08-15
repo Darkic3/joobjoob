@@ -109,34 +109,15 @@
                                 class="hero-anim hero-btns flex flex-wrap items-center justify-center lg:justify-start gap-4"
                             >
 
-                                {{-- Primary CTA — معماری Button-in-Button: فلش در دایرهٔ داخلی + گرادیان/شیین --}}
-                                <a
-                                    href="{{ $slide->url }}"
-                                    class="neu-btn neu-btn-primary hero-cta hero-cta--primary font-bold text-sm shadow-lg hover:shadow-xl transition-all group"
-                                >
-                                    <span class="hero-cta-label">
-                                        {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
-                                    </span>
+                                {{-- Primary CTA — کامپوننت cta-button: حلقهٔ «بازهٔ اعتماد» + دایرهٔ فلش --}}
+                                <x-cta-button :href="$slide->url" variant="primary">
+                                    {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
+                                </x-cta-button>
 
-                                    <span class="hero-cta-icon" aria-hidden="true">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>
-                                    </span>
-                                </a>
-
-
-                                {{-- Secondary CTA — همان معماری با حلقهٔ رنگی و تنت آکسانت --}}
-                                <a
-                                    href="#deals"
-                                    class="neu-btn hero-cta hero-cta--secondary font-bold text-sm"
-                                >
-                                    <span class="hero-cta-label">
-                                        {{ __('messages.special_deals') }}
-                                    </span>
-
-                                    <span class="hero-cta-icon" aria-hidden="true">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>
-                                    </span>
-                                </a>
+                                {{-- Secondary CTA — همان کامپوننت با تاکید کمتر (variant=secondary) --}}
+                                <x-cta-button href="#deals" variant="secondary">
+                                    {{ __('messages.special_deals') }}
+                                </x-cta-button>
 
                             </div>
 
