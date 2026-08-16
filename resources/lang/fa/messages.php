@@ -147,7 +147,7 @@ return [
     'next_slide' => 'اسلاید بعدی',
     'prev_slide' => 'اسلاید قبلی',
     'view_products' => 'مشاهده محصولات',
-    'special_deals' => 'پیشنهادات ویژه 🔥',
+    'special_deals' => 'پیشنهادات ویژه',
     'discount_off' => 'تخفیف',
 
     // وبلاگ

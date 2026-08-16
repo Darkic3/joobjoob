@@ -106,7 +106,7 @@ return [
     'next_slide' => 'Sonraki slayt',
     'prev_slide' => 'Önceki slayt',
     'view_products' => 'Ürünleri Görüntüle',
-    'special_deals' => 'Özel Fırsatlar 🔥',
+    'special_deals' => 'Özel Fırsatlar',
     'discount_off' => 'İndirim',
 
     // Blog

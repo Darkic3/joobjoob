@@ -114,8 +114,10 @@
                                     {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
                                 </x-cta-button>
 
-                                {{-- Secondary CTA — همان کامپوننت با تاکید کمتر (variant=secondary) --}}
+                                {{-- Secondary CTA — همان کامپوننت با تاکید کمتر (variant=secondary)؛
+                                     شعلهٔ SVG هم‌شکلِ شعلهٔ بخش پیشنهادات (جایگزین ایموجی 🔥) --}}
                                 <x-cta-button href="#deals" variant="secondary">
+                                    <svg class="cta-ring-flame" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
                                     {{ __('messages.special_deals') }}
                                 </x-cta-button>
 
@@ -399,7 +401,7 @@
             if (typeof Swiper !== 'undefined') {
                 const heroSwiperEl = document.querySelector('.hero-swiper');
                 if (heroSwiperEl) {
-                    new Swiper(heroSwiperEl, {
+                    const heroSwiper = new Swiper(heroSwiperEl, {
                         // جهت از سند گرفته می‌شود تا در زبان‌های LTR (انگلیسی و…) درست کار کند
                         rtl: document.documentElement.dir === 'rtl',
                         effect: 'fade',
@@ -423,8 +425,38 @@
                         },
                         // watchSlidesProgress: true,
                     });
+
+                    // دات پیشرفت زمان: در طول هر اسلاید، نوار داخل دات فعال از رویداد
+                    // autoplayTimeLeft سوییپر پر می‌شود (روی هاور/توقف متوقف و ادامه می‌یابد)
+                    const heroPagination = heroSwiperEl.querySelector('.hero-pagination');
+                    const setDotProgress = (fraction) => {
+                        const active = heroPagination && heroPagination.querySelector('.swiper-pagination-bullet-active');
+                        if (active) active.style.setProperty('--dot-progress', (Math.max(0, Math.min(1, fraction)) * 100) + '%');
+                    };
+                    heroSwiper.on('slideChange', () => setDotProgress(0));
+                    heroSwiper.on('autoplayTimeLeft', (swiper, timeLeft) => {
+                        const delay = (swiper.params.autoplay && swiper.params.autoplay.delay) || 6500;
+                        setDotProgress(1 - timeLeft / delay);
+                    });
                 }
             }
+
+            // CTA ثانویهٔ هیرو: اسکرول نرم به بخش پیشنهادات + هایلایت لحظه‌ای (حلقهٔ آکسانت)
+            // با event delegation — چون سوییپر با loop گره‌های اسلاید را جابه‌جا/تکثیر می‌کند،
+            // بایند مستقیم به یک گرهٔ خاص ناامن است
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest && e.target.closest('a[href="#deals"]');
+                if (!link) return;
+                const target = document.querySelector('#deals');
+                if (!target) return; // اگر بخش نیست، لینک پیش‌فرض اجرا شود
+                e.preventDefault();
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+                target.classList.remove('deals-highlight');
+                void target.offsetWidth; // ری‌استارت انیمیشن هایلایت
+                target.classList.add('deals-highlight');
+                setTimeout(() => target.classList.remove('deals-highlight'), 2500);
+            });
 
             // اسکریپت تغییر زنده تعداد بازدیدکنندگان
             // (پشتیبانی از ارقام فارسی: localize-digits.js متن را به ارقام فارسی تبدیل کرده است)

@@ -143,7 +143,7 @@ return [
     'next_slide' => 'Next slide',
     'prev_slide' => 'Previous slide',
     'view_products' => 'View Products',
-    'special_deals' => 'Special Deals 🔥',
+    'special_deals' => 'Special Deals',
     'discount_off' => 'OFF',
 
     // Blog

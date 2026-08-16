@@ -504,7 +504,11 @@ html, body {
 .cta-ring-label {
     display: inline-flex;
     align-items: center;
+    gap: .45rem;
     line-height: 1.15;
+}
+.cta-ring-flame {
+    flex-shrink: 0;
 }
 .cta-ring-icon {
     display: grid;
@@ -609,6 +613,9 @@ html, body {
     .cta-ring:hover::after { animation: none !important; transform: scale(1); opacity: 1; }
     .cta-ring:hover .cta-ring-icon,
     [dir="ltr"] .cta-ring:hover .cta-ring-icon { transform: none; }
+    /* دات پیشرفت: بدون حرکت — پر کامل به‌عنوان نشانگر فعال */
+    .hero-pagination .swiper-pagination-bullet-active::after { transform: scaleX(1); transition: none; }
+    #deals.deals-highlight .deals-shell { animation: none; }
 }
 
 /* ---------- 4.7) ناوبری اسلایدر (داخل هیرو) ---------- */
@@ -649,8 +656,10 @@ html, body {
     .hero-navigation { display: none !important; }
 }
 
-/* ---------- 4.8) صفحه‌بندی ---------- */
+/* ---------- 4.8) صفحه‌بندی — دات فعال با نوار پیشرفت زمان ---------- */
 .hero-pagination .swiper-pagination-bullet {
+    position: relative;
+    overflow: hidden;
     width: 6px;
     height: 6px;
     margin-inline: 4px !important;
@@ -664,6 +673,28 @@ html, body {
     border-radius: 999px;
     background: var(--accent);
     box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+/* نوار پیشرفت: در طول هر اسلاید (--dot-progress از رویداد autoplayTimeLeft سوییپر) از سمت شروع پر می‌شود */
+.hero-pagination .swiper-pagination-bullet-active::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: color-mix(in srgb, #fff 45%, var(--accent));
+    transform: scaleX(var(--dot-progress, 0));
+    transform-origin: right; /* RTL: از سمت راست (شروع) پر می‌شود */
+    transition: transform .25s linear;
+    pointer-events: none;
+}
+[dir="ltr"] .hero-pagination .swiper-pagination-bullet-active::after { transform-origin: left; }
+
+/* ---------- 4.8.1) هایلایت لحظه‌ای بخش پیشنهادات (بعد از کلیک CTA ثانویه) ---------- */
+#deals { scroll-margin-top: 24px; }
+#deals.deals-highlight .deals-shell { animation: dealsHighlightRing 2.4s var(--ease-out); }
+@keyframes dealsHighlightRing {
+    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+    55%  { box-shadow: 0 0 0 9px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 /* ---------- 4.9) ریسپانسیو ---------- */

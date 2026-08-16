@@ -106,7 +106,7 @@ return [
     'next_slide' => 'الشريحة التالية',
     'prev_slide' => 'الشريحة السابقة',
     'view_products' => 'عرض المنتجات',
-    'special_deals' => 'عروض خاصة 🔥',
+    'special_deals' => 'عروض خاصة',
     'discount_off' => 'خصم',
 
     // المدونة
