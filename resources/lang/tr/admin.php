@@ -289,6 +289,7 @@ return [
         'title_subtitle' => 'Başlık ve Alt Metin',
         'style' => 'Stil',
         'tone' => 'Renk',
+        'icon' => 'Simge',
         'empty' => 'Henüz afiş eklenmedi',
         'create_first' => 'İlk afişi oluşturun',
         'create' => 'Yeni Afiş Oluştur',

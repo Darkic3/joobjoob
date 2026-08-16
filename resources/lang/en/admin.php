@@ -289,6 +289,7 @@ return [
         'title_subtitle' => 'Title & Subtitle',
         'style' => 'Style',
         'tone' => 'Color',
+        'icon' => 'Icon',
         'empty' => 'No banners have been created yet',
         'create_first' => 'Create the first banner',
         'create' => 'Create New Banner',
