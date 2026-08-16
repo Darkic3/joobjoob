@@ -134,7 +134,7 @@
                                 {{-- Rating --}}
                                 @if($slide->hasRating())
 
-                                    <div class="inline-flex items-center gap-3 neu-flat-sm px-4 py-2.5 rounded-2xl">
+                                    <div class="inline-flex items-center gap-3">
 
                                         {{-- ستاره‌ها — درصد پر شدن هر ستاره از HeroSlide::ratingStars() --}}
                                         <div
@@ -255,18 +255,23 @@
                             class="hero-anim hero-image-wrap order-1 lg:order-2 relative flex justify-center items-center min-h-[420px] lg:min-h-[600px]"
                         >
 
-                            {{-- Product Ambient Glow --}}
+                            {{-- Product Ambient Glow — لفاف پارالاکس (لایهٔ عمق ۰.۳)؛ خود هاله انیمیشن CSS دارد
+                                 پس ترجمهٔ ماوس روی لفاف اعمال می‌شود تا با انیمیشن تداخل نکند --}}
                             <div
-                                class="hero-product-glow"
+                                class="hero-glow-parallax"
                                 aria-hidden="true"
-                            ></div>
+                            >
+                                <div class="hero-product-glow"></div>
+                            </div>
 
 
-                            {{-- Orbital Ring --}}
+                            {{-- Orbital Ring — لفاف پارالاکس (لایهٔ عمق ۰.۵۵)؛ چرخش ۴۰ثانیه‌ای روی خود حلقه می‌ماند --}}
                             <div
-                                class="hero-stage-ring"
+                                class="hero-ring-parallax"
                                 aria-hidden="true"
-                            ></div>
+                            >
+                                <div class="hero-stage-ring"></div>
+                            </div>
 
 
                             {{-- Decorative Particles --}}
@@ -280,6 +285,13 @@
                                 <span></span>
                                 <span></span>
                                 <span></span>
+                            </div>
+
+
+                            {{-- سکوی شیشه‌ای + بازتاب کف زیر محصول (تزئینی، عمق‌دهندهٔ صحنه) --}}
+                            <div class="hero-stage" aria-hidden="true">
+                                <div class="hero-stage-plate"></div>
+                                <div class="hero-stage-reflection"></div>
                             </div>
 
 
@@ -321,6 +333,9 @@
                                     @if($loop->first) fetchpriority="high" @endif
                                     onerror="this.src='https://picsum.photos/seed/hero-fallback/600/600'"
                                 >
+
+                                {{-- درخشش گذرای مورب هنگام ورود اسلاید (Micro-interaction) --}}
+                                <span class="hero-shine" aria-hidden="true"></span>
 
                             </div>
 
@@ -379,6 +394,16 @@
         ></div>
 
 
+        {{-- شمارندهٔ اسلاید (تزئینی — aria-hidden) --}}
+        @if(count($slides) > 1)
+            <div class="hero-counter" aria-hidden="true">
+                <span class="hero-counter-current mono">01</span>
+                <span class="hero-counter-sep">/</span>
+                <span class="hero-counter-total mono">{{ str_pad(count($slides), 2, '0', STR_PAD_LEFT) }}</span>
+            </div>
+        @endif
+
+
         {{-- =====================================================
              SWIPER NAVIGATION
         ====================================================== --}}
@@ -393,6 +418,15 @@
         ></div>
 
     </div>
+
+    {{-- نشانگر اسکرول (دسکتاپ) — دعوت به مرور محتوای پایین --}}
+    @if(count($slides) > 0)
+        <div class="hero-scroll-cue" aria-hidden="true">
+            <span class="hero-scroll-cue-mouse">
+                <span class="hero-scroll-cue-wheel"></span>
+            </span>
+        </div>
+    @endif
 
 </section>
 @push('scripts')
@@ -443,6 +477,90 @@
                         const delay = (swiper.params.autoplay && swiper.params.autoplay.delay) || 6500;
                         setDotProgress(1 - timeLeft / delay);
                     });
+
+                    // شمارندهٔ اسلاید (01 / 03) — با realIndex تا در حالت loop ایندکس تکراری نشمارد
+                    const heroCounter = heroSwiperEl.querySelector('.hero-counter');
+                    if (heroCounter) {
+                        const heroCounterCurrent = heroCounter.querySelector('.hero-counter-current');
+                        const heroCounterTotal = heroCounter.querySelector('.hero-counter-total');
+                        const pad2 = (n) => String(n).padStart(2, '0');
+                        const setHeroCounter = () => {
+                            const real = (typeof heroSwiper.realIndex === 'number') ? heroSwiper.realIndex : heroSwiper.activeIndex;
+                            if (heroCounterCurrent) heroCounterCurrent.textContent = pad2(real + 1);
+                            if (heroCounterTotal) heroCounterTotal.textContent = pad2(heroSwiper.slides.length);
+                        };
+                        setHeroCounter();
+                        heroSwiper.on('slideChange', setHeroCounter);
+                    }
+
+                    // ============================================================
+                    // پارالاکس چندلایه (جهت A — فاز ۱): فقط دسکتاپ و بدون reduced-motion
+                    // لایه‌های عمق: محصول (۱.۰)، حلقه‌ها (۰.۵۵)، هاله (۰.۳)، ذرات (۰.۲)
+                    // gsap.matchMedia شرایط را مدیریت می‌کند: هنگام خروج از شرط،
+                    // پاکسازی کامل انجام می‌شود (killing تویین‌ها + حذف لیسنرها)
+                    // ============================================================
+                    if (typeof gsap !== 'undefined') {
+                        const heroMM = gsap.matchMedia();
+                        heroMM.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+                            const MAX = 28; // حداکثر جابه‌جایی (px) برای عمیق‌ترین لایه
+                            let lastNX = 0, lastNY = 0;
+                            let layers = [];
+
+                            const getLayers = () => {
+                                const slide = heroSwiperEl.querySelector('.swiper-slide-active');
+                                if (!slide) return [];
+                                const q = (sel) => slide.querySelector(sel);
+                                return [
+                                    { el: q('.hero-product-media'), depth: 1.0 },
+                                    { el: q('.hero-ring-parallax'), depth: 0.55 },
+                                    { el: q('.hero-glow-parallax'), depth: 0.3 },
+                                    { el: q('.hero-particles'), depth: 0.2 },
+                                ].filter(l => l.el);
+                            };
+
+                            // پاکسازی تویین‌های یک لایه و بازگرداندن آن به حالت طبیعی
+                            // (در GSAP 3.15 تابع quickTo فقط .tween دارد — kill روی tween صدا زده می‌شود)
+                            const killLayer = (l) => {
+                                if (l.xTo && l.xTo.tween) l.xTo.tween.kill();
+                                if (l.yTo && l.yTo.tween) l.yTo.tween.kill();
+                                if (l.el) gsap.set(l.el, { x: 0, y: 0, willChange: 'auto' });
+                            };
+
+                            const initLayers = () => {
+                                // پاکسازی تویین‌های قبلی (اسلاید قبلی) — تویین سرگردان نماند
+                                layers.forEach(killLayer);
+                                layers = getLayers().map(l => ({
+                                    ...l,
+                                    xTo: gsap.quickTo(l.el, 'x', { duration: 0.9, ease: 'power3.out' }),
+                                    yTo: gsap.quickTo(l.el, 'y', { duration: 0.9, ease: 'power3.out' }),
+                                }));
+                                // بدون حرکت ماوس (مثلاً بعد از تعویض اسلاید) موقعیت قبلی بلافاصله اعمال شود
+                                layers.forEach(l => {
+                                    gsap.set(l.el, { willChange: 'transform' });
+                                    gsap.set(l.el, { x: lastNX * MAX * l.depth, y: lastNY * MAX * l.depth });
+                                });
+                            };
+
+                            const onMove = (e) => {
+                                lastNX = (e.clientX / window.innerWidth) * 2 - 1; // -1..1
+                                lastNY = (e.clientY / window.innerHeight) * 2 - 1;
+                                layers.forEach(l => {
+                                    l.xTo(lastNX * MAX * l.depth);
+                                    l.yTo(lastNY * MAX * l.depth);
+                                });
+                            };
+
+                            initLayers();
+                            heroSwiper.on('slideChange', initLayers);
+                            window.addEventListener('mousemove', onMove, { passive: true });
+
+                            return () => {
+                                layers.forEach(killLayer);
+                                heroSwiper.off('slideChange', initLayers);
+                                window.removeEventListener('mousemove', onMove);
+                            };
+                        });
+                    }
                 } catch (err) {
                     heroSwiperEl.classList.add('hero-init-failed');
                 }

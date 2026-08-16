@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import gsap from 'gsap';
 import Swiper from 'swiper';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
@@ -14,3 +15,6 @@ Alpine.start();
 // (مثل hero.blade.php) قرار می‌دهیم تا بدون تغییر منطق آن‌ها کار کند.
 Swiper.use([Navigation, Pagination, Autoplay, EffectFade]);
 window.Swiper = Swiper;
+
+// GSAP به‌صورت سراسری برای اسکریپت‌های inline صفحات (مثل پارالاکس هیرو)
+window.gsap = gsap;
