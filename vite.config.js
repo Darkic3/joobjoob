@@ -8,6 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/css/app-admin.css',
                 'resources/js/ui-effects.js',
+                'resources/js/app.js',
                 'resources/js/app-admin.js',
             ],
             refresh: true,

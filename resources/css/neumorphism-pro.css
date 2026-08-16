@@ -302,6 +302,9 @@ html, body {
     filter: blur(35px);
     opacity: .55;
     z-index: -2;
+    /* لایه‌ی مستقل: بلور یک‌بار رندر شود و انیمیشن transform روی لایه‌ی کامپوزیت‌شده اجرا شود
+       (از بازپینت هر فریم جلوگیری می‌کند) */
+    will-change: transform;
     animation: heroAurora 9s ease-in-out infinite alternate;
 }
 
@@ -347,6 +350,7 @@ html, body {
     background: radial-gradient(circle, color-mix(in srgb, var(--accent) 28%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 35%, transparent 70%);
     filter: blur(20px);
     opacity: .8;
+    will-change: transform;
     animation: heroProductGlow 5s ease-in-out infinite;
 }
 
@@ -395,11 +399,20 @@ html, body {
     .hero-content { padding-inline-start: clamp(20px, 4vw, 70px); }
 }
 
-/* حالت اولیه‌ی همه‌ی بخش‌های متنی/تصویری: نامرئی */
-.hero-anim {
+/* حالت اولیه‌ی همه‌ی بخش‌های متنی/تصویری: نامرئی — فقط وقتی JS فعال است (html.js).
+   اگر JS غیرفعال باشد یا باندل سوییپر لود نشود، محتوا از ابتدا قابل دیدن می‌ماند. */
+.js .hero-anim {
     opacity: 0;
     transform: translateY(30px);
     transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .7s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Fallback: اگر ساخت سوییپر شکست خورد (CDN/باندل/خطای runtime)، کلاس hero-init-failed
+   روی .hero-swiper اضافه می‌شود و محتوا بدون انیمیشن و بدون تاخیر قابل دیدن می‌شود */
+.hero-swiper.hero-init-failed .hero-anim {
+    opacity: 1;
+    transform: none;
+    transition: none;
 }
 
 /* ظاهر شدن پله‌ای وقتی اسلاید فعال شد — هر بخش باید قانون خودش را داشته باشد */
@@ -619,6 +632,13 @@ html, body {
 }
 
 /* ---------- 4.7) ناوبری اسلایدر (داخل هیرو) ---------- */
+/* Swiper 14 ماژول ناوبری خودش یک SVG فلش (رنگ پیش‌فرض آبی) داخل دکمه تزریق می‌کند.
+   طراحی هیرو از فلش متنی ::after استفاده می‌کند — SVG تزریقی مخفی می‌شود تا ظاهر
+   دقیقاً مثل قبل (فلش آکسانت روی دکمهٔ نیومورفیک) بماند. */
+.hero-navigation svg {
+    display: none;
+}
+
 .hero-navigation {
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -630,8 +650,11 @@ html, body {
     box-shadow: 6px 7px 16px var(--shadow-dark), -5px -6px 14px var(--shadow-light) !important;
     transition: transform .25s ease, box-shadow .25s ease, background .25s ease !important;
 }
-.hero-navigation.swiper-button-next { inset-inline-end: 20px; }
-.hero-navigation.swiper-button-prev { inset-inline-start: 20px; }
+/* !important: CSS سوییپر (v14) بعد از CSS پروژه لود می‌شود و با اختصاصیت بالاتر
+   (مثل .swiper-horizontal.swiper-rtl .swiper-button-next) فاصلهٔ لبه را 4px می‌کند —
+   برای حفظ دقیق طراحی قبلی (20px)، فاصلهٔ لبه‌ها اجباری می‌شود */
+.hero-navigation.swiper-button-next { inset-inline-end: 20px !important; }
+.hero-navigation.swiper-button-prev { inset-inline-start: 20px !important; }
 .hero-navigation:hover {
     background: var(--accent) !important;
     transform: translateY(-50%) scale(1.08) !important;

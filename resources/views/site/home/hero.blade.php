@@ -318,6 +318,7 @@
                                     src="{{ $slide->imageUrl() }}"
                                     class="hero-product-image"
                                     alt="{{ strip_tags($slide->trans('title')) }}"
+                                    @if($loop->first) fetchpriority="high" @endif
                                     onerror="this.src='https://picsum.photos/seed/hero-fallback/600/600'"
                                 >
 
@@ -395,12 +396,16 @@
 
 </section>
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (typeof Swiper !== 'undefined') {
-                const heroSwiperEl = document.querySelector('.hero-swiper');
-                if (heroSwiperEl) {
+            // اگر سوییپر (باندل Vite) به هر دلیلی در دسترس نبود یا ساخت آن خطا داد،
+            // کلاس hero-init-failed اضافه می‌شود تا CSS محتوا را قابل دیدن کند —
+            // هیرو هرگز به‌صورت دائمی نامرئی نمی‌ماند.
+            const heroSwiperEl = document.querySelector('.hero-swiper');
+            if (heroSwiperEl && typeof Swiper === 'undefined') {
+                heroSwiperEl.classList.add('hero-init-failed');
+            } else if (heroSwiperEl) {
+                try {
                     const heroSwiper = new Swiper(heroSwiperEl, {
                         // جهت از سند گرفته می‌شود تا در زبان‌های LTR (انگلیسی و…) درست کار کند
                         rtl: document.documentElement.dir === 'rtl',
@@ -438,6 +443,8 @@
                         const delay = (swiper.params.autoplay && swiper.params.autoplay.delay) || 6500;
                         setDotProgress(1 - timeLeft / delay);
                     });
+                } catch (err) {
+                    heroSwiperEl.classList.add('hero-init-failed');
                 }
             }
 

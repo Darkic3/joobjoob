@@ -3,6 +3,9 @@
       data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
 
 <head>
+    {{-- کلاس js: حالت «مخفی» هیرو فقط وقتی JS فعال است اعمال می‌شود؛ اگر JS یا باندل
+         از کار بیفتد، محتوای هیرو هرگز نامرئی نمی‌ماند --}}
+    <script>document.documentElement.classList.add('js');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -21,8 +24,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     @endif
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    @vite(['resources/css/app.css', 'resources/js/ui-effects.js'])
+    @vite(['resources/css/app.css', 'resources/js/ui-effects.js', 'resources/js/app.js'])
     @stack('styles')
 </head>
 
@@ -62,7 +64,6 @@
 <x-social-proof-toast/>
 
 {{--@include('layouts.site._partials.scripts')--}}
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 @stack('scripts')
 </body>
 </html>
