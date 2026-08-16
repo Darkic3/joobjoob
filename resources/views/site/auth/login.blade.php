@@ -75,6 +75,13 @@
             <p class="mt-6 text-center text-xs leading-relaxed" style="color: var(--text-secondary);">
                 {{ __('messages.no_account_hint') }}
             </p>
+
+            {{-- ورود با کد یکبارمصرف --}}
+            <div class="mt-4 pt-4 text-center border-t" style="border-color: color-mix(in srgb, var(--text-secondary) 15%, transparent);">
+                <a href="{{ localizedRoute('login.otp') }}" class="text-sm font-semibold hover:opacity-70 transition-opacity" style="color: var(--accent);">
+                    {{ __('messages.otp_login') }}
+                </a>
+            </div>
         </div>
     </div>
 </div>

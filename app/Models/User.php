@@ -28,6 +28,8 @@ class User extends Authenticatable
         'locale',
         'theme',
         'is_admin',
+        'confirm_code',
+        'confirm_code_expires_at',
     ];
 
     /**
@@ -50,6 +52,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'confirm_code_expires_at' => 'datetime',
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
         ];

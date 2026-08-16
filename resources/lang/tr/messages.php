@@ -165,6 +165,31 @@ return [
     'account' => 'Hesap',
     'no_account_hint' => 'Henüz hesabınız yok mu? %10 indirim koduyla kayıt yakında gelecek',
 
+    // Tek kullanımlık kodla giriş (OTP)
+    'otp_login' => 'Tek kullanımlık kodla giriş',
+    'otp_subtitle' => 'Doğrulama kodunu almak için cep telefonu numaranızı girin',
+    'otp_code_subtitle' => ':mobile numarasına doğrulama kodu gönderildi. 4 haneli kodu girin.',
+    'otp_mobile' => 'Cep telefonu',
+    'otp_mobile_ph' => '09123456789',
+    'otp_send_code' => 'Doğrulama kodu gönder',
+    'otp_code' => 'Doğrulama kodu',
+    'otp_code_ph' => '4 haneli kod',
+    'otp_verify' => 'Doğrula ve giriş yap',
+    'otp_resend' => 'Kodu yeniden gönder',
+    'otp_change_number' => 'Numarayı değiştir',
+    'otp_back_to_login' => 'E-posta ve şifre ile giriş',
+    'otp_code_sent' => 'Doğrulama kodu başarıyla gönderildi',
+    'otp_resent' => 'Yeni kod gönderildi',
+    'otp_login_success' => 'Tekrar hoş geldiniz!',
+    'otp_mobile_invalid' => 'Geçersiz telefon numarası',
+    'otp_mobile_blocked' => 'Bu numaraya erişime izin verilmiyor',
+    'otp_code_invalid' => 'Girdiğiniz kod hatalı',
+    'otp_code_expired' => 'Kodun süresi doldu. Lütfen yeni bir kod isteyin',
+    'otp_sms_failed' => 'SMS gönderilemedi. Lütfen biraz sonra tekrar deneyin',
+    'otp_sms_not_configured' => 'SMS hizmeti henüz yapılandırılmadı. Lütfen destek ile iletişime geçin',
+    'otp_session_expired' => 'Oturumunuz sona erdi. Lütfen numaranızı yeniden girin',
+    'otp_dev_code_hint' => 'Test kodu (geliştirme): :code',
+
     // Statik sayfalar
     'pages' => [
         'about' => [

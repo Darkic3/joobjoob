@@ -16,6 +16,7 @@ use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\DashboardController;
 use App\Http\Controllers\Site\HomeController;
+use App\Http\Controllers\Site\OtpController;
 use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\SiteAuthController;
@@ -75,6 +76,18 @@ $siteRoutes = function () {
     Route::get('/login', [SiteAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [SiteAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [SiteAuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+    // ورود با کد یکبارمصرف (OTP) — پیامک کاوه‌نگار
+    Route::get('/login/otp', [OtpController::class, 'show'])->name('login.otp');
+    Route::post('/login/otp/send', [OtpController::class, 'send'])
+        ->middleware('throttle:5,1')
+        ->name('login.otp.send');
+    Route::post('/login/otp/resend', [OtpController::class, 'resend'])
+        ->middleware('throttle:3,1')
+        ->name('login.otp.resend');
+    Route::post('/login/otp/verify', [OtpController::class, 'verify'])
+        ->middleware('throttle:5,1')
+        ->name('login.otp.verify');
 
     Route::middleware('auth')->group(function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
