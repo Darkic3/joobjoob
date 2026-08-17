@@ -279,6 +279,25 @@
                         setDotProgress(1 - timeLeft / delay);
                     });
 
+                    // توقف اتوپلی در تب پس‌زمینه: مرورگر تایمرهای تب مخفی را throttle می‌کند و
+                    // جابه‌جایی‌ای که کسی نمی‌بیند بی‌فایده است؛ با برگشت به تب، چرخه از ابتدای
+                    // تأخیر (۶.۵ ثانیه) ادامه می‌یابد. سوییپر خودش visibilitychange را مدیریت می‌کند،
+                    // اما چون waitForTransition:false گذاشته‌ایم، pause داخلی‌اش بلافاصله resume
+                    // می‌شود و عملاً بی‌اثر است — پس این‌جا با stop/start خودمان انجامش می‌دهیم.
+                    let heroHidden = document.hidden;
+                    const onHeroVisibility = () => {
+                        if (document.hidden) {
+                            heroHidden = true;
+                            if (heroSwiper.autoplay.running) heroSwiper.autoplay.stop();
+                        } else if (heroHidden) {
+                            heroHidden = false;
+                            heroSwiper.autoplay.start();
+                        }
+                    };
+                    document.addEventListener('visibilitychange', onHeroVisibility);
+                    // اگر صفحه در تب پس‌زمینه لود شد، همین ابتدا متوقفش کن
+                    if (heroHidden && heroSwiper.autoplay.running) heroSwiper.autoplay.stop();
+
                     // پارالاکس چندلایهٔ ماوس حذف شد — هیروی تمام‌کادر حالا فقط زوم آرام
                     // سینمایی (Ken Burns) دارد که کاملاً CSS-محور است و توسط همان کلاس
                     // swiper-slide-active که سوییپر خودش مدیریت می‌کند فعال می‌شود.
