@@ -27,6 +27,58 @@ class HeroSlideFormTest extends TestCase
         $this->assertStringContainsString('assets/admin/js/sweetalert2.all.min.js', $html);
     }
 
+    public function test_hero_form_trust_items_are_drag_sortable_with_visibility_badges(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+
+        // درگ‌اند‌دراپ روی کارت‌های آیتم اعتماد
+        $this->assertStringContainsString('draggable="true"', $html);
+        $this->assertStringContainsString('@dragstart="startDrag(i)"', $html);
+        $this->assertStringContainsString('@dragover.prevent="overDrag(i)"', $html);
+        $this->assertStringContainsString('@dragend="endDrag()"', $html);
+
+        // بج وضعیت نمایش (سه آیتم اول نمایش داده می‌شوند)
+        $this->assertStringContainsString(__('admin.hero_slides.shown_in_hero'), $html);
+        $this->assertStringContainsString(__('admin.hero_slides.hidden_in_hero'), $html);
+        $this->assertStringContainsString(
+            __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN]),
+            $html
+        );
+
+        // پیکر آیکون جمع‌وجور: پاپ‌اور به‌جای گرید بزرگ همیشگی
+        $this->assertStringContainsString('iconPicker === i', $html);
+        $this->assertStringContainsString('grid grid-cols-6 gap-1', $html);
+    }
+
+    public function test_hero_form_xdata_attribute_is_intact_and_valid(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+
+        // رگرسیون: اگر داخل x-data کوتیشن دوبل خام بیفتد (مثل @json یا کامنت حاوی :key="i")
+        // attribute زودتر از موعد بسته می‌شود و کل اسکوپ Alpine از کار می‌افتد.
+        // این‌جا مثل مرورگر عمل می‌کنیم: مقدار attribute = متن بین x-data=" تا اولین " خام بعدی.
+        $open = strpos($html, "x-data=\"{\n    buttonActive:");
+        $this->assertNotFalse($open, 'x-data attribute must start with the Alpine object');
+
+        $valueStart = $open + strlen('x-data="');
+        $close = strpos($html, '"', $valueStart); // اولین کوتیشن دوبل خام = پایان attribute
+        $xData = substr($html, $valueStart, $close - $valueStart);
+
+        // کل آبجکت باید داخل attribute باشد — اگر جایی کوتیشن خام بیفتد، این‌جا قطع می‌شود
+        $this->assertStringEndsWith('}', $xData);
+        $this->assertStringContainsString('buttonActive:', $xData);
+        $this->assertStringContainsString('ratingActive:', $xData);
+        $this->assertStringContainsString('viewersActive:', $xData);
+        $this->assertStringContainsString('icons: [&quot;badge-check&quot;,&quot;shield-check&quot;', $xData);
+        $this->assertStringContainsString('trusts: [{&quot;icon&quot;:', $xData);
+        $this->assertStringContainsString('labels:', $xData);
+        $this->assertStringContainsString('.map((t, i) => ({ _key:', $xData);
+    }
+
     public function test_hero_form_shows_validation_errors_via_swal(): void
     {
         $this->actingAsSuperAdmin();

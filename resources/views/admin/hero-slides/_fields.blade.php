@@ -1,11 +1,15 @@
 {{-- دادهٔ فرم (linkType/linkValue/hasButton/hasRating/hasViewers/trusts) در HeroSlideController::formData آماده می‌شود --}}
+{{-- نکته: داخل attribute نباید کوتیشن دوبل خام باشد (attribute را می‌شکند و کل اسکوپ x-data از کار می‌افتد) — همهٔ JSONها با {{ }} escape می‌شوند. _key پایدار برای هر آیتم لازمهٔ درگ‌اند‌دراپ است (با :key="i" ترتیب‌دهی دوباره DOM به‌هم می‌ریزد) --}}
 @props(['heroSlide' => null])
 
 <div x-data="{
     buttonActive: '{{ old('button_active', $formData['hasButton'] ? '1' : '0') }}' === '1',
     ratingActive: '{{ old('rating_active', $formData['hasRating'] ? '1' : '0') }}' === '1',
     viewersActive: '{{ old('viewers_active', $formData['hasViewers'] ? '1' : '0') }}' === '1',
-    trusts: {{ json_encode(old('trusts', $formData['trusts']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
+    icons: {{ json_encode(array_keys(config('trust-icons')), JSON_UNESCAPED_UNICODE) }},
+    trusts: {{ json_encode(old('trusts', $formData['trusts']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}.map((t, i) => ({ _key: 't' + i + '-' + Date.now(), ...t })),
+    dragFrom: null,
+    iconPicker: null,
     linkType: '{{ old('link_type', $formData['linkType']) }}',
     customUrl: '{{ old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '' }}',
     pageValue: '{{ old('link_type', $formData['linkType']) === 'page' ? old('link_value', $formData['linkValue']) : '' }}',
@@ -69,9 +73,19 @@
     },
 
     addTrust() {
-        if (this.trusts.length >= 5) return;
-        this.trusts.push({ icon: 'badge-check', fa: '', en: '' });
-    }
+        if (this.trusts.length >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}) return;
+        this.trusts.push({ _key: 'n' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), icon: 'badge-check', fa: '', en: '' });
+    },
+
+    // درگ‌اند‌دراپ: مرتب‌سازی آیتم‌های اعتماد — سه آیتم اول همیشه در هیرو نمایش داده می‌شوند
+    startDrag(i) { this.dragFrom = i; },
+    overDrag(i) {
+        if (this.dragFrom === null || this.dragFrom === i) return;
+        const [item] = this.trusts.splice(this.dragFrom, 1);
+        this.trusts.splice(i, 0, item);
+        this.dragFrom = i;
+    },
+    endDrag() { this.dragFrom = null; }
 }" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <div class="lg:col-span-2 space-y-6">
@@ -329,37 +343,91 @@
                 <p>{{ __('admin.hero_slides.trust_max_display', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN, 'store' => \App\Models\HeroSlide::MAX_TRUST_ITEMS]) }}</p>
             </div>
 
-            {{-- آیتم‌ها در دسکتاپ دو‌ستونه (کنار هم) — در موبایل تک‌ستونه --}}
+            <p class="flex items-start gap-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg>
+                <span>{{ __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN]) }}</span>
+            </p>
+
+            {{-- آیتم‌ها در دسکتاپ دو‌ستونه (کنار هم) — در موبایل تک‌ستونه
+                 درگ‌اند‌دراپ: کارت را بگیرید و بکشید تا ترتیب تغییر کند —
+                 سه آیتم اول (MAX_TRUST_ITEMS_SHOWN) در هیرو نمایش داده می‌شوند و بقیه خاموش/خط‌چین نشان داده می‌شوند --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <template x-for="(trust, i) in trusts" :key="i">
-                <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="labels.item + ' ' + (i + 1)"></span>
-                        <button type="button" @click="trusts.splice(i, 1)" class="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            {{ __('admin.common.delete') }}
-                        </button>
+            <template x-for="(trust, i) in trusts" :key="trust._key">
+                <div
+                    draggable="true"
+                    @dragstart="startDrag(i)"
+                    @dragover.prevent="overDrag(i)"
+                    @dragend="endDrag()"
+                    @drop.prevent="endDrag()"
+                    class="p-3 rounded-xl border space-y-3 cursor-grab active:cursor-grabbing select-none transition-colors"
+                    :class="dragFrom === i
+                        ? 'opacity-60 border-primary-400 ring-2 ring-primary-300 bg-primary-50 dark:bg-primary-900/20'
+                        : (i >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}
+                            ? 'border-dashed border-gray-300 dark:border-gray-500 bg-gray-50/70 dark:bg-gray-800/40'
+                            : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50')"
+                >
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <svg class="w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg>
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="labels.item + ' ' + (i + 1)"></span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span x-show="i < {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                {{ __('admin.hero_slides.shown_in_hero') }}
+                            </span>
+                            <span x-show="i >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                {{ __('admin.hero_slides.hidden_in_hero') }}
+                            </span>
+                            <button type="button" @click="trusts.splice(i, 1)" class="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                {{ __('admin.common.delete') }}
+                            </button>
+                        </div>
                     </div>
-                    {{-- انتخاب آیکون — گرید بصری آیکون‌های SVG باکیفیت (از config/trust-icons.php) --}}
-                    <div>
+
+                    {{-- انتخاب آیکون — جمع‌وجور: با کلیک روی دکمه، پاپ‌اور کوچکی کنار آن باز می‌شود --}}
+                    <div class="relative" @click.outside="iconPicker = null">
                         <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">{{ __('admin.hero_slides.icon_label') }}</label>
                         <input type="hidden" :name="'trusts[' + i + '][icon]'" :value="trust.icon">
-                        <div class="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
+                        <button
+                            type="button"
+                            @click="iconPicker = (iconPicker === i ? null : i)"
+                            class="inline-flex items-center gap-2 w-full px-2.5 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-primary-400 transition-colors text-xs font-medium"
+                        >
+                            <span class="relative w-8 h-8 shrink-0 rounded-full grid place-items-center bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300">
+                                @foreach(config('trust-icons') as $iconKey => $iconSvg)
+                                    <svg x-show="trust.icon === '{{ $iconKey }}'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
+                                @endforeach
+                                <span x-show="!icons.includes(trust.icon)" class="text-[11px] font-bold leading-none" x-text="trust.icon">✓</span>
+                            </span>
+                            <span class="flex-1 text-start truncate">{{ __('admin.hero_slides.icon_label') }}</span>
+                            <svg class="w-3.5 h-3.5 shrink-0 text-gray-400 transition-transform" :class="iconPicker === i && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+
+                        <div
+                            x-show="iconPicker === i"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            class="absolute z-30 top-full mt-1.5 start-0 w-56 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl grid grid-cols-6 gap-1"
+                        >
                             @foreach(config('trust-icons') as $iconKey => $iconSvg)
                                 <button
                                     type="button"
-                                    @click="trust.icon = '{{ $iconKey }}'"
+                                    @click="trust.icon = '{{ $iconKey }}'; iconPicker = null"
                                     :class="trust.icon === '{{ $iconKey }}'
-                                        ? 'bg-primary-600 border-primary-600 text-white scale-110 shadow-md'
-                                        : 'bg-gray-100 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-300 hover:scale-105'"
-                                    class="flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-150"
+                                        ? 'bg-primary-600 border-primary-600 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-300'"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-100"
+                                    :title="'{{ $iconKey }}'"
                                     aria-label="{{ $iconKey }}"
                                 >
-                                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
                                 </button>
                             @endforeach
                         </div>
-                        <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">برای انتخاب، روی آیکون موردنظر کلیک کنید.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
