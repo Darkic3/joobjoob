@@ -116,7 +116,9 @@
 
                             {{-- =========================
                                  TRUST / SOCIAL PROOF
+                                 — فقط اگر حداقل یکی از بخش‌ها (امتیاز / بازدیدکننده / آیتم اعتماد) موجود باشد نمایش داده می‌شود
                             ========================== --}}
+                            @if($slide->hasRating() || $slide->viewers > 0 || ! empty($slide->trustItems()))
                             <div class="hero-trust flex flex-wrap items-center gap-5">
                                 {{-- Rating --}}
                                 @if($slide->hasRating())
@@ -155,6 +157,7 @@
                                     </div>
                                 @endforeach
                             </div>
+                            @endif
 
                         </div>
 
