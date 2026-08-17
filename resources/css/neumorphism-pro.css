@@ -38,6 +38,10 @@ html, body {
 /* ==========================================================================
    2) Keyframeها
    ========================================================================== */
+@keyframes urgencyPulse {
+    0%, 100% { box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--urgency) 60%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent), 0 0 0 0 color-mix(in srgb, var(--urgency) 0%, transparent); }
+    50%      { box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--urgency) 60%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent), 0 0 0 8px color-mix(in srgb, var(--urgency) 0%, transparent); }
+}
 @keyframes pulseGlow {
     0%, 100% { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 0 color-mix(in srgb, var(--urgency) 35%, transparent); }
     50%      { box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light), 0 0 0 10px color-mix(in srgb, var(--urgency) 0%, transparent); }
@@ -339,9 +343,29 @@ html, body {
         linear-gradient(to top, color-mix(in srgb, var(--bg) 55%, transparent) 0%, transparent 45%);
 }
 
-.hero-fb-discount {
-    position: absolute; z-index: 3; top: 6%; inset-inline-start: 5%;
+/* بج تخفیف — داخل پنل، دقیقاً بالای قیمت‌ها (به‌جای شناور روی عکس/سمت مخالف پنل) */
+.hero-discount-row {
+    margin-bottom: .9rem;
 }
+.hero-discount-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: .4rem .9rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--urgency) 0%, #ff8a3d 100%);
+    color: #fff;
+    font-weight: 800;
+    font-size: .82rem;
+    letter-spacing: .01em;
+    line-height: 1;
+    box-shadow:
+        0 6px 18px -4px color-mix(in srgb, var(--urgency) 60%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
+    animation: urgencyPulse 2.4s ease-in-out infinite;
+}
+.hero-discount-pill svg { flex-shrink: 0; }
+.hero-discount-pill bdi { font-variant-numeric: tabular-nums; }
 
 /* ---------- 4.4-NEW) پنل شیشه‌ای متن ---------- */
 .hero-fb-panel {
@@ -385,6 +409,7 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
     .hero-fb-media img { transition: none; transform: none !important; }
+    .hero-discount-pill { animation: none; }
 }
 
 /* ---------- 4.5.1) بج هیرو + نوار اعتماد — ارتقای شیشه‌ای یکپارچه ---------- */

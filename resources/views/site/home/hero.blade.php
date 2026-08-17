@@ -39,22 +39,12 @@
                         </div>
                         <div class="hero-fb-overlay" aria-hidden="true"></div>
 
-                        {{-- بج تخفیف — روی خود عکس، سمت مقابل پنل متن --}}
-                        @if($slide->old_price > $slide->price)
-                            <span class="badge-urgency neu-pulse hero-fb-discount">
-                                <span aria-hidden="true">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
-                                </span>
-                                <bdi dir="ltr">{{ $slide->discountPercent() }}٪</bdi>
-                                {{ __('messages.discount_off') }}
-                            </span>
-                        @endif
-
                         {{-- =====================================================
                              پنل شیشه‌ای متن — دقیقاً همون محتوای hero-content قبلی
                              (بج / تیتر / توضیح / قیمت / CTA / نوار اعتماد) بدون تغییر منطق
+                             بج تخفیف به‌جای شناور روی عکس، داخل پنل بالای قیمت‌ها نمایش داده می‌شود
                         ====================================================== --}}
-                        <div class="hero-fb-panel hero-anim">
+                        <div class="hero-fb-panel hero-anim {{ $slide->old_price > $slide->price ? 'hero-fb-panel--sale' : '' }}">
 
                             {{-- Badge --}}
                             @if($slide->trans('badge'))
@@ -80,6 +70,17 @@
                                  PRICE
                             ========================== --}}
                             @if($slide->price > 0)
+                                {{-- بج تخفیف — دقیقاً بالای قیمت‌ها، کاملاً مشخص و خوانا --}}
+                                @if($slide->old_price > $slide->price)
+                                    <div class="hero-discount-row">
+                                        <span class="hero-discount-pill">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
+                                            <bdi dir="ltr">{{ $slide->discountPercent() }}٪</bdi>
+                                            {{ __('messages.discount_off') }}
+                                        </span>
+                                    </div>
+                                @endif
+
                                 <div class="hero-fb-price flex items-end gap-3 mb-7">
                                     {{-- Old Price — Vazirmatn برای ارقام فارسی (مونو گلیف فارسی ندارد) --}}
                                     @if($slide->old_price > $slide->price)
