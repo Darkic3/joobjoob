@@ -250,7 +250,12 @@
                         autoplay: {
                             delay: 6500,
                             disableOnInteraction: false,
-                            pauseOnMouseEnter: true,
+                            // pauseOnMouseEnter حذف شد: در fade، رویداد transitionend روی wrapperEl
+                            // شلیک نمی‌شود و اتوپلی هنگام هاور برای همیشه در حالت paused گیر می‌کرد
+                            // (تا وقتی موس بیرون می‌رفت). هاور حالا هیچ اثری روی اتوپلی ندارد.
+                            // waitForTransition:false — تایمر اتوپلی مستقل از رویداد transition است؛
+                            // بعد از هر جابه‌جایی بلافاصله تایمر بعدی تنظیم می‌شود (چرخش بی‌وقفه و نرم).
+                            waitForTransition: false,
                         },
                         pagination: {
                             el: '.swiper-pagination',
@@ -261,10 +266,8 @@
                             prevEl: '.swiper-button-prev',
                         },
                         // watchSlidesProgress: true,
-                    });
-
-                    // دات پیشرفت زمان: در طول هر اسلاید، نوار داخل دات فعال از رویداد
-                    // autoplayTimeLeft سوییپر پر می‌شود (روی هاور/توقف متوقف و ادامه می‌یابد)
+                    });                        // دات پیشرفت زمان: در طول هر اسلاید، نوار داخل دات فعال از رویداد
+                        // autoplayTimeLeft سوییپر پر می‌شود
                     const heroPagination = heroSwiperEl.querySelector('.hero-pagination');
                     const setDotProgress = (fraction) => {
                         const active = heroPagination && heroPagination.querySelector('.swiper-pagination-bullet-active');
