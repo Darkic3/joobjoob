@@ -38,6 +38,11 @@ html, body {
 /* ==========================================================================
    2) Keyframeها
    ========================================================================== */
+@keyframes emberFlicker {
+    0%, 100% { opacity: .7; }
+    35%      { opacity: .95; }
+    65%      { opacity: .8; }
+}
 @keyframes urgencyPulse {
     0%, 100% { box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--urgency) 60%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent), 0 0 0 0 color-mix(in srgb, var(--urgency) 0%, transparent); }
     50%      { box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--urgency) 60%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent), 0 0 0 8px color-mix(in srgb, var(--urgency) 0%, transparent); }
@@ -384,6 +389,51 @@ html, body {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
+
+/* پنل تخفیف‌دار — حالت آتش/فوریت: شست‌وشوی گرم، حاشیهٔ آتشین، نوار اخگر بالا و هالهٔ سوسوزن */
+.hero-fb-panel--sale {
+    border-color: color-mix(in srgb, var(--urgency) 55%, transparent);
+    background:
+        linear-gradient(160deg,
+            color-mix(in srgb, var(--urgency) 30%, transparent) 0%,
+            color-mix(in srgb, #ff8a3d 14%, transparent) 42%,
+            transparent 78%),
+        linear-gradient(160deg, color-mix(in srgb, var(--bg-elevated) 86%, transparent) 0%, color-mix(in srgb, var(--bg-elevated) 70%, transparent) 100%);
+    box-shadow:
+        10px 10px 26px color-mix(in srgb, var(--shadow-dark) 55%, transparent),
+        -8px -8px 22px color-mix(in srgb, var(--shadow-light) 45%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--urgency) 16%, transparent),
+        0 0 60px -8px color-mix(in srgb, var(--urgency) 60%, transparent),
+        0 0 26px -4px color-mix(in srgb, #ff8a3d 50%, transparent);
+}
+
+/* نوار اخگر در لبهٔ بالای پنل */
+.hero-fb-panel--sale::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline: 1.4rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, var(--urgency) 30%, #ffb35c 55%, var(--urgency) 80%, transparent 100%);
+    box-shadow: 0 0 14px 2px color-mix(in srgb, var(--urgency) 55%, transparent);
+    pointer-events: none;
+}
+
+/* هالهٔ آتش سوسوزن دور پنل */
+.hero-fb-panel--sale::after {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(55% 60% at 78% 0%, color-mix(in srgb, var(--urgency) 60%, transparent) 0%, color-mix(in srgb, #ff8a3d 28%, transparent) 45%, transparent 72%);
+    filter: blur(16px);
+    opacity: .85;
+    animation: emberFlicker 3s ease-in-out infinite;
+    pointer-events: none;
+}
 .hero-fb-title {
     margin: 0 0 .8rem;
     font-weight: 800; line-height: 1.15; letter-spacing: -.02em;
@@ -410,6 +460,7 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .hero-fb-media img { transition: none; transform: none !important; }
     .hero-discount-pill { animation: none; }
+    .hero-fb-panel--sale::after { animation: none; }
 }
 
 /* ---------- 4.5.1) بج هیرو + نوار اعتماد — ارتقای شیشه‌ای یکپارچه ---------- */
