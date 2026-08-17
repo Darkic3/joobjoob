@@ -841,6 +841,55 @@ html, body {
     .hero-navigation { display: none !important; }
 }
 
+/* ---------- 4.7.1) ناوبری بخش نظرات — هماهنگ با ناوبری هیرو ----------
+   دکمه‌های گرد نیومورفیک با فلش متنی RTL-aware، هاور آکسانت؛
+   در موبایل مخفی می‌شوند و فقط دات‌های پیشرفت می‌مانند. */
+.reviews-rotator { position: relative; }
+.reviews-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 6px 7px 16px var(--shadow-dark), -5px -6px 14px var(--shadow-light);
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.reviews-nav--next { inset-inline-end: -14px; }
+.reviews-nav--prev { inset-inline-start: -14px; }
+.reviews-nav::after {
+    font-family: 'Vazirmatn', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--accent);
+    transition: color .25s ease;
+}
+.reviews-nav:hover {
+    background: var(--accent);
+    transform: translateY(-50%) scale(1.08);
+}
+.reviews-nav:hover::after { color: var(--accent-contrast); }
+.reviews-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[dir="rtl"] .reviews-nav--next::after { content: '←'; }
+[dir="rtl"] .reviews-nav--prev::after { content: '→'; }
+[dir="ltr"] .reviews-nav--next::after { content: '→'; }
+[dir="ltr"] .reviews-nav--prev::after { content: '←'; }
+
+/* در موبایل دکمه‌ها مخفی می‌شوند — فقط دات‌ها می‌مانند (هماهنگ با هیرو) */
+@media (max-width: 767px) {
+    .reviews-nav { display: none !important; }
+}
+
 /* ---------- 4.8) صفحه‌بندی — دات فعال با نوار پیشرفت زمان ----------
    ارتقای کیفیت: دات‌ها داخل سینی شیشه‌ای-نیومورفیک؛ دات‌های غیرفعال فرورفته
    (inset) با هاور کشسان؛ دات فعال گرادینتی با هالهٔ آکسانت، درخشش مورب دوره‌ای

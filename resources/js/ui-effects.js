@@ -674,6 +674,12 @@ document.addEventListener('DOMContentLoaded', function () {
         dot.addEventListener('click', () => activate(i, true));
     });
 
+    // دکمه‌های قبلی/بعدی — هماهنگ با ناوبری هیرو: چرخش بی‌پایان + ری‌استارت تایمر
+    const nextBtn = rotator.querySelector('[data-reviews-next]');
+    const prevBtn = rotator.querySelector('[data-reviews-prev]');
+    if (nextBtn) nextBtn.addEventListener('click', () => activate((current + 1) % batches.length, true));
+    if (prevBtn) prevBtn.addEventListener('click', () => activate((current - 1 + batches.length) % batches.length, true));
+
     // مکث با هاور / فوکوس
     rotator.addEventListener('mouseenter', () => { paused = true; stopTimer(); });
     rotator.addEventListener('mouseleave', () => { paused = false; startTimer(); });
@@ -696,6 +702,19 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         startTimer();
     }
+
+    // مثل هیرو: وقتی تب مخفی می‌شود چرخش متوقف و با برگشت ادامه می‌یابد
+    let rotatorHidden = document.hidden;
+    const onRotatorVisibility = () => {
+        if (document.hidden) {
+            rotatorHidden = true;
+            stopTimer();
+        } else if (rotatorHidden) {
+            rotatorHidden = false;
+            if (!paused && !reduceMotion) startTimer();
+        }
+    };
+    document.addEventListener('visibilitychange', onRotatorVisibility);
 });
 
 

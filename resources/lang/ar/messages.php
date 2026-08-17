@@ -36,6 +36,8 @@ return [
     'review_average' => 'التقييم العام',
     'based_on_recent' => 'بناءً على :count مراجعة حديثة',
     'review_batch' => 'المراجعات — المجموعة :num',
+    'reviews_next' => 'المراجعات التالية',
+    'reviews_prev' => 'المراجعات السابقة',
     'about_product' => 'حول',
     'verified_purchase' => 'موثّق',
     'view_all' => 'عرض الكل',

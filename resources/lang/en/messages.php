@@ -36,6 +36,8 @@ return [
     'review_average' => 'Overall rating',
     'based_on_recent' => 'Based on :count recent reviews',
     'review_batch' => 'Reviews — group :num',
+    'reviews_next' => 'Next reviews',
+    'reviews_prev' => 'Previous reviews',
     'about_product' => 'About',
     'verified_purchase' => 'Verified',
     'view_all' => 'View All',

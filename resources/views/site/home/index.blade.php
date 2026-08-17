@@ -348,6 +348,12 @@
                                     </button>
                                 @endforeach
                             </div>
+
+                            {{-- دکمه‌های قبلی/بعدی — هماهنگ با ناوبری هیرو (در موبایل فقط دات‌ها می‌مانند) --}}
+                            <button type="button" class="reviews-nav reviews-nav--next" data-reviews-next
+                                    aria-label="{{ __('messages.reviews_next') }}"></button>
+                            <button type="button" class="reviews-nav reviews-nav--prev" data-reviews-prev
+                                    aria-label="{{ __('messages.reviews_prev') }}"></button>
                         </div>
                     </div>
                 </div>

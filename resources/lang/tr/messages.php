@@ -36,6 +36,8 @@ return [
     'review_average' => 'Genel puan',
     'based_on_recent' => ':count son yoruma göre',
     'review_batch' => 'Yorumlar — grup :num',
+    'reviews_next' => 'Sonraki yorumlar',
+    'reviews_prev' => 'Önceki yorumlar',
     'about_product' => 'Hakkında',
     'verified_purchase' => 'Doğrulanmış',
     'view_all' => 'Tümünü Gör',
