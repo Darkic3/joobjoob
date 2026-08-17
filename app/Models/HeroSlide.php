@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class HeroSlide extends Model
 {
+    /** حداکثر آیتم‌های اعتماد قابل ذخیره برای هر اسلاید (فرم، اعتبارسنجی و DTO) */
+    public const MAX_TRUST_ITEMS = 5;
+
+    /** حداکثر آیتم‌های اعتمادی که در هیرو نمایش داده می‌شوند — مابقی فقط ذخیره می‌شوند */
+    public const MAX_TRUST_ITEMS_SHOWN = 3;
+
     protected $fillable = [
         'badge', 'title', 'desc', 'btn_text',
         'price', 'old_price', 'currency', 'rating', 'viewers', 'trusts',

@@ -117,45 +117,57 @@
                             {{-- =========================
                                  TRUST / SOCIAL PROOF
                                  — فقط اگر حداقل یکی از بخش‌ها (امتیاز / بازدیدکننده / آیتم اعتماد) موجود باشد نمایش داده می‌شود
+                                 چیدمان حساب‌شده: ردیف وضعیت (امتیاز + بازدید زنده) بالای ردیف چیپ‌های اعتماد؛
+                                 چیپ‌ها دایره‌ای‌اند و حداکثر MAX_TRUST_ITEMS_SHOWN مورد نمایش داده می‌شود —
+                                 مابقی (در صورت اضافه شدن در ادمین) فقط ذخیره می‌شوند و نمایش داده نمی‌شوند.
                             ========================== --}}
                             @if($slide->hasRating() || $slide->viewers > 0 || ! empty($slide->trustItems()))
-                            <div class="hero-trust flex flex-wrap items-center gap-5">
-                                {{-- Rating --}}
-                                @if($slide->hasRating())
-                                    <div class="inline-flex items-center gap-3">
-                                        {{-- ستاره‌ها — درصد پر شدن هر ستاره از HeroSlide::ratingStars() --}}
-                                        <div class="hero-rating-stars flex items-center gap-[3px] text-base leading-none" aria-hidden="true">
-                                            @foreach($slide->ratingStars() as $fill)
-                                                <span class="hero-star">
-                                                    <span class="hero-star-bg">★</span>
-                                                    <span class="hero-star-fill" style="width: {{ $fill }}%;">★</span>
-                                                </span>
-                                            @endforeach
+                            <div class="hero-trust">
+                                {{-- ردیف وضعیت: امتیاز + بازدید زنده --}}
+                                @if($slide->hasRating() || $slide->viewers > 0)
+                                <div class="hero-trust-meta">
+                                    {{-- Rating --}}
+                                    @if($slide->hasRating())
+                                        <div class="inline-flex items-center gap-3">
+                                            {{-- ستاره‌ها — درصد پر شدن هر ستاره از HeroSlide::ratingStars() --}}
+                                            <div class="hero-rating-stars flex items-center gap-[3px] text-base leading-none" aria-hidden="true">
+                                                @foreach($slide->ratingStars() as $fill)
+                                                    <span class="hero-star">
+                                                        <span class="hero-star-bg">★</span>
+                                                        <span class="hero-star-fill" style="width: {{ $fill }}%;">★</span>
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                            <div class="mono font-black text-lg leading-none" style="color: var(--accent);">
+                                                <bdi dir="ltr">{{ $slide->rating }}</bdi>
+                                            </div>
                                         </div>
-                                        <div class="mono font-black text-lg leading-none" style="color: var(--accent);">
-                                            <bdi dir="ltr">{{ $slide->rating }}</bdi>
+                                    @endif
+
+                                    {{-- Viewer Count --}}
+                                    @if($slide->viewers > 0)
+                                        <div class="flex items-center gap-2 text-[11px] font-semibold" style="color: var(--text-secondary);">
+                                            <span class="live-dot"></span>
+                                            <span class="live-viewers mono" dir="ltr">{{ $slide->viewers }}</span>
+                                            <span>{{ __('messages.viewing_now') }}</span>
                                         </div>
-                                    </div>
+                                    @endif
+                                </div>
                                 @endif
 
-                                {{-- Viewer Count --}}
-                                @if($slide->viewers > 0)
-                                    <div class="flex items-center gap-2 text-[11px] font-semibold" style="color: var(--text-secondary);">
-                                        <span class="live-dot"></span>
-                                        <span class="live-viewers mono" dir="ltr">{{ $slide->viewers }}</span>
-                                        <span>{{ __('messages.viewing_now') }}</span>
-                                    </div>
+                                {{-- چیپ‌های اعتماد — دایره‌ای و حداکثر MAX_TRUST_ITEMS_SHOWN مورد --}}
+                                @if(! empty($slide->trustItems()))
+                                <div class="hero-trust-chips">
+                                    @foreach(array_slice($slide->trustItems(), 0, \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN) as $trust)
+                                        <div class="hero-trust-chip">
+                                            <span class="neu-icon-circle-sm" style="color: var(--accent);">
+                                                <x-trust-icon :icon="$trust['icon']" />
+                                            </span>
+                                            <span class="text-xs font-bold" style="color: var(--text-secondary);">{{ $trust['text'] }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
                                 @endif
-
-                                {{-- Trust Items (قابل تنظیم برای هر اسلاید — ۰ تا ۵ آیتم) --}}
-                                @foreach($slide->trustItems() as $trust)
-                                    <div class="hidden sm:flex items-center gap-2">
-                                        <span class="neu-icon-circle-sm w-8 h-8 grid place-items-center text-xs font-bold" style="color: var(--accent);">
-                                            <x-trust-icon :icon="$trust['icon']" />
-                                        </span>
-                                        <span class="text-xs font-bold" style="color: var(--text-secondary);">{{ $trust['text'] }}</span>
-                                    </div>
-                                @endforeach
                             </div>
                             @endif
 

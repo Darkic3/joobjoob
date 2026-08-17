@@ -486,6 +486,7 @@ return [
         'add_trust_item' => 'Add Item',
         'item_label' => 'Item',
         'max_items' => 'Max 5 items — ',
+        'trust_max_display' => 'Of the :store items you can save, only :max are shown in the hero; the rest are stored but not displayed on the site.',
         'icon_label' => 'Choose Icon',
         'text_fa' => 'Text (Persian)',
         'text_en' => 'Text (English)',

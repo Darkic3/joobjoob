@@ -486,6 +486,7 @@ return [
         'add_trust_item' => 'Öğe Ekle',
         'item_label' => 'Öğe',
         'max_items' => 'Maks 5 öğe — ',
+        'trust_max_display' => 'Kaydedebileceğiniz :store öğeden yalnızca :max tanesi heroda gösterilir; geri kalanı kaydedilir ama sitede görünmez.',
         'icon_label' => 'İkon Seç',
         'text_fa' => 'Metin (Farsça)',
         'text_en' => 'Metin (İngilizce)',

@@ -314,12 +314,19 @@
                 <button
                     type="button"
                     @click="addTrust()"
-                    :disabled="trusts.length >= 5"
+                    :disabled="trusts.length >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}"
                     class="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     {{ __('admin.hero_slides.add_trust_item') }}
                 </button>
+            </div>
+
+            {{-- اطلاع‌رسانی: سقف نمایش در هیرو کمتر از سقف ذخیره‌سازی است —
+                 آیتم‌های اضافی ذخیره می‌شوند ولی در سایت نمایش داده نمی‌شوند --}}
+            <div class="flex items-start gap-2.5 rounded-xl border border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-900/30 px-3.5 py-2.5 text-xs leading-relaxed text-sky-800 dark:text-sky-200">
+                <svg class="w-4 h-4 shrink-0 mt-0.5 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p>{{ __('admin.hero_slides.trust_max_display', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN, 'store' => \App\Models\HeroSlide::MAX_TRUST_ITEMS]) }}</p>
             </div>
 
             {{-- آیتم‌ها در دسکتاپ دو‌ستونه (کنار هم) — در موبایل تک‌ستونه --}}
@@ -372,7 +379,7 @@
             <p x-show="trusts.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
                 {{ __('admin.hero_slides.trusts_empty') }}
             </p>
-            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="labels.maxItems + trusts.length + ' / 5'"></p>
+            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="labels.maxItems + trusts.length + ' / {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}'"></p>
         </div>
     </div>
 

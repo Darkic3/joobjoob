@@ -416,12 +416,17 @@ html, body {
         0 6px 18px -8px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-/* نوار اعتماد: باند شیشه‌ای واحد (امتیاز + بازدید زنده + نشان‌ها) به‌جای چیپ‌های پراکنده —
-   حس یک «نوار سوشال‌پروف» طراحی‌شده را می‌دهد */
+/* نوار اعتماد: باند شیشه‌ای واحد (امتیاز + بازدید زنده + چیپ‌های اعتماد) به‌جای چیپ‌های پراکنده —
+   حس یک «نوار سوشال‌پروف» طراحی‌شده را می‌دهد.
+   چیدمان حساب‌شده: دو ردیف — وضعیت (امتیاز/بازدید) بالا، چیپ‌های اعتماد پایین. */
 .hero-trust {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .55rem;
     width: fit-content;
     max-width: 100%;
-    padding: .5rem .7rem;
+    padding: .6rem .85rem;
     border-radius: var(--radius-lg);
     background: linear-gradient(145deg,
         color-mix(in srgb, var(--bg-elevated) 86%, #fff 14%) 0%,
@@ -435,15 +440,46 @@ html, body {
     -webkit-backdrop-filter: blur(8px);
 }
 
+/* ردیف وضعیت: امتیاز + بازدید زنده — جمع‌وجور با فاصلهٔ منظم */
+.hero-trust-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem 1.4rem;
+}
+
+/* ردیف چیپ‌های اعتماد: هر چیپ = دایرهٔ آیکون + متن — با فاصلهٔ حساب‌شده */
+.hero-trust-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1.1rem;
+}
+.hero-trust-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-width: 0;
+}
+
 /* ستاره‌های امتیاز داخل باند — کمی بزرگ‌تر برای دیده‌شدن بهتر */
 .hero-trust .hero-rating-stars { font-size: 1.05rem; }
 /* چیپ‌های نشان اعتماد داخل باند — دایرهٔ کوچک شیشه‌ای-آکسانتی با تنت رنگی،
    رینگ ظریف و هایلایت داخلی؛ به‌جای سایهٔ سنگین نیومورفیک (که روی عکس هیرو
-   لکهٔ خاکستری/هالهٔ سفید می‌ساخت) از درخشش نرم آکسانت استفاده می‌شود. */
+   لکهٔ خاکستری/هالهٔ سفید می‌ساخت) از درخشش نرم آکسانت استفاده می‌شود.
+   نکته: اسپن فقط کلاس size (neu-icon-circle-sm) را دارد نه کلاس پایهٔ
+   neu-icon-circle — پس display/align/border-radius باید همین‌جا کامل داده
+   شود وگرنه به‌صورت باکس مربعیِ تیز و بدون وسط‌چینی رندر می‌شود. */
 .hero-trust .neu-icon-circle-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
+    border-radius: 50%;
     font-size: .78rem;
+    line-height: 1;
     background: linear-gradient(145deg,
         color-mix(in srgb, var(--accent) 20%, var(--bg-elevated)) 0%,
         color-mix(in srgb, var(--accent) 9%, var(--bg-elevated)) 100%);
@@ -458,7 +494,7 @@ html, body {
         border-color .25s var(--ease-out),
         background .25s var(--ease-out);
 }
-.hero-trust > div:hover .neu-icon-circle-sm {
+.hero-trust-chip:hover .neu-icon-circle-sm {
     transform: translateY(-2px) scale(1.08);
     border-color: color-mix(in srgb, var(--accent) 50%, transparent);
     background: linear-gradient(145deg,
@@ -677,7 +713,7 @@ html, body {
     .hero-pagination .swiper-pagination-bullet-active::after { transform: scaleX(1); transition: none; }
     .hero-pagination .swiper-pagination-bullet-active::before { animation: none; opacity: 0; transform: none; }
     .hero-pagination .swiper-pagination-bullet:hover { transform: none; }
-    .hero-trust > div:hover .neu-icon-circle-sm { transform: none; }
+    .hero-trust-chip:hover .neu-icon-circle-sm { transform: none; }
     #deals.deals-highlight .deals-shell { animation: none; }
 }
 

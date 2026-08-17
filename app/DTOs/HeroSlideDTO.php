@@ -5,6 +5,7 @@ namespace App\DTOs;
 use App\Http\Requests\Admin\HeroSlideRequest;
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Models\HeroSlide;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\UploadedFile;
@@ -89,7 +90,7 @@ readonly class HeroSlideDTO
             ];
         }
 
-        return array_slice($trusts, 0, 5);
+        return array_slice($trusts, 0, HeroSlide::MAX_TRUST_ITEMS);
     }
 
     public function getLinkableType(): ?string
