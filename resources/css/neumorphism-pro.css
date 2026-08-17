@@ -646,6 +646,8 @@ html, body {
     [dir="ltr"] .cta-ring:hover .cta-ring-icon { transform: none; }
     /* دات پیشرفت: بدون حرکت — پر کامل به‌عنوان نشانگر فعال */
     .hero-pagination .swiper-pagination-bullet-active::after { transform: scaleX(1); transition: none; }
+    .hero-pagination .swiper-pagination-bullet-active::before { animation: none; opacity: 0; transform: none; }
+    .hero-pagination .swiper-pagination-bullet:hover { transform: none; }
     #deals.deals-highlight .deals-shell { animation: none; }
 }
 
@@ -697,37 +699,127 @@ html, body {
     .hero-navigation { display: none !important; }
 }
 
-/* ---------- 4.8) صفحه‌بندی — دات فعال با نوار پیشرفت زمان ---------- */
+/* ---------- 4.8) صفحه‌بندی — دات فعال با نوار پیشرفت زمان ----------
+   ارتقای کیفیت: دات‌ها داخل سینی شیشه‌ای-نیومورفیک؛ دات‌های غیرفعال فرورفته
+   (inset) با هاور کشسان؛ دات فعال گرادینتی با هالهٔ آکسانت، درخشش مورب دوره‌ای
+   و نوار پیشرفتی که به سمت خط پایان روشن‌تر می‌شود (--dot-progress از رویداد
+   autoplayTimeLeft سوییپر). */
+.hero-pagination {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: max-content !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-elevated) 72%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid color-mix(in srgb, var(--shadow-light) 40%, transparent);
+    box-shadow:
+        4px 4px 12px var(--shadow-dark),
+        -4px -4px 12px var(--shadow-light),
+        inset 0 1px 0 color-mix(in srgb, #fff 30%, transparent);
+}
 .hero-pagination .swiper-pagination-bullet {
     position: relative;
     overflow: hidden;
-    width: 6px;
-    height: 6px;
-    margin-inline: 4px !important;
-    opacity: .25;
-    background: var(--text-secondary);
-    transition: width .35s var(--ease-out), opacity .35s var(--ease-out), background-color .35s var(--ease-out), box-shadow .35s var(--ease-out);
+    width: 7px;
+    height: 7px;
+    margin: 0 !important;
+    border-radius: 999px;
+    opacity: .8;
+    background: color-mix(in srgb, var(--text-secondary) 50%, transparent);
+    box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--shadow-dark) 45%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--shadow-light) 60%, transparent);
+    transition:
+        width .45s var(--ease-out),
+        height .45s var(--ease-out),
+        transform .3s var(--ease-out),
+        opacity .3s var(--ease-out),
+        background-color .3s var(--ease-out),
+        box-shadow .3s var(--ease-out);
+}
+.hero-pagination .swiper-pagination-bullet:hover {
+    opacity: 1;
+    transform: scale(1.35);
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.hero-pagination .swiper-pagination-bullet:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }
 .hero-pagination .swiper-pagination-bullet-active {
-    width: 34px;
+    width: 42px;
+    height: 8px;
     opacity: 1;
-    border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--accent) 84%, #fff 16%),
+        color-mix(in srgb, var(--accent) 66%, #000 34%));
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, #fff 26%, transparent),
+        0 3px 12px -2px color-mix(in srgb, var(--accent) 62%, transparent);
 }
-/* نوار پیشرفت: در طول هر اسلاید (--dot-progress از رویداد autoplayTimeLeft سوییپر) از سمت شروع پر می‌شود */
+.hero-pagination .swiper-pagination-bullet-active:hover {
+    transform: none;
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--accent) 90%, #fff 10%),
+        color-mix(in srgb, var(--accent) 72%, #000 28%));
+}
+/* نوار پیشرفت: در طول هر اسلاید (--dot-progress از رویداد autoplayTimeLeft سوییپر)
+   از سمت شروع پر می‌شود و به سمت خط پایان (انتهای کپسول) روشن‌تر می‌شود.
+   RTL: شروع راست، پایان چپ → گرادیان از چپ (روشن) به راست (عمیق). */
 .hero-pagination .swiper-pagination-bullet-active::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: color-mix(in srgb, #fff 45%, var(--accent));
+    background: linear-gradient(90deg,
+        color-mix(in srgb, #fff 45%, var(--accent)) 0%,
+        color-mix(in srgb, #fff 12%, var(--accent)) 100%);
     transform: scaleX(var(--dot-progress, 0));
     transform-origin: right; /* RTL: از سمت راست (شروع) پر می‌شود */
     transition: transform .25s linear;
     pointer-events: none;
+    will-change: transform;
 }
-[dir="ltr"] .hero-pagination .swiper-pagination-bullet-active::after { transform-origin: left; }
+[dir="ltr"] .hero-pagination .swiper-pagination-bullet-active::after {
+    transform-origin: left;
+    background: linear-gradient(90deg,
+        color-mix(in srgb, #fff 12%, var(--accent)) 0%,
+        color-mix(in srgb, #fff 45%, var(--accent)) 100%);
+}
+/* درخشش مورب دوره‌ای روی دات فعال — حس «زنده بودن» بدون مزاحمت */
+.hero-pagination .swiper-pagination-bullet-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 38%;
+    background: linear-gradient(115deg,
+        transparent 0%,
+        color-mix(in srgb, #fff 38%, transparent) 50%,
+        transparent 100%);
+    transform: translateX(260%);
+    animation: heroDotShineRtl 5s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes heroDotShineRtl {
+    0%, 55%   { transform: translateX(260%); }
+    85%, 100% { transform: translateX(-160%); }
+}
+[dir="ltr"] .hero-pagination .swiper-pagination-bullet-active::before {
+    transform: translateX(-160%);
+    animation-name: heroDotShineLtr;
+}
+@keyframes heroDotShineLtr {
+    0%, 55%   { transform: translateX(-160%); }
+    85%, 100% { transform: translateX(260%); }
+}
 
 /* ---------- 4.8.1) هایلایت لحظه‌ای بخش پیشنهادات (بعد از کلیک CTA ثانویه) ---------- */
 #deals { scroll-margin-top: 24px; }
@@ -749,7 +841,12 @@ html, body {
     /* دات‌های صفحه‌بندی روی موبایل: از حالت absolute خارج و در جریان عادی زیر محتوا
        قرار می‌گیرند تا هرگز روی ستاره‌های امتیاز/محتوای پایین نیفتند (حتی با تغییر
        ارتفاع خودکار اسلایدها) */
-    .hero-swiper .hero-pagination { position: static; margin-top: .5rem; }
+    .hero-swiper .hero-pagination {
+        position: static;
+        left: auto !important;
+        transform: none !important;
+        margin: .7rem auto 0;
+    }
 }
 
 @media (min-width: 768px) {
