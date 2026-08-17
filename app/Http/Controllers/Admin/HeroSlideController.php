@@ -70,7 +70,7 @@ class HeroSlideController extends Controller
             'hasRating' => false,
             'hasViewers' => false,
             'trusts' => [
-                ['icon' => '✓', 'fa' => '+۱۲,۰۰۰ مشتری راضی', 'en' => '+12,000 happy customers'],
+                ['icon' => 'users', 'fa' => '+۱۲,۰۰۰ مشتری راضی', 'en' => '+12,000 happy customers'],
             ],
             'selectedModel' => null,
         ];

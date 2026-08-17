@@ -486,7 +486,7 @@ return [
         'add_trust_item' => 'Add Item',
         'item_label' => 'Item',
         'max_items' => 'Max 5 items — ',
-        'icon_label' => 'Icon (emoji/symbol)',
+        'icon_label' => 'Choose Icon',
         'text_fa' => 'Text (Persian)',
         'text_en' => 'Text (English)',
         'trusts_empty' => 'No items added yet — you can add up to 5 items (e.g. “Happy Customers”, “Authenticity Guarantee”, “Fast Shipping”, …). If you add nothing, nothing is shown on the site.',

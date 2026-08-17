@@ -19,8 +19,10 @@
 
     // برچسب‌های محلی‌شده (از فایل ترجمه) — برای نمایش در x-text
     labels: {
-        item: @json(__('admin.hero_slides.item_label'), JSON_UNESCAPED_UNICODE),
-        maxItems: @json(__('admin.hero_slides.max_items'), JSON_UNESCAPED_UNICODE),
+        // نکته: مقادیر JSON اینجا escape می‌شوند؛ دایرکتیو json خام کوتیشن دوبل می‌سازد و
+        // attribute را می‌شکند و کل اسکوپ x-data از کار می‌افتاد
+        item: {{ json_encode(__('admin.hero_slides.item_label'), JSON_UNESCAPED_UNICODE) }},
+        maxItems: {{ json_encode(__('admin.hero_slides.max_items'), JSON_UNESCAPED_UNICODE) }},
     },
 
     get isCustomUrl() { return this.linkType === 'custom'; },
@@ -68,7 +70,7 @@
 
     addTrust() {
         if (this.trusts.length >= 5) return;
-        this.trusts.push({ icon: '✓', fa: '', en: '' });
+        this.trusts.push({ icon: 'badge-check', fa: '', en: '' });
     }
 }" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -320,6 +322,8 @@
                 </button>
             </div>
 
+            {{-- آیتم‌ها در دسکتاپ دو‌ستونه (کنار هم) — در موبایل تک‌ستونه --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <template x-for="(trust, i) in trusts" :key="i">
                 <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-3">
                     <div class="flex items-center justify-between">
@@ -329,11 +333,29 @@
                             {{ __('admin.common.delete') }}
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.icon_label') }}</label>
-                            <input type="text" x-model="trust.icon" :name="'trusts[' + i + '][icon]'" class="input-custom" placeholder="✓" maxlength="4">
+                    {{-- انتخاب آیکون — گرید بصری آیکون‌های SVG باکیفیت (از config/trust-icons.php) --}}
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">{{ __('admin.hero_slides.icon_label') }}</label>
+                        <input type="hidden" :name="'trusts[' + i + '][icon]'" :value="trust.icon">
+                        <div class="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
+                            @foreach(config('trust-icons') as $iconKey => $iconSvg)
+                                <button
+                                    type="button"
+                                    @click="trust.icon = '{{ $iconKey }}'"
+                                    :class="trust.icon === '{{ $iconKey }}'
+                                        ? 'bg-primary-600 border-primary-600 text-white scale-110 shadow-md'
+                                        : 'bg-gray-100 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-300 hover:scale-105'"
+                                    class="flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-150"
+                                    aria-label="{{ $iconKey }}"
+                                >
+                                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
+                                </button>
+                            @endforeach
                         </div>
+                        <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">برای انتخاب، روی آیکون موردنظر کلیک کنید.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.text_fa') }}</label>
                             <input type="text" x-model="trust.fa" :name="'trusts[' + i + '][fa]'" class="input-custom" placeholder="مثال: +۱۲,۰۰۰ مشتری راضی">
@@ -345,6 +367,7 @@
                     </div>
                 </div>
             </template>
+            </div>
 
             <p x-show="trusts.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
                 {{ __('admin.hero_slides.trusts_empty') }}

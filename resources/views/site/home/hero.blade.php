@@ -151,7 +151,7 @@
                                 @foreach($slide->trustItems() as $trust)
                                     <div class="hidden sm:flex items-center gap-2">
                                         <span class="neu-icon-circle-sm w-8 h-8 grid place-items-center text-xs font-bold" style="color: var(--accent);">
-                                            {{ $trust['icon'] }}
+                                            <x-trust-icon :icon="$trust['icon']" />
                                         </span>
                                         <span class="text-xs font-bold" style="color: var(--text-secondary);">{{ $trust['text'] }}</span>
                                     </div>

@@ -486,7 +486,7 @@ return [
         'add_trust_item' => 'Öğe Ekle',
         'item_label' => 'Öğe',
         'max_items' => 'Maks 5 öğe — ',
-        'icon_label' => 'İkon (emoji/sembol)',
+        'icon_label' => 'İkon Seç',
         'text_fa' => 'Metin (Farsça)',
         'text_en' => 'Metin (İngilizce)',
         'trusts_empty' => 'Henüz öğe eklenmedi — en fazla 5 öğe ekleyebilirsiniz (örn. «Mutlu Müşteriler», «Ürün Orijinallik Garantisi», «Hızlı Kargo»…). Hiçbir şey eklemezseniz sitede gösterilmez.',
