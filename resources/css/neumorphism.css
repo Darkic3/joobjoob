@@ -171,6 +171,10 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* نوار اسکرول خودِ صفحه مخفی می‌شود — اسکرول (ماوس/تاچ/کیبورد) همچنان کار می‌کند */
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 [dir="rtl"] .flip-rtl { transform: scaleX(-1); }
 
 @media (max-width: 768px) {
