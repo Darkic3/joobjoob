@@ -32,7 +32,9 @@
                                 src="{{ $slide->imageUrl() }}"
                                 alt=""
                                 @if($loop->first) fetchpriority="high" @endif
-                                onerror="this.src='https://picsum.photos/seed/hero-fallback/1600/1000'"
+                                {{-- fallback محلی: picsum.photos 403 می‌داد و حلقهٔ بی‌نهایت ریکوئست می‌ساخت؛
+                                     this.onerror=null فقط یک‌بار جایگزینی را مجاز می‌کند --}}
+                                onerror="this.onerror=null;this.src='{{ asset('images/hero-fallback.svg') }}'"
                             >
                         </div>
                         <div class="hero-fb-overlay" aria-hidden="true"></div>

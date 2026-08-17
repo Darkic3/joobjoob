@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6c63ff"/>
+      <stop offset="60%" stop-color="#5248d6"/>
+      <stop offset="100%" stop-color="#2b2763"/>
+    </linearGradient>
+    <radialGradient id="fb-glow" cx="0.72" cy="0.28" r="0.65">
+      <stop offset="0%" stop-color="#a79bff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#a79bff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#fb-bg)"/>
+  <rect width="1600" height="1000" fill="url(#fb-glow)"/>
+</svg>
