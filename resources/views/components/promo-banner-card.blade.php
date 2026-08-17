@@ -1,6 +1,6 @@
 @props(['banner'])
 
-{{-- اگر لینک ندارد، بنر اصلاً کلیک‌پذیر نیست (div به‌جای a) و فلش/لیفت هاور نمایش داده نمی‌شود --}}
+{{-- اگر لینک ندارد، بنر اصلاً کلیک‌پذیر نیست (div به‌جای a) و لیفت هاور نمایش داده نمی‌شود --}}
 @if($banner->url)
     <a href="{{ $banner->url }}"
        class="promo-banner promo-banner--{{ $banner->style }} promo-banner--{{ $banner->tone }} group">
@@ -13,9 +13,6 @@
             @if($banner->trans('subtitle'))
                 <span class="promo-banner-subtitle">{{ $banner->trans('subtitle') }}</span>
             @endif
-        </span>
-        <span class="promo-banner-arrow" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </span>
     </a>
 @else

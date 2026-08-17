@@ -2256,21 +2256,8 @@ html, body {
     transition: background-color var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out),
                 box-shadow var(--dur-med) var(--ease-out);
 }
-.promo-banner-arrow {
-    display: grid;
-    place-items: center;
-    margin-inline-start: auto;
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    transition: transform var(--dur-med) var(--ease-out), background-color var(--dur-med) var(--ease-out),
-                color var(--dur-med) var(--ease-out);
-}
-.promo-banner:hover .promo-banner-arrow { transform: translateX(3px); }
-[dir="rtl"] .promo-banner:hover .promo-banner-arrow { transform: translateX(-3px); }
 @media (prefers-reduced-motion: reduce) {
-    .promo-banner, .promo-banner-icon, .promo-banner-arrow { transition: none; }
+    .promo-banner, .promo-banner-icon { transition: none; }
 }
 
 /* ---------- رنگ‌ها (tone) — فقط متغیرها؛ تمام سبک‌ها از این‌ها استفاده می‌کنند ---------- */
@@ -2290,7 +2277,6 @@ html, body {
 }
 .promo-banner--gradient:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--banner-tone) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--banner-on) 25%, transparent); }
 .promo-banner--gradient .promo-banner-icon { background: color-mix(in srgb, var(--banner-on) 16%, transparent); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--banner-on) 30%, transparent); }
-.promo-banner--gradient .promo-banner-arrow { background: color-mix(in srgb, var(--banner-on) 18%, transparent); }
 
 /* ---------- سبک ۲: نئومورفیک ---------- */
 .promo-banner--neumorphic {
@@ -2305,11 +2291,6 @@ html, body {
     box-shadow: inset 3px 3px 6px color-mix(in srgb, var(--shadow-dark) 60%, transparent), inset -3px -3px 6px var(--shadow-light);
 }
 .promo-banner--neumorphic .promo-banner-title { color: var(--banner-tone); }
-.promo-banner--neumorphic .promo-banner-arrow {
-    background: var(--bg-elevated);
-    color: var(--banner-tone);
-    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-}
 
 /* ---------- سبک ۳: مینیمال ---------- */
 .promo-banner--minimal {
@@ -2321,7 +2302,6 @@ html, body {
 .promo-banner--minimal:hover { border-color: color-mix(in srgb, var(--banner-tone) 55%, transparent); box-shadow: none; }
 .promo-banner--minimal .promo-banner-title { color: var(--banner-tone); }
 .promo-banner--minimal .promo-banner-icon { background: transparent; box-shadow: none; color: var(--banner-tone); }
-.promo-banner--minimal .promo-banner-arrow { background: transparent; color: var(--banner-tone); box-shadow: none; }
 
 /* ---------- سبک ۴: تیره لوکس ---------- */
 .promo-banner--dark {
@@ -2334,7 +2314,6 @@ html, body {
 .promo-banner--dark .promo-banner-title { color: var(--banner-title-bright); }
 .promo-banner--dark .promo-banner-subtitle { color: rgba(255, 255, 255, .72); }
 .promo-banner--dark .promo-banner-icon { background: rgba(255, 255, 255, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); color: var(--banner-tone); }
-.promo-banner--dark .promo-banner-arrow { background: rgba(255, 255, 255, .1); color: var(--banner-tone); }
 
 /* ---------- سبک ۵: کوپنی (بلیت/کوپن با خط چین) ---------- */
 .promo-banner--coupon {
@@ -2345,17 +2324,11 @@ html, body {
 }
 .promo-banner--coupon:hover { box-shadow: 0 14px 30px color-mix(in srgb, var(--banner-tone) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--banner-on) 25%, transparent); }
 .promo-banner--coupon .promo-banner-icon { background: color-mix(in srgb, var(--banner-on) 16%, transparent); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--banner-on) 30%, transparent); border-radius: 999px; }
-.promo-banner--coupon .promo-banner-arrow {
-    width: 46px;
-    height: 46px;
-    background: color-mix(in srgb, var(--banner-on) 24%, transparent);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--banner-on) 30%, transparent);
-}
 .promo-banner--coupon::after {
     content: '';
     position: absolute;
     inset-block: 12px;
-    inset-inline-end: 3.4rem;
+    inset-inline-end: 1.6rem;
     border-inline-start: 2px dashed color-mix(in srgb, var(--banner-on) 55%, transparent);
     pointer-events: none;
 }
