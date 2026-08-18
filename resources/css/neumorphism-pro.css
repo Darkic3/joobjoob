@@ -252,7 +252,13 @@ html, body {
 .hero-fullbleed {
     width: 100vw;
     margin-inline-start: calc(50% - 50vw);
+    margin-top: -4.5rem;
     position: relative;
+}
+@media (min-width: 768px) {
+    .hero-fullbleed {
+        margin-top: -5rem;
+    }
 }
 
 /* ---------- 4.2) خود اسلایدر + پس‌زمینه (گرید و هاله) ---------- */

@@ -42,7 +42,7 @@
 
 <x-header :cart-count="$cartCount" :wishlist-count="$wishlistCount"/>
 
-<main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+<main class="max-w-7xl mx-auto px-4 md:px-6 @yield('main_class', 'py-6')">
     @if (session('success'))
         <div class="neu-flat-sm px-4 py-3 mb-4" style="color: var(--success)">{{ session('success') }}</div>
     @endif

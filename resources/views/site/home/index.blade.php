@@ -1,5 +1,7 @@
 @extends('layouts.site.app')
 
+@section('main_class', 'pt-0 pb-6')
+
 @section('title', __('messages.site_name') . ' - ' . __('messages.home'))
 
 @section('content')
