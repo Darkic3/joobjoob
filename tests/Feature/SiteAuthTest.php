@@ -26,7 +26,7 @@ class SiteAuthTest extends TestCase
             ->assertOk()
             ->assertSee(__('messages.login_title'))
             ->assertSee(__('messages.login_subtitle'))
-            ->assertSee('name="email"', false)
+            ->assertSee('name="mobile"', false)
             ->assertSee('name="password"', false);
     }
 
@@ -41,12 +41,12 @@ class SiteAuthTest extends TestCase
     public function test_login_with_valid_credentials_redirects_to_dashboard(): void
     {
         User::factory()->create([
-            'email' => 'customer@example.com',
+            'mobile' => '09123456789',
             'is_active' => true,
         ]);
 
         $this->post('/login', [
-            'email' => 'customer@example.com',
+            'mobile' => '09123456789',
             'password' => 'password',
         ])->assertRedirect(route('dashboard'));
 
@@ -56,15 +56,15 @@ class SiteAuthTest extends TestCase
     public function test_login_with_invalid_credentials_shows_error(): void
     {
         User::factory()->create([
-            'email' => 'customer@example.com',
+            'mobile' => '09123456789',
             'is_active' => true,
         ]);
 
         $this->from('/login')->post('/login', [
-            'email' => 'customer@example.com',
+            'mobile' => '09123456789',
             'password' => 'wrong-password',
         ])->assertRedirect('/login')
-            ->assertSessionHasErrors('email');
+            ->assertSessionHasErrors('mobile');
 
         $this->assertGuest();
     }
@@ -72,16 +72,42 @@ class SiteAuthTest extends TestCase
     public function test_inactive_user_cannot_login(): void
     {
         User::factory()->create([
-            'email' => 'blocked@example.com',
+            'mobile' => '09123456789',
             'is_active' => false,
         ]);
 
         $this->post('/login', [
-            'email' => 'blocked@example.com',
+            'mobile' => '09123456789',
             'password' => 'password',
-        ])->assertSessionHasErrors('email');
+        ])->assertSessionHasErrors('mobile');
 
         $this->assertGuest();
+    }
+
+    public function test_login_with_invalid_mobile_format_shows_validation_error(): void
+    {
+        $this->from('/login')->post('/login', [
+            'mobile' => '09123',
+            'password' => 'password',
+        ])->assertRedirect('/login')
+            ->assertSessionHasErrors('mobile');
+
+        $this->assertGuest();
+    }
+
+    public function test_login_normalizes_persian_digits_and_country_code(): void
+    {
+        User::factory()->create([
+            'mobile' => '09123456789',
+            'is_active' => true,
+        ]);
+
+        $this->post('/login', [
+            'mobile' => '۰۹۱۲۳۴۵۶۷۸۹',
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticated();
     }
 
     public function test_guest_is_redirected_to_login_when_accessing_dashboard(): void
@@ -120,7 +146,7 @@ class SiteAuthTest extends TestCase
         $this->get('/en/login')
             ->assertOk()
             ->assertSee(__('messages.login_title', [], 'en'))
-            ->assertSee('name="email"', false);
+            ->assertSee('name="mobile"', false);
     }
 
     public function test_header_shows_login_button_for_guest_and_full_actions_for_user(): void

@@ -25,13 +25,13 @@
             <p class="mt-2 text-sm leading-relaxed" style="color: var(--text-secondary);">{{ __('messages.login_subtitle') }}</p>
 
             {{-- خطای عمومی لاگین --}}
-            @if ($errors->has('email'))
+            @if ($errors->has('mobile'))
                 <div class="mt-5 flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-semibold"
                      style="background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);">
                     <svg class="w-4.5 h-4.5 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
                     </svg>
-                    {{ $errors->first('email') }}
+                    {{ $errors->first('mobile') }}
                 </div>
             @endif
 
@@ -39,11 +39,12 @@
                 @csrf
 
                 <div class="form-field">
-                    <label for="login-email" class="form-label">{{ __('messages.email') }}</label>
-                    <input id="login-email" type="email" name="email" value="{{ old('email') }}" required maxlength="190"
-                           placeholder="you@example.com" class="neu-input" autocomplete="email" dir="ltr"
-                           @error('email') style="box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--danger) 45%, transparent);" @enderror>
-                    @error('email')<span class="form-error">{{ $message }}</span>@enderror
+                    <label for="login-mobile" class="form-label">{{ __('messages.otp_mobile') }}</label>
+                    <input id="login-mobile" type="tel" name="mobile" value="{{ old('mobile') }}" required
+                           placeholder="{{ __('messages.otp_mobile_ph') }}" class="neu-input" autocomplete="tel" dir="ltr"
+                           inputmode="tel" maxlength="13"
+                           @error('mobile') style="box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--danger) 45%, transparent);" @enderror>
+                    @error('mobile')<span class="form-error">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-field">

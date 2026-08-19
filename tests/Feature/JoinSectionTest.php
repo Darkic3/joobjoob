@@ -29,6 +29,7 @@ class JoinSectionTest extends TestCase
             ->assertSee(__('messages.register_title'))
             ->assertSee(__('messages.register_desc'))
             ->assertSee(__('messages.register_btn'))
+            ->assertSee('name="mobile"', false)
             // TODO: فرم هنوز به روت ثبت‌نام کانکت نشده (منطق بعداً پیاده می‌شود)
             ->assertSee('action="#"', false);
     }

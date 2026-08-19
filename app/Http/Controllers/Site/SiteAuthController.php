@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SiteAuthController extends Controller
 {
+    public function __construct(private readonly OtpService $otpService) {}
+
     public function showLogin()
     {
         if (auth()->check()) {
@@ -20,8 +23,17 @@ class SiteAuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
+        // شماره موبایل را قبل از اعتبارسنجی نرمال‌سازی می‌کنیم (۰۹۱۲۳۴۵۶۷۸۹)
+        // تا ورودی‌هایی مثل +98، 0098 یا ارقام فارسی/عربی هم درست شناسایی شوند.
+        $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
+        $request->merge(['mobile' => $mobile]);
+
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'mobile' => ['required', 'string', function (string $attribute, string $value, callable $fail): void {
+                if (! $this->otpService->isValidMobile($value)) {
+                    $fail(__('messages.otp_mobile_invalid'));
+                }
+            }],
             'password' => ['required', 'string'],
         ]);
 
@@ -31,7 +43,7 @@ class SiteAuthController extends Controller
             return redirect()->intended(localizedRoute('dashboard'));
         }
 
-        return back()->withErrors(['email' => __('messages.login_failed')])->onlyInput('email');
+        return back()->withErrors(['mobile' => __('messages.login_failed')])->onlyInput('mobile');
     }
 
     public function logout(Request $request): RedirectResponse
