@@ -89,8 +89,7 @@ class OtpTest extends TestCase
 
         $this->assertTrue($fake->lookupCalled);
         $this->assertSame('verify', $fake->lastTemplate);
-        $this->assertSame($user->fresh()->confirm_code, $fake->lastTokens['token2']);
-        $this->assertSame(setting('site_name') ?: config('app.name', 'سایت'), $fake->lastTokens['token']);
+        $this->assertSame($user->fresh()->confirm_code, $fake->lastTokens['token']);
     }
 
     public function test_send_otp_new_user_with_name_creates_user_and_sends_code(): void

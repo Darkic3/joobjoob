@@ -103,11 +103,10 @@ class OtpService
         ]);
 
         $template = setting('otp_template') ?: 'verify';
-        $siteName = setting('site_name') ?: config('app.name', 'سایت');
 
         try {
-            // الگوی کاوه‌نگار: "به سایت %token خوش آمدید. کد تایید شما : %token2 می باشد."
-            $response = $this->sms->sendLookup($template, ['token' => $siteName, 'token2' => $code], $mobile);
+            // فقط کد OTP به‌عنوان token ارسال می‌شود (محدودیت کاوه‌نگار: بدون فاصله)
+            $response = $this->sms->sendLookup($template, ['token' => $code], $mobile);
 
             if ($response instanceof RedirectResponse) {
                 return $this->result(false, __('messages.otp_sms_not_configured'), $code);
