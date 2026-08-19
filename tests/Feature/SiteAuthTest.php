@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * حساب کاربری سمت سایت: لاگین/خروج + گارد داشبورد + آیکون هدر.
+ * حساب کاربری سمت سایت: ورود OTP + گارد داشبورد + آیکون هدر.
  */
 class SiteAuthTest extends TestCase
 {
@@ -20,14 +20,19 @@ class SiteAuthTest extends TestCase
         $this->seed(LanguageSeeder::class);
     }
 
-    public function test_guest_sees_login_page(): void
+    public function test_guest_sees_otp_login_page(): void
+    {
+        $this->get('/login/otp')
+            ->assertOk()
+            ->assertSee(__('messages.otp_login'))
+            ->assertSee('name="mobile"', false)
+            ->assertDontSee('name="password"', false);
+    }
+
+    public function test_login_redirects_to_otp_page(): void
     {
         $this->get('/login')
-            ->assertOk()
-            ->assertSee(__('messages.login_title'))
-            ->assertSee(__('messages.login_subtitle'))
-            ->assertSee('name="mobile"', false)
-            ->assertSee('name="password"', false);
+            ->assertRedirect(route('login.otp'));
     }
 
     public function test_logged_in_user_visiting_login_is_redirected_to_dashboard(): void
@@ -38,35 +43,71 @@ class SiteAuthTest extends TestCase
             ->assertRedirect(route('dashboard'));
     }
 
-    public function test_login_with_valid_credentials_redirects_to_dashboard(): void
+    public function test_otp_send_existing_user_redirects_to_verify(): void
     {
         User::factory()->create([
             'mobile' => '09123456789',
             'is_active' => true,
         ]);
 
-        $this->post('/login', [
-            'mobile' => '09123456789',
-            'password' => 'password',
-        ])->assertRedirect(route('dashboard'));
-
-        $this->assertAuthenticated();
+        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+            ->assertRedirect(route('login.verify'))
+            ->assertSessionHas('otp_mobile', '09123456789');
     }
 
-    public function test_login_with_invalid_credentials_shows_error(): void
+    public function test_otp_send_new_user_without_name_shows_error(): void
     {
-        User::factory()->create([
-            'mobile' => '09123456789',
+        $this->post('/login/otp/send', ['mobile' => '09991112222'])
+            ->assertSessionHasErrors('name');
+    }
+
+    public function test_otp_send_new_user_with_name_creates_user_and_redirects_to_verify(): void
+    {
+        $this->post('/login/otp/send', [
+            'mobile' => '09991112222',
+            'name' => 'علی رضایی',
+        ])->assertRedirect(route('login.verify'));
+
+        $this->assertDatabaseHas('users', [
+            'mobile' => '09991112222',
+            'name' => 'علی رضایی',
             'is_active' => true,
         ]);
+    }
 
-        $this->from('/login')->post('/login', [
-            'mobile' => '09123456789',
-            'password' => 'wrong-password',
-        ])->assertRedirect('/login')
+    public function test_otp_send_with_invalid_mobile_shows_error(): void
+    {
+        $this->from('/login/otp')->post('/login/otp/send', ['mobile' => '09123'])
             ->assertSessionHasErrors('mobile');
 
         $this->assertGuest();
+    }
+
+    public function test_otp_send_normalizes_persian_digits(): void
+    {
+        User::factory()->create([
+            'mobile' => '09123456789',
+            'is_active' => true,
+        ]);
+
+        $this->post('/login/otp/send', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹'])
+            ->assertRedirect(route('login.verify'))
+            ->assertSessionHas('otp_mobile', '09123456789');
+    }
+
+    public function test_verify_page_requires_otp_mobile_in_session(): void
+    {
+        $this->get('/login/verify')
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_verify_page_shows_for_valid_session(): void
+    {
+        $this->session(['otp_mobile' => '09123456789']);
+
+        $this->get('/login/verify')
+            ->assertOk()
+            ->assertSee(__('messages.otp_verify_title'));
     }
 
     public function test_inactive_user_cannot_login(): void
@@ -76,38 +117,11 @@ class SiteAuthTest extends TestCase
             'is_active' => false,
         ]);
 
-        $this->post('/login', [
-            'mobile' => '09123456789',
-            'password' => 'password',
-        ])->assertSessionHasErrors('mobile');
+        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+            ->assertRedirect(route('login.verify'))
+            ->assertSessionHas('error');
 
         $this->assertGuest();
-    }
-
-    public function test_login_with_invalid_mobile_format_shows_validation_error(): void
-    {
-        $this->from('/login')->post('/login', [
-            'mobile' => '09123',
-            'password' => 'password',
-        ])->assertRedirect('/login')
-            ->assertSessionHasErrors('mobile');
-
-        $this->assertGuest();
-    }
-
-    public function test_login_normalizes_persian_digits_and_country_code(): void
-    {
-        User::factory()->create([
-            'mobile' => '09123456789',
-            'is_active' => true,
-        ]);
-
-        $this->post('/login', [
-            'mobile' => '۰۹۱۲۳۴۵۶۷۸۹',
-            'password' => 'password',
-        ])->assertRedirect(route('dashboard'));
-
-        $this->assertAuthenticated();
     }
 
     public function test_guest_is_redirected_to_login_when_accessing_dashboard(): void
@@ -141,17 +155,15 @@ class SiteAuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_login_page_works_in_localized_locale(): void
+    public function test_otp_page_works_in_localized_locale(): void
     {
-        $this->get('/en/login')
+        $this->get('/en/login/otp')
             ->assertOk()
-            ->assertSee(__('messages.login_title', [], 'en'))
-            ->assertSee('name="mobile"', false);
+            ->assertSee(__('messages.otp_login', [], 'en'));
     }
 
     public function test_header_shows_login_button_for_guest_and_full_actions_for_user(): void
     {
-        // مهمان → فقط دکمهٔ ورود/ثبت‌نام در هدر (بدون آواتار عضو)
         $this->get('/')
             ->assertOk()
             ->assertSee('site-login-btn', false)
@@ -159,7 +171,6 @@ class SiteAuthTest extends TestCase
             ->assertSee('href="'.route('login').'"', false)
             ->assertDontSee('site-account-btn', false);
 
-        // عضو → سبد/علاقه‌مندی/آواتار (لینک پنل کاربری + حرف اول نام)
         $user = User::factory()->create(['name' => 'نگار احمدی']);
         $this->actingAs($user)
             ->get('/')

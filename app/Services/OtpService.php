@@ -13,9 +13,11 @@ use Illuminate\Support\Str;
 /**
  * ورود/ثبت‌نام با کد یکبارمصرف (OTP) از طریق پیامک کاوه‌نگار.
  *
- * جریان: کاربر شماره موبایل می‌دهد → کد ۴ رقمی ساخته و روی کاربر ذخیره می‌شود
- * (اگر کاربر وجود نداشته باشد ساخته می‌شود) → پیامک الگودار ارسال می‌شود →
- * کاربر کد را وارد می‌کند → کد چک و لاگین می‌شود.
+ * جریان: کاربر شماره موبایل می‌دهد → بررسی وجود کاربر
+ *   - اگر کاربر وجود داشته باشد: کد ارسال می‌شود
+ *   - اگر کاربر وجود نداشته باشد و نام وارد شده باشد: کاربر ساخته شده و کد ارسال می‌شود
+ *   - اگر کاربر وجود نداشته باشد بدون نام: نیاز به ورود نام
+ * → کاربر کد را وارد می‌کند → کد چک و لاگین می‌شود.
  */
 class OtpService
 {
@@ -52,11 +54,21 @@ class OtpService
     }
 
     /**
+     * بررسی وجود کاربر با شماره موبایل.
+     */
+    public function userExists(string $mobile): bool
+    {
+        return User::where('mobile', $mobile)->exists();
+    }
+
+    /**
      * ساخت کد ۴ رقمی، ذخیره روی کاربر و ارسال پیامک.
      *
+     * @param  string  $mobile  شماره موبایل نرمال‌شده
+     * @param  string|null  $name  نام کاربر (فقط برای کاربران جدید)
      * @return array{success: bool, message: string, code?: string}
      */
-    public function send(string $mobile): array
+    public function send(string $mobile, ?string $name = null): array
     {
         $mobile = $this->normalizeMobile($mobile);
 
@@ -70,11 +82,14 @@ class OtpService
             return ['success' => false, 'message' => __('messages.otp_mobile_blocked')];
         }
 
-        // کاربر وجود ندارد → ساخت (ثبت‌نام خودکار با OTP)؛
-        // رمز عبور placeholder چون ورود فقط از طریق کد یکبارمصرف انجام می‌شود.
+        // کاربر وجود ندارد → ساخت با نام ارائه‌شده
         if (! $user) {
+            if (! $name || trim($name) === '') {
+                return ['success' => false, 'message' => __('messages.otp_name_required')];
+            }
+
             $user = User::create([
-                'name' => null,
+                'name' => trim($name),
                 'mobile' => $mobile,
                 'password' => Str::random(32),
                 'is_active' => true,
@@ -88,12 +103,13 @@ class OtpService
         ]);
 
         $template = setting('otp_template') ?: 'verify';
+        $siteName = setting('site_name') ?: config('app.name', 'سایت');
 
         try {
-            $response = $this->sms->sendLookup($template, ['token' => $code], $mobile);
+            // الگوی کاوه‌نگار: "به سایت %token خوش آمدید. کد تایید شما : %token2 می باشد."
+            $response = $this->sms->sendLookup($template, ['token' => $siteName, 'token2' => $code], $mobile);
 
             if ($response instanceof RedirectResponse) {
-                // کلید API تنظیم نشده است
                 return $this->result(false, __('messages.otp_sms_not_configured'), $code);
             }
 

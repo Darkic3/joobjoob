@@ -72,9 +72,8 @@ $siteRoutes = function () {
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
     });
 
-    // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
+    // حساب کاربری — ورود/ثبت‌نام فقط از طریق OTP + خروج + پنل کاربری
     Route::get('/login', [SiteAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [SiteAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [SiteAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
     // ورود با کد یکبارمصرف (OTP) — پیامک کاوه‌نگار
@@ -82,6 +81,7 @@ $siteRoutes = function () {
     Route::post('/login/otp/send', [OtpController::class, 'send'])
         ->middleware('throttle:5,1')
         ->name('login.otp.send');
+    Route::get('/login/verify', [OtpController::class, 'showVerify'])->name('login.verify');
     Route::post('/login/otp/resend', [OtpController::class, 'resend'])
         ->middleware('throttle:3,1')
         ->name('login.otp.resend');

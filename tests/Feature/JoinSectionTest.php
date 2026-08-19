@@ -30,8 +30,8 @@ class JoinSectionTest extends TestCase
             ->assertSee(__('messages.register_desc'))
             ->assertSee(__('messages.register_btn'))
             ->assertSee('name="mobile"', false)
-            // TODO: فرم هنوز به روت ثبت‌نام کانکت نشده (منطق بعداً پیاده می‌شود)
-            ->assertSee('action="#"', false);
+            ->assertSee('name="name"', false)
+            ->assertSee(localizedRoute('login.otp.send'), false);
     }
 
     public function test_logged_in_user_sees_member_card_instead_of_form(): void

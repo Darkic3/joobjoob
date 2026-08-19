@@ -46,17 +46,14 @@
                     <h3 class="font-extrabold text-lg mb-2">{{ __('messages.register_title') }}</h3>
                     <p class="text-xs mb-5" style="color: var(--text-secondary);">{{ __('messages.register_desc') }}</p>
 
-                    {{-- TODO: منطق ثبت‌نام + کد تخفیف ۱۰٪ — بعداً کانکت می‌شود
-                         (action باید به route('site.register') اشاره کند؛ ذخیرهٔ کاربر + ساخت
-                         کد تخفیف ۱۰٪ و پیام swal/toast محلی‌شده در آن پیاده شود) --}}
-                    <form action="#" method="POST" data-register-form class="space-y-3">
+                    <form action="{{ localizedRoute('login.otp.send') }}" method="POST" data-register-form class="space-y-3">
                         @csrf
                         <div class="flex flex-col sm:flex-row gap-3">
-                            <input type="text" name="name" placeholder="{{ __('messages.register_name_ph') }}"
-                                   class="neu-input px-4 py-3 text-sm flex-1">
                             <input type="tel" name="mobile" placeholder="{{ __('messages.register_mobile_ph') }}"
                                    class="neu-input px-4 py-3 text-sm flex-1" required dir="ltr"
                                    inputmode="tel" autocomplete="tel" maxlength="13">
+                            <input type="text" name="name" placeholder="{{ __('messages.register_name_ph') }}"
+                                   class="neu-input px-4 py-3 text-sm flex-1" required>
                         </div>
                         <button type="submit" class="neu-btn neu-btn-primary w-full px-6 py-3 text-sm font-bold">
                             <svg class="inline-block me-1.5 -mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>
