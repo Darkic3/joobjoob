@@ -455,7 +455,7 @@ html, body {
 }
 
 @media (max-width: 767px) {
-    .hero-fb-inner { min-height: 0; }
+    .hero-fb-inner { min-height: clamp(480px, 78vh, 640px); min-height: clamp(480px, 78dvh, 640px); }
     .hero-fb-panel {
         margin: 0; max-width: none; width: 100%;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -1030,14 +1030,27 @@ html, body {
 
 /* ---------- 4.9) ریسپانسیو ---------- */
 @media (max-width: 767px) {
-    /* موبایل: ارتفاع با autoHeight به محتوای اسلاید فعال می‌چسبد — بدون فضای خالی بزرگ */
-    .hero-swiper { min-height: 0; }
-    /* CTAها تمام‌عرض — هدف لمسی بزرگ‌تر */
-    .hero-btns { width: 100%; }
-    .hero-btns .cta-ring { flex: 1 1 100%; }
-    /* دات‌های صفحه‌بندی روی موبایل: از حالت absolute خارج و در جریان عادی زیر محتوا
-       قرار می‌گیرند تا هرگز روی ستاره‌های امتیاز/محتوای پایین نیفتند (حتی با تغییر
-       ارتفاع خودکار اسلایدها) */
+    /* ارتفاع ثابت: autoHeight با معماری absolute-image سازگار نیست */
+    .hero-swiper { min-height: clamp(480px, 78vh, 640px); min-height: clamp(480px, 78dvh, 640px); }
+    /* محتوای غیرضروری برای نگاه اول موبایل جمع می‌شود */
+    .hero-fb-desc            { display: none; }
+    .hero-trust              { display: none; }
+    .hero-btns .cta-ring--secondary { display: none; }
+    .hero-btns               { width: 100%; margin-bottom: 0; }
+    .hero-btns .cta-ring    { flex: 1 1 100%; }
+    .hero-fb-title {
+        font-size: clamp(1.5rem, 6.5vw, 2rem);
+        margin-bottom: .6rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .hero-badge         { margin-bottom: .6rem !important; }
+    .hero-discount-row  { margin-bottom: .6rem; }
+    .hero-fb-price       { margin-bottom: .9rem !important; }
+    .hero-price-num      { font-size: clamp(1.5rem, 6vw, 1.9rem); }
+    /* دات‌های صفحه‌بندی روی موبایل: از حالت absolute خارج و در جریان عادی زیر محتوا */
     .hero-swiper .hero-pagination {
         position: static;
         left: auto !important;
