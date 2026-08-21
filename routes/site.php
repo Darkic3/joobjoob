@@ -78,7 +78,9 @@ $siteRoutes = function () {
 
     // ورود با کد یکبارمصرف (OTP) — پیامک کاوه‌نگار
     Route::get('/login/otp', [OtpController::class, 'show'])->name('login.otp');
-    Route::post('/login/otp/send', [OtpController::class, 'send'])
+    Route::post('/login/check-phone', [OtpController::class, 'checkPhone'])
+        ->name('login.otp.check');
+    Route::post('/login/send', [OtpController::class, 'send'])
         ->middleware('throttle:5,1')
         ->name('login.otp.send');
     Route::get('/login/verify', [OtpController::class, 'showVerify'])->name('login.verify');

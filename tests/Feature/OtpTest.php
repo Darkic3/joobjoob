@@ -60,18 +60,18 @@ class OtpTest extends TestCase
 
     public function test_otp_page_renders_mobile_step_for_guest(): void
     {
-        $this->get('/login/otp')
+        $this->get('/login')
             ->assertOk()
             ->assertSee(__('messages.otp_login'))
             ->assertSee('name="mobile"', false)
             ->assertDontSee('name="code"', false);
     }
 
-    public function test_logged_in_user_visiting_otp_page_is_redirected_to_dashboard(): void
+    public function test_logged_in_user_visiting_login_page_is_redirected_to_dashboard(): void
     {
         $this->actingAs(User::factory()->create());
 
-        $this->get('/login/otp')->assertRedirect(route('dashboard'));
+        $this->get('/login')->assertRedirect(route('dashboard'));
     }
 
     public function test_send_otp_existing_user_redirects_to_verify(): void
@@ -79,7 +79,7 @@ class OtpTest extends TestCase
         $fake = $this->fakeSms();
         $user = User::factory()->create(['mobile' => '09123456789']);
 
-        $this->post('/login/otp/send', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹'])
+        $this->post('/login/send', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹'])
             ->assertRedirect(route('login.verify'))
             ->assertSessionHas('otp_mobile', '09123456789');
 
@@ -90,13 +90,16 @@ class OtpTest extends TestCase
         $this->assertTrue($fake->lookupCalled);
         $this->assertSame('verify', $fake->lastTemplate);
         $this->assertSame($user->fresh()->confirm_code, $fake->lastTokens['token']);
+        // سرویس OTP فاصله‌های اسم سایت رو با نیم‌فاصله فارسی (ZWNJ) جایگزین می‌کنه
+        $expectedToken2 = str_replace(' ', "\xE2\x80\x8C", setting('site_name', config('app.name', 'Shopora')));
+        $this->assertSame($expectedToken2, $fake->lastTokens['token2']);
     }
 
     public function test_send_otp_new_user_with_name_creates_user_and_sends_code(): void
     {
         $fake = $this->fakeSms();
 
-        $this->post('/login/otp/send', [
+        $this->post('/login/send', [
             'mobile' => '09123456789',
             'name' => 'علی رضایی',
         ])->assertRedirect(route('login.verify'))
@@ -113,9 +116,10 @@ class OtpTest extends TestCase
         $this->assertSame('09123456789', $fake->lastMobile);
     }
 
-    public function test_send_otp_new_user_without_name_shows_error(): void
+    public function test_send_otp_new_user_without_name_shows_error_and_redirects_back(): void
     {
-        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+        $this->post('/login/send', ['mobile' => '09123456789'])
+            ->assertRedirect(route('login'))
             ->assertSessionHasErrors('name');
 
         $this->assertDatabaseMissing('users', ['mobile' => '09123456789']);
@@ -125,7 +129,7 @@ class OtpTest extends TestCase
     {
         $this->fakeSms();
 
-        $this->post('/login/otp/send', ['mobile' => '12345'])
+        $this->from('/login')->post('/login/send', ['mobile' => '12345'])
             ->assertSessionHasErrors('mobile');
 
         $this->assertDatabaseMissing('users', ['mobile' => '12345']);
@@ -137,7 +141,7 @@ class OtpTest extends TestCase
         // کاربر وجود دارد → کد ساخته می‌شود ولی SMS ارسال نمی‌شود
         $user = User::factory()->create(['mobile' => '09123456789']);
 
-        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+        $this->post('/login/send', ['mobile' => '09123456789'])
             ->assertRedirect(route('login.verify'))
             ->assertSessionHas('error');
     }

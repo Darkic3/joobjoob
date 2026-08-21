@@ -105,8 +105,10 @@ class OtpService
         $template = setting('otp_template') ?: 'verify';
 
         try {
-            // فقط کد OTP به‌عنوان token ارسال می‌شود (محدودیت کاوه‌نگار: بدون فاصله)
-            $response = $this->sms->sendLookup($template, ['token' => $code], $mobile);
+            // token = کد OTP (فقط عدد — بدون فاصله)
+            // token2 = نام سایت
+            $siteName = str_replace(' ', "\xE2\x80\x8C", setting('site_name', config('app.name', 'Shopora')));
+            $response = $this->sms->sendLookup($template, ['token' => $code, 'token2' => $siteName], $mobile);
 
             if ($response instanceof RedirectResponse) {
                 return $this->result(false, __('messages.otp_sms_not_configured'), $code);

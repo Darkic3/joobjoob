@@ -22,17 +22,24 @@ class SiteAuthTest extends TestCase
 
     public function test_guest_sees_otp_login_page(): void
     {
-        $this->get('/login/otp')
+        $this->get('/login')
             ->assertOk()
             ->assertSee(__('messages.otp_login'))
             ->assertSee('name="mobile"', false)
             ->assertDontSee('name="password"', false);
     }
 
-    public function test_login_redirects_to_otp_page(): void
+    public function test_login_page_renders_directly(): void
     {
         $this->get('/login')
-            ->assertRedirect(route('login.otp'));
+            ->assertOk()
+            ->assertSee(__('messages.otp_login'));
+    }
+
+    public function test_old_otp_route_redirects_to_login(): void
+    {
+        $this->get('/login/otp')
+            ->assertRedirect(route('login'));
     }
 
     public function test_logged_in_user_visiting_login_is_redirected_to_dashboard(): void
@@ -50,20 +57,21 @@ class SiteAuthTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+        $this->post('/login/send', ['mobile' => '09123456789'])
             ->assertRedirect(route('login.verify'))
             ->assertSessionHas('otp_mobile', '09123456789');
     }
 
-    public function test_otp_send_new_user_without_name_shows_error(): void
+    public function test_otp_send_new_user_without_name_shows_error_and_redirects_back(): void
     {
-        $this->post('/login/otp/send', ['mobile' => '09991112222'])
+        $this->post('/login/send', ['mobile' => '09991112222'])
+            ->assertRedirect(route('login'))
             ->assertSessionHasErrors('name');
     }
 
     public function test_otp_send_new_user_with_name_creates_user_and_redirects_to_verify(): void
     {
-        $this->post('/login/otp/send', [
+        $this->post('/login/send', [
             'mobile' => '09991112222',
             'name' => 'علی رضایی',
         ])->assertRedirect(route('login.verify'));
@@ -77,7 +85,7 @@ class SiteAuthTest extends TestCase
 
     public function test_otp_send_with_invalid_mobile_shows_error(): void
     {
-        $this->from('/login/otp')->post('/login/otp/send', ['mobile' => '09123'])
+        $this->from('/login')->post('/login/send', ['mobile' => '09123'])
             ->assertSessionHasErrors('mobile');
 
         $this->assertGuest();
@@ -90,7 +98,7 @@ class SiteAuthTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->post('/login/otp/send', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹'])
+        $this->post('/login/send', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹'])
             ->assertRedirect(route('login.verify'))
             ->assertSessionHas('otp_mobile', '09123456789');
     }
@@ -117,7 +125,7 @@ class SiteAuthTest extends TestCase
             'is_active' => false,
         ]);
 
-        $this->post('/login/otp/send', ['mobile' => '09123456789'])
+        $this->post('/login/send', ['mobile' => '09123456789'])
             ->assertRedirect(route('login.verify'))
             ->assertSessionHas('error');
 
@@ -157,7 +165,7 @@ class SiteAuthTest extends TestCase
 
     public function test_otp_page_works_in_localized_locale(): void
     {
-        $this->get('/en/login/otp')
+        $this->get('/en/login')
             ->assertOk()
             ->assertSee(__('messages.otp_login', [], 'en'));
     }
@@ -179,5 +187,31 @@ class SiteAuthTest extends TestCase
             ->assertSee('href="'.route('dashboard').'"', false)
             ->assertSee(mb_substr('نگار احمدی', 0, 1))
             ->assertDontSee('site-login-btn', false);
+    }
+
+    public function test_check_phone_returns_exists_for_existing_user(): void
+    {
+        User::factory()->create([
+            'mobile' => '09123456789',
+            'is_active' => true,
+        ]);
+
+        $this->postJson('/login/check-phone', ['mobile' => '09123456789'])
+            ->assertOk()
+            ->assertJson(['exists' => true, 'valid' => true]);
+    }
+
+    public function test_check_phone_returns_not_exists_for_new_user(): void
+    {
+        $this->postJson('/login/check-phone', ['mobile' => '09991112222'])
+            ->assertOk()
+            ->assertJson(['exists' => false, 'valid' => true]);
+    }
+
+    public function test_check_phone_returns_invalid_for_bad_mobile(): void
+    {
+        $this->postJson('/login/check-phone', ['mobile' => '09123'])
+            ->assertOk()
+            ->assertJson(['valid' => false]);
     }
 }

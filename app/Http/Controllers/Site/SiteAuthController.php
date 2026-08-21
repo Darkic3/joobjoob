@@ -10,15 +10,27 @@ use Illuminate\Support\Facades\Auth;
 class SiteAuthController extends Controller
 {
     /**
-     * صفحه ورود → مستقیماً به صفحه OTP هدایت می‌شود.
+     * صفحه ورود/ثبت‌نام — فرم شماره موبایل (OTP).
+     * کاربر شماره را وارد می‌کند:
+     *   - اگر وجود داشته باشد → کد OTP ارسال می‌شود
+     *   - اگر وجود نداشته باشد → فیلد نام ظاهر شده و کاربر ثبت‌نام می‌شود
      */
-    public function showLogin()
+    public function showLogin(Request $request)
     {
         if (auth()->check()) {
             return redirect()->route('dashboard');
         }
 
-        return redirect()->route('login.otp');
+        if ($request->boolean('change')) {
+            $request->session()->forget('otp_mobile');
+            $request->session()->forget('otp_new_user');
+        }
+
+        return view('site.auth.otp', [
+            'otpMobile' => $request->session()->get('otp_mobile'),
+            'isNewUser' => $request->session()->get('otp_new_user', false),
+            'showNameField' => $request->session()->get('otp_new_user', false),
+        ]);
     }
 
     /**

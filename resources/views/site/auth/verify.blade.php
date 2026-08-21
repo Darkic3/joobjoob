@@ -1,4 +1,4 @@
-@extends('layouts.site.app')
+@extends('layouts.site.guest')
 
 @section('title', __('messages.otp_verify'))
 
@@ -92,7 +92,7 @@
                         {{ __('messages.otp_resend') }}
                     </button>
                 </form>
-                <a href="{{ localizedRoute('login.otp', ['change' => 1]) }}"
+                <a href="{{ localizedRoute('login', ['change' => 1]) }}"
                    class="font-semibold hover:opacity-70 transition-opacity"
                    style="color: var(--text-secondary);">
                     {{ __('messages.otp_change_number') }}

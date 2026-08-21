@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Services\OtpService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -12,23 +13,28 @@ class OtpController extends Controller
     public function __construct(private readonly OtpService $otpService) {}
 
     /**
-     * صفحه اصلی ورود/ثبت‌نام — فقط شماره موبایل.
-     * اگر کاربر جدید باشد (otp_new_user در سشن) فیلد نام هم نمایش داده می‌شود.
+     * برگرداندن به صفحه اصلی ورود/ثبت‌نام (backward compatibility).
      */
     public function show(Request $request)
     {
-        if (auth()->check()) {
-            return redirect()->route('dashboard');
+        return redirect()->route('login', $request->query());
+    }
+
+    /**
+     * بررسی AJAX وجود شماره موبایل.
+     * فرانت‌اند قبل از ارسال فرم، شماره را چک می‌کند تا فیلد نام را نشان/پنهان کند.
+     */
+    public function checkPhone(Request $request): JsonResponse
+    {
+        $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
+
+        if (! $this->otpService->isValidMobile($mobile)) {
+            return response()->json(['exists' => null, 'valid' => false]);
         }
 
-        if ($request->boolean('change')) {
-            $request->session()->forget('otp_mobile');
-            $request->session()->forget('otp_new_user');
-        }
-
-        return view('site.auth.otp', [
-            'otpMobile' => $request->session()->get('otp_mobile'),
-            'isNewUser' => $request->session()->get('otp_new_user', false),
+        return response()->json([
+            'exists' => $this->otpService->userExists($mobile),
+            'valid'   => true,
         ]);
     }
 
@@ -52,11 +58,19 @@ class OtpController extends Controller
         $isNewUser = ! $this->otpService->userExists($mobile);
 
         if ($isNewUser) {
-            $data = $request->validate([
-                'name' => ['required', 'string', 'max:100'],
-            ]);
+            $name = $request->input('name');
 
-            $result = $this->otpService->send($mobile, $data['name']);
+            // اگر کاربر جدید است ولی نام وارد نشده → به صفحه ورود برگردان با فلگ
+            if (! $name || trim($name) === '') {
+                $request->session()->put('otp_mobile', $mobile);
+                $request->session()->put('otp_new_user', true);
+
+                return redirect()->route('login')
+                    ->withInput(['mobile' => $mobile])
+                    ->withErrors(['name' => __('messages.otp_name_required')]);
+            }
+
+            $result = $this->otpService->send($mobile, $name);
         } else {
             $result = $this->otpService->send($mobile);
         }
