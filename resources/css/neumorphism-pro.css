@@ -252,20 +252,13 @@ html, body {
 .hero-fullbleed {
     width: 100vw;
     margin-inline-start: calc(50% - 50vw);
-    margin-top: -4.5rem;
     position: relative;
-}
-@media (min-width: 768px) {
-    .hero-fullbleed {
-        margin-top: -5rem;
-    }
 }
 
 /* ---------- 4.2) خود اسلایدر + پس‌زمینه (گرید و هاله) ---------- */
 .hero-swiper {
     position: relative;
     width: 100%;
-    min-height: clamp(600px, 76vh, 760px);
     /* نوار پایین محفوظ برای دات‌های صفحه‌بندی — حتی هنگام انیمیشن ورود (translateY 30px)
        محتوای بلند اسلاید هرگز به دات‌ها نمی‌رسد */
     padding-bottom: 4.25rem;
@@ -1059,12 +1052,10 @@ html, body {
     }
 }
 
+/* desktop: hero height driven by aspect-ratio — adapts to viewport width */
 @media (min-width: 768px) {
-    .hero-swiper { min-height: 680px; }
-}
-
-@media (min-width: 1280px) {
-    .hero-swiper { min-height: 720px; }
+    .hero-swiper { aspect-ratio: 21 / 9; }
+    .hero-fb-inner { height: 100%; }
 }
 
 /* ==========================================================================
