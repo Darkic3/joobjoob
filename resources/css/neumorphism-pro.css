@@ -445,6 +445,10 @@ html, body {
     margin: 0 0 1.4rem;
     color: var(--text-secondary);
     font-size: .98rem; line-height: 1.8; max-width: 44ch;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 @media (max-width: 767px) {
