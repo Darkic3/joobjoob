@@ -49,7 +49,9 @@ class AdminPermissionTest extends TestCase
     {
         $user = User::factory()->create(['is_admin' => false, 'is_active' => true]);
 
-        $this->actingAs($user)->get('/admin/products')->assertForbidden();
+        // کاربر عادی بدون نقش → ریدایرکت به صفحه اصلی سایت
+        $this->actingAs($user)->get('/admin/products')
+            ->assertRedirect(route('home'));
     }
 
     public function test_user_with_permission_can_access_that_section_only(): void
@@ -61,12 +63,13 @@ class AdminPermissionTest extends TestCase
         $this->actingAs($user)->get('/admin/roles')->assertForbidden();
     }
 
-    public function test_free_routes_are_accessible_to_any_authenticated_admin(): void
+    public function test_free_routes_are_blocked_for_non_admin_users(): void
     {
         $user = User::factory()->create(['is_admin' => false, 'is_active' => true]);
 
-        // dashboard در لیست free است (نمای کلی) — حتی بدون نقش
-        $this->actingAs($user)->get('/admin/dashboard')->assertOk();
+        // ⚠️ حتی روت‌های free (مثل dashboard) هم برای کاربر عادی مسدود هستند
+        $this->actingAs($user)->get('/admin/dashboard')
+            ->assertRedirect(route('home'));
     }
 
     public function test_permission_catalog_matches_config_tree(): void

@@ -249,14 +249,13 @@ class LanguageCrudTest extends TestCase
 
     public function test_sidebar_hides_languages_for_user_without_permission(): void
     {
-        // کاربر عادی بدون هیچ نقشی — لاگین ادمین او را راه نمی‌دهد،
-        // پس مستقیم دسترسی به index باید 403 باشد (غیر از داشبورد که free است)
+        // کاربر عادی بدون هیچ نقشی → ریدایرکت به صفحه اصلی سایت
         $editor = User::factory()->create(['is_admin' => false, 'is_active' => true]);
         $editor->roles()->detach();
 
         $this->actingAs($editor)
             ->get(route('admin.languages.index'))
-            ->assertForbidden();
+            ->assertRedirect(route('home'));
     }
 
     public function test_reorder_updates_sort_order(): void
