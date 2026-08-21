@@ -75,23 +75,23 @@
                                     <div class="hero-discount-row">
                                         <span class="hero-discount-pill">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
-                                            <bdi dir="ltr">{{ $slide->discountPercent() }}٪</bdi>
+                                            <bdi dir="ltr" class="hero-num">{{ $slide->discountPercent() }}</bdi>٪
                                             {{ __('messages.discount_off') }}
                                         </span>
                                     </div>
                                 @endif
 
-                                <div class="hero-fb-price flex items-end gap-3 mb-7">
+                                <div class="hero-fb-price flex items-end gap-3">
                                     {{-- Old Price — Vazirmatn برای ارقام فارسی (مونو گلیف فارسی ندارد) --}}
                                     @if($slide->old_price > $slide->price)
-                                        <span class="hero-old-price mb-1" dir="ltr">
+                                        <span class="hero-old-price hero-num mb-1" dir="ltr">
                                             {{ number_format($slide->old_price) }}
                                             {{ $slide->currencyLabel() }}
                                         </span>
                                     @endif
 
                                     {{-- Current Price — Vazirmatn 900، بزرگ‌ترین عنصر متن --}}
-                                    <span class="hero-price-num" dir="ltr">
+                                    <span class="hero-price-num hero-num" dir="ltr">
                                         {{ number_format($slide->price) }}
                                         <small>{{ $slide->currencyLabel() }}</small>
                                     </span>
@@ -101,7 +101,7 @@
                             {{-- =========================
                                  CTA BUTTONS
                             ========================== --}}
-                            <div class="hero-btns flex flex-wrap items-center gap-4 mb-6">
+                            <div class="hero-btns flex flex-wrap items-center gap-4">
                                 {{-- Primary CTA — کامپوننت cta-button: حلقهٔ «بازهٔ اعتماد» + دایرهٔ فلش --}}
                                 <x-cta-button :href="$slide->url" variant="primary">
                                     {{ $slide->trans('btn_text') ?: __('messages.view_products') }}
@@ -139,7 +139,7 @@
                                                     </span>
                                                 @endforeach
                                             </div>
-                                            <div class="mono font-black text-lg leading-none" style="color: var(--accent);">
+                                            <div class="hero-num font-black text-lg leading-none" style="color: var(--accent);">
                                                 <bdi dir="ltr">{{ $slide->rating }}</bdi>
                                             </div>
                                         </div>
@@ -149,7 +149,7 @@
                                     @if($slide->viewers > 0)
                                         <div class="flex items-center gap-2 text-[11px] font-semibold" style="color: var(--text-secondary);">
                                             <span class="live-dot"></span>
-                                            <span class="live-viewers mono" dir="ltr">{{ $slide->viewers }}</span>
+                                            <span class="live-viewers hero-num" dir="ltr">{{ $slide->viewers }}</span>
                                             <span>{{ __('messages.viewing_now') }}</span>
                                         </div>
                                     @endif

@@ -354,13 +354,13 @@ html, body {
 .hero-discount-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: .4rem .9rem;
+    gap: 4px;
+    padding: .3rem .7rem;
     border-radius: 999px;
     background: linear-gradient(135deg, var(--urgency) 0%, #ff8a3d 100%);
     color: #fff;
     font-weight: 800;
-    font-size: .82rem;
+    font-size: .7rem;
     letter-spacing: .01em;
     line-height: 1;
     box-shadow:
@@ -388,6 +388,8 @@ html, body {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
+.hero-fb-price { margin-bottom: .75rem; }
+.hero-btns { margin-bottom: .8rem; }
 
 /* پنل تخفیف‌دار — حالت آتش/فوریت: شست‌وشوی گرم، حاشیهٔ آتشین، نوار اخگر بالا و هالهٔ سوسوزن */
 .hero-fb-panel--sale {
@@ -433,18 +435,22 @@ html, body {
     animation: emberFlicker 3s ease-in-out infinite;
     pointer-events: none;
 }
+/* ---- تایپوگرافی و فاصله‌گذاری پنل (تک‌منبع) ---- */
 .hero-fb-title {
-    margin: 0 0 .8rem;
-    font-weight: 800; line-height: 1.15; letter-spacing: -.02em;
-    font-size: clamp(1.9rem, 3.4vw, 3rem);
+    font-size: clamp(1.5rem, 1rem + 2.2vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.22;
+    letter-spacing: -.02em;
+    margin-bottom: .55rem;
     color: var(--text-primary);
     text-wrap: balance;
 }
 .hero-fb-title span { color: var(--accent); }
 .hero-fb-desc {
-    margin: 0 0 1.4rem;
+    font-size: .95rem;
+    line-height: 1.75;
+    margin-bottom: .7rem;
     color: var(--text-secondary);
-    font-size: .98rem; line-height: 1.8; max-width: 44ch;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -466,10 +472,23 @@ html, body {
     .hero-fb-panel--sale::after { animation: none; }
 }
 
+/* ---- فونت اختصاصی اعداد — JetBrains Mono با tabular-nums ---- */
+.hero-num {
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
 /* ---------- 4.5.1) بج هیرو + نوار اعتماد — ارتقای شیشه‌ای یکپارچه ---------- */
 /* بج بالای تیتر: شیشهٔ نئومورفیک با لبهٔ گرادینتی آکسانت (جایگزین بج سادهٔ توپر) */
 .hero-badge {
     position: relative;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .01em;
+    padding: .4rem .85rem;
+    margin-bottom: .6rem;
     border-radius: 999px;
     background: linear-gradient(135deg,
         color-mix(in srgb, var(--accent) 22%, var(--bg-elevated)) 0%,
@@ -609,13 +628,11 @@ html, body {
 
 /* ---------- 4.6.2) قیمت — فونت فارسی Vazirmatn (JetBrains Mono گلیف فارسی ندارد) ---------- */
 .hero-price-num {
-    font-family: 'Vazirmatn', sans-serif;
-    font-size: clamp(2.15rem, 4.5vw, 4.4rem);
-    font-weight: 900;
+    font-size: clamp(1.6rem, 1.1rem + 2.6vw, 2.5rem);
+    font-weight: 800;
     line-height: 1.05;
-    letter-spacing: -.02em;
-    font-variant-numeric: tabular-nums;
-    /* گرادیان فلزی — عمق بیشتر از رنگ تخت */
+    letter-spacing: -.01em;
+    /* گرادیان فلزی */
     background: linear-gradient(165deg,
         color-mix(in srgb, var(--accent) 74%, #fff 26%) 0%,
         var(--accent) 45%,
@@ -626,20 +643,20 @@ html, body {
     filter: drop-shadow(0 10px 24px color-mix(in srgb, var(--accent) 30%, transparent));
 }
 .hero-price-num small {
-    font-family: 'Vazirmatn', sans-serif;
-    font-size: clamp(.72rem, 1.4vw, 1rem);
+    font-family: 'Vazirmatn', sans-serif; /* واحد پول فارسی می‌ماند */
+    font-size: .55em;
     font-weight: 700;
+    margin-inline-start: .25em;
     letter-spacing: 0;
     color: var(--text-secondary);
 }
 .hero-old-price {
-    font-family: 'Vazirmatn', sans-serif;
-    font-size: clamp(.9rem, 1.5vw, 1.1rem);
+    font-size: .8rem;
     font-weight: 600;
     color: var(--text-secondary);
     text-decoration: line-through;
     text-decoration-color: color-mix(in srgb, var(--text-secondary) 70%, transparent);
-    opacity: .8;
+    opacity: .7;
 }
 
 /* ---------- 4.6.1) ستاره‌های امتیاز هیرو ---------- */
@@ -1035,18 +1052,16 @@ html, body {
     .hero-btns .cta-ring--secondary { display: none; }
     .hero-btns               { width: 100%; margin-bottom: 0; }
     .hero-btns .cta-ring    { flex: 1 1 100%; }
+    /* تیتر: line-clamp + پدینگ فشرده‌تر موبایل */
     .hero-fb-title {
-        font-size: clamp(1.5rem, 6.5vw, 2rem);
-        margin-bottom: .6rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        margin-bottom: .4rem;
     }
-    .hero-badge         { margin-bottom: .6rem !important; }
-    .hero-discount-row  { margin-bottom: .6rem; }
-    .hero-fb-price       { margin-bottom: .9rem !important; }
-    .hero-price-num      { font-size: clamp(1.5rem, 6vw, 1.9rem); }
+    .hero-fb-panel { padding: 1rem 1.15rem 1.2rem; }
+    .hero-discount-row  { margin-bottom: .5rem; }
     /* دات‌های صفحه‌بندی روی موبایل: از حالت absolute خارج و در جریان عادی زیر محتوا */
     .hero-swiper .hero-pagination {
         position: static;

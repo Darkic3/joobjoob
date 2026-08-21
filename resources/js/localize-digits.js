@@ -79,6 +79,8 @@
         if (skipElement(p)) return true;
         // داخل فیلدهای فرم یا المان‌های قابل ادیت دست نمی‌زنیم
         if (p.closest('input, select, option, [contenteditable="true"], [data-digit-raw]')) return true;
+        // اعداد لاتین هیرو (hero-num) همیشه لاتین می‌مانند
+        if (p.closest('.hero-num')) return true;
         return false;
     }
 
