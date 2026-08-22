@@ -90,6 +90,8 @@ return [
     'review_placeholder' => 'Bu ürün hakkında ne düşünüyorsunuz? Neleri beğendiniz veya beğenmediniz?',
     'review_submit' => 'Gönder',
     'review_login_hint' => 'Yorum yazmak için lütfen giriş yapın',
+    'review_empty_title' => 'Deneyimini paylaşan ilk sen ol!',
+    'review_empty_desc' => 'Yorumun başkalarına daha iyi seçim yapmasına yardımcı olabilir.',
     'brand' => 'Marka',
     'theme_updated' => 'Varsayılan site teması başarıyla güncellendi',
     'light_mode' => 'Açık Mod',

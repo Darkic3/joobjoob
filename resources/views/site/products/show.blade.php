@@ -288,133 +288,150 @@
 
             {{-- ─── فرم ثبت نظر ─── --}}
             @auth
-                <div class="review-form-wrap mb-8">
-                    <h3 class="text-lg font-extrabold mb-5 flex items-center gap-2">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        {{ __('messages.review_write') }}
-                    </h3>
+                <div class="review-form-glass mb-8">
+                    <div class="review-form-glass__inner">
+                        {{-- هدر فرم --}}
+                        <div class="review-form-header">
+                            <div class="review-form-header__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="review-form-header__title">{{ __('messages.review_write') }}</h3>
+                                <p class="review-form-header__sub">{{ __('messages.review_your_review') }}</p>
+                            </div>
+                        </div>
 
-                    <form action="{{ route('products.reviews.store', $product->slug) }}" method="POST" class="review-form">
-                        @csrf
+                        <form action="{{ route('products.reviews.store', $product->slug) }}" method="POST" class="review-form">
+                            @csrf
 
-                        {{-- امتیاز ستاره‌ای --}}
-                        <div class="review-form__rating">
-                            <label class="review-form__label">{{ __('messages.review_your_rating') }}</label>
-                            <div class="star-rating" id="star-rating" role="radiogroup" aria-label="امتیاز">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <button type="button"
-                                            class="star-rating__star"
-                                            data-value="{{ $i }}"
-                                            onclick="setRating({{ $i }})"
-                                            onmouseenter="previewRating({{ $i }})"
-                                            onmouseleave="resetRatingPreview()"
-                                            aria-label="{{ $i }} از ۵">
-                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    </button>
-                                @endfor
-                                <input type="hidden" name="rating" id="rating-input" value="" required>
+                            {{-- امتیاز ستاره‌ای --}}
+                            <div class="review-form__rating">
+                                <div class="star-rating" id="star-rating" role="radiogroup" aria-label="امتیاز">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <button type="button"
+                                                class="star-rating__star"
+                                                data-value="{{ $i }}"
+                                                onclick="setRating({{ $i }})"
+                                                onmouseenter="previewRating({{ $i }})"
+                                                onmouseleave="resetRatingPreview()"
+                                                aria-label="{{ $i }} از ۵">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        </button>
+                                    @endfor
+                                    <input type="hidden" name="rating" id="rating-input" value="" required>
+                                </div>
+                                <span class="star-rating__label" id="rating-label"></span>
                             </div>
                             @error('rating')
                                 <p class="review-form__error">{{ $message }}</p>
                             @enderror
-                        </div>
 
-                        {{-- متن نظر --}}
-                        <div class="review-form__body">
-                            <label class="review-form__label" for="review-comment">{{ __('messages.review_your_review') }}</label>
-                            <textarea
-                                id="review-comment"
-                                name="comment"
-                                rows="4"
-                                maxlength="1000"
-                                placeholder="{{ __('messages.review_placeholder') }}"
-                                class="review-form__textarea"
-                                required
-                            >{{ old('comment') }}</textarea>
-                            <div class="review-form__char-count">
-                                <span id="char-count">0</span> / 1000
+                            {{-- متن نظر --}}
+                            <div class="review-form__body">
+                                <textarea
+                                    id="review-comment"
+                                    name="comment"
+                                    rows="4"
+                                    maxlength="1000"
+                                    placeholder="{{ __('messages.review_placeholder') }}"
+                                    class="review-form__textarea"
+                                    required
+                                >{{ old('comment') }}</textarea>
+                                <div class="review-form__footer">
+                                    <span class="review-form__char-count"><span id="char-count">0</span> / 1000</span>
+                                </div>
+                                @error('comment')
+                                    <p class="review-form__error">{{ $message }}</p>
+                                @enderror
                             </div>
-                            @error('comment')
-                                <p class="review-form__error">{{ $message }}</p>
-                            @enderror
-                        </div>
 
-                        {{-- دکمه ارسال --}}
-                        <div class="review-form__actions">
-                            <button type="submit" class="neu-btn neu-btn-primary review-form__submit" id="review-submit-btn" disabled>
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                                {{ __('messages.review_submit') }}
+                            {{-- دکمه ارسال --}}
+                            <button type="submit" class="review-submit-btn" id="review-submit-btn" disabled>
+                                <span class="review-submit-btn__chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                </span>
+                                <span>{{ __('messages.review_submit') }}</span>
                             </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             @else
-                <div class="review-login-hint neu-flat p-6 mb-8 text-center">
-                    <svg class="w-10 h-10 mx-auto mb-3" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <p class="font-bold mb-1">{{ __('messages.review_login_hint') }}</p>
-                    <a href="{{ route('login') }}" class="neu-btn neu-btn-primary inline-flex items-center gap-2 mt-3 px-6 py-2 text-sm font-bold">
+                <div class="review-login-glass mb-8">
+                    <div class="review-login-glass__glow"></div>
+                    <div class="review-login-glass__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <p class="review-login-glass__title">{{ __('messages.review_login_hint') }}</p>
+                    <a href="{{ route('login') }}" class="review-login-glass__btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                         {{ __('messages.login') }}
                     </a>
                 </div>
             @endauth
 
-            {{-- ─── لیست نظرات --}}
-            <div class="review-summary mb-6" style="display: {{ $product->reviews->count() > 0 ? 'block' : 'none' }};">
-                <div class="flex items-center gap-4 flex-wrap">
-                    <div class="review-summary__score">
-                        <span class="text-4xl font-extrabold" style="color: var(--accent);">{{ number_format($product->reviews->avg('rating'), 1) }}</span>
-                        <span class="text-sm" style="color: var(--text-secondary);">از ۵</span>
+            {{-- ─── خلاصه امتیازات ─── --}}
+            @if($product->reviews->count() > 0)
+                <div class="review-summary-glass mb-8">
+                    <div class="review-summary-glass__left">
+                        <div class="review-summary-glass__score">
+                            <span class="review-summary-glass__num">{{ number_format($product->reviews->avg('rating'), 1) }}</span>
+                            <div class="review-summary-glass__stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="review-summary-glass__star" style="color: {{ $i <= round($product->reviews->avg('rating')) ? 'var(--gold)' : 'var(--shadow-dark)' }};"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                @endfor
+                            </div>
+                            <span class="review-summary-glass__count">{{ $product->reviews->count() }} {{ __('messages.reviews') }}</span>
+                        </div>
                     </div>
-                    <div class="flex flex-col gap-1">
+                    <div class="review-summary-glass__bars">
                         @for($i = 5; $i >= 1; $i--)
-                            @php $count = $product->reviews->where('rating', $i)->count(); @endphp
-                            <div class="review-bar" style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="text-xs font-bold" style="width: 1.2rem; text-align: center; color: var(--text-secondary);">{{ $i }}</span>
-                                <div class="review-bar__track" style="flex: 1; height: 6px; border-radius: 999px; background: var(--shadow-dark); overflow: hidden; min-width: 80px;">
-                                    <div class="review-bar__fill" style="height: 100%; border-radius: 999px; background: var(--gold); transition: width 0.6s ease; width: {{ $product->reviews->count() > 0 ? ($count / $product->reviews->count() * 100) : 0 }}%;"></div>
+                            @php $count = $product->reviews->where('rating', $i)->count(); $pct = $product->reviews->count() > 0 ? ($count / $product->reviews->count() * 100) : 0; @endphp
+                            <div class="review-summary-bar">
+                                <span class="review-summary-bar__num">{{ $i }}</span>
+                                <div class="review-summary-bar__track">
+                                    <div class="review-summary-bar__fill" style="width: {{ $pct }}%;"></div>
                                 </div>
-                                <span class="text-xs" style="width: 1.5rem; color: var(--text-secondary);">{{ $count }}</span>
+                                <span class="review-summary-bar__count">{{ $count }}</span>
                             </div>
                         @endfor
                     </div>
-                    <span class="text-xs" style="color: var(--text-secondary);">{{ $product->reviews->count() }} {{ __('messages.reviews') }}</span>
                 </div>
-            </div>
+            @endif
 
-            {{-- لیست نظرات --}}
-            <div class="grid md:grid-cols-2 gap-5">
+            {{-- ─── لیست نظرات --}}
+            <div class="review-list">
                 @forelse($product->reviews as $review)
-                    <div class="neu-card p-5 flex flex-col h-full review-card">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <span
-                                    class="w-10 h-10 rounded-full neu-flat flex items-center justify-center text-sm font-bold"
-                                    style="color: var(--accent);">
+                    <div class="review-card">
+                        <div class="review-card__head">
+                            <div class="review-card__user">
+                                <span class="review-card__avatar">
                                     {{ mb_substr($review->user->name ?? 'U', 0, 1) }}
                                 </span>
                                 <div>
-                                    <p class="text-sm font-bold">{{ $review->user->name ?? __('messages.user') }}</p>
-                                    <p class="text-[10px]"
-                                       style="color: var(--text-secondary);">{{ show_date($review->created_at, 'd F Y') }}</p>
+                                    <p class="review-card__name">{{ $review->user->name ?? __('messages.user') }}</p>
+                                    <p class="review-card__date">{{ show_date($review->created_at, 'd F Y') }}</p>
                                 </div>
                             </div>
-                            <span class="text-[var(--gold)] text-sm tracking-wider">
-                                {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
-                            </span>
+                            <div class="review-card__rating">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="review-card__star" style="color: {{ $i <= $review->rating ? 'var(--gold)' : 'var(--shadow-dark)' }};"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                @endfor
+                            </div>
                         </div>
-                        <p class="text-sm leading-relaxed flex-1" style="color: var(--text-secondary);">
-                            "{{ $review->comment }}"
-                        </p>
+                        <p class="review-card__body">{{ $review->comment }}</p>
                     </div>
                 @empty
-                    <div class="col-span-full neu-flat p-10 text-center">
-                        <p class="text-lg mb-2" aria-hidden="true">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.6-.7L3 21l1.9-5.3a8 8 0 0 1-.9-3.7A8.4 8.4 0 0 1 12.5 3.5 8.4 8.4 0 0 1 21 11.5z"/></svg>
-                        </p>
-                        <p style="color: var(--text-secondary);">{{ __('messages.no_reviews_yet') }}</p>
+                    <div class="review-empty">
+                        <div class="review-empty__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.6-.7L3 21l1.9-5.3a8 8 0 0 1-.9-3.7A8.4 8.4 0 0 1 12.5 3.5 8.4 8.4 0 0 1 21 11.5z"/>
+                            </svg>
+                        </div>
+                        <p class="review-empty__title">{{ __('messages.review_empty_title') }}</p>
+                        <p class="review-empty__desc">{{ __('messages.review_empty_desc') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -775,15 +792,18 @@
             var textarea = document.getElementById('review-comment');
             var charCount = document.getElementById('char-count');
             var submitBtn = document.getElementById('review-submit-btn');
+            var label = document.getElementById('rating-label');
             var stars = document.querySelectorAll('.star-rating__star');
             if (!input || !stars.length) return;
 
             var currentRating = 0;
+            var ratingLabels = ['','ضعیف','متوسط','خوب','عالی','فوق‌العاده'];
 
             window.setRating = function(val) {
                 currentRating = val;
                 input.value = val;
                 syncStars();
+                if (label) label.textContent = ratingLabels[val] || '';
                 checkValid();
             };
 
@@ -792,10 +812,12 @@
                     var v = parseInt(s.dataset.value);
                     s.classList.toggle('is-preview', v <= val && v > currentRating);
                 });
+                if (label && val > currentRating) label.textContent = ratingLabels[val] || '';
             };
 
             window.resetRatingPreview = function() {
                 stars.forEach(function(s) { s.classList.remove('is-preview'); });
+                if (label) label.textContent = currentRating > 0 ? ratingLabels[currentRating] : '';
             };
 
             function syncStars() {
@@ -817,7 +839,6 @@
                 });
             }
 
-            // Enter روی textarea → ارسال فرم نشه
             if (textarea) {
                 textarea.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter' && !e.shiftKey) e.stopPropagation();
@@ -848,105 +869,260 @@
 @push('styles')
     <style>
         /* ═══════════════════════════════════════
-           Review Form
+           Review Section — PRO
            ═══════════════════════════════════════ */
-        .review-form-wrap {
-            background: var(--bg-elevated);
-            border-radius: var(--radius-lg, 1rem);
-            padding: 1.5rem;
-            box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+
+        /* ── فرم شیشه‌ای (Glass Morphism) ── */
+        .review-form-glass {
+            position: relative;
+            border-radius: var(--radius-lg, 1.25rem);
+            overflow: hidden;
         }
-        .review-form { display: flex; flex-direction: column; gap: 1.25rem; }
-        .review-form__label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 0.4rem;
-            color: var(--text-primary);
-        }
-        .review-form__error {
-            color: var(--danger, #e53e3e);
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
+        .review-form-glass__inner {
+            padding: clamp(1.25rem, 3vw, 2rem);
+            border-radius: var(--radius-lg, 1.25rem);
+            background: linear-gradient(160deg, color-mix(in srgb, var(--bg-elevated) 86%, transparent) 0%, color-mix(in srgb, var(--bg-elevated) 70%, transparent) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+            box-shadow: 10px 10px 26px color-mix(in srgb, var(--shadow-dark) 55%, transparent), -8px -8px 22px color-mix(in srgb, var(--shadow-light) 45%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
-        /* Star rating */
+        /* هدر فرم */
+        .review-form-header {
+            display: flex; align-items: center; gap: 0.85rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid color-mix(in srgb, var(--shadow-dark) 30%, transparent);
+        }
+        .review-form-header__icon {
+            display: grid; place-items: center;
+            width: 44px; height: 44px; flex-shrink: 0;
+            border-radius: 50%;
+            background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 18%, var(--bg-elevated)) 0%, color-mix(in srgb, var(--accent) 6%, var(--bg-elevated)) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+            box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent), 0 3px 10px -3px color-mix(in srgb, var(--accent) 30%, transparent);
+            color: var(--accent);
+        }
+        .review-form-header__icon svg { width: 20px; height: 20px; }
+        .review-form-header__title { font-size: 1rem; font-weight: 800; color: var(--text-primary); }
+        .review-form-header__sub { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+
+        .review-form { display: flex; flex-direction: column; gap: 1.25rem; }
+        .review-form__error { color: var(--danger, #e53e3e); font-size: 0.75rem; margin-top: 0.25rem; }
+
+        /* ── ستاره امتیاز ── */
+        .review-form__rating {
+            display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+        }
         .star-rating {
-            display: flex;
-            gap: 0.35rem;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
+            display: flex; gap: 0.25rem;
+            flex-direction: row-reverse; justify-content: flex-end;
         }
         .star-rating__star {
-            width: 2.2rem; height: 2.2rem;
+            width: 2.5rem; height: 2.5rem;
             background: none; border: none; cursor: pointer;
-            color: var(--shadow-dark);
-            transition: color 0.15s, transform 0.15s;
-            padding: 0;
+            color: color-mix(in srgb, var(--shadow-dark) 60%, transparent);
+            transition: color 0.2s, transform 0.2s cubic-bezier(.4,0,.2,1), filter 0.2s;
+            padding: 0; position: relative;
         }
-        .star-rating__star svg { width: 100%; height: 100%; }
-        .star-rating__star:hover { transform: scale(1.15); }
+        .star-rating__star svg { width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+        .star-rating__star:hover { transform: scale(1.25) rotate(-5deg); }
         .star-rating__star.is-active {
             color: var(--gold, #f59e0b);
-            transform: scale(1.1);
+            transform: scale(1.15);
+            filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--gold, #f59e0b) 50%, transparent));
         }
         .star-rating__star.is-preview {
             color: var(--gold, #f59e0b);
-            opacity: 0.55;
+            opacity: 0.5;
         }
+        .star-rating__label {
+            font-size: 0.8rem; font-weight: 700;
+            color: var(--gold, #f59e0b);
+            min-width: 60px;
+            transition: opacity 0.2s;
+        }
+
+        /* ── Textarea ── */
+        .review-form__body { position: relative; }
         .review-form__textarea {
-            width: 100%;
-            resize: vertical;
-            min-height: 100px;
-            padding: 0.8rem 1rem;
-            border-radius: 0.75rem;
+            width: 100%; resize: vertical; min-height: 110px;
+            padding: 0.9rem 1.1rem;
+            border-radius: 0.85rem;
             border: 2px solid transparent;
             background: var(--bg);
             color: var(--text-primary);
-            font-size: 0.9rem;
-            line-height: 1.7;
-            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.88rem; line-height: 1.75;
+            box-shadow: inset 2px 2px 6px var(--shadow-dark), inset -2px -2px 6px var(--shadow-light);
+            transition: border-color 0.25s, box-shadow 0.25s;
         }
         .review-form__textarea:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+            box-shadow: inset 2px 2px 6px var(--shadow-dark), inset -2px -2px 6px var(--shadow-light), 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
         }
-        .review-form__textarea::placeholder { color: var(--text-secondary); opacity: 0.6; }
-        .review-form__char-count {
-            text-align: left;
-            font-size: 0.7rem;
+        .review-form__textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
+        .review-form__footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem; }
+        .review-form__char-count { font-size: 0.7rem; color: var(--text-secondary); }
+
+        /* ── دکمه ارسال (الگوی add-to-cart) ── */
+        .review-submit-btn {
+            position: relative; display: inline-flex; align-items: center; justify-content: center;
+            gap: 0.55rem;
+            padding: 0.7rem 1.6rem;
+            border: none; border-radius: 999px;
+            font-weight: 800; font-size: 0.85rem;
+            color: #fff; cursor: pointer;
+            background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #000 28%) 100%);
+            box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.22);
+            transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.3s, filter 0.3s, opacity 0.3s;
+            overflow: hidden;
+        }
+        .review-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+            box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 1px 0 rgba(255,255,255,0.22);
+        }
+        .review-submit-btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+        .review-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: saturate(0.3); transform: none !important; }
+        .review-submit-btn__chip {
+            display: inline-grid; place-items: center;
+            width: 26px; height: 26px; flex-shrink: 0;
+            border-radius: 50%;
+            background: color-mix(in srgb, #fff 18%, transparent);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        .review-submit-btn:hover:not(:disabled) .review-submit-btn__chip { transform: translateY(-1px) scale(1.12); }
+        .review-submit-btn:active:not(:disabled) .review-submit-btn__chip { transform: scale(0.9); }
+        .review-submit-btn__chip svg { width: 14px; height: 14px; }
+
+        /* ── لاگین هینت (شیشه‌ای) ── */
+        .review-login-glass {
+            position: relative;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: var(--radius-lg, 1.25rem);
+            background: linear-gradient(160deg, color-mix(in srgb, var(--bg-elevated) 86%, transparent) 0%, color-mix(in srgb, var(--bg-elevated) 70%, transparent) 100%);
+            border: 2px dashed color-mix(in srgb, var(--accent) 25%, transparent);
+            box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+            overflow: hidden;
+        }
+        .review-login-glass__glow {
+            position: absolute; top: -60px; right: -60px;
+            width: 160px; height: 160px; border-radius: 50%;
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent), transparent 70%);
+            pointer-events: none;
+        }
+        .review-login-glass__icon {
+            display: inline-grid; place-items: center;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 15%, var(--bg-elevated)) 0%, var(--bg-elevated) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+            box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent), 0 4px 14px -4px color-mix(in srgb, var(--accent) 30%, transparent);
+            color: var(--accent);
+            margin: 0 auto 1rem;
+        }
+        .review-login-glass__icon svg { width: 26px; height: 26px; }
+        .review-login-glass__title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 1rem; }
+        .review-login-glass__btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.55rem 1.4rem; border-radius: 999px;
+            font-size: 0.82rem; font-weight: 700; color: #fff; text-decoration: none;
+            background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #000 28%) 100%);
+            box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .review-login-glass__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 50%, transparent); }
+
+        /* ── خلاصه امتیازات ── */
+        .review-summary-glass {
+            display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg, 1.25rem);
+            background: linear-gradient(160deg, color-mix(in srgb, var(--bg-elevated) 88%, transparent) 0%, var(--bg-elevated) 100%);
+            border: 1px solid color-mix(in srgb, var(--shadow-light) 40%, transparent);
+            box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
+        }
+        .review-summary-glass__left { text-align: center; min-width: 100px; }
+        .review-summary-glass__num {
+            font-size: 2.8rem; font-weight: 900; line-height: 1;
+            background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 74%, #fff 26%) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 68%, #000 32%) 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .review-summary-glass__stars { display: flex; gap: 2px; justify-content: center; margin: 0.3rem 0 0.4rem; }
+        .review-summary-glass__star { width: 18px; height: 18px; }
+        .review-summary-glass__count { font-size: 0.75rem; color: var(--text-secondary); }
+        .review-summary-glass__bars { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 0.4rem; }
+        .review-summary-bar { display: flex; align-items: center; gap: 0.5rem; }
+        .review-summary-bar__num { font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); width: 1rem; text-align: center; }
+        .review-summary-bar__track {
+            flex: 1; height: 7px; border-radius: 999px;
+            background: var(--bg);
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+            overflow: hidden;
+        }
+        .review-summary-bar__fill {
+            height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, var(--gold, #f59e0b), color-mix(in srgb, var(--gold, #f59e0b) 70%, #fff));
+            transition: width 0.8s cubic-bezier(.4,0,.2,1);
+        }
+        .review-summary-bar__count { font-size: 0.7rem; color: var(--text-secondary); width: 1.2rem; text-align: center; }
+
+        /* ── لیست نظرات ── */
+        .review-list { display: flex; flex-direction: column; gap: 0.85rem; }
+        .review-card {
+            padding: 1.25rem;
+            border-radius: var(--radius-lg, 1rem);
+            background: var(--bg-elevated);
+            box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+            transition: transform 0.25s, box-shadow 0.25s;
+            animation: reviewSlide 0.35s ease both;
+        }
+        .review-card:hover { transform: translateY(-2px); box-shadow: 6px 6px 16px var(--shadow-dark), -6px -6px 16px var(--shadow-light); }
+        .review-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+        .review-card__user { display: flex; align-items: center; gap: 0.65rem; }
+        .review-card__avatar {
+            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 800; color: var(--accent);
+            background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)) 0%, var(--bg-elevated) 100%);
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+        .review-card__name { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+        .review-card__date { font-size: 0.68rem; color: var(--text-secondary); margin-top: 1px; }
+        .review-card__rating { display: flex; gap: 1px; }
+        .review-card__star { width: 15px; height: 15px; }
+        .review-card__body { font-size: 0.85rem; line-height: 1.75; color: var(--text-secondary); }
+
+        /* ── حالت خالی ── */
+        .review-empty {
+            text-align: center; padding: 2.5rem 1.5rem;
+            border-radius: var(--radius-lg, 1.25rem);
+            background: var(--bg-elevated);
+            box-shadow: inset 3px 3px 8px var(--shadow-dark), inset -3px -3px 8px var(--shadow-light);
+        }
+        .review-empty__icon {
+            display: inline-grid; place-items: center;
+            width: 64px; height: 64px; border-radius: 50%; margin-bottom: 1rem;
+            background: linear-gradient(145deg, color-mix(in srgb, var(--shadow-dark) 15%, var(--bg-elevated)) 0%, var(--bg-elevated) 100%);
+            box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
             color: var(--text-secondary);
-            margin-top: 0.25rem;
         }
-        .review-form__actions { display: flex; justify-content: flex-start; }
-        .review-form__submit {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.65rem 1.5rem;
-            font-size: 0.85rem;
-            transition: opacity 0.2s, transform 0.15s;
-        }
-        .review-form__submit:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-            transform: none !important;
-        }
+        .review-empty__icon svg { width: 28px; height: 28px; }
+        .review-empty__title { font-weight: 800; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.35rem; }
+        .review-empty__desc { font-size: 0.8rem; color: var(--text-secondary); }
 
-        /* Login hint */
-        .review-login-hint { border: 2px dashed var(--shadow-dark); }
-
-        /* Review card entrance */
+        /* ── انیمیشن ورود ── */
         @keyframes reviewSlide {
             from { opacity: 0; transform: translateY(10px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .review-card { animation: reviewSlide 0.35s ease both; }
         .review-card:nth-child(2) { animation-delay: 0.05s; }
         .review-card:nth-child(3) { animation-delay: 0.10s; }
         .review-card:nth-child(4) { animation-delay: 0.15s; }
+        .review-card:nth-child(5) { animation-delay: 0.20s; }
 
         /* ═══════════════════════════════════════
            Image Zoom Lens

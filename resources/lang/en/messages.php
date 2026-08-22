@@ -108,6 +108,8 @@ return [
     'review_placeholder' => 'What do you think about this product? What did you like or dislike?',
     'review_submit' => 'Submit Review',
     'review_login_hint' => 'Please sign in to write a review',
+    'review_empty_title' => 'Be the first to share your experience!',
+    'review_empty_desc' => 'Your review can help others make a better choice.',
     'login' => 'login',
     'register' => 'register',
     'login_register' => 'Login / Register',
