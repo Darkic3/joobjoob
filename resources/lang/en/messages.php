@@ -289,6 +289,21 @@ return [
             ],
         ],
     ],
+    // Share
+    'share' => 'Share',
+    'share_telegram' => 'Share on Telegram',
+    'share_whatsapp' => 'Share on WhatsApp',
+    'share_all' => 'Share',
+    'share_native' => 'Share via all apps',
+    'share_bale' => 'Share on Bale',
+    'share_eitaa' => 'Share on Eitaa',
+    'share_ig_story' => 'Share to Instagram Story',
+    'share_ig_dm' => 'Send via Instagram DM',
+    'share_copy' => 'Copy link',
+    'share_copied' => 'Link copied!',
+    'share_more' => 'More',
+    'share_less' => 'Less',
+
     'breadcrumb' => 'Page trail',
     'quick_links' => 'Quick links',
 ];

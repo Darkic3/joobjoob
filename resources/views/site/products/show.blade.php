@@ -67,6 +67,12 @@
                 </div>
             </div>
 
+            {{-- دکمه‌های اشتراک‌گذاری --}}
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-sm font-semibold" style="color: var(--text-secondary);">{{ __('messages.share') }}:</span>
+                <x-share-buttons :url="url()->current()" :title="$product->trans('name')" />
+            </div>
+
             {{-- انتخابگر واریانت (رنگ/سایز) --}}
             <div id="variant-selector" class="space-y-5 mb-6">
                 @foreach($mainSpecs as $group)
@@ -519,6 +525,184 @@
         .detail-tab.active {
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             color: var(--accent);
+        }
+    </style>
+@endpush
+
+@push('styles')
+    <style>
+        /* ═══════════════════════════════════════
+           Share Section — Pill + Overflow
+           ═══════════════════════════════════════ */
+        .share-section { margin-bottom: 0; }
+
+        .share-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        /* ── Pill base ── */
+        .share-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+            transition: all 0.25s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .share-pill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 0;
+        }
+        .share-pill:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 4px 5px 14px var(--shadow-dark), -4px -5px 14px var(--shadow-light);
+        }
+        .share-pill:active {
+            transform: translateY(0) scale(0.96);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            transition-duration: 0.1s;
+        }
+        .share-pill__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        .share-pill__icon svg { width: 100%; height: 100%; }
+        .share-pill__label {
+            white-space: nowrap;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Platform colors ── */
+        .share-pill[data-platform="telegram"] { color: #0088cc; }
+        .share-pill[data-platform="telegram"]::before { background: linear-gradient(135deg, #0088cc 0%, #229ed9 100%); }
+        .share-pill[data-platform="telegram"]:hover { color: #fff; }
+        .share-pill[data-platform="telegram"]:hover::before { opacity: 1; }
+
+        .share-pill[data-platform="whatsapp"] { color: #25D366; }
+        .share-pill[data-platform="whatsapp"]::before { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); }
+        .share-pill[data-platform="whatsapp"]:hover { color: #fff; }
+        .share-pill[data-platform="whatsapp"]:hover::before { opacity: 1; }
+
+        /* Native share (همه اپ‌ها) */
+        .share-pill--native { color: var(--accent); }
+        .share-pill--native::before { background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #000) 100%); }
+        .share-pill--native:hover { color: #fff; }
+        .share-pill--native:hover::before { opacity: 1; }
+        .share-pill--native.share-pill--copied { color: var(--success) !important; }
+        .share-pill--native.share-pill--copied::before { background: linear-gradient(135deg, var(--success) 0%, color-mix(in srgb, var(--success) 70%, #000) 100%) !important; opacity: 1 !important; }
+
+        /* Toggle (بیشتر/کمتر) */
+        .share-pill--toggle { color: var(--text-secondary); border: 1.5px dashed var(--text-secondary); background: transparent; box-shadow: none; }
+        .share-pill--toggle::before { background: linear-gradient(135deg, var(--text-secondary) 0%, color-mix(in srgb, var(--text-secondary) 70%, #000) 100%); }
+        .share-pill--toggle:hover { color: #fff; border-color: transparent; }
+        .share-pill--toggle:hover::before { opacity: 1; }
+        .share-pill--toggle .share-pill__icon svg { transition: transform 0.25s ease; }
+
+        /* Copy link */
+        .share-pill--copy { color: var(--text-secondary); }
+        .share-pill--copy::before { background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #000) 100%); }
+        .share-pill--copy:hover { color: #fff !important; }
+        .share-pill--copy:hover::before { opacity: 1; }
+        .share-pill--copied { color: var(--success) !important; }
+        .share-pill--copied::before { background: linear-gradient(135deg, var(--success) 0%, color-mix(in srgb, var(--success) 70%, #000) 100%) !important; opacity: 1 !important; }
+        .share-pill--copied .share-pill__icon,
+        .share-pill--copied .share-pill__label { position: relative; color: #fff !important; }
+
+        /* Overflow platform colors */
+        [data-platform="bale"] { color: #0d7c9d; }
+        [data-platform="bale"]::before { background: linear-gradient(135deg, #0d7c9d 0%, #00a693 100%); }
+        [data-platform="bale"]:hover { color: #fff; }
+        [data-platform="bale"]:hover::before { opacity: 1; }
+        [data-platform="eitaa"] { color: #e84393; }
+        [data-platform="eitaa"]::before { background: linear-gradient(135deg, #e84393 0%, #a855f7 100%); }
+        [data-platform="eitaa"]:hover { color: #fff; }
+        [data-platform="eitaa"]:hover::before { opacity: 1; }
+        [data-platform="instagram-story"] { color: #f77737; }
+        [data-platform="instagram-story"]::before { background: linear-gradient(135deg, #f77737 0%, #c13584 50%, #833ab4 100%); }
+        [data-platform="instagram-story"]:hover { color: #fff; }
+        [data-platform="instagram-story"]:hover::before { opacity: 1; }
+        [data-platform="instagram-dm"] { color: #c13584; }
+        [data-platform="instagram-dm"]::before { background: linear-gradient(135deg, #c13584 0%, #833ab4 100%); }
+        [data-platform="instagram-dm"]:hover { color: #fff; }
+        [data-platform="instagram-dm"]:hover::before { opacity: 1; }
+
+        /* ── Overflow row ── */
+        .share-overflow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-top: 0.4rem;
+        }
+        .share-overflow.hidden { display: none; }
+        .share-overflow .share-pill {
+            opacity: 0;
+            transform: translateY(6px) scale(0.85);
+        }
+        .share-overflow:not(.hidden) .share-pill {
+            animation: sharePop 0.3s ease both;
+        }
+        .share-overflow:not(.hidden) .share-pill:nth-child(1) { animation-delay: 0.00s; }
+        .share-overflow:not(.hidden) .share-pill:nth-child(2) { animation-delay: 0.05s; }
+        .share-overflow:not(.hidden) .share-pill:nth-child(3) { animation-delay: 0.10s; }
+        .share-overflow:not(.hidden) .share-pill:nth-child(4) { animation-delay: 0.15s; }
+        .share-overflow:not(.hidden) .share-pill:nth-child(5) { animation-delay: 0.20s; }
+
+        /* ── Stagger entrance ── */
+        @keyframes sharePop {
+            from { opacity: 0; transform: translateY(6px) scale(0.85); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .share-pills .share-pill:nth-child(1) { animation: sharePop 0.3s 0.00s both; }
+        .share-pills .share-pill:nth-child(2) { animation: sharePop 0.3s 0.05s both; }
+        .share-pills .share-pill:nth-child(3) { animation: sharePop 0.3s 0.10s both; }
+        .share-pills .share-pill:nth-child(4) { animation: sharePop 0.3s 0.15s both; }
+        .share-pills .share-pill:nth-child(5) { animation: sharePop 0.3s 0.20s both; }
+        .share-pills .share-pill:nth-child(6) { animation: sharePop 0.3s 0.25s both; }
+        .share-pills .share-pill:nth-child(7) { animation: sharePop 0.3s 0.30s both; }
+
+        /* ── Ripple pulse ── */
+        .share-pill::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+            z-index: 0;
+        }
+        .share-pill:active::after {
+            width: 200%; height: 200%;
+            opacity: 1;
+            transition: 0s;
         }
     </style>
 @endpush
