@@ -22,10 +22,13 @@
         {{-- ۱. گالری تصاویر --}}
         <div>
             <div class="neu-flat-lg p-4 mb-4">
-                <img id="main-image" src="{{ $mainImage }}"
-                     alt="{{ $product->trans('name') }}"
-                     class="w-full rounded-xl object-cover transition-all duration-300"
-                     style="aspect-ratio:1/1;">
+                <div class="image-zoom-wrap" id="image-zoom-wrap">
+                    <img id="main-image" src="{{ $mainImage }}"
+                         alt="{{ $product->trans('name') }}"
+                         class="w-full rounded-xl object-cover transition-all duration-300"
+                         style="aspect-ratio:1/1;">
+                    <div class="zoom-lens" id="zoom-lens"></div>
+                </div>
             </div>
 
             @if($product->images->count() > 1)
@@ -38,10 +41,33 @@
                     @endforeach
                 </div>
             @endif
+
+            {{-- لایت‌باکس تمام‌صفحه --}}
+            <div class="lightbox" id="product-lightbox">
+                <button type="button" class="lightbox__close" onclick="closeLightbox()" aria-label="بستن">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <button type="button" class="lightbox__arrow lightbox__arrow--prev" onclick="lightboxNav(-1)" aria-label="قبلی">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="lightbox__img-wrap">
+                    <img class="lightbox__img" id="lightbox-img" src="" alt="">
+                </div>
+                <button type="button" class="lightbox__arrow lightbox__arrow--next" onclick="lightboxNav(1)" aria-label="بعدی">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                <div class="lightbox__counter" id="lightbox-counter"></div>
+            </div>
         </div>
 
         {{-- ۲. اطلاعات محصول --}}
         <div class="flex flex-col">
+            @php
+                $allImages = collect([$mainImage]);
+                foreach ($product->images as $img) {
+                    if ($img->url !== $mainImage) $allImages->push($img->url);
+                }
+            @endphp
             <h1 class="text-2xl font-extrabold mb-3 leading-tight">{{ $product->trans('name') }}</h1>
 
             {{-- برند + امتیاز --}}
@@ -508,6 +534,138 @@
                 document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
             });
         });
+
+        // ===== ذره‌بین تصویر اصلی =====
+        (function() {
+            var wrap = document.getElementById('image-zoom-wrap');
+            var lens = document.getElementById('zoom-lens');
+            if (!wrap || !lens) return;
+
+            var img = document.getElementById('main-image');
+            var zoom = parseFloat(getComputedStyle(lens).getPropertyValue('--zoom')) || 2.5;
+
+            function updateLens(e) {
+                var rect = wrap.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+
+                // Clamp
+                x = Math.max(0, Math.min(x, rect.width));
+                y = Math.max(0, Math.min(y, rect.height));
+
+                // Position lens
+                lens.style.left = x + 'px';
+                lens.style.top  = y + 'px';
+
+                // Background: the actual image at zoom level
+                var bgW = rect.width * zoom;
+                var bgH = rect.height * zoom;
+                var bgX = -(x * zoom - lens.offsetWidth / 2);
+                var bgY = -(y * zoom - lens.offsetHeight / 2);
+
+                lens.style.backgroundImage  = 'url("' + img.src + '")';
+                lens.style.backgroundSize    = bgW + 'px ' + bgH + 'px';
+                lens.style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+            }
+
+            wrap.addEventListener('mousemove', updateLens);
+            wrap.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                updateLens(e.touches[0]);
+            }, { passive: false });
+
+            // Reset on thumbnail change
+            var observer = new MutationObserver(function() {
+                lens.style.backgroundImage = '';
+            });
+            observer.observe(img, { attributes: true, attributeFilter: ['src'] });
+        })();
+
+        // ===== لایت‌باکس تمام‌صفحه =====
+        (function() {
+            var LIGHTBOX_IMAGES = @json($allImages);
+            var currentIndex = 0;
+            var lb = document.getElementById('product-lightbox');
+            var lbImg = document.getElementById('lightbox-img');
+            var lbCounter = document.getElementById('lightbox-counter');
+            var wrap = document.getElementById('image-zoom-wrap');
+
+            function showImage(i) {
+                currentIndex = (i + LIGHTBOX_IMAGES.length) % LIGHTBOX_IMAGES.length;
+                lbImg.style.opacity = '0';
+                lbImg.style.transform = 'scale(0.95)';
+                setTimeout(function() {
+                    lbImg.src = LIGHTBOX_IMAGES[currentIndex];
+                    lbImg.alt = 'تصویر ' + (currentIndex + 1);
+                    lbCounter.textContent = (currentIndex + 1) + ' / ' + LIGHTBOX_IMAGES.length;
+                    lbImg.style.opacity = '1';
+                    lbImg.style.transform = 'scale(1)';
+                }, 150);
+            }
+
+            window.openLightbox = function(startIndex) {
+                currentIndex = startIndex || 0;
+                lb.classList.add('is-active');
+                document.body.style.overflow = 'hidden';
+                showImage(currentIndex);
+            };
+
+            window.closeLightbox = function() {
+                lb.classList.remove('is-active');
+                document.body.style.overflow = '';
+            };
+
+            window.lightboxNav = function(dir) {
+                showImage(currentIndex + dir);
+            };
+
+            // کلیک روی تصویر اصلی → باز شدن لایت‌باکس
+            if (wrap) {
+                wrap.addEventListener('click', function(e) {
+                    // اگه ذره‌بین فعال بود، کلیک نادیده گرفته نشه
+                    if (e.target.closest('.zoom-lens')) return;
+                    openLightbox(0);
+                });
+            }
+
+            // کلیک روی thumbnail → باز شدن لایت‌باکس از همون عکس
+            document.querySelectorAll('.flex.gap-3 button[onclick]').forEach(function(btn, i) {
+                btn.addEventListener('click', function(e) {
+                    // اجازه تغییر عکس اصلی بده، بعد لایت‌باکس رو باز کن
+                    setTimeout(function() { openLightbox(i); }, 50);
+                });
+            });
+
+            // کلیک روی پس‌زمینه تاریک → بسته شدن
+            lb.addEventListener('click', function(e) {
+                if (e.target === lb || e.target.classList.contains('lightbox__img-wrap')) {
+                    closeLightbox();
+                }
+            });
+
+            // کلیدهای جهت‌دار + Escape
+            document.addEventListener('keydown', function(e) {
+                if (!lb.classList.contains('is-active')) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowRight') lightboxNav(-1); // RTL: راست = قبلی
+                if (e.key === 'ArrowLeft') lightboxNav(1);   // RTL: چپ = بعدی
+            });
+
+            // Swipe لمسی
+            var touchStartX = 0;
+            var touchStartY = 0;
+            lb.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            lb.addEventListener('touchend', function(e) {
+                var dx = e.changedTouches[0].clientX - touchStartX;
+                var dy = e.changedTouches[0].clientY - touchStartY;
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                    lightboxNav(dx > 0 ? -1 : 1); // RTL
+                }
+            }, { passive: true });
+        })();
     </script>
 
     <style>
@@ -531,6 +689,120 @@
 
 @push('styles')
     <style>
+        /* ═══════════════════════════════════════
+           Image Zoom Lens
+           ═══════════════════════════════════════ */
+        .image-zoom-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg, 1rem);
+            cursor: crosshair;
+        }
+        .zoom-lens {
+            display: none;
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.85);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.18);
+            pointer-events: none;
+            z-index: 20;
+            background-repeat: no-repeat;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.15s ease;
+            opacity: 0;
+            /* 2.5x zoom */
+            --zoom: 2.5;
+        }
+        .image-zoom-wrap:hover .zoom-lens {
+            display: block;
+            opacity: 1;
+        }
+        @media (max-width: 640px) {
+            .zoom-lens { width: 120px; height: 120px; --zoom: 2; }
+        }
+
+        /* ═══════════════════════════════════════
+           Lightbox
+           ═══════════════════════════════════════ */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .lightbox.is-active {
+            display: flex;
+            opacity: 1;
+        }
+        .lightbox__close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border: none; border-radius: 50%;
+            color: #fff; cursor: pointer;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .lightbox__close:hover { background: rgba(255,255,255,0.25); }
+        .lightbox__close svg { width: 22px; height: 22px; }
+        .lightbox__img-wrap {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%;
+            padding: 60px 60px;
+            user-select: none;
+        }
+        .lightbox__img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.25s ease;
+            transform: scale(0.95);
+            opacity: 0;
+        }
+        .lightbox.is-active .lightbox__img {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .lightbox__arrow {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.08);
+            border: none; border-radius: 50%;
+            color: #fff; cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            z-index: 10;
+        }
+        .lightbox__arrow:hover { background: rgba(255,255,255,0.2); }
+        .lightbox__arrow svg { width: 26px; height: 26px; }
+        .lightbox__arrow--prev { left: 1rem; }
+        .lightbox__arrow--next { right: 1rem; }
+        .lightbox__counter {
+            position: absolute;
+            bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+            font-size: 0.85rem; font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 0.05em;
+        }
+        @media (max-width: 640px) {
+            .lightbox__img-wrap { padding: 50px 12px 60px; }
+            .lightbox__arrow { width: 38px; height: 38px; }
+            .lightbox__arrow--prev { left: 0.5rem; }
+            .lightbox__arrow--next { right: 0.5rem; }
+            .lightbox__arrow svg { width: 20px; height: 20px; }
+        }
+
         /* ═══════════════════════════════════════
            Share Section — Pill + Overflow
            ═══════════════════════════════════════ */
