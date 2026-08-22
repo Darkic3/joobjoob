@@ -432,59 +432,60 @@
                 @endforelse
             </div>
 
-            {{-- مودال پاسخ به نظر --}}
-            <div class="reply-modal" id="reply-modal">
-                <div class="reply-modal__backdrop" onclick="closeReplyModal()"></div>
-                <div class="reply-modal__content">
-                    <div class="reply-modal__header">
-                        <div class="reply-modal__title-row">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" class="reply-modal__icon"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-                            <h3 class="reply-modal__title">{{ __('messages.reply_to') }} <span id="reply-to-name"></span></h3>
-                        </div>
-                        <button type="button" class="reply-modal__close" onclick="closeReplyModal()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        </button>
-                    </div>
-                    <form id="reply-form" method="POST" class="reply-modal__form">
-                        @csrf
-                        {{-- فیلدهای مهمان --}}
-                        @guest
-                            <div class="review-guest-fields">
-                                <div class="review-guest-fields__row">
-                                    <div class="review-input-group">
-                                        <label class="review-input-group__label">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                            {{ __('messages.review_guest_name') }}
-                                        </label>
-                                        <input type="text" name="guest_name" maxlength="100" placeholder="{{ __('messages.review_guest_name_ph') }}" class="review-input-group__input" required>
-                                    </div>
-                                    <div class="review-input-group">
-                                        <label class="review-input-group__label">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                                            {{ __('messages.review_guest_phone') }}
-                                        </label>
-                                        <input type="tel" name="guest_phone" maxlength="20" placeholder="{{ __('messages.review_guest_phone_ph') }}" class="review-input-group__input" dir="ltr" inputmode="numeric" required>
-                                    </div>
-                                </div>
-                            </div>
-                        @endguest
-                        <div class="reply-modal__body">
-                            <textarea name="comment" rows="3" maxlength="500" placeholder="{{ __('messages.reply_placeholder') }}" class="review-form__textarea" required></textarea>
-                            <div class="review-form__footer">
-                                <span class="review-form__char-count"><span class="reply-char-count">0</span> / 500</span>
-                            </div>
-                        </div>
-                        <button type="submit" class="review-submit-btn">
-                            <span class="review-submit-btn__chip">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                            </span>
-                            <span>{{ __('messages.reply_submit') }}</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
         </div>
     </section>
+
+    {{-- مودال پاسخ به نظر (خارج از سکشن برای position: fixed) --}}
+    <div class="reply-modal" id="reply-modal">
+        <div class="reply-modal__backdrop" onclick="closeReplyModal()"></div>
+        <div class="reply-modal__content">
+            <div class="reply-modal__header">
+                <div class="reply-modal__title-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" class="reply-modal__icon"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                    <h3 class="reply-modal__title">{{ __('messages.reply_to') }} <span id="reply-to-name"></span></h3>
+                </div>
+                <button type="button" class="reply-modal__close" onclick="closeReplyModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="reply-form" method="POST" class="reply-modal__form">
+                @csrf
+                {{-- فیلدهای مهمان --}}
+                @guest
+                    <div class="review-guest-fields">
+                        <div class="review-guest-fields__row">
+                            <div class="review-input-group">
+                                <label class="review-input-group__label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    {{ __('messages.review_guest_name') }}
+                                </label>
+                                <input type="text" name="guest_name" maxlength="100" placeholder="{{ __('messages.review_guest_name_ph') }}" class="review-input-group__input" required>
+                            </div>
+                            <div class="review-input-group">
+                                <label class="review-input-group__label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                    {{ __('messages.review_guest_phone') }}
+                                </label>
+                                <input type="tel" name="guest_phone" maxlength="20" placeholder="{{ __('messages.review_guest_phone_ph') }}" class="review-input-group__input" dir="ltr" inputmode="numeric" required>
+                            </div>
+                        </div>
+                    </div>
+                @endguest
+                <div class="reply-modal__body">
+                    <textarea name="comment" rows="3" maxlength="500" placeholder="{{ __('messages.reply_placeholder') }}" class="review-form__textarea reply-modal__textarea" required></textarea>
+                    <div class="review-form__footer">
+                        <span class="review-form__char-count"><span class="reply-char-count">0</span> / 500</span>
+                    </div>
+                </div>
+                <button type="submit" class="review-submit-btn">
+                    <span class="review-submit-btn__chip">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </span>
+                    <span>{{ __('messages.reply_submit') }}</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
     {{-- ۴. محصولات مکمل --}}
     @if($complement->isNotEmpty())
