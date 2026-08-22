@@ -46,6 +46,8 @@ $siteRoutes = function () {
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::post('/products/{product:slug}/reviews', [ProductController::class, 'storeReview'])
         ->name('products.reviews.store');
+    Route::post('/products/{product:slug}/reviews/{review}/reply', [ProductController::class, 'storeReply'])
+        ->name('products.reviews.reply');
     Route::get('/products/{product:slug}/quick-view', [ProductController::class, 'quickView'])->name('products.quick-view');
     Route::get('/product-categories/{category:slug}', [ProductController::class, 'category'])->name('products.category');
 

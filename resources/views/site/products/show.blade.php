@@ -415,28 +415,10 @@
                 </div>
             @endif
 
-            {{-- ─── لیست نظرات --}}
+            {{-- ─── لیست نظرات (درختی تو در تو) --}}
             <div class="review-list">
-                @forelse($product->reviews as $review)
-                    <div class="review-card">
-                        <div class="review-card__head">
-                            <div class="review-card__user">
-                                <span class="review-card__avatar">
-                                    {{ mb_substr($review->user->name ?? 'U', 0, 1) }}
-                                </span>
-                                <div>
-                                    <p class="review-card__name">{{ $review->user->name ?? __('messages.user') }}</p>
-                                    <p class="review-card__date">{{ show_date($review->created_at, 'd F Y') }}</p>
-                                </div>
-                            </div>
-                            <div class="review-card__rating">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <svg viewBox="0 0 24 24" fill="currentColor" class="review-card__star" style="color: {{ $i <= $review->rating ? 'var(--gold)' : 'var(--shadow-dark)' }};"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                @endfor
-                            </div>
-                        </div>
-                        <p class="review-card__body">{{ $review->comment }}</p>
-                    </div>
+                @forelse($reviewTree as $review)
+                    @include('site.products.partials.review-item', ['review' => $review, 'depth' => 0])
                 @empty
                     <div class="review-empty">
                         <div class="review-empty__icon">
@@ -448,6 +430,58 @@
                         <p class="review-empty__desc">{{ __('messages.review_empty_desc') }}</p>
                     </div>
                 @endforelse
+            </div>
+
+            {{-- مودال پاسخ به نظر --}}
+            <div class="reply-modal" id="reply-modal">
+                <div class="reply-modal__backdrop" onclick="closeReplyModal()"></div>
+                <div class="reply-modal__content">
+                    <div class="reply-modal__header">
+                        <div class="reply-modal__title-row">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" class="reply-modal__icon"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                            <h3 class="reply-modal__title">{{ __('messages.reply_to') }} <span id="reply-to-name"></span></h3>
+                        </div>
+                        <button type="button" class="reply-modal__close" onclick="closeReplyModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <form id="reply-form" method="POST" class="reply-modal__form">
+                        @csrf
+                        {{-- فیلدهای مهمان --}}
+                        @guest
+                            <div class="review-guest-fields">
+                                <div class="review-guest-fields__row">
+                                    <div class="review-input-group">
+                                        <label class="review-input-group__label">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            {{ __('messages.review_guest_name') }}
+                                        </label>
+                                        <input type="text" name="guest_name" maxlength="100" placeholder="{{ __('messages.review_guest_name_ph') }}" class="review-input-group__input" required>
+                                    </div>
+                                    <div class="review-input-group">
+                                        <label class="review-input-group__label">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                            {{ __('messages.review_guest_phone') }}
+                                        </label>
+                                        <input type="tel" name="guest_phone" maxlength="20" placeholder="{{ __('messages.review_guest_phone_ph') }}" class="review-input-group__input" dir="ltr" inputmode="numeric" required>
+                                    </div>
+                                </div>
+                            </div>
+                        @endguest
+                        <div class="reply-modal__body">
+                            <textarea name="comment" rows="3" maxlength="500" placeholder="{{ __('messages.reply_placeholder') }}" class="review-form__textarea" required></textarea>
+                            <div class="review-form__footer">
+                                <span class="review-form__char-count"><span class="reply-char-count">0</span> / 500</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="review-submit-btn">
+                            <span class="review-submit-btn__chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </span>
+                            <span>{{ __('messages.reply_submit') }}</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
@@ -863,6 +897,46 @@
                 });
             }
         })();
+
+        // ===== مودال پاسخ به نظر =====
+        function openReplyModal(reviewId, authorName) {
+            var modal = document.getElementById('reply-modal');
+            var form = document.getElementById('reply-form');
+            var nameEl = document.getElementById('reply-to-name');
+            if (!modal || !form) return;
+
+            form.action = '{{ route('products.reviews.reply', [$product->slug, '__REVIEW_ID__']) }}'.replace('__REVIEW_ID__', reviewId);
+            nameEl.textContent = authorName;
+            modal.classList.add('is-active');
+            document.body.style.overflow = 'hidden';
+
+            // شمارنده حروف مودال
+            var ta = form.querySelector('textarea[name="comment"]');
+            var cc = form.querySelector('.reply-char-count');
+            if (ta && cc) {
+                ta.value = '';
+                cc.textContent = '0';
+                ta.focus();
+                ta.oninput = function() { cc.textContent = ta.value.length; };
+            }
+        }
+
+        function closeReplyModal() {
+            var modal = document.getElementById('reply-modal');
+            if (!modal) return;
+            modal.classList.remove('is-active');
+            document.body.style.overflow = '';
+        }
+
+        // بستن با Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var modal = document.getElementById('reply-modal');
+                if (modal && modal.classList.contains('is-active')) {
+                    closeReplyModal();
+                }
+            }
+        });
     </script>
 
     <style>
@@ -1137,6 +1211,141 @@
         .review-card__rating { display: flex; gap: 1px; }
         .review-card__star { width: 15px; height: 15px; }
         .review-card__body { font-size: 0.85rem; line-height: 1.75; color: var(--text-secondary); }
+
+        /* ── دکمه پاسخ ── */
+        .review-card__actions {
+            display: flex; gap: 0.5rem; margin-top: 0.75rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid color-mix(in srgb, var(--shadow-dark) 15%, transparent);
+        }
+        .review-reply-btn {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.3rem 0.7rem; border: none; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 600;
+            color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .review-reply-btn:hover {
+            background: color-mix(in srgb, var(--accent) 16%, transparent);
+            transform: translateY(-1px);
+        }
+        .review-reply-btn svg { flex-shrink: 0; }
+
+        /* ── پاسخ‌ها (تو در تو) ── */
+        .review-card--reply {
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.85rem;
+            background: color-mix(in srgb, var(--bg-elevated) 80%, var(--bg));
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+            animation: reviewSlide 0.3s ease both;
+        }
+        .review-card--reply:hover {
+            transform: none;
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+        .review-replies {
+            margin-top: 0.65rem;
+            padding-right: 0;
+            padding-left: 1.25rem;
+            border-right: 2px solid color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+        .review-replies[style*="--depth: 2"] {
+            border-right-color: color-mix(in srgb, var(--accent) 12%, transparent);
+        }
+        .review-replies[style*="--depth: 3"] {
+            border-right-color: color-mix(in srgb, var(--accent) 8%, transparent);
+        }
+        .review-card__avatar--sm {
+            width: 30px !important; height: 30px !important;
+            font-size: 0.7rem !important;
+        }
+        .review-card__reply-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 0.6rem; font-weight: 600;
+            color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 10%, transparent);
+            padding: 2px 6px; border-radius: 999px;
+            margin-inline-start: 4px;
+            vertical-align: middle;
+        }
+
+        /* ── مودال پاسخ ── */
+        .reply-modal {
+            display: none; position: fixed; inset: 0;
+            z-index: 9998; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .reply-modal.is-active { display: flex; }
+        .reply-modal__backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease;
+        }
+        .reply-modal__content {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 480px;
+            max-height: 90vh; overflow-y: auto;
+            border-radius: var(--radius-lg, 1.25rem);
+            background: linear-gradient(160deg, color-mix(in srgb, var(--bg-elevated) 90%, transparent) 0%, var(--bg-elevated) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+            box-shadow: 12px 12px 30px var(--shadow-dark), -8px -8px 24px var(--shadow-light), inset 0 1px 0 rgba(255,255,255,0.3);
+            animation: modalSlideUp 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        .reply-modal__header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid color-mix(in srgb, var(--shadow-dark) 20%, transparent);
+        }
+        .reply-modal__title-row {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .reply-modal__icon { color: var(--accent); }
+        .reply-modal__title {
+            font-size: 0.95rem; font-weight: 800; color: var(--text-primary);
+        }
+        .reply-modal__close {
+            width: 36px; height: 36px; display: grid; place-items: center;
+            border: none; border-radius: 50%; cursor: pointer;
+            color: var(--text-secondary);
+            background: color-mix(in srgb, var(--shadow-dark) 12%, transparent);
+            transition: all 0.2s;
+        }
+        .reply-modal__close:hover {
+            background: var(--danger, #e53e3e); color: #fff;
+            transform: rotate(90deg);
+        }
+        .reply-modal__form {
+            padding: 1.25rem 1.5rem;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .reply-modal__body textarea {
+            width: 100%; resize: vertical; min-height: 80px;
+            padding: 0.8rem 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid transparent;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-size: 0.85rem; line-height: 1.7;
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .reply-modal__body textarea:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+        }
+        .reply-modal__body textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
+        .reply-modal__form .review-submit-btn { align-self: flex-start; }
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
 
         /* ── حالت خالی ── */
         .review-empty {

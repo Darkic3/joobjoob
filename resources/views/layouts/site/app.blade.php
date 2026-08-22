@@ -61,6 +61,8 @@
 
 <x-quick-view-modal/>
 
+<x-toast/>
+
 <x-social-proof-toast/>
 
 {{--@include('layouts.site._partials.scripts')--}}

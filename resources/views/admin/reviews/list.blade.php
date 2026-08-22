@@ -179,7 +179,7 @@
         <script>
             function toggleApproval(element) {
                 var reviewId = element.getAttribute('data-id');
-                var isApproved = element.value === '1';
+                var isApproved = parseInt(element.value, 10);
                 var spinner = document.getElementById('spinner-' + reviewId);
 
                 element.disabled = true;

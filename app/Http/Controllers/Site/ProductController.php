@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Review;
 use App\Services\RecentlyViewedService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -149,10 +150,38 @@ class ProductController extends Controller
         // ثبت در اخیراً مشاهده‌شده
         $this->recentlyViewed->add($product);
 
+        // ساخت درخت نظرات (نظرات اصلی + پاسخ‌های تو در تو)
+        $allReviews = $product->reviews()->with('user')->approved()->oldest()->get();
+        $reviewTree = $this->buildReviewTree($allReviews);
+
         // داده‌های نمایشی صفحهٔ محصول (مشخصات/واریانت‌ها/تصویر اصلی) — از ویو خارج شده
         $viewData = $this->prepareShowData($product);
 
-        return view('site.products.show', array_merge(compact('product', 'related', 'complement'), $viewData));
+        return view('site.products.show', array_merge(compact('product', 'related', 'complement', 'reviewTree'), $viewData));
+    }
+
+    /**
+     * ساخت درخت نظرات — نظرات اصلی + پاسخ‌های تو در تو.
+     */
+    private function buildReviewTree($allReviews): array
+    {
+        $map = [];
+        $tree = [];
+
+        foreach ($allReviews as $review) {
+            $review->replies = collect();
+            $map[$review->id] = $review;
+        }
+
+        foreach ($allReviews as $review) {
+            if ($review->parent_id && isset($map[$review->parent_id])) {
+                $map[$review->parent_id]->replies->push($review);
+            } else {
+                $tree[] = $review;
+            }
+        }
+
+        return $tree;
     }
 
     /**
@@ -286,6 +315,55 @@ class ProductController extends Controller
 
         return redirect()
             ->route('products.show', $product->slug)
-            ->with('success', 'نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده خواهد شد.');
+            ->withFragment('tab-reviews')
+            ->with('success', __('messages.review_submitted'));
+    }
+
+    /**
+     * ثبت پاسخ به یک نظر.
+     */
+    public function storeReply(Request $request, Product $product, Review $review)
+    {
+        $isGuest = ! auth()->check();
+
+        $rules = [
+            'comment' => 'required|string|min:3|max:500',
+        ];
+        $messages = [
+            'comment.required' => 'لطفاً متن پاسخ را بنویسید.',
+            'comment.min'      => 'پاسخ باید حداقل ۳ حرف باشد.',
+            'comment.max'      => 'پاسخ نمی‌تواند بیش از ۵۰۰ حرف باشد.',
+        ];
+
+        if ($isGuest) {
+            $rules['guest_name']  = 'required|string|min:2|max:100';
+            $rules['guest_phone'] = 'required|string|min:10|max:20|regex:/^0[0-9]{9,}$/';
+            $messages['guest_name.required']  = 'لطفاً نام خود را وارد کنید.';
+            $messages['guest_name.min']       = 'نام باید حداقل ۲ حرف باشد.';
+            $messages['guest_phone.required'] = 'لطفاً شماره تلفن خود را وارد کنید.';
+            $messages['guest_phone.regex']    = 'شماره تلفن معتبر نیست.';
+        }
+
+        $validated = $request->validate($rules, $messages);
+
+        $data = [
+            'user_id'     => auth()->id(),
+            'parent_id'   => $review->id,
+            'rating'      => $review->rating, // پاسخ امتیاز نداره
+            'comment'     => $validated['comment'],
+            'is_approved' => Review::STATUS_PENDING,
+        ];
+
+        if ($isGuest) {
+            $data['guest_name']  = $validated['guest_name'];
+            $data['guest_phone'] = $validated['guest_phone'];
+        }
+
+        $product->reviews()->create($data);
+
+        return redirect()
+            ->route('products.show', $product->slug)
+            ->withFragment('tab-reviews')
+            ->with('success', __('messages.reply_submitted'));
     }
 }
