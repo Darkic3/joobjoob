@@ -237,4 +237,33 @@ class ProductController extends Controller
 
         return compact('mainImage', 'specGroups', 'textValues', 'mainSpecs', 'variantsData', 'minVariant');
     }
+
+    /**
+     * ثبت نظر جدید برای محصول.
+     */
+    public function storeReview(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|min:3|max:1000',
+        ], [
+            'rating.required'  => 'لطفاً امتیاز را انتخاب کنید.',
+            'rating.min'       => 'امتیاز باید حداقل ۱ باشد.',
+            'rating.max'       => 'امتیاز حداکثر ۵ است.',
+            'comment.required' => 'لطفاً متن نظر را بنویسید.',
+            'comment.min'      => 'نظر باید حداقل ۳ حرف باشد.',
+            'comment.max'      => 'نظر نمی‌تواند بیش از ۱۰۰۰ حرف باشد.',
+        ]);
+
+        $product->reviews()->create([
+            'user_id'     => auth()->id(),
+            'rating'      => $validated['rating'],
+            'comment'     => $validated['comment'],
+            'is_approved' => false,
+        ]);
+
+        return redirect()
+            ->route('products.show', $product->slug)
+            ->with('success', 'نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده خواهد شد.');
+    }
 }
