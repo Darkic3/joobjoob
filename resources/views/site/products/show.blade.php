@@ -32,7 +32,7 @@
             </div>
 
             @if($product->images->count() > 1)
-                <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+                <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar" data-gallery-thumbs>
                     @foreach($product->images as $img)
                         <button onclick="document.getElementById('main-image').src='{{ $img->url }}'"
                                 class="neu-flat-sm p-1 w-20 h-20 flex-shrink-0 overflow-hidden hover:neu-pressed transition-all">
@@ -753,8 +753,8 @@
             // کلیک روی تصویر اصلی → باز شدن لایت‌باکس
             if (wrap) {
                 wrap.addEventListener('click', function(e) {
-                    // اگه ذره‌بین فعال بود، کلیک نادیده گرفته نشه
-                    if (e.target.closest('.zoom-lens')) return;
+                    // فقط کلیک مستقیم روی تصویر یا خود wrap → لایت‌باکس
+                    if (e.target !== wrap && e.target !== document.getElementById('main-image')) return;
                     var curSrc = document.getElementById('main-image').src;
                     var idx = LIGHTBOX_IMAGES.findIndex(function(u) { return curSrc.includes(u) || u.includes(curSrc); });
                     openLightbox(idx >= 0 ? idx : 0);
@@ -762,12 +762,16 @@
             }
 
             // کلیک روی thumbnail → باز شدن لایت‌باکس از همون عکس
-            document.querySelectorAll('.flex.gap-3 button[onclick]').forEach(function(btn, i) {
-                btn.addEventListener('click', function(e) {
-                    // اجازه تغییر عکس اصلی بده، بعد لایت‌باکس رو باز کن
-                    setTimeout(function() { openLightbox(i); }, 50);
+            // فقط thumbnailهای گالری تصویر
+            var thumbContainer = document.querySelector('[data-gallery-thumbs]');
+            if (thumbContainer) {
+                thumbContainer.querySelectorAll('button[onclick]').forEach(function(btn, i) {
+                    btn.addEventListener('click', function(e) {
+                        // اجازه تغییر عکس اصلی بده، بعد لایت‌باکس رو باز کن
+                        setTimeout(function() { openLightbox(i); }, 50);
+                    });
                 });
-            });
+            }
 
             // کلیک روی پس‌زمینه تاریک → بسته شدن
             lb.addEventListener('click', function(e) {
