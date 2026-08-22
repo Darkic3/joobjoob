@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Services\RecentlyViewedService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        private readonly RecentlyViewedService $recentlyViewed,
+    ) {}
+
     public function index(Request $request)
     {
         $query = Product::with(['images', 'category', 'brand'])->where('is_active', true);
@@ -140,6 +145,9 @@ class ProductController extends Controller
                 ->get();
 
         $complement = $product->complement;
+
+        // ثبت در اخیراً مشاهده‌شده
+        $this->recentlyViewed->add($product);
 
         // داده‌های نمایشی صفحهٔ محصول (مشخصات/واریانت‌ها/تصویر اصلی) — از ویو خارج شده
         $viewData = $this->prepareShowData($product);

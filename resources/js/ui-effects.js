@@ -188,6 +188,21 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// ---------- جلوگیری از ناوبری لینک کارت هنگام کلیک روی دکمه‌های داخل آن ----------
+// دکمه‌های "افزودن به سبد"، "علاقه‌مندی" و "پیش‌نمایش" داخل <a> کارت قرار دارند.
+// این هندلر مطمئن می‌شود کلیک روی دکمه‌ها باعث باز شدن صفحهٔ محصول نشود.
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-card-link]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            if (e.target.closest('button, [data-wishlist-toggle], [data-quick-view-url]')) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    });
+});
+
+
 // ---------- اسکرول افقی حرفه‌ای (محصولات ویژه / پرفروش‌ترین‌ها) ----------
 // تعامل: درگ با اینرسی + فلش‌هایی که دقیقاً روی مرز کارت می‌ایستند (اسنپ به کارت)
 // + نوار پیشرفت اسکرول. فیزیک خروج اکسپو؛ بدون پریدن نیمه‌کارت.
@@ -320,14 +335,20 @@ document.addEventListener('DOMContentLoaded', function () {
             dragLastT = performance.now();
             velocity = 0;
             didDrag = false;
-            rail.classList.add('hscroll-dragging');
-            try { rail.setPointerCapture(e.pointerId); } catch (_) { /* قدیمی‌تر */ }
+            // pointer capture فقط وقتی درگ واقعی شروع می‌شود فعال می‌شود
+            // تا کلیک عادی روی کارت محصول به <a> برسد و ناوبری انجام شود
         });
 
         rail.addEventListener('pointermove', function (e) {
             if (e.pointerId !== pointerId) return;
             const dx = e.clientX - dragStartX;
-            if (Math.abs(dx) > 4) didDrag = true;
+            if (!didDrag && Math.abs(dx) > 10) {
+                didDrag = true;
+                rail.classList.add('hscroll-dragging');
+                try { rail.setPointerCapture(e.pointerId); } catch (_) { /* قدیمی‌تر */ }
+            }
+            // فقط بعد از شروع درگ اسکرول را تغییر بده — وگرنه مرورگر کلیک را لغو می‌کند
+            if (!didDrag) return;
             // RTL (منفی): کشیدن به چپ → سمت پایان؛ LTR برعکس
             rail.scrollLeft = inRange(rtlNegative ? dragStartScroll + dx : dragStartScroll - dx);
             const now = performance.now();
@@ -341,8 +362,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.pointerId !== pointerId) return;
             pointerId = null;
             rail.classList.remove('hscroll-dragging');
+            // همیشه capture را آزاد کن تا کلیک عادی به <a> برسد
+            try { rail.releasePointerCapture(e.pointerId); } catch (_) {}
             if (!didDrag) return;
-            e.preventDefault();
             const v = velocity;
             if (Math.abs(v) > 0.25) {
                 // اینرسی: سرعت با نرخ نمایی می‌میرد، بعد اسنپ به نزدیک‌ترین کارت
@@ -381,11 +403,14 @@ document.addEventListener('DOMContentLoaded', function () {
         rail.addEventListener('pointerup', endDrag);
         rail.addEventListener('pointercancel', endDrag);
         // اگر کاربر کارت را کشید، کلیک روی لینک/دکمه اجرا نشود
+        // فقط وقتی اسکرول واقعاً جابه‌جا شده از ناوبری جلوگیری کن
+        // (حرکت خیلی کم انگشت/ماوس باعث نمی‌شود کلیک مسدود شود)
         rail.addEventListener('click', function (e) {
-            if (didDrag) {
+            const scrolled = didDrag && rail.scrollLeft !== dragStartScroll;
+            didDrag = false;
+            if (scrolled) {
                 e.preventDefault();
                 e.stopPropagation();
-                didDrag = false;
             }
         }, true);
 
