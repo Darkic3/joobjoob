@@ -1,10 +1,11 @@
 {{-- مودال پیش‌نمایش سریع محصول — محتوای این پارشال با fetch داخل #quick-view-content تزریق می‌شود --}}
 <div class="quick-view-grid">
     <div class="quick-view-media">
-        <img src="{{ $product->main_image_url ?? $product->images->first()->url ?? 'https://picsum.photos/seed/'.$product->slug.'/600/600' }}"
+        <img src="{{ $product->main_image_url ?? $product->images->first()->url ?? asset('assets/admin/images/image-not-found.png') }}"
              alt="{{ $product->trans('name') }}"
              class="w-full h-full object-cover rounded-2xl"
              loading="lazy"
+             onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
              width="600" height="600">
     </div>
 

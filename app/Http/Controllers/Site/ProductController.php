@@ -156,7 +156,7 @@ class ProductController extends Controller
      */
     private function prepareShowData(Product $product): array
     {
-        $mainImage = $product->main_image_url ?? 'https://picsum.photos/seed/'.$product->slug.'/600/600';
+        $mainImage = $product->main_image_url ?? asset('assets/admin/images/image-not-found.png');
 
         // ۱) مشخصه‌های انتخابی گروه‌بندی‌شده: والد → [مقادیر]
         $specGroups = [];

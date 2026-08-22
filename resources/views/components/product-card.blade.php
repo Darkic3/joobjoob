@@ -49,6 +49,7 @@
                  alt="{{ $name }}"
                  width="400" height="400"
                  loading="lazy"
+                 onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform">
 
             {{-- نشان‌ها (فقط اگر رتبه‌بندی نباشد) --}}

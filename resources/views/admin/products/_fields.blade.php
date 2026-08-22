@@ -257,7 +257,8 @@
                 <div id="gallery-existing" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     @foreach($product->images as $image)
                         <div class="gallery-tile relative group rounded-xl overflow-hidden border-2 aspect-square shadow-sm bg-gray-100 dark:bg-gray-800 transition-all {{ $image->is_primary ? 'border-amber-400' : 'border-gray-200 dark:border-gray-700' }}" data-image-id="{{ $image->id }}">
-                            <img src="{{ $image->url }}" class="w-full h-full object-cover" alt="{{ __('admin.products.product_image') }}">
+                            <img src="{{ $image->url }}" class="w-full h-full object-cover" alt="{{ __('admin.products.product_image') }}"
+                                         onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'">
                             <span class="gallery-main-badge absolute top-2 left-2 bg-amber-400 text-amber-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm {{ $image->is_primary ? '' : 'hidden' }}">⭐ {{ __('admin.products.main') }}</span>
                             {{-- ستاره: انتخاب تصویر اصلی --}}
                             <button type="button" class="gallery-star absolute bottom-2 left-2 w-7 h-7 rounded-full bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm {{ $image->is_primary ? 'text-amber-500' : 'text-gray-500 hover:text-amber-500' }} flex items-center justify-center transition-all" title="{{ __('admin.products.set_main') }}">

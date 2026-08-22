@@ -51,7 +51,7 @@ class ProductCard extends Component
         public ?int $soldPercent = null,
     ) {
         $this->name = $product->trans('name');
-        $this->imageUrl = $product->main_image_url ?? 'https://picsum.photos/seed/fallback/300/300';
+        $this->imageUrl = $product->main_image_url ?? asset('assets/admin/images/image-not-found.png');
         $this->url = localizedRoute('products.show', ['product' => $product->slug]);
 
         $this->hasDiscount = $product->has_discount;
