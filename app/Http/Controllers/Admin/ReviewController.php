@@ -12,7 +12,7 @@ class ReviewController extends Controller
 {
     public function index(Request $request): View
     {
-        $reviews = Review::with('product', 'user')
+        $reviews = Review::with('product', 'user', 'parent')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = trim($request->search);
                 $query->where(function ($q) use ($search) {

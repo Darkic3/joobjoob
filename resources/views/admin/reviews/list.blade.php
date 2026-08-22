@@ -88,6 +88,12 @@
                                     </span>
                                     <div>
                                         <span class="font-medium text-gray-800 dark:text-gray-100 text-sm">{{ $review->display_name }}</span>
+                                        @if($review->parent)
+                                            <div class="text-[11px] text-blue-500 dark:text-blue-400 mt-0.5 flex items-center gap-1">
+                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                                {{ __('admin.reviews.reply_to') }}: {{ $review->parent->display_name }}
+                                            </div>
+                                        @endif
                                         @if($review->guest_phone)
                                             <div class="text-xs text-gray-400 dark:text-gray-500" dir="ltr">{{ $review->guest_phone }}</div>
                                         @endif
@@ -97,8 +103,9 @@
                             <td class="px-5 py-4">
                                 @if($review->product)
                                     <a href="{{ localizedRoute('products.show', ['product' => $review->product->slug]) }}" target="_blank"
-                                       class="text-sm text-primary-600 dark:text-primary-400 hover:underline line-clamp-1 max-w-[180px]">
-                                        {{ $review->product->trans('name') }}
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span class="line-clamp-1">{{ $review->product->trans('name') }}</span>
                                     </a>
                                 @else
                                     <span class="text-sm text-gray-400">—</span>
@@ -203,6 +210,12 @@
                             </span>
                             <div class="min-w-0">
                                 <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm truncate">{{ $review->display_name }}</p>
+                                @if($review->parent)
+                                    <p class="text-[11px] text-blue-500 dark:text-blue-400 mt-0.5 flex items-center gap-1">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        {{ __('admin.reviews.reply_to') }}: {{ $review->parent->display_name }}
+                                    </p>
+                                @endif
                                 @if($review->guest_phone)
                                     <p class="text-xs text-gray-400 dark:text-gray-500" dir="ltr">{{ $review->guest_phone }}</p>
                                 @endif
@@ -217,10 +230,8 @@
                     @if($review->product)
                         <div class="px-4 pb-2">
                             <a href="{{ localizedRoute('products.show', ['product' => $review->product->slug]) }}" target="_blank"
-                               class="inline-flex items-center gap-1.5 text-xs text-primary-600 dark:text-primary-400 hover:underline">
-                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                </svg>
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span class="line-clamp-1">{{ $review->product->trans('name') }}</span>
                             </a>
                         </div>

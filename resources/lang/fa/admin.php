@@ -914,6 +914,7 @@ return [
         'status_approved' => 'تأیید شده',
         'status_pending' => 'در انتظار تأیید',
         'status_rejected' => 'رد شده',
+        'reply_to' => 'پاسخ به',
         'all_ratings' => 'همه امتیازها',
         'empty' => 'هنوز نظری ثبت نشده است.',
         'detail' => 'جزئیات نظر',
