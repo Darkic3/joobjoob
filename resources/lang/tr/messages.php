@@ -293,8 +293,8 @@ return [
     ],
     // Paylaşım
     'share' => 'Paylaş',
-    'share_telegram' => 'Telegram'da paylaş',
-    'share_whatsapp' => 'WhatsApp'ta paylaş',
+    'share_telegram' => "Telegram'da paylaş",
+    'share_whatsapp' => "WhatsApp'ta paylaş",
     'share_all' => 'Paylaş',
     'share_native' => 'Tüm uygulamalarla paylaş',
     'share_bale' => "Bale'da paylaş",
