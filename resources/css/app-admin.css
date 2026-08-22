@@ -671,3 +671,87 @@
 .dark .swal2-confirm.fb-swal-danger {
     background: linear-gradient(135deg, #ef4444, #dc2626) !important;
 }
+
+/* ==========================================
+   7. Dark Mode Fixes — دکمه‌های اقدام و ... 
+   ========================================== */
+
+/* دکمه‌های اقدام در جدول‌ها */
+.dark table td a.text-gray-400,
+.dark table td button.text-gray-400 {
+    color: rgb(156 163 175 / 1) !important; /* gray-400 */
+}
+.dark table td a:hover.text-primary-600,
+.dark table td button:hover.text-red-600 {
+    color: rgb(255 255 255 / 1) !important;
+}
+.dark table td a:hover.bg-primary-50,
+.dark table td button:hover.bg-red-50 {
+    background-color: transparent !important;
+}
+.dark table td a:hover {
+    background-color: rgb(55 65 81 / 1) !important; /* gray-700 */
+}
+.dark table td button:hover.text-red-600 {
+    background-color: rgb(127 29 29 / 0.3) !important; /* red-900/30 */
+}
+
+/* ==========================================
+   8. Mobile Responsive — پنل ادمین
+   ========================================== */
+
+@media (max-width: 767px) {
+    /* فیلترها: هر فیلتر یک ردیف کامل */
+    .flex.flex-wrap.gap-3,
+    .flex.flex-col.sm\:flex-row.sm\:flex-wrap.gap-3 {
+        flex-direction: column !important;
+    }
+    .flex.flex-wrap.gap-3 > *,
+    .flex.flex-col.sm\:flex-row.sm\:flex-wrap.gap-3 > * {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: none !important;
+    }
+
+    /* جدول‌ها: کوچک‌تر و فشرده‌تر */
+    table th,
+    table td {
+        padding: 0.5rem 0.625rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* ستون شماره ردیف و تاریخ مخفی شوند */
+    table th:first-child,
+    table td:first-child,
+    table th:nth-child(7),
+    table td:nth-child(7) {
+        display: none !important;
+    }
+
+    /* دکمه‌های اقدام بزرگ‌تر */
+    table td:last-child a,
+    table td:last-child button {
+        padding: 0.625rem !important; /* 10px — بزرگ‌تر برای تپ */
+    }
+    table td:last-child svg {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+
+    /* سلکتور وضعیت تمام عرض */
+    .review-status-select {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* هدر صفحه */
+    h1.text-2xl {
+        font-size: 1.25rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* کارت‌های آمار */
+    .stat-card {
+        padding: 1rem !important;
+    }
+}

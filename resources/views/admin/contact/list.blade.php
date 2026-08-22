@@ -36,8 +36,8 @@
             </form>
         </div>
 
-        {{-- جدول پیام‌ها --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+        {{-- ═══ جدول پیام‌ها — دسکتاپ ═══ --}}
+        <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900/40">
@@ -140,5 +140,92 @@
                 </div>
             @endif
         </div>
+
+        {{-- ═══ کارت پیام‌ها — موبایل ═══ --}}
+        <div class="md:hidden space-y-3">
+            @forelse($contacts as $contact)
+                @php
+                    $cardBorder = ! $contact->is_read ? 'border-r-4 border-r-primary-400' : '';
+                @endphp
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm {{ $cardBorder }} overflow-hidden">
+                    {{-- هدر کارت --}}
+                    <div class="flex items-center justify-between p-4 pb-2">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-bold flex-shrink-0">
+                                {{ mb_substr($contact->name, 0, 1) }}
+                            </span>
+                            <div class="min-w-0">
+                                <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm truncate">{{ $contact->name }}</p>
+                                @if($contact->phone)
+                                    <p class="text-xs text-gray-400 dark:text-gray-500" dir="ltr">{{ $contact->phone }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @if(! $contact->is_read)
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-600 text-white flex-shrink-0">
+                                {{ __('admin.contact.unread') }}
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- ایمیل + دپارتمان --}}
+                    <div class="px-4 pb-2 flex flex-wrap items-center gap-2">
+                        <span class="text-xs text-gray-500 dark:text-gray-400" dir="ltr">{{ $contact->email }}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                            {{ $contact->department ? __('messages.pages.contact.departments.' . $contact->department, [], $contact->department) : __('admin.contact.no_department') }}
+                        </span>
+                    </div>
+
+                    {{-- پیام --}}
+                    <div class="px-4 pb-3">
+                        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">{{ $contact->message }}</p>
+                    </div>
+
+                    {{-- فوتر: تاریخ + اقدامات --}}
+                    <div class="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+                        <span class="text-[11px] text-gray-400 dark:text-gray-500">{{ show_date($contact->created_at, 'Y/m/d - H:i') }}</span>
+                        <div class="flex items-center gap-1">
+                            @if(auth()->user()->canAccess('admin.contact.show'))
+                                <a href="{{ route('admin.contact.show', $contact) }}"
+                                   class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-primary-600 rounded-lg transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/>
+                                    </svg>
+                                </a>
+                            @endif
+                            @if(auth()->user()->canAccess('admin.contact.destroy'))
+                                <form action="{{ route('admin.contact.destroy', $contact) }}" method="POST" class="delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-600 rounded-lg transition-all">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-700 mb-4">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.contact.empty') }}</p>
+                </div>
+            @endforelse
+        </div>
+
+        {{-- صفحه‌بندی موبایل --}}
+        @if($contacts->hasPages())
+            <div class="md:hidden bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 py-3">
+                {{ $contacts->links() }}
+            </div>
+        @endif
     </div>
 @endsection
