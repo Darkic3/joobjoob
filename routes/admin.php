@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PromoBannerController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
@@ -66,6 +67,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
         Route::post('promo-banners/reorder', [PromoBannerController::class, 'reorder'])->name('promo-banners.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');
+
+        // ⚠️ approval باید قبل از resource باشد تا با reviews/{review} تداخل نکند
+        Route::patch('reviews/approval', [ReviewController::class, 'updateApproval'])->name('reviews.approval');
+        Route::resource('reviews', ReviewController::class)->except('create', 'edit');
 
         Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
         Route::get('contact/{contact}', [ContactController::class, 'show'])->name('contact.show');

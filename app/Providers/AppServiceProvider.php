@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\CartService;
+use App\Services\RecentlyViewedService;
+use App\Services\WishlistService;
 use App\View\Composers\FooterComposer;
 use App\View\Composers\LocaleComposer;
 use App\View\Composers\SiteLayoutComposer;
@@ -16,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(RecentlyViewedService::class);
+        $this->app->singleton(WishlistService::class);
+        $this->app->singleton(CartService::class);
     }
 
     /**

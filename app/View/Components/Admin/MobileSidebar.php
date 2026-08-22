@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\Review;
 use Closure;
 use Illuminate\View\Component;
 use Illuminate\View\View;
@@ -20,6 +21,8 @@ class MobileSidebar extends Component
     public bool $showSettingsDivider;
 
     public string $productsTarget;
+
+    public int $pendingReviewsCount = 0;
 
     public function __construct()
     {
@@ -46,6 +49,11 @@ class MobileSidebar extends Component
         $this->productsTarget = ($this->can)('admin.products.index')
             ? 'admin.products.index'
             : ((($this->can)('admin.brands.index')) ? 'admin.brands.index' : 'admin.specifications.index');
+
+        // تعداد نظرات در انتظار تأیید
+        if (($this->can)('admin.reviews.index')) {
+            $this->pendingReviewsCount = Review::pending()->count();
+        }
     }
 
     public function render(): View

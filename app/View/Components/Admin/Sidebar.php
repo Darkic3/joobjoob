@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\Review;
 use Closure;
 use Illuminate\View\Component;
 use Illuminate\View\View;
@@ -22,6 +23,8 @@ class Sidebar extends Component
     public bool $showContentDivider;
 
     public bool $showSettingsDivider;
+
+    public int $pendingReviewsCount = 0;
 
     public function __construct()
     {
@@ -49,6 +52,11 @@ class Sidebar extends Component
             || ($this->can)('admin.roles.index')
             || ($this->can)('admin.users.index')
             || ($this->can)('admin.languages.index');
+
+        // تعداد نظرات در انتظار تأیید
+        if (($this->can)('admin.reviews.index')) {
+            $this->pendingReviewsCount = Review::pending()->count();
+        }
     }
 
     public function render(): View
