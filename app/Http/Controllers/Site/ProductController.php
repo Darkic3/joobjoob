@@ -243,24 +243,46 @@ class ProductController extends Controller
      */
     public function storeReview(Request $request, Product $product)
     {
-        $validated = $request->validate([
+        $isGuest = !auth()->check();
+
+        $rules = [
             'rating'  => 'required|integer|min:1|max:5',
             'comment' => 'required|string|min:3|max:1000',
-        ], [
+        ];
+
+        $messages = [
             'rating.required'  => 'لطفاً امتیاز را انتخاب کنید.',
             'rating.min'       => 'امتیاز باید حداقل ۱ باشد.',
             'rating.max'       => 'امتیاز حداکثر ۵ است.',
             'comment.required' => 'لطفاً متن نظر را بنویسید.',
             'comment.min'      => 'نظر باید حداقل ۳ حرف باشد.',
             'comment.max'      => 'نظر نمی‌تواند بیش از ۱۰۰۰ حرف باشد.',
-        ]);
+        ];
 
-        $product->reviews()->create([
+        if ($isGuest) {
+            $rules['guest_name']  = 'required|string|min:2|max:100';
+            $rules['guest_phone'] = 'required|string|min:10|max:20|regex:/^0[0-9]{9,}$/';
+            $messages['guest_name.required']  = 'لطفاً نام خود را وارد کنید.';
+            $messages['guest_name.min']       = 'نام باید حداقل ۲ حرف باشد.';
+            $messages['guest_phone.required'] = 'لطفاً شماره تلفن خود را وارد کنید.';
+            $messages['guest_phone.regex']    = 'شماره تلفن معتبر نیست (مثال: 09123456789).';
+        }
+
+        $validated = $request->validate($rules, $messages);
+
+        $data = [
             'user_id'     => auth()->id(),
             'rating'      => $validated['rating'],
             'comment'     => $validated['comment'],
             'is_approved' => false,
-        ]);
+        ];
+
+        if ($isGuest) {
+            $data['guest_name']  = $validated['guest_name'];
+            $data['guest_phone'] = $validated['guest_phone'];
+        }
+
+        $product->reviews()->create($data);
 
         return redirect()
             ->route('products.show', $product->slug)

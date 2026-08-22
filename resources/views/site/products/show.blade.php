@@ -286,91 +286,105 @@
         {{-- نظرات --}}
         <div class="detail-tab-content hidden" id="tab-reviews">
 
-            {{-- ─── فرم ثبت نظر ─── --}}
-            @auth
-                <div class="review-form-glass mb-8">
-                    <div class="review-form-glass__inner">
-                        {{-- هدر فرم --}}
-                        <div class="review-form-header">
-                            <div class="review-form-header__icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="review-form-header__title">{{ __('messages.review_write') }}</h3>
-                                <p class="review-form-header__sub">{{ __('messages.review_your_review') }}</p>
-                            </div>
+            {{-- ─── فرم ثبت نظر (همه کاربران) ─── --}}
+            <div class="review-form-glass mb-8">
+                <div class="review-form-glass__inner">
+                    {{-- هدر فرم --}}
+                    <div class="review-form-header">
+                        <div class="review-form-header__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </div>
+                        <div>
+                            <h3 class="review-form-header__title">{{ __('messages.review_write') }}</h3>
+                            <p class="review-form-header__sub">{{ __('messages.review_your_review') }}</p>
+                        </div>
+                    </div>
 
-                        <form action="{{ route('products.reviews.store', $product->slug) }}" method="POST" class="review-form">
-                            @csrf
+                    <form action="{{ route('products.reviews.store', $product->slug) }}" method="POST" class="review-form">
+                        @csrf
 
-                            {{-- امتیاز ستاره‌ای --}}
-                            <div class="review-form__rating">
-                                <div class="star-rating" id="star-rating" role="radiogroup" aria-label="امتیاز">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button"
-                                                class="star-rating__star"
-                                                data-value="{{ $i }}"
-                                                onclick="setRating({{ $i }})"
-                                                onmouseenter="previewRating({{ $i }})"
-                                                onmouseleave="resetRatingPreview()"
-                                                aria-label="{{ $i }} از ۵">
-                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        </button>
-                                    @endfor
-                                    <input type="hidden" name="rating" id="rating-input" value="" required>
+                        {{-- ─── فیلدهای مهمان (فقط بدون لاگین) ─── --}}
+                        @guest
+                            <div class="review-guest-fields">
+                                <div class="review-guest-fields__row">
+                                    <div class="review-input-group">
+                                        <label class="review-input-group__label" for="guest-name">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            {{ __('messages.review_guest_name') }}
+                                        </label>
+                                        <input type="text" id="guest-name" name="guest_name" maxlength="100"
+                                               placeholder="{{ __('messages.review_guest_name_ph') }}"
+                                               class="review-input-group__input"
+                                               value="{{ old('guest_name') }}" required>
+                                        @error('guest_name')<p class="review-form__error">{{ $message }}</p>@enderror
+                                    </div>
+                                    <div class="review-input-group">
+                                        <label class="review-input-group__label" for="guest-phone">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="review-input-group__icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                            {{ __('messages.review_guest_phone') }}
+                                        </label>
+                                        <input type="tel" id="guest-phone" name="guest_phone" maxlength="20"
+                                               placeholder="{{ __('messages.review_guest_phone_ph') }}"
+                                               class="review-input-group__input"
+                                               dir="ltr" inputmode="numeric"
+                                               value="{{ old('guest_phone') }}" required>
+                                        @error('guest_phone')<p class="review-form__error">{{ $message }}</p>@enderror
+                                    </div>
                                 </div>
-                                <span class="star-rating__label" id="rating-label"></span>
                             </div>
-                            @error('rating')
+                        @endguest
+
+                        {{-- امتیاز ستاره‌ای --}}
+                        <div class="review-form__rating">
+                            <div class="star-rating" id="star-rating" role="radiogroup" aria-label="امتیاز">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <button type="button"
+                                            class="star-rating__star"
+                                            data-value="{{ $i }}"
+                                            onclick="setRating({{ $i }})"
+                                            onmouseenter="previewRating({{ $i }})"
+                                            onmouseleave="resetRatingPreview()"
+                                            aria-label="{{ $i }} از ۵">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    </button>
+                                @endfor
+                                <input type="hidden" name="rating" id="rating-input" value="" required>
+                            </div>
+                            <span class="star-rating__label" id="rating-label"></span>
+                        </div>
+                        @error('rating')
+                            <p class="review-form__error">{{ $message }}</p>
+                        @enderror
+
+                        {{-- متن نظر --}}
+                        <div class="review-form__body">
+                            <textarea
+                                id="review-comment"
+                                name="comment"
+                                rows="4"
+                                maxlength="1000"
+                                placeholder="{{ __('messages.review_placeholder') }}"
+                                class="review-form__textarea"
+                                required
+                            >{{ old('comment') }}</textarea>
+                            <div class="review-form__footer">
+                                <span class="review-form__char-count"><span id="char-count">0</span> / 1000</span>
+                            </div>
+                            @error('comment')
                                 <p class="review-form__error">{{ $message }}</p>
                             @enderror
+                        </div>
 
-                            {{-- متن نظر --}}
-                            <div class="review-form__body">
-                                <textarea
-                                    id="review-comment"
-                                    name="comment"
-                                    rows="4"
-                                    maxlength="1000"
-                                    placeholder="{{ __('messages.review_placeholder') }}"
-                                    class="review-form__textarea"
-                                    required
-                                >{{ old('comment') }}</textarea>
-                                <div class="review-form__footer">
-                                    <span class="review-form__char-count"><span id="char-count">0</span> / 1000</span>
-                                </div>
-                                @error('comment')
-                                    <p class="review-form__error">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            {{-- دکمه ارسال --}}
-                            <button type="submit" class="review-submit-btn" id="review-submit-btn" disabled>
-                                <span class="review-submit-btn__chip">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                                </span>
-                                <span>{{ __('messages.review_submit') }}</span>
-                            </button>
-                        </form>
-                    </div>
+                        {{-- دکمه ارسال --}}
+                        <button type="submit" class="review-submit-btn" id="review-submit-btn" disabled>
+                            <span class="review-submit-btn__chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </span>
+                            <span>{{ __('messages.review_submit') }}</span>
+                        </button>
+                    </form>
                 </div>
-            @else
-                <div class="review-login-glass mb-8">
-                    <div class="review-login-glass__glow"></div>
-                    <div class="review-login-glass__icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <p class="review-login-glass__title">{{ __('messages.review_login_hint') }}</p>
-                    <a href="{{ route('login') }}" class="review-login-glass__btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                        {{ __('messages.login') }}
-                    </a>
-                </div>
-            @endauth
+            </div>
 
             {{-- ─── خلاصه امتیازات ─── --}}
             @if($product->reviews->count() > 0)
@@ -910,6 +924,30 @@
 
         .review-form { display: flex; flex-direction: column; gap: 1.25rem; }
         .review-form__error { color: var(--danger, #e53e3e); font-size: 0.75rem; margin-top: 0.25rem; }
+
+        /* ── فیلدهای مهمان ── */
+        .review-guest-fields { padding-bottom: 0.5rem; }
+        .review-guest-fields__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+        @media (max-width: 540px) { .review-guest-fields__row { grid-template-columns: 1fr; } }
+        .review-input-group__label {
+            display: flex; align-items: center; gap: 0.35rem;
+            font-size: 0.78rem; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .review-input-group__icon { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+        .review-input-group__input {
+            width: 100%; padding: 0.6rem 0.85rem;
+            border-radius: 0.7rem; border: 2px solid transparent;
+            background: var(--bg); color: var(--text-primary);
+            font-size: 0.85rem;
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .review-input-group__input:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+        }
+        .review-input-group__input::placeholder { color: var(--text-secondary); opacity: 0.5; }
 
         /* ── ستاره امتیاز ── */
         .review-form__rating {

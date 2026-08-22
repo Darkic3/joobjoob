@@ -14,6 +14,8 @@ class Review extends Model
     protected $fillable = [
         'product_id',
         'user_id',
+        'guest_name',
+        'guest_phone',
         'rating',
         'comment',
         'is_approved',
@@ -37,5 +39,25 @@ class Review extends Model
     public function scopeApproved($query)
     {
         return $query->where('is_approved', true);
+    }
+
+    /**
+     * نام نمایشی نویسنده نظر — کاربر ثبت‌نام‌شده یا مهمان.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->user) {
+            return $this->user->name;
+        }
+
+        return $this->guest_name ?: __('messages.user');
+    }
+
+    /**
+     * حرف اول نام برای آواتار.
+     */
+    public function getAvatarLetterAttribute(): string
+    {
+        return mb_substr($this->display_name, 0, 1);
     }
 }
