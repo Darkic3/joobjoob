@@ -724,7 +724,9 @@
                 wrap.addEventListener('click', function(e) {
                     // اگه ذره‌بین فعال بود، کلیک نادیده گرفته نشه
                     if (e.target.closest('.zoom-lens')) return;
-                    openLightbox(0);
+                    var curSrc = document.getElementById('main-image').src;
+                    var idx = LIGHTBOX_IMAGES.findIndex(function(u) { return curSrc.includes(u) || u.includes(curSrc); });
+                    openLightbox(idx >= 0 ? idx : 0);
                 });
             }
 
