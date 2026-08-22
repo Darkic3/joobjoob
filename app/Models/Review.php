@@ -23,8 +23,13 @@ class Review extends Model
 
     protected $casts = [
         'rating' => 'integer',
-        'is_approved' => 'boolean',
+        'is_approved' => 'integer',
     ];
+
+    // مقادیر is_approved
+    const STATUS_PENDING  = 0;
+    const STATUS_APPROVED = 1;
+    const STATUS_REJECTED = 2;
 
     public function product(): BelongsTo
     {
@@ -38,7 +43,21 @@ class Review extends Model
 
     public function scopeApproved($query)
     {
-        return $query->where('is_approved', true);
+        return $query->where('is_approved', self::STATUS_APPROVED);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('is_approved', self::STATUS_PENDING);
+    }
+
+    public function getIsApprovedLabelAttribute(): string
+    {
+        return match ($this->is_approved) {
+            self::STATUS_APPROVED => __('admin.reviews.status_approved'),
+            self::STATUS_REJECTED => __('admin.reviews.status_rejected'),
+            default               => __('admin.reviews.status_pending'),
+        };
     }
 
     /**
