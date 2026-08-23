@@ -21,11 +21,13 @@ class Review extends Model
         'rating',
         'comment',
         'is_approved',
+        'is_featured',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'integer',
+        'is_featured' => 'boolean',
     ];
 
     // مقادیر is_approved
@@ -64,6 +66,11 @@ class Review extends Model
     public function scopeApproved($query)
     {
         return $query->where('is_approved', self::STATUS_APPROVED);
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 
     public function scopePending($query)

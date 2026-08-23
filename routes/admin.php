@@ -68,8 +68,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('promo-banners/reorder', [PromoBannerController::class, 'reorder'])->name('promo-banners.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');
 
-        // ⚠️ approval باید قبل از resource باشد تا با reviews/{review} تداخل نکند
+        // ⚠️ approval و featured باید قبل از resource باشد تا با reviews/{review} تداخل نکند
         Route::patch('reviews/approval', [ReviewController::class, 'updateApproval'])->name('reviews.approval');
+        Route::patch('reviews/featured', [ReviewController::class, 'toggleFeatured'])->name('reviews.featured');
         Route::resource('reviews', ReviewController::class)->except('create', 'edit');
 
         Route::get('contact', [ContactController::class, 'index'])->name('contact.index');

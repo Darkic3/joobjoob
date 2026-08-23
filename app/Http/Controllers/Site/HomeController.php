@@ -66,8 +66,8 @@ class HomeController extends Controller
         // با تبدیل این بخش‌ها به اسکرول افقی، تعداد بیشتری لازم است تا ریل قابل اسکرول باشد
         $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(8)->get();
         $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
-        // نظرات مشتریان برای چرخش (rotator): بچ‌های ۳تایی = ۱ کارت برجسته + ۲ ثانویه
-        $reviews = Review::with(['user', 'product'])->approved()->latest()->take(12)->get();
+        // نظرات مشتریان برای چرخش (rotator): فقط نظراتی که ادمین نمایش در صفحه اول را فعال کرده
+        $reviews = Review::with(['user', 'product'])->approved()->featured()->latest()->take(12)->get();
         $reviewBatches = $reviews->chunk(3);
         // میانگین امتیاز همهٔ نظرات نمایش‌داده‌شده — محاسبه در کنترلر، نه در ویو
         $reviewsAvg = round($reviews->avg('rating') ?? 0, 1);

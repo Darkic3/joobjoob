@@ -135,6 +135,14 @@
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ show_date($review->created_at, 'Y/m/d - H:i') }}</td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-1.5">
+                                    <button type="button"
+                                            onclick="toggleFeatured({{ $review->id }}, this)"
+                                            class="p-2 rounded-lg transition-all {{ $review->is_featured ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30' : 'text-gray-400 dark:text-gray-500 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20' }}"
+                                            title="{{ __('admin.reviews.show_home') }}">
+                                        <svg class="w-4 h-4" fill="{{ $review->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    </button>
                                     @if(auth()->user()->canAccess('admin.reviews.index'))
                                         <a href="{{ route('admin.reviews.show', $review) }}"
                                            class="p-2 text-gray-400 dark:text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
@@ -269,6 +277,14 @@
 
                         {{-- دکمه‌های اقدام --}}
                         <div class="flex items-center gap-1">
+                            <button type="button"
+                                    onclick="toggleFeatured({{ $review->id }}, this)"
+                                    class="p-2.5 rounded-lg transition-all {{ $review->is_featured ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-gray-400 dark:text-gray-500 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20' }}"
+                                    title="{{ __('admin.reviews.show_home') }}">
+                                <svg class="w-5 h-5" fill="{{ $review->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                            </button>
                             @if(auth()->user()->canAccess('admin.reviews.index'))
                                 <a href="{{ route('admin.reviews.show', $review) }}"                                    class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
                                    title="{{ __('admin.common.show') }}">
@@ -340,6 +356,42 @@
 
     @push('scripts')
         <script>
+            function toggleFeatured(reviewId, button) {
+                button.disabled = true;
+
+                fetch('{{ route("admin.reviews.featured") }}', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ id: reviewId }),
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var svg = button.querySelector('svg');
+                        if (data.is_featured) {
+                            button.classList.remove('text-gray-400', 'dark:text-gray-500', 'hover:text-amber-500');
+                            button.classList.add('text-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
+                            svg.setAttribute('fill', 'currentColor');
+                        } else {
+                            button.classList.remove('text-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
+                            button.classList.add('text-gray-400', 'dark:text-gray-500', 'hover:text-amber-500');
+                            svg.setAttribute('fill', 'none');
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    alert('{{ __("admin.common.request_error") }}');
+                })
+                .finally(function() {
+                    button.disabled = false;
+                });
+            }
+
             function toggleApproval(element) {
                 var reviewId = element.getAttribute('data-id');
                 var isApproved = parseInt(element.value, 10);

@@ -80,4 +80,25 @@ class ReviewController extends Controller
         return redirect()->route('admin.reviews.index')
             ->with('success', __('admin.reviews.deleted'));
     }
+
+    /**
+     * تغییر وضعیت نمایش در صفحه اول (AJAX)
+     */
+    public function toggleFeatured(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:reviews,id',
+        ]);
+
+        $review = Review::findOrFail($request->id);
+        $review->update(['is_featured' => ! $review->is_featured]);
+
+        return response()->json([
+            'success' => true,
+            'is_featured' => $review->is_featured,
+            'message' => $review->is_featured
+                ? __('admin.reviews.featured_on')
+                : __('admin.reviews.featured_off'),
+        ]);
+    }
 }

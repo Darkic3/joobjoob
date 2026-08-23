@@ -43,6 +43,7 @@ class HomeReviewRotatorTest extends TestCase
                 'rating' => 5,
                 'comment' => "نظر نمونه $i",
                 'is_approved' => true,
+                'is_featured' => true,
                 'created_at' => now()->subMinutes($count - $i),
             ]);
         }

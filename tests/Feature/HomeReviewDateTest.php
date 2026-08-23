@@ -43,6 +43,7 @@ class HomeReviewDateTest extends TestCase
             'rating' => 5,
             'comment' => 'نظر آزمایشی',
             'is_approved' => true,
+            'is_featured' => true,
         ]);
         $review->created_at = $createdAt;
         $review->save();
