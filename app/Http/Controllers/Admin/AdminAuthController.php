@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class AdminAuthController extends Controller
 {
@@ -37,8 +38,6 @@ class AdminAuthController extends Controller
                 return back()->withErrors(['email' => __('admin.login.restricted')])->onlyInput('email');
             }
 
-            $request->session()->regenerate();
-
             return redirect()->intended(route('admin.dashboard.index'));
         }
 
@@ -52,6 +51,23 @@ class AdminAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // پاک‌سازی کوکی «مرا به خاطر بسپار» — بدون این خط، کوکی باقی می‌ماند
+        // و کاربر در درخواست بعدی دوباره به‌صورت خودکار وارد می‌شود.
+        $this->clearRecallerCookie();
+
         return redirect()->route('admin.login');
+    }
+
+    /**
+     * حذف کوکی recaller (remember-me) مرتبط با guard وب.
+     */
+    private function clearRecallerCookie(): void
+    {
+        $guard = Auth::guard();
+        $name  = 'remember_web_'.$guard->getName().'_'.md5($guard::class);
+
+        if (Cookie::hasQueued($name)) {
+            Cookie::queue(Cookie::forget($name));
+        }
     }
 }

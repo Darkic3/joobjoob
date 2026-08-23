@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class SiteAuthController extends Controller
 {
@@ -26,8 +27,6 @@ class SiteAuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
-            $request->session()->regenerate();
-
             return redirect()->intended(localizedRoute('dashboard'));
         }
 
@@ -41,6 +40,18 @@ class SiteAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        $this->clearRecallerCookie();
+
         return redirect()->route('home');
+    }
+
+    private function clearRecallerCookie(): void
+    {
+        $guard = Auth::guard();
+        $name  = 'remember_web_'.$guard->getName().'_'.md5($guard::class);
+
+        if (Cookie::hasQueued($name)) {
+            Cookie::queue(Cookie::forget($name));
+        }
     }
 }
