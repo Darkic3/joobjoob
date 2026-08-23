@@ -13,6 +13,7 @@
 //   کامپایلر Laravel الزامی می‌شود — پس نسخه‌ی پیشونددار با {locale} اجباری ثبت می‌شود.
 
 use App\Http\Controllers\Site\BlogController;
+use App\Http\Controllers\Site\CheckoutController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\DashboardController;
 use App\Http\Controllers\Site\HomeController;
@@ -74,6 +75,13 @@ $siteRoutes = function () {
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
+    });
+
+    // تسویه حساب
+    Route::prefix('checkout')->name('checkout.')->group(function () {
+        Route::get('/', [CheckoutController::class, 'index'])->name('index');
+        Route::post('/', [CheckoutController::class, 'store'])->name('store');
+        Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
     });
 
     // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)

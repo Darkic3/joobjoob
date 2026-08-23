@@ -64,6 +64,8 @@ return [
     'select_size' => 'انتخاب سایز',
     'in_stock' => 'موجود',
     'out_of_stock' => 'ناموجود',
+    'low_stock' => 'موجودی کم',
+    'left' => 'باقی‌مانده',
     'reviews' => 'نظرات',
     'sort_by' => 'مرتب‌سازی',
     'filter' => 'فیلتر',

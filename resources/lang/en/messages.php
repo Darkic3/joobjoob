@@ -70,6 +70,8 @@ return [
     'select_size' => 'Select Size',
     'in_stock' => 'In Stock',
     'out_of_stock' => 'Out of Stock',
+    'low_stock' => 'Low Stock',
+    'left' => 'left',
     'reviews' => 'Reviews',
     'sort_by' => 'Sort By',
     'filter' => 'Filter',

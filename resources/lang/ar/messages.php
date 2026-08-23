@@ -70,6 +70,8 @@ return [
     'select_size' => 'اختر المقاس',
     'in_stock' => 'متوفر',
     'out_of_stock' => 'غير متوفر',
+    'low_stock' => 'مخزون منخفض',
+    'left' => 'متبقي',
     'reviews' => 'التقييمات',
     'sort_by' => 'ترتيب حسب',
     'filter' => 'تصفية',

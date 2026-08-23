@@ -47,7 +47,12 @@ class CartController extends Controller
     public function update(Request $request, string $rowId)
     {
         $request->validate(['qty' => 'required|integer|min:1']);
-        $this->cart->update($rowId, $request->qty);
+
+        $item = $this->cart->content()->get($rowId);
+        $maxQty = $item['stock'] ?? PHP_INT_MAX;
+        $qty = min((int) $request->qty, $maxQty);
+
+        $this->cart->update($rowId, $qty);
 
         return back();
     }

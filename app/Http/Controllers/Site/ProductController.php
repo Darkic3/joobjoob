@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Review;
 use App\Services\RecentlyViewedService;
+use App\Services\TrustBadgeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -15,6 +16,7 @@ class ProductController extends Controller
 {
     public function __construct(
         private readonly RecentlyViewedService $recentlyViewed,
+        private readonly TrustBadgeService $trustBadgeService,
     ) {}
 
     public function index(Request $request)
@@ -157,7 +159,20 @@ class ProductController extends Controller
         // داده‌های نمایشی صفحهٔ محصول (مشخصات/واریانت‌ها/تصویر اصلی) — از ویو خارج شده
         $viewData = $this->prepareShowData($product);
 
-        return view('site.products.show', array_merge(compact('product', 'related', 'complement', 'reviewTree'), $viewData));
+        // نشان‌های اعتماد فعال برای نمایش نزدیک دکمه خرید
+        $trustBadges = $this->trustBadgeService->getActiveForSite(4);
+
+        // تایمر شمارش معکوس تخفیف
+        $dealEndsAt = null;
+        if ($product->timer_active && $product->end_timer && $product->end_timer->isFuture()) {
+            $dealEndsAt = $product->end_timer;
+        } elseif ($product->deal_ends_at && $product->deal_ends_at->isFuture()) {
+            $dealEndsAt = $product->deal_ends_at;
+        }
+
+        return view('site.products.show', array_merge(compact(
+            'product', 'related', 'complement', 'reviewTree', 'trustBadges', 'dealEndsAt'
+        ), $viewData));
     }
 
     /**

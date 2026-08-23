@@ -58,6 +58,15 @@
                                     <span class="mono font-bold" dir="ltr">{{ number_format($item['price']) }}</span>
                                     <span class="text-[10px]"> {{ __('messages.toman') }}</span>
                                 </p>
+                                @if($item['stock'] <= 0)
+                                    <p class="text-xs mt-1 font-bold" style="color: var(--danger);">
+                                        {{ __('messages.out_of_stock') }}
+                                    </p>
+                                @elseif($item['stock'] <= 3)
+                                    <p class="text-xs mt-1 font-bold" style="color: var(--danger);">
+                                        {{ __('messages.low_stock') }} ({{ $item['stock'] }} {{ __('messages.left') }})
+                                    </p>
+                                @endif
 
                                 <div class="flex items-center gap-3 mt-3 flex-wrap">
                                     {{-- تغییر تعداد --}}
@@ -65,14 +74,26 @@
                                           method="POST" class="flex items-center gap-2">
                                         @csrf
                                         @method('PATCH')
-                                        <div class="flex items-center neu-flat-sm rounded-full overflow-hidden">
+                                        <div class="flex items-center gap-0.5 neu-flat-sm rounded-full p-1">
+                                            <button type="button"
+                                                    onclick="var f=this.closest('form');var inp=f.querySelector('input[name=qty]');if(parseInt(inp.value)>1){inp.value=parseInt(inp.value)-1;f.submit();}"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all duration-200"
+                                                    style="background: var(--accent); color: var(--accent-contrast);"
+                                                    aria-label="{{ __('messages.quantity') }}">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            </button>
                                             <input type="number" name="qty" value="{{ $item['qty'] }}" min="1"
-                                                   class="w-16 bg-transparent text-center text-sm py-1.5 outline-none"
-                                                   aria-label="{{ __('messages.quantity') }}">
+                                                   max="{{ $item['stock'] }}"
+                                                   class="w-12 bg-transparent text-center text-sm font-bold py-1.5 outline-none mono"
+                                                   aria-label="{{ __('messages.quantity') }}" readonly>
+                                            <button type="button"
+                                                    onclick="var f=this.closest('form');var inp=f.querySelector('input[name=qty]');if(parseInt(inp.value)<{{ $item['stock'] }}){inp.value=parseInt(inp.value)+1;f.submit();}"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all duration-200"
+                                                    style="background: var(--accent); color: var(--accent-contrast);"
+                                                    aria-label="{{ __('messages.quantity') }}">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            </button>
                                         </div>
-                                        <button type="submit" class="neu-btn px-3 py-1.5 text-xs font-bold rounded-full">
-                                            {{ __('messages.update_cart') }}
-                                        </button>
                                     </form>
 
                                     {{-- حذف --}}
@@ -129,13 +150,18 @@
                             </button>
                         </form>
 
-                        <div class="border-t pt-4 flex items-center justify-between"
+                        <div class="border-t pt-4 flex items-center justify-between mb-5"
                              style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                             <span class="font-bold">{{ __('messages.total') }}</span>
                             <span class="mono font-black text-lg" style="color: var(--accent);" dir="ltr">
                                 {{ number_format($cart->total()) }}
                             </span>
                         </div>
+
+                        <a href="{{ localizedRoute('checkout.index') }}"
+                           class="neu-btn neu-btn-primary w-full py-3 text-sm font-bold rounded-full text-center block">
+                            {{ __('messages.proceed_to_checkout') }}
+                        </a>
                     </div>
                 </div>
             </div>

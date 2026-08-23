@@ -70,6 +70,8 @@ return [
     'select_size' => 'Beden Seç',
     'in_stock' => 'Stokta Var',
     'out_of_stock' => 'Stokta Yok',
+    'low_stock' => 'Az Stok',
+    'left' => 'kalan',
     'reviews' => 'Yorumlar',
     'sort_by' => 'Sırala',
     'filter' => 'Filtrele',
