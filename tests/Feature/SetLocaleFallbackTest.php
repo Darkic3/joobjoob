@@ -80,6 +80,7 @@ class SetLocaleFallbackTest extends TestCase
         // سازگاری با عقب: بوکمارک قدیمی ?lang= → 301 به نسخه‌ی پیشونددار (SEO)
         $this->get('/?lang=en')->assertRedirect('/en');
         $this->get('/products?lang=tr')->assertRedirect('/tr/products');
+        $this->actingAs(User::factory()->create());
         $this->get('/cart?lang=ar')->assertRedirect('/ar/cart');
 
         // نکته: در صفحه‌های دارای مدل-بایندینگ (products/{slug})، اگر رکورد وجود

@@ -68,8 +68,8 @@ $siteRoutes = function () {
         ->middleware('throttle:5,1')
         ->name('site.contact.send');
 
-    // سبد خرید
-    Route::prefix('cart')->name('cart.')->group(function () {
+    // سبد خرید (نیازمند ورود)
+    Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
         Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
@@ -77,8 +77,8 @@ $siteRoutes = function () {
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
     });
 
-    // تسویه حساب
-    Route::prefix('checkout')->name('checkout.')->group(function () {
+    // تسویه حساب (نیازمند ورود)
+    Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::post('/', [CheckoutController::class, 'store'])->name('store');
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');

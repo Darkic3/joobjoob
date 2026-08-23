@@ -111,27 +111,27 @@ class OtpService
             $response = $this->sms->sendLookup($template, ['token' => $code, 'token2' => $siteName], $mobile);
 
             if ($response instanceof RedirectResponse) {
-                return $this->result(false, __('messages.otp_sms_not_configured'), $code);
+                return $this->result(false, __('messages.otp_sms_not_configured'));
             }
 
             if ($response === false) {
-                return $this->result(false, __('messages.otp_sms_failed'), $code);
+                return $this->result(false, __('messages.otp_sms_failed'));
             }
 
             $decoded = json_decode((string) $response, true);
 
             if (($decoded['return']['status'] ?? null) === 200) {
-                return $this->result(true, __('messages.otp_code_sent'), $code);
+                return $this->result(true, __('messages.otp_code_sent'));
             }
 
             $apiMessage = $decoded['return']['message'] ?? 'API error';
             Log::error("Kavenegar OTP failed for {$mobile}: {$apiMessage}");
 
-            return $this->result(false, __('messages.otp_sms_failed'), $code);
+            return $this->result(false, __('messages.otp_sms_failed'));
         } catch (\Throwable $e) {
             Log::error("Kavenegar OTP exception for {$mobile}: ".$e->getMessage());
 
-            return $this->result(false, __('messages.otp_sms_failed'), $code);
+            return $this->result(false, __('messages.otp_sms_failed'));
         }
     }
 
@@ -191,18 +191,10 @@ class OtpService
     }
 
     /**
-     * کد فقط در محیط debug برگردانده می‌شود تا بدون ارسال واقعی هم تست شود.
-     *
-     * @return array{success: bool, message: string, code?: string}
+     * @return array{success: bool, message: string}
      */
-    private function result(bool $success, string $message, string $code): array
+    private function result(bool $success, string $message): array
     {
-        $result = ['success' => $success, 'message' => $message];
-
-        if (config('app.debug')) {
-            $result['code'] = $code;
-        }
-
-        return $result;
+        return ['success' => $success, 'message' => $message];
     }
 }

@@ -79,10 +79,6 @@ class OtpController extends Controller
         $request->session()->put('otp_mobile', $normalizedMobile);
         $request->session()->forget('otp_new_user');
 
-        if (isset($result['code'])) {
-            $request->session()->flash('otp_dev_code', $result['code']);
-        }
-
         if (! $result['success']) {
             return redirect()->route('login.verify')->with('error', $result['message']);
         }
@@ -153,10 +149,6 @@ class OtpController extends Controller
 
         if (! $result['success']) {
             return back()->withErrors(['code' => $result['message']]);
-        }
-
-        if (isset($result['code'])) {
-            $request->session()->flash('otp_dev_code', $result['code']);
         }
 
         return back()->with('success', __('messages.otp_resent'));

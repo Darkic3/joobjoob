@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\User;
 use App\Services\CartService;
 use Database\Seeders\LanguageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,6 +18,11 @@ class CartPageTest extends TestCase
     {
         parent::setUp();
         $this->seed(LanguageSeeder::class);
+    }
+
+    private function loginAsUser(): void
+    {
+        $this->actingAs(User::factory()->create());
     }
 
     private function makeProduct(string $slug = 'test-product', int $price = 150000): Product
@@ -62,6 +68,7 @@ class CartPageTest extends TestCase
 
     public function test_mobile_bar_cart_badge_shows_real_session_count(): void
     {
+        $this->loginAsUser();
         $product = $this->makeProduct();
         $this->post(route('cart.add', $product->id));
 
@@ -77,6 +84,7 @@ class CartPageTest extends TestCase
 
     public function test_empty_cart_page_renders_with_empty_state(): void
     {
+        $this->loginAsUser();
         $this->get('/cart')
             ->assertOk()
             ->assertSee(__('messages.cart_empty'))
@@ -85,6 +93,7 @@ class CartPageTest extends TestCase
 
     public function test_cart_page_shows_added_items_and_totals(): void
     {
+        $this->loginAsUser();
         $product = $this->makeProduct();
 
         $this->post(route('cart.add', $product->id));
@@ -98,6 +107,7 @@ class CartPageTest extends TestCase
 
     public function test_cart_item_can_be_removed(): void
     {
+        $this->loginAsUser();
         $product = $this->makeProduct();
         $this->post(route('cart.add', $product->id));
 

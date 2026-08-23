@@ -167,7 +167,6 @@ return [
     'otp_sms_failed' => 'Sending the SMS failed. Please try again shortly',
     'otp_sms_not_configured' => 'The SMS service is not configured yet. Please contact support',
     'otp_session_expired' => 'Your session expired. Please enter your number again',
-    'otp_dev_code_hint' => 'Test code (development): :code',
     'footer_desc' => 'Online store with the best quality and prices',
     'footer_brand_tag' => 'Online store with the best quality and prices',
     'newsletter_subtitle' => 'Be the first to hear about special offers and new arrivals.',

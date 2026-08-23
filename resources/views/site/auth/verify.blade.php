@@ -33,14 +33,6 @@
                 </div>
             @endif
 
-            {{-- کد تست در محیط توسعه --}}
-            @if (session('otp_dev_code'))
-                <div class="mt-3 flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-semibold"
-                     style="background: color-mix(in srgb, var(--gold) 14%, transparent); color: var(--gold);">
-                    <span>{{ __('messages.otp_dev_code_hint', ['code' => session('otp_dev_code')]) }}</span>
-                </div>
-            @endif
-
             {{-- پیام خطا (مثلاً ارسال پیامک ناموفق) --}}
             @if (session('error'))
                 <div class="mt-5 flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-semibold"

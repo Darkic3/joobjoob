@@ -219,7 +219,6 @@ return [
     'otp_sms_failed' => 'SMS gönderilemedi. Lütfen biraz sonra tekrar deneyin',
     'otp_sms_not_configured' => 'SMS hizmeti henüz yapılandırılmadı. Lütfen destek ile iletişime geçin',
     'otp_session_expired' => 'Oturumunuz sona erdi. Lütfen numaranızı yeniden girin',
-    'otp_dev_code_hint' => 'Test kodu (geliştirme): :code',
 
     // Statik sayfalar
     'pages' => [
