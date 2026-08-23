@@ -10,20 +10,27 @@ use Illuminate\Support\Facades\Cookie;
 
 class SiteAuthController extends Controller
 {
-    public function showLogin()
+    /**
+     * صفحه ورود/ثبت‌نام — فرم شماره موبایل (OTP).
+     * کاربر شماره را وارد می‌کند:
+     *   - اگر وجود داشته باشد → کد OTP ارسال می‌شود
+     *   - اگر وجود نداشته باشد → فیلد نام ظاهر شده و کاربر ثبت‌نام می‌شود
+     */
+    public function showLogin(Request $request)
     {
         if (auth()->check()) {
             return redirect()->route('dashboard');
         }
 
-        return view('site.auth.login');
-    }
+        if ($request->boolean('change')) {
+            $request->session()->forget('otp_mobile');
+            $request->session()->forget('otp_new_user');
+        }
 
-    public function login(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
+        return view('site.auth.otp', [
+            'otpMobile' => $request->session()->get('otp_mobile'),
+            'isNewUser' => $request->session()->get('otp_new_user', false),
+            'showNameField' => $request->session()->get('otp_new_user', false),
         ]);
 
         if (Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
@@ -33,6 +40,9 @@ class SiteAuthController extends Controller
         return back()->withErrors(['email' => __('messages.login_failed')])->onlyInput('email');
     }
 
+    /**
+     * خروج از حساب کاربری.
+     */
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();

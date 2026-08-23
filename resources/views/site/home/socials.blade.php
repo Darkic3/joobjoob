@@ -46,15 +46,13 @@
                     <h3 class="font-extrabold text-lg mb-2">{{ __('messages.register_title') }}</h3>
                     <p class="text-xs mb-5" style="color: var(--text-secondary);">{{ __('messages.register_desc') }}</p>
 
-                    {{-- TODO: منطق ثبت‌نام + کد تخفیف ۱۰٪ — بعداً کانکت می‌شود
-                         (action باید به route('site.register') اشاره کند؛ ذخیرهٔ کاربر + ساخت
-                         کد تخفیف ۱۰٪ و پیام swal/toast محلی‌شده در آن پیاده شود) --}}
-                    <form action="#" method="POST" data-register-form class="space-y-3">
+                    <form action="{{ localizedRoute('login.otp.send') }}" method="POST" data-register-form class="space-y-3">
                         @csrf
                         <div class="flex flex-col sm:flex-row gap-3">
+                            <input type="tel" name="mobile" placeholder="{{ __('messages.register_mobile_ph') }}"
+                                   class="neu-input px-4 py-3 text-sm flex-1" required dir="ltr"
+                                   inputmode="tel" autocomplete="tel" maxlength="13">
                             <input type="text" name="name" placeholder="{{ __('messages.register_name_ph') }}"
-                                   class="neu-input px-4 py-3 text-sm flex-1">
-                            <input type="email" name="email" placeholder="{{ __('messages.register_email_ph') }}"
                                    class="neu-input px-4 py-3 text-sm flex-1" required>
                         </div>
                         <button type="submit" class="neu-btn neu-btn-primary w-full px-6 py-3 text-sm font-bold">

@@ -27,6 +27,19 @@ class AdminPermission
                 : redirect()->guest(route('admin.login'));
         }
 
+        // ⚠️ اول باید بررسی شود که کاربر اصلاً ادمین هست یا نقشی دارد.
+        // بدون این چک، هر کاربر لاگین‌شده‌ای به روت‌های free (مثل داشبورد) دسترسی پیدا می‌کند.
+        // ⚠️ اگر کاربر لاگین‌شده ولی ادمین نیست → به صفحه اصلی سایت هدایت شود
+        //    (نه admin.login چون AdminAuthController::showLogin لاگین‌ها رو به dashboard برمی‌گرداند → لوپ!)
+        if (! $user->is_admin && ! $user->roles()->exists()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('admin.login.restricted')], 403);
+            }
+
+            return redirect()->route('home')
+                ->with('error', __('admin.login.restricted'));
+        }
+
         if ($user->is_admin) {
             return $next($request);
         }

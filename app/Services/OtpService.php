@@ -13,9 +13,11 @@ use Illuminate\Support\Str;
 /**
  * ورود/ثبت‌نام با کد یکبارمصرف (OTP) از طریق پیامک کاوه‌نگار.
  *
- * جریان: کاربر شماره موبایل می‌دهد → کد ۴ رقمی ساخته و روی کاربر ذخیره می‌شود
- * (اگر کاربر وجود نداشته باشد ساخته می‌شود) → پیامک الگودار ارسال می‌شود →
- * کاربر کد را وارد می‌کند → کد چک و لاگین می‌شود.
+ * جریان: کاربر شماره موبایل می‌دهد → بررسی وجود کاربر
+ *   - اگر کاربر وجود داشته باشد: کد ارسال می‌شود
+ *   - اگر کاربر وجود نداشته باشد و نام وارد شده باشد: کاربر ساخته شده و کد ارسال می‌شود
+ *   - اگر کاربر وجود نداشته باشد بدون نام: نیاز به ورود نام
+ * → کاربر کد را وارد می‌کند → کد چک و لاگین می‌شود.
  */
 class OtpService
 {
@@ -52,11 +54,21 @@ class OtpService
     }
 
     /**
+     * بررسی وجود کاربر با شماره موبایل.
+     */
+    public function userExists(string $mobile): bool
+    {
+        return User::where('mobile', $mobile)->exists();
+    }
+
+    /**
      * ساخت کد ۴ رقمی، ذخیره روی کاربر و ارسال پیامک.
      *
+     * @param  string  $mobile  شماره موبایل نرمال‌شده
+     * @param  string|null  $name  نام کاربر (فقط برای کاربران جدید)
      * @return array{success: bool, message: string, code?: string}
      */
-    public function send(string $mobile): array
+    public function send(string $mobile, ?string $name = null): array
     {
         $mobile = $this->normalizeMobile($mobile);
 
@@ -70,11 +82,14 @@ class OtpService
             return ['success' => false, 'message' => __('messages.otp_mobile_blocked')];
         }
 
-        // کاربر وجود ندارد → ساخت (ثبت‌نام خودکار با OTP)؛
-        // رمز عبور placeholder چون ورود فقط از طریق کد یکبارمصرف انجام می‌شود.
+        // کاربر وجود ندارد → ساخت با نام ارائه‌شده
         if (! $user) {
+            if (! $name || trim($name) === '') {
+                return ['success' => false, 'message' => __('messages.otp_name_required')];
+            }
+
             $user = User::create([
-                'name' => null,
+                'name' => trim($name),
                 'mobile' => $mobile,
                 'password' => Str::random(32),
                 'is_active' => true,
@@ -90,10 +105,12 @@ class OtpService
         $template = setting('otp_template') ?: 'verify';
 
         try {
-            $response = $this->sms->sendLookup($template, ['token' => $code], $mobile);
+            // token = کد OTP (فقط عدد — بدون فاصله)
+            // token2 = نام سایت (پاکسازی‌شده برای سازگاری با قالب کاوه‌نگار)
+            $siteName = $this->cleanSiteName(setting('site_name', config('app.name', 'Shopora')));
+            $response = $this->sms->sendLookup($template, ['token' => $code, 'token2' => $siteName], $mobile);
 
             if ($response instanceof RedirectResponse) {
-                // کلید API تنظیم نشده است
                 return $this->result(false, __('messages.otp_sms_not_configured'), $code);
             }
 
@@ -153,6 +170,24 @@ class OtpService
     private function generateCode(): string
     {
         return str_pad((string) random_int(0, 9999), self::CODE_LENGTH, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * پاکسازی نام سایت برای ارسال در token2 قالب کاوه‌نگار.
+     *
+     *  - اگر بیش از یک کلمه باشد و کلمه‌ی اول «فروشگاه» باشد → کلمه‌ی دوم
+     *  - اگر بیش از یک کلمه باشد و کلمه‌ی اول «فروشگاه» نباشد → کلمه‌ی اول
+     *  - اگر یک کلمه باشد → همان کلمه
+     */
+    private function cleanSiteName(string $raw): string
+    {
+        $parts = preg_split('/\s+/', trim($raw));
+
+        if (count($parts) >= 2 && $parts[0] === 'فروشگاه') {
+            return $parts[1];
+        }
+
+        return $parts[0] ?? $raw;
     }
 
     /**
