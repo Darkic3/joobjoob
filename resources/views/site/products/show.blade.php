@@ -183,6 +183,15 @@
                 <span class="text-sm font-semibold" style="color: var(--text-secondary);">تومان</span>
             </div>
 
+            {{-- تایمر شمارش معکوس تخفیف --}}
+            @if($dealEndsAt)
+                <div class="deal-timer-bar flex items-center gap-3 mb-6 p-3 rounded-xl"
+                     style="background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 8%, transparent), color-mix(in srgb, var(--urgency) 5%, transparent)); border: 1px solid color-mix(in srgb, var(--danger) 15%, transparent);">
+                    <span class="text-xs font-bold" style="color: var(--danger);">⏰ {{ __('messages.deal_ends_in') }}</span>
+                    <x-countdown-timer :ends-at="$dealEndsAt" id="product-deal-cd"/>
+                </div>
+            @endif
+
             {{-- توضیحات --}}
             <p class="mb-8 leading-relaxed text-sm" style="color: var(--text-secondary);">
                 {{ $product->trans('short_description')  ?: __('messages.no_description') }}
@@ -395,9 +404,30 @@
                             </span>
                             <span>{{ __('messages.review_submit') }}</span>
                         </button>
-                    </form>
-                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- نوار چسبان سبد خرید (فقط موبایل) --}}
+    <div class="sticky-cart-bar" id="sticky-cart-bar">
+        <div class="sticky-cart-bar__inner">
+            <div class="sticky-cart-bar__info">
+                <span class="sticky-cart-bar__price mono font-black text-lg" style="color: var(--accent);" dir="ltr">
+                    {{ number_format($product->final_price) }}
+                </span>
+                <span class="sticky-cart-bar__toman text-[10px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
             </div>
+            <button type="button" class="sticky-cart-bar__btn"
+                    onclick="document.getElementById('add-to-cart-btn').click(); window.scrollTo({top: document.getElementById('add-to-cart-btn').getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth'});"
+                    @disabled($product->stock === 0)>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                {{ __('messages.add_to_cart') }}
+            </button>
+        </div>
+    </div>
 
             {{-- ─── خلاصه امتیازات ─── --}}
             @if($product->reviews->count() > 0)
@@ -942,6 +972,35 @@
             document.body.style.overflow = '';
         }
 
+        // ===== نوار چسبان سبد خرید (موبایل) =====
+        (function() {
+            var bar = document.getElementById('sticky-cart-bar');
+            var addBtn = document.getElementById('add-to-cart-btn');
+            if (!bar || !addBtn) return;
+
+            function toggleBar() {
+                var rect = addBtn.getBoundingClientRect();
+                if (rect.bottom < 0) {
+                    bar.classList.add('is-visible');
+                } else {
+                    bar.classList.remove('is-visible');
+                }
+            }
+
+            var ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        toggleBar();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+
+            toggleBar();
+        })();
+
         // بستن با Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -968,6 +1027,107 @@
         .detail-tab.active {
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════
+           Sticky Cart Bar — Mobile Only
+           ═══════════════════════════════════════ */
+        .sticky-cart-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0.6rem 1rem;
+            padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0));
+            background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, transparent) 0%, var(--bg) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid color-mix(in srgb, var(--shadow-dark) 15%, transparent);
+            box-shadow: 0 -4px 20px color-mix(in srgb, var(--shadow-dark) 20%, transparent);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .sticky-cart-bar.is-visible {
+            transform: translateY(0);
+        }
+        .sticky-cart-bar__inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+        .sticky-cart-bar__info {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+        .sticky-cart-bar__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.4rem;
+            border: none;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--accent-contrast, #fff);
+            background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #000 28%) 100%);
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .sticky-cart-bar__btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 55%, transparent);
+        }
+        .sticky-cart-bar__btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .sticky-cart-bar__btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        @media (min-width: 1024px) {
+            .sticky-cart-bar { display: none !important; }
+        }
+        @media (max-width: 1023px) {
+            .sticky-cart-bar { display: block; }
+        }
+
+        /* ═══════════════════════════════════════
+           Deal Timer Bar
+           ═══════════════════════════════════════ */
+        .deal-timer-bar .cd-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .deal-timer-bar .cd-chip {
+            min-width: 2rem;
+            padding: 0.2rem 0.35rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            border-radius: 0.4rem;
+            background: color-mix(in srgb, var(--danger) 12%, var(--bg));
+            color: var(--danger);
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+        .deal-timer-bar .cd-sep {
+            font-weight: 900;
+            color: var(--danger);
+            font-size: 0.9rem;
+        }
+        .deal-timer-bar .cd-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
     </style>
 @endpush
