@@ -90,8 +90,10 @@ class OtpTest extends TestCase
         $this->assertTrue($fake->lookupCalled);
         $this->assertSame('verify', $fake->lastTemplate);
         $this->assertSame($user->fresh()->confirm_code, $fake->lastTokens['token']);
-        // سرویس OTP فاصله‌های اسم سایت رو با نیم‌فاصله فارسی (ZWNJ) جایگزین می‌کنه
-        $expectedToken2 = str_replace(' ', "\xE2\x80\x8C", setting('site_name', config('app.name', 'Shopora')));
+        // سرویس OTP نام سایت رو پاکسازی می‌کنه: اگر با «فروشگاه» شروع شود کلمه‌ی دوم ارسال می‌شود
+        $rawName = setting('site_name', config('app.name', 'Shopora'));
+        $parts = preg_split('/\s+/', trim($rawName));
+        $expectedToken2 = (count($parts) >= 2 && $parts[0] === 'فروشگاه') ? $parts[1] : $parts[0];
         $this->assertSame($expectedToken2, $fake->lastTokens['token2']);
     }
 

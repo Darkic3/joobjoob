@@ -106,8 +106,8 @@ class OtpService
 
         try {
             // token = کد OTP (فقط عدد — بدون فاصله)
-            // token2 = نام سایت
-            $siteName = str_replace(' ', "\xE2\x80\x8C", setting('site_name', config('app.name', 'Shopora')));
+            // token2 = نام سایت (پاکسازی‌شده برای سازگاری با قالب کاوه‌نگار)
+            $siteName = $this->cleanSiteName(setting('site_name', config('app.name', 'Shopora')));
             $response = $this->sms->sendLookup($template, ['token' => $code, 'token2' => $siteName], $mobile);
 
             if ($response instanceof RedirectResponse) {
@@ -170,6 +170,24 @@ class OtpService
     private function generateCode(): string
     {
         return str_pad((string) random_int(0, 9999), self::CODE_LENGTH, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * پاکسازی نام سایت برای ارسال در token2 قالب کاوه‌نگار.
+     *
+     *  - اگر بیش از یک کلمه باشد و کلمه‌ی اول «فروشگاه» باشد → کلمه‌ی دوم
+     *  - اگر بیش از یک کلمه باشد و کلمه‌ی اول «فروشگاه» نباشد → کلمه‌ی اول
+     *  - اگر یک کلمه باشد → همان کلمه
+     */
+    private function cleanSiteName(string $raw): string
+    {
+        $parts = preg_split('/\s+/', trim($raw));
+
+        if (count($parts) >= 2 && $parts[0] === 'فروشگاه') {
+            return $parts[1];
+        }
+
+        return $parts[0] ?? $raw;
     }
 
     /**
