@@ -228,6 +228,19 @@
                     <span
                         id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock') . " ({$product->stock} عدد)" : __('messages.out_of_stock') }}</span>
                 </p>
+
+                {{-- نشان‌های اعتماد --}}
+                @if($trustBadges->isNotEmpty())
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-[var(--shadow-light)]">
+                        @foreach($trustBadges as $badge)
+                            <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg"
+                                 style="background: color-mix(in srgb, var(--bg-elevated) 80%, transparent); color: var(--text-secondary); box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);">
+                                <span class="text-sm" aria-hidden="true">{{ $badge->icon }}</span>
+                                <span>{{ $badge->trans('title') }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </form>
         </div>
     </div>
