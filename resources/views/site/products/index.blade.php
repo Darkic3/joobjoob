@@ -3,11 +3,9 @@
 @section('title', __('messages.products'))
 
 @section('content')
-    <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-        <span class="mx-1">/</span>
-        <span style="color: var(--text-primary);">{{ __('messages.products') }}</span>
-    </p>
+    @include('site.partials.breadcrumb', ['items' => [
+        ['label' => __('messages.products')],
+    ]])
 
     <div class="flex items-center justify-between mb-5 lg:hidden">
         <h1 class="font-extrabold text-lg">{{ __('messages.products') }}</h1>

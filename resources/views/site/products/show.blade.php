@@ -6,16 +6,19 @@
 @section('content')
 
     {{-- Breadcrumb --}}
-    <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-        <span class="mx-1">/</span>
-        <a href="{{ localizedRoute('products.index') }}"
-           class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
-        @if($product->category)
-            <span class="mx-1">/</span>
-            <span style="color: var(--text-primary);">{{ $product->category->trans('name') }}</span>
-        @endif
-    </p>
+    @php
+        $breadcrumbItems = [
+            ['label' => __('messages.products'), 'url' => localizedRoute('products.index')],
+        ];
+        if ($product->category) {
+            $breadcrumbItems[] = [
+                'label' => $product->category->trans('name'),
+                'url' => localizedRoute('products.index', ['category' => $product->category->slug]),
+            ];
+        }
+        $breadcrumbItems[] = ['label' => $product->trans('name')];
+    @endphp
+    @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
 
     <div class="grid lg:grid-cols-2 gap-10 mb-14">
 
