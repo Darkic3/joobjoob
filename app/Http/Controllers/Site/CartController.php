@@ -54,12 +54,35 @@ class CartController extends Controller
 
         $this->cart->update($rowId, $qty);
 
+        if ($request->wantsJson()) {
+            $updatedItem = $this->cart->content()->get($rowId);
+            return response()->json([
+                'success' => true,
+                'item' => $updatedItem,
+                'subtotal' => $this->cart->subtotal(),
+                'discount' => $this->cart->discount(),
+                'total' => $this->cart->total(),
+                'cart_count' => $this->cart->count(),
+            ]);
+        }
+
         return back();
     }
 
-    public function remove(string $rowId)
+    public function remove(Request $request, string $rowId)
     {
         $this->cart->remove($rowId);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'subtotal' => $this->cart->subtotal(),
+                'discount' => $this->cart->discount(),
+                'total' => $this->cart->total(),
+                'cart_count' => $this->cart->count(),
+                'is_empty' => $this->cart->content()->isEmpty(),
+            ]);
+        }
 
         return back();
     }
