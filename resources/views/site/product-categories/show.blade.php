@@ -3,13 +3,13 @@
 @section('title', $category->trans('name') ?? __('messages.categories'))
 
 @section('content')
-    <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-        <span class="mx-1">/</span>
-        <a href="{{ localizedRoute('products.index') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
-        <span class="mx-1">/</span>
-        <span style="color: var(--text-primary);">{{ $category->trans('name') ?? $category->slug }}</span>
-    </p>
+    @php
+        $breadcrumbItems = [
+            ['label' => __('messages.products'), 'url' => localizedRoute('products.index')],
+            ['label' => $category->trans('name') ?? $category->slug],
+        ];
+    @endphp
+    @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
 
     {{-- سربرگ دسته‌بندی --}}
     <div class="neu-flat rounded-3xl p-6 md:p-8 mb-8 flex items-center gap-5">

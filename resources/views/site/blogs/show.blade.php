@@ -3,18 +3,17 @@
 @section('title', $blog->title)
 
 @section('content')
-    <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-        <span class="mx-1">/</span>
-        <a href="{{ localizedRoute('blogs.index') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.blogs') }}</a>
-        @if($blog->category)
-            <span class="mx-1">/</span>
-            <a href="{{ localizedRoute('blogs.category', ['category' => $blog->category->slug]) }}"
-               class="hover:text-[var(--accent)] transition-colors">{{ $blog->category->title }}</a>
-        @endif
-        <span class="mx-1">/</span>
-        <span style="color: var(--text-primary);">{{ $blog->title }}</span>
-    </p>
+    @php
+        $blogBreadcrumb = [['label' => __('messages.blogs'), 'url' => localizedRoute('blogs.index')]];
+        if ($blog->category) {
+            $blogBreadcrumb[] = [
+                'label' => $blog->category->title,
+                'url' => localizedRoute('blogs.category', ['category' => $blog->category->slug]),
+            ];
+        }
+        $blogBreadcrumb[] = ['label' => $blog->title];
+    @endphp
+    @include('site.partials.breadcrumb', ['items' => $blogBreadcrumb])
 
     <div class="max-w-3xl mx-auto">
         <article class="neu-flat rounded-3xl overflow-hidden">

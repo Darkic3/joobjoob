@@ -6,21 +6,24 @@
 @section('content')
 
     {{-- Breadcrumb --}}
-    <p class="text-xs mb-5" style="color: var(--text-secondary);">
-        <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-        <span class="mx-1">/</span>
-        <a href="{{ localizedRoute('products.index') }}"
-           class="hover:text-[var(--accent)] transition-colors">{{ __('messages.products') }}</a>
-        @if($product->category)
-            <span class="mx-1">/</span>
-            <span style="color: var(--text-primary);">{{ $product->category->trans('name') }}</span>
-        @endif
-    </p>
+    @php
+        $breadcrumbItems = [
+            ['label' => __('messages.products'), 'url' => localizedRoute('products.index')],
+        ];
+        if ($product->category) {
+            $breadcrumbItems[] = [
+                'label' => $product->category->trans('name'),
+                'url' => localizedRoute('products.index', ['category' => $product->category->slug]),
+            ];
+        }
+        $breadcrumbItems[] = ['label' => $product->trans('name')];
+    @endphp
+    @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
 
     <div class="grid lg:grid-cols-2 gap-10 mb-14">
 
         {{-- ۱. گالری تصاویر --}}
-        <div>
+        <div class="pe-anim-slide-right pe-delay-1">
             <div class="neu-flat-lg p-4 mb-4">
                 <div class="image-zoom-wrap" id="image-zoom-wrap">
                     <img id="main-image" src="{{ $mainImage }}"
@@ -61,17 +64,17 @@
         </div>
 
         {{-- ۲. اطلاعات محصول --}}
-        <div class="flex flex-col">
+        <div class="flex flex-col pe-anim-slide-left pe-delay-2">
             @php
                 $allImages = collect([$mainImage]);
                 foreach ($product->images as $img) {
                     if ($img->url !== $mainImage) $allImages->push($img->url);
                 }
             @endphp
-            <h1 class="text-2xl font-extrabold mb-3 leading-tight">{{ $product->trans('name') }}</h1>
+            <h1 class="text-2xl font-extrabold mb-3 leading-tight pe-anim-fade-up pe-delay-3">{{ $product->trans('name') }}</h1>
 
             {{-- برند + امتیاز --}}
-            <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <div class="flex items-center justify-between mb-5 flex-wrap gap-3 pe-anim-fade-up pe-delay-4">
                 @if($product->brand)
                     <a href="{{ localizedRoute('products.index', ['brand' => $product->brand->url]) }}"
                        class="inline-flex items-center gap-2 neu-flat-sm px-4 py-2 rounded-xl text-sm font-bold hover:text-[var(--accent)] transition-colors">
@@ -94,13 +97,13 @@
             </div>
 
             {{-- دکمه‌های اشتراک‌گذاری --}}
-            <div class="flex items-center gap-3 mb-6">
+            <div class="flex items-center gap-3 mb-6 pe-anim-fade-up pe-delay-5">
                 <span class="text-sm font-semibold" style="color: var(--text-secondary);">{{ __('messages.share') }}:</span>
                 <x-share-buttons :url="url()->current()" :title="$product->trans('name')" />
             </div>
 
             {{-- انتخابگر واریانت (رنگ/سایز) --}}
-            <div id="variant-selector" class="space-y-5 mb-6">
+            <div id="variant-selector" class="space-y-5 mb-6 pe-anim-fade-up pe-delay-6">
                 @foreach($mainSpecs as $group)
                     <div data-spec-group="{{ $group['id'] }}">
                         <label class="text-sm font-semibold block mb-3">
@@ -136,7 +139,7 @@
             </div>
 
             {{-- قیمت — سه حالت (موجود / تماس بگیرید / ناموجود) --}}
-            <div class="mb-6" id="price-block">
+            <div class="mb-6 pe-anim-fade-up pe-delay-7" id="price-block">
                 @if($product->has_variants)
                     {{-- قیمت از ارزان‌ترین واریانت --}}
                     @if($minVariant)
@@ -156,6 +159,14 @@
                                 </span>
                             @endif
                         </div>
+                        @if($minVariant->discounted_price > 0 && $minVariant->discounted_price < $minVariant->price)
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                                      style="background: color-mix(in srgb, var(--success) 10%, transparent); color: var(--success);">
+                                    <span id="display-save-amount">{{ __('messages.you_save', ['amount' => number_format($minVariant->price - $minVariant->final_price) . ' ' . __('messages.toman')]) }}</span>
+                                </span>
+                            </div>
+                        @endif
                     @else
                         <div class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr">
                             {{ number_format($product->final_price) }}
@@ -179,9 +190,26 @@
                             </span>
                         @endif
                     </div>
+                    @if($product->has_discount)
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                                  style="background: color-mix(in srgb, var(--success) 10%, transparent); color: var(--success);">
+                                {{ __('messages.you_save', ['amount' => number_format($product->price - $product->final_price) . ' ' . __('messages.toman')]) }}
+                            </span>
+                        </div>
+                    @endif
                 @endif
                 <span class="text-sm font-semibold" style="color: var(--text-secondary);">تومان</span>
             </div>
+
+            {{-- تایمر شمارش معکوس تخفیف --}}
+            @if($dealEndsAt)
+                <div class="deal-timer-bar flex items-center gap-3 mb-6 p-3 rounded-xl"
+                     style="background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 8%, transparent), color-mix(in srgb, var(--urgency) 5%, transparent)); border: 1px solid color-mix(in srgb, var(--danger) 15%, transparent);">
+                    <span class="text-xs font-bold" style="color: var(--danger);">⏰ {{ __('messages.deal_ends_in') }}</span>
+                    <x-countdown-timer :ends-at="$dealEndsAt" id="product-deal-cd"/>
+                </div>
+            @endif
 
             {{-- توضیحات --}}
             <p class="mb-8 leading-relaxed text-sm" style="color: var(--text-secondary);">
@@ -189,7 +217,7 @@
             </p>
             {{--            ?: $product->trans('description')--}}
             {{-- فرم افزودن به سبد خرید --}}
-            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="space-y-6 mt-auto">
+            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="space-y-6 mt-auto pe-anim-fade-up pe-delay-8">
                 @csrf
                 <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ $minVariant?->id ?? '' }}">
 
@@ -228,12 +256,25 @@
                     <span
                         id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock') . " ({$product->stock} عدد)" : __('messages.out_of_stock') }}</span>
                 </p>
+
+                {{-- نشان‌های اعتماد --}}
+                @if($trustBadges->isNotEmpty())
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-[var(--shadow-light)]">
+                        @foreach($trustBadges as $badge)
+                            <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg"
+                                 style="background: color-mix(in srgb, var(--bg-elevated) 80%, transparent); color: var(--text-secondary); box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);">
+                                <span class="text-sm" aria-hidden="true">{{ $badge->icon }}</span>
+                                <span>{{ $badge->trans('title') }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </form>
         </div>
     </div>
 
     {{-- ۳. تب‌ها: توضیحات / مشخصات / نظرات --}}
-    <section class="mb-14 reveal-on-scroll">
+    <section class="mb-14 reveal-on-scroll pe-anim-fade-up">
         <div class="flex flex-wrap gap-2 mb-6" id="detail-tabs">
             <button type="button" class="detail-tab neu-flat-sm px-5 py-2.5 rounded-xl text-sm font-bold active"
                     data-tab="description">{{ __('messages.description') }}</button>
@@ -382,9 +423,30 @@
                             </span>
                             <span>{{ __('messages.review_submit') }}</span>
                         </button>
-                    </form>
-                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- نوار چسبان سبد خرید (فقط موبایل) --}}
+    <div class="sticky-cart-bar" id="sticky-cart-bar">
+        <div class="sticky-cart-bar__inner">
+            <div class="sticky-cart-bar__info">
+                <span class="sticky-cart-bar__price mono font-black text-lg" style="color: var(--accent);" dir="ltr">
+                    {{ number_format($product->final_price) }}
+                </span>
+                <span class="sticky-cart-bar__toman text-[10px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
             </div>
+            <button type="button" class="sticky-cart-bar__btn"
+                    onclick="document.getElementById('add-to-cart-btn').click(); window.scrollTo({top: document.getElementById('add-to-cart-btn').getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth'});"
+                    @disabled($product->stock === 0)>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                {{ __('messages.add_to_cart') }}
+            </button>
+        </div>
+    </div>
 
             {{-- ─── خلاصه امتیازات ─── --}}
             @if($product->reviews->count() > 0)
@@ -489,7 +551,7 @@
 
     {{-- ۴. محصولات مکمل --}}
     @if($complement->isNotEmpty())
-        <section class="mb-14 reveal-on-scroll">
+        <section class="mb-14 reveal-on-scroll pe-anim-fade-up">
             <h2 class="text-xl font-extrabold mb-6">پیشنهاد مکمل</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($complement as $item)
@@ -501,7 +563,7 @@
 
     {{-- ۵. محصولات مرتبط --}}
     @if($related->isNotEmpty())
-        <section class="mb-14 reveal-on-scroll">
+        <section class="mb-14 reveal-on-scroll pe-anim-fade-up">
             <h2 class="text-xl font-extrabold mb-6">{{ __('messages.related_products') }}</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 @foreach($related as $item)
@@ -635,6 +697,19 @@
                     }
                 }
 
+                // به‌روزرسانی مبلغ صرفه‌جویی
+                const saveEl = document.getElementById('display-save-amount');
+                if (saveEl) {
+                    if (selectedVariant.discount_price > 0 && selectedVariant.discount_price < selectedVariant.price) {
+                        const saved = selectedVariant.price - selectedVariant.final_price;
+                        const saveText = '{{ __("messages.you_save", ["amount" => "__AMOUNT__"]) }}'.replace('__AMOUNT__', formatPrice(saved) + ' {{ __("messages.toman") }}');
+                        saveEl.textContent = saveText;
+                        saveEl.parentElement.classList.remove('hidden');
+                    } else {
+                        saveEl.parentElement.classList.add('hidden');
+                    }
+                }
+
                 const btn = document.getElementById('add-to-cart-btn');
                 const status = document.getElementById('stock-status');
                 const stockText = document.getElementById('stock-text');
@@ -667,10 +742,10 @@
             });
         });
 
-        // انتخاب خودکار اگر یک گروه فقط یک مقدار دارد
+        // انتخاب خودکار اولین واریانت از هر گروه
         document.addEventListener('DOMContentLoaded', () => {
             PRODUCT_MAIN_SPECS.forEach(group => {
-                if (group.children.length === 1) {
+                if (group.children.length > 0) {
                     selections[group.id] = group.children[0].id;
                 }
             });
@@ -929,6 +1004,35 @@
             document.body.style.overflow = '';
         }
 
+        // ===== نوار چسبان سبد خرید (موبایل) =====
+        (function() {
+            var bar = document.getElementById('sticky-cart-bar');
+            var addBtn = document.getElementById('add-to-cart-btn');
+            if (!bar || !addBtn) return;
+
+            function toggleBar() {
+                var rect = addBtn.getBoundingClientRect();
+                if (rect.bottom < 0) {
+                    bar.classList.add('is-visible');
+                } else {
+                    bar.classList.remove('is-visible');
+                }
+            }
+
+            var ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        toggleBar();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+
+            toggleBar();
+        })();
+
         // بستن با Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -938,6 +1042,59 @@
                 }
             }
         });
+
+        // ===== AJAX: افزودن به سبد خرید (بدون رفرش صفحه) =====
+        (function() {
+            var addForm = document.querySelector('form[action*="cart.add"]');
+            if (!addForm) return;
+            var csrfToken = function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
+
+            addForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = document.getElementById('add-to-cart-btn');
+                if (btn && btn.disabled) return;
+
+                var origHTML = btn ? btn.innerHTML : '';
+                if (btn) { btn.innerHTML = '<span class="btn-spinner"></span>'; btn.disabled = true; }
+
+                fetch(addForm.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken(), 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                    body: new FormData(addForm),
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
+
+                    if (data.success) {
+                        ['cart-count', 'cart-count-mobile'].forEach(function(id) {
+                            var badge = document.getElementById(id);
+                            if (!badge) return;
+                            badge.textContent = data.cart_count;
+                            badge.classList.remove('count-pop');
+                            void badge.offsetWidth;
+                            badge.classList.add('count-pop');
+                        });
+
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || '{{ __("messages.added_to_cart") }}', 'success');
+                        }
+
+                        if (btn) {
+                            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> {{ __("messages.added_short") }}';
+                            btn.classList.add('neu-btn-success');
+                            setTimeout(function() { btn.innerHTML = origHTML; btn.classList.remove('neu-btn-success'); }, 1500);
+                        }
+                    } else {
+                        if (typeof showToast === 'function') showToast(data.message || 'خطا', 'error');
+                    }
+                })
+                .catch(function() {
+                    if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
+                    addForm.submit();
+                });
+            });
+        })();
     </script>
 
     <style>
@@ -955,6 +1112,201 @@
         .detail-tab.active {
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════
+           Sticky Cart Bar — Mobile Only
+           ═══════════════════════════════════════ */
+        .sticky-cart-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0.6rem 1rem;
+            padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0));
+            background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, transparent) 0%, var(--bg) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid color-mix(in srgb, var(--shadow-dark) 15%, transparent);
+            box-shadow: 0 -4px 20px color-mix(in srgb, var(--shadow-dark) 20%, transparent);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .sticky-cart-bar.is-visible {
+            transform: translateY(0);
+        }
+        .sticky-cart-bar__inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+        .sticky-cart-bar__info {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+        .sticky-cart-bar__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.4rem;
+            border: none;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--accent-contrast, #fff);
+            background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #000 28%) 100%);
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .sticky-cart-bar__btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 55%, transparent);
+        }
+        .sticky-cart-bar__btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .sticky-cart-bar__btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        @media (min-width: 1024px) {
+            .sticky-cart-bar { display: none !important; }
+        }
+        @media (max-width: 1023px) {
+            .sticky-cart-bar { display: block; }
+        }
+
+        /* ═══════════════════════════════════════
+           Deal Timer Bar
+           ═══════════════════════════════════════ */
+        .deal-timer-bar .cd-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .deal-timer-bar .cd-chip {
+            min-width: 2rem;
+            padding: 0.2rem 0.35rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            border-radius: 0.4rem;
+            background: color-mix(in srgb, var(--danger) 12%, var(--bg));
+            color: var(--danger);
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+        .deal-timer-bar .cd-sep {
+            font-weight: 900;
+            color: var(--danger);
+            font-size: 0.9rem;
+        }
+        .deal-timer-bar .cd-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* ═══════════════════════════════════════
+           Entrance Animations
+           ═══════════════════════════════════════ */
+        @keyframes productFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes productFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes productScaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes productSlideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes productSlideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .pe-anim-fade-up {
+            animation: productFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .pe-anim-fade-in {
+            animation: productFadeIn 0.5s ease both;
+        }
+        .pe-anim-scale-in {
+            animation: productScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .pe-anim-slide-right {
+            animation: productSlideInRight 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .pe-anim-slide-left {
+            animation: productSlideInLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* Staggered delays for child elements */
+        .pe-delay-1 { animation-delay: 0.05s; }
+        .pe-delay-2 { animation-delay: 0.10s; }
+        .pe-delay-3 { animation-delay: 0.15s; }
+        .pe-delay-4 { animation-delay: 0.20s; }
+        .pe-delay-5 { animation-delay: 0.25s; }
+        .pe-delay-6 { animation-delay: 0.30s; }
+        .pe-delay-7 { animation-delay: 0.35s; }
+        .pe-delay-8 { animation-delay: 0.40s; }
+
+        /* Respect reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .pe-anim-fade-up,
+            .pe-anim-fade-in,
+            .pe-anim-scale-in,
+            .pe-anim-slide-right,
+            .pe-anim-slide-left {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+            }
         }
     </style>
 @endpush

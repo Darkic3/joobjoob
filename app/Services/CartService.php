@@ -70,7 +70,9 @@ class CartService
         $cart = $this->content();
 
         if ($cart->has($rowId)) {
-            $cart[$rowId]['qty'] = max(1, $qty);
+            $item = $cart[$rowId];
+            $item['qty'] = max(1, $qty);
+            $cart->put($rowId, $item);
             session([$this->sessionKey => $cart->toArray()]);
         }
     }

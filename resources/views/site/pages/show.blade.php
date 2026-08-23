@@ -13,14 +13,8 @@
         </div>
 
         <div class="relative z-10">
-            <nav class="page-breadcrumb" aria-label="{{ __('messages.breadcrumb') }}">
-                <a href="{{ localizedRoute('home') }}" class="hover:text-[var(--accent)] transition-colors">{{ __('messages.home') }}</a>
-                <span class="page-breadcrumb-sep" aria-hidden="true">
-                    <svg class="flip-rtl" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </span>
-                <span style="color: var(--text-primary);">{{ $title }}</span>
-            </nav>
+            @php $breadcrumbItems = [['label' => $title]]; @endphp
+            @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
 
             <span class="page-eyebrow">{{ $data['hero_badge'] ?? '' }}</span>
             <h1 class="page-title">{{ $title }}</h1>

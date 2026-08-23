@@ -47,14 +47,42 @@ class CartController extends Controller
     public function update(Request $request, string $rowId)
     {
         $request->validate(['qty' => 'required|integer|min:1']);
-        $this->cart->update($rowId, $request->qty);
+
+        $item = $this->cart->content()->get($rowId);
+        $maxQty = $item['stock'] ?? PHP_INT_MAX;
+        $qty = min((int) $request->qty, $maxQty);
+
+        $this->cart->update($rowId, $qty);
+
+        if ($request->wantsJson()) {
+            $updatedItem = $this->cart->content()->get($rowId);
+            return response()->json([
+                'success' => true,
+                'item' => $updatedItem,
+                'subtotal' => $this->cart->subtotal(),
+                'discount' => $this->cart->discount(),
+                'total' => $this->cart->total(),
+                'cart_count' => $this->cart->count(),
+            ]);
+        }
 
         return back();
     }
 
-    public function remove(string $rowId)
+    public function remove(Request $request, string $rowId)
     {
         $this->cart->remove($rowId);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'subtotal' => $this->cart->subtotal(),
+                'discount' => $this->cart->discount(),
+                'total' => $this->cart->total(),
+                'cart_count' => $this->cart->count(),
+                'is_empty' => $this->cart->content()->isEmpty(),
+            ]);
+        }
 
         return back();
     }
