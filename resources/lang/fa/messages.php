@@ -67,6 +67,8 @@ return [
     'low_stock' => 'موجودی کم',
     'left' => 'باقی‌مانده',
     'removed_from_cart' => 'از سبد خرید حذف شد',
+    'recently_viewed' => 'مشاهده شده اخیراً',
+    'recently_viewed_desc' => 'محصولاتی که اخیراً دیده‌اید',
     'reviews' => 'نظرات',
     'sort_by' => 'مرتب‌سازی',
     'filter' => 'فیلتر',

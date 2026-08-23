@@ -452,7 +452,33 @@
         </section>
     @endif
 
-    {{-- ۹. بنر خبرنامه یا اخبار --}}
+    {{-- ۹. مشاهده اخیر --}}
+    @if($recentlyViewed->isNotEmpty())
+        <section class="reveal-on-scroll py-6">
+            <div class="section-head mb-6">
+                <div class="section-head-main">
+                    <span class="section-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                    </span>
+                    <div>
+                        <h2 class="section-title">{{ __('messages.recently_viewed') }}</h2>
+                        <p class="section-subtitle">{{ __('messages.recently_viewed_desc') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hscroll-wrap" data-hscroll>
+                <div class="hscroll-rail flex gap-5 overflow-x-auto pb-4 custom-scrollbar scroll-smooth" dir="ltr">
+                    @foreach($recentlyViewed as $rv)
+                        <div class="hscroll-item shrink-0 w-[180px] md:w-[200px]">
+                            <x-product-card :product="$rv" />
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- ۱۰. بنر خبرنامه یا اخبار --}}
     @include('site.home.socials')
 
 @endsection

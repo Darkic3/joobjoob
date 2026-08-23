@@ -73,6 +73,8 @@ return [
     'low_stock' => 'Az Stok',
     'left' => 'kalan',
     'removed_from_cart' => 'Sepetten kaldırıldı',
+    'recently_viewed' => 'Son Görüntülenenler',
+    'recently_viewed_desc' => 'Son zamanlarda görüntülediğiniz ürünler',
     'reviews' => 'Yorumlar',
     'sort_by' => 'Sırala',
     'filter' => 'Filtrele',

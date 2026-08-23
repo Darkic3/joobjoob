@@ -9,6 +9,7 @@ use App\Models\ProductCategory;
 use App\Models\Review;
 use App\Services\HeroSlideService;
 use App\Services\PromoBannerService;
+use App\Services\RecentlyViewedService;
 use App\Services\TrustBadgeService;
 use Database\Seeders\BrandSeeder;
 use Database\Seeders\ProductCategorySeeder;
@@ -23,6 +24,7 @@ class HomeController extends Controller
         protected HeroSlideService $heroSlideService,
         protected TrustBadgeService $trustBadgeService,
         protected PromoBannerService $promoBannerService,
+        protected RecentlyViewedService $recentlyViewed,
     ) {}
 
     public function index()
@@ -81,7 +83,10 @@ class HomeController extends Controller
         // بنرهای میانی فعال — از ۱ تا ۴ بنر، کش و محدودیت داخل سرویس
         $promoBanners = $this->promoBannerService->getActiveForSite();
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners'));
+        // محصولات اخیراً مشاهده‌شده — حداکثر ۸ آیتم
+        $recentlyViewed = $this->recentlyViewed->content(8);
+
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners', 'recentlyViewed'));
     }
 
     /**

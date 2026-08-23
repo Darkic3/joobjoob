@@ -73,6 +73,8 @@ return [
     'low_stock' => 'Low Stock',
     'left' => 'left',
     'removed_from_cart' => 'Removed from cart',
+    'recently_viewed' => 'Recently Viewed',
+    'recently_viewed_desc' => 'Products you recently viewed',
     'reviews' => 'Reviews',
     'sort_by' => 'Sort By',
     'filter' => 'Filter',

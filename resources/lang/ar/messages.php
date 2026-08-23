@@ -73,6 +73,8 @@ return [
     'low_stock' => 'مخزون منخفض',
     'left' => 'متبقي',
     'removed_from_cart' => 'تمت الإزالة من السلة',
+    'recently_viewed' => 'شوهد مؤخراً',
+    'recently_viewed_desc' => 'المنتجات التي شاهدتها مؤخراً',
     'reviews' => 'التقييمات',
     'sort_by' => 'ترتيب حسب',
     'filter' => 'تصفية',
