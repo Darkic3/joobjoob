@@ -667,10 +667,10 @@
             });
         });
 
-        // انتخاب خودکار اگر یک گروه فقط یک مقدار دارد
+        // انتخاب خودکار اولین واریانت از هر گروه
         document.addEventListener('DOMContentLoaded', () => {
             PRODUCT_MAIN_SPECS.forEach(group => {
-                if (group.children.length === 1) {
+                if (group.children.length > 0) {
                     selections[group.id] = group.children[0].id;
                 }
             });
