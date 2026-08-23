@@ -76,7 +76,7 @@
                                         @method('PATCH')
                                         <div class="flex items-center gap-0.5 neu-flat-sm rounded-full p-1">
                                             <button type="button"
-                                                    onclick="var f=this.closest('form');var inp=f.querySelector('input[name=qty]');if(parseInt(inp.value)>1){inp.value=parseInt(inp.value)-1;f.submit();}"
+                                                    data-cart-qty="dec"
                                                     class="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all duration-200"
                                                     style="background: var(--accent); color: var(--accent-contrast);"
                                                     aria-label="{{ __('messages.quantity') }}">
@@ -87,7 +87,7 @@
                                                    class="w-12 bg-transparent text-center text-sm font-bold py-1.5 outline-none mono"
                                                    aria-label="{{ __('messages.quantity') }}" readonly>
                                             <button type="button"
-                                                    onclick="var f=this.closest('form');var inp=f.querySelector('input[name=qty]');if(parseInt(inp.value)<{{ $item['stock'] }}){inp.value=parseInt(inp.value)+1;f.submit();}"
+                                                    data-cart-qty="inc"
                                                     class="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all duration-200"
                                                     style="background: var(--accent); color: var(--accent-contrast);"
                                                     aria-label="{{ __('messages.quantity') }}">
@@ -98,10 +98,11 @@
 
                                     {{-- حذف --}}
                                     <form action="{{ localizedRoute('cart.remove', ['rowId' => $item['rowId']]) }}"
-                                          method="POST" class="inline">
+                                          method="POST" class="inline" data-cart-remove-form>
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
+                                        <button type="button"
+                                                data-cart-remove
                                                 class="text-xs font-bold inline-flex items-center gap-1 px-3 py-1.5 rounded-full hover:opacity-70 transition-opacity"
                                                 style="color: var(--danger);">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -114,7 +115,7 @@
                             </div>
 
                             <div class="text-end shrink-0">
-                                <p class="mono font-black text-sm md:text-base" style="color: var(--accent);" dir="ltr">
+                                <p data-cart-item-total class="mono font-black text-sm md:text-base" style="color: var(--accent);" dir="ltr">
                                     {{ number_format($item['price'] * $item['qty']) }}
                                 </p>
                                 <p class="text-[10px]" style="color: var(--text-secondary);">{{ __('messages.toman') }}</p>
@@ -128,17 +129,15 @@
                     <div class="neu-card p-5">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="font-bold">{{ __('messages.subtotal') }}</h2>
-                            <span class="mono font-bold" style="color: var(--text-primary);" dir="ltr">
+                            <span id="cart-subtotal" class="mono font-bold" style="color: var(--text-primary);" dir="ltr">
                                 {{ number_format($cart->subtotal()) }}
                             </span>
                         </div>
 
-                        @if(session('coupon'))
-                            <div class="flex items-center justify-between text-sm mb-2">
+                        <div id="cart-coupon-row" class="flex items-center justify-between text-sm mb-2 {{ session('coupon') ? '' : 'hidden' }}">
                                 <span style="color: var(--text-secondary);">{{ __('messages.coupon_code') }} ({{ session('coupon.code') }})</span>
-                                <span class="mono" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
+                                <span id="cart-coupon-amount" class="mono" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
                             </div>
-                        @endif
 
                         <form action="{{ localizedRoute('cart.coupon') }}" method="POST" class="flex items-center gap-2 mb-5">
                             @csrf
@@ -153,7 +152,7 @@
                         <div class="border-t pt-4 flex items-center justify-between mb-5"
                              style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                             <span class="font-bold">{{ __('messages.total') }}</span>
-                            <span class="mono font-black text-lg" style="color: var(--accent);" dir="ltr">
+                            <span id="cart-total" class="mono font-black text-lg" style="color: var(--accent);" dir="ltr">
                                 {{ number_format($cart->total()) }}
                             </span>
                         </div>
@@ -168,3 +167,7 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    @include('site.cart.ajax-cart')
+@endpush
