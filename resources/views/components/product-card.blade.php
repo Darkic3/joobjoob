@@ -127,6 +127,8 @@
                     class="add-to-cart"
                     @disabled($outOfStock)
                     data-success="{{ __('messages.added_short') }}"
+                    data-cart-url="{{ route('cart.add', ['product' => $product->id]) }}"
+                    data-csrf="{{ csrf_token() }}"
                     onclick="event.stopPropagation()">
 
                 @if($outOfStock)

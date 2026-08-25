@@ -155,34 +155,70 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            const originalText = this.innerHTML;
-            const successText = this.dataset.success || '✓ اضافه شد';
+            e.stopPropagation();
+            const btn = this;
+            const originalText = btn.innerHTML;
+            const successText = btn.dataset.success || '✓ اضافه شد';
+            const cartUrl = btn.dataset.cartUrl;
+
+            // اگر URL سبد وجود ندارد (مثلاً در quick-view)، از form والد استفاده کن
+            if (!cartUrl) return;
 
             // حالت لودینگ
-            this.innerHTML = '<span class="btn-spinner"></span>';
-            this.disabled = true;
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+            btn.disabled = true;
 
-            // شبیه‌سازی درخواست — در پروژهٔ واقعی به‌جای setTimeout از fetch(url, {method: 'POST'})
-            setTimeout(() => {
-                this.innerHTML = successText;
-                this.classList.add('neu-btn-success');
+            fetch(cartUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': btn.dataset.csrf || document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ qty: 1 }),
+            })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return null;
+                }
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
 
-                // شمارندهٔ سبد — هم در هدر و هم در نوار پایین موبایل
-                ['cart-count', 'cart-count-mobile'].forEach(function (id) {
-                    const badge = document.getElementById(id);
-                    if (!badge) return;
-                    badge.textContent = (parseInt(badge.textContent || '0') + 1);
-                    badge.classList.remove('count-pop');
-                    void badge.offsetWidth;
-                    badge.classList.add('count-pop');
-                });
+                if (data.success) {
+                    btn.innerHTML = successText;
+                    btn.classList.add('neu-btn-success');
+
+                    const count = typeof data.cart_count === 'number' ? data.cart_count : 0;
+                    ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                        const badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = count;
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
+                } else {
+                    btn.innerHTML = data.message || 'خطا';
+                }
 
                 setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.classList.remove('neu-btn-success');
-                    this.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('neu-btn-success');
+                    btn.disabled = false;
                 }, 1500);
-            }, 800);
+            })
+            .catch(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('neu-btn-success');
+                btn.disabled = false;
+            });
         });
     });
 });
