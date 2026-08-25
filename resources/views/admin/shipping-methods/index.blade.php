@@ -8,13 +8,6 @@
         <a href="{{ route('admin.shipping-methods.create') }}" class="btn btn-primary btn-sm">+ افزودن روش ارسال</a>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover table-sm mb-0">
