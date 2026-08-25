@@ -1067,10 +1067,12 @@
                     if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
 
                     if (data.success) {
+                        var cartCount = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
+                        var cartCountStr = window.localizeDigits ? window.localizeDigits.convert(String(cartCount)) : String(cartCount);
                         ['cart-count', 'cart-count-mobile'].forEach(function(id) {
                             var badge = document.getElementById(id);
                             if (!badge) return;
-                            badge.textContent = data.cart_count;
+                            badge.textContent = cartCountStr;
                             badge.classList.remove('count-pop');
                             void badge.offsetWidth;
                             badge.classList.add('count-pop');

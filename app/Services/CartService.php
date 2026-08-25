@@ -24,7 +24,8 @@ class CartService
     public function add(Product $product, int $qty = 1, ?int $variantId = null, ?string $color = null, ?string $size = null): string
     {
         $cart = $this->content();
-        $rowId = md5($product->id . $variantId . $color . $size);
+        $qty = max(1, $qty);
+        $rowId = md5($product->id . ($variantId ?? '') . ($color ?? '') . ($size ?? ''));
 
         $variant = $variantId ? $product->variants()->find($variantId) : null;
 
@@ -91,7 +92,7 @@ class CartService
 
     public function subtotal(): float
     {
-        return $this->content()->sum(fn ($item) => $item['price'] * $item['qty']);
+        return (float) $this->content()->sum(fn ($item) => ($item['price'] ?? 0) * ($item['qty'] ?? 0));
     }
 
     public function discount(): float
@@ -114,7 +115,7 @@ class CartService
 
     public function count(): int
     {
-        return $this->content()->sum('qty');
+        return (int) $this->content()->sum('qty');
     }
 
     /**

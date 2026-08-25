@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\StateService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -13,7 +15,21 @@ class CartController extends Controller
 
     public function index()
     {
-        return view('site.cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart]);
+        if ($this->cart->count() === 0) {
+            return view('site.cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart, 'addresses' => collect(), 'states' => [], 'banks' => collect()]);
+        }
+
+        $addresses = AddressService::find()['addresses'] ?? collect();
+        $states = StateService::findActive();
+        $banks = \App\Models\Bank::active()->orderBy('id', 'DESC')->get();
+
+        return view('site.cart.index', [
+            'items' => $this->cart->content(),
+            'cart' => $this->cart,
+            'addresses' => $addresses,
+            'states' => $states,
+            'banks' => $banks,
+        ]);
     }
 
     public function add(Request $request, Product $product)
@@ -25,10 +41,10 @@ class CartController extends Controller
 
         $this->cart->add(
             $product,
-            $request->get('qty', 1),
-            $request->get('variant_id') ? (int) $request->get('variant_id') : null,
-            $request->get('color'),
-            $request->get('size')
+            (int) ($request->input('qty') ?? 1),
+            $request->input('variant_id') ? (int) $request->input('variant_id') : null,
+            $request->input('color'),
+            $request->input('size')
         );
 
         // اگر درخواست از نوع AJAX (JSON) بود، پاسخ جیسون بده
@@ -50,7 +66,7 @@ class CartController extends Controller
 
         $item = $this->cart->content()->get($rowId);
         $maxQty = $item['stock'] ?? PHP_INT_MAX;
-        $qty = min((int) $request->qty, $maxQty);
+        $qty = min((int) ($request->input('qty') ?? 1), $maxQty);
 
         $this->cart->update($rowId, $qty);
 

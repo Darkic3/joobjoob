@@ -24,35 +24,14 @@ class CheckoutController extends Controller
 
     public function index()
     {
-        if ($this->cart->count() === 0) {
-            return redirect()->route('cart.index');
-        }
-
-        return view('checkout.index', [
-            'items' => $this->cart->content(),
-            'cart' => $this->cart,
-            'subtotal' => $this->cart->subtotal(),
-            'discount' => $this->cart->discount(),
-            'total' => $this->cart->total(),
-        ]);
+        return redirect()->route('cart.index');
     }
 
     // ==================== مرحله ۲: انتخاب آدرس ====================
 
     public function address()
     {
-        if ($this->cart->count() === 0) {
-            return redirect()->route('cart.index');
-        }
-
-        $addresses = AddressService::find()['addresses'] ?? collect();
-        $states = StateService::findActive();
-
-        return view('checkout.address', [
-            'addresses' => $addresses,
-            'states' => $states,
-            'cart' => $this->cart,
-        ]);
+        return redirect()->route('cart.index')->with('step', 2);
     }
 
     /**
@@ -122,34 +101,7 @@ class CheckoutController extends Controller
 
     public function payment()
     {
-        if ($this->cart->count() === 0) {
-            return redirect()->route('cart.index');
-        }
-
-        $addressId = session('checkout_address_id');
-        $shippingMethodId = session('checkout_shipping_method_id');
-
-        if (! $addressId) {
-            return redirect()->route('checkout.address')
-                ->with('error', 'لطفا ابتدا آدرس را انتخاب کنید');
-        }
-
-        if (! $shippingMethodId) {
-            return redirect()->route('checkout.address')
-                ->with('error', 'لطفا روش ارسال را انتخاب کنید');
-        }
-
-        $banks = \App\Models\Bank::active()->orderBy('id', 'DESC')->get();
-
-        return view('checkout.payment', [
-            'items' => $this->cart->content(),
-            'cart' => $this->cart,
-            'banks' => $banks,
-            'subtotal' => $this->cart->subtotal(),
-            'discount' => $this->cart->discount(),
-            'shipping_price' => session('checkout_shipping_price', 0),
-            'total' => $this->cart->total() + intval(session('checkout_shipping_price', 0)),
-        ]);
+        return redirect()->route('cart.index')->with('step', 3);
     }
 
     /**
@@ -268,7 +220,7 @@ class CheckoutController extends Controller
             return $result;
         } catch (\Exception $e) {
             \Log::error('Order creation failed', ['message' => $e->getMessage()]);
-            return redirect(route('checkout.failed'))
+            return redirect()->route('checkout.failed')
                 ->with('error', 'خطا در ایجاد سفارش، مجدد تلاش نمایید.');
         }
     }
