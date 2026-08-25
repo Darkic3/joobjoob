@@ -77,11 +77,38 @@ $siteRoutes = function () {
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
     });
 
-    // تسویه حساب (نیازمند ورود)
+    // ==================== تسویه حساب (نیازمند ورود) ====================
     Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+        // مرحله ۱: سبد خرید
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
-        Route::post('/', [CheckoutController::class, 'store'])->name('store');
+
+        // مرحله ۲: انتخاب آدرس
+        Route::get('/address', [CheckoutController::class, 'address'])->name('address');
+        Route::get('/cities', [CheckoutController::class, 'cities'])->name('cities');
+        Route::post('/shipments', [CheckoutController::class, 'shipments'])->name('shipments');
+        Route::post('/set-shipment', [CheckoutController::class, 'setShipment'])->name('set-shipment');
+        Route::get('/address-price', [CheckoutController::class, 'addressPrice'])->name('address-price');
+
+        // مرحله ۳: پرداخت
+        Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
+        Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('apply-discount');
+        Route::post('/remove-discount', [CheckoutController::class, 'removeDiscount'])->name('remove-discount');
+        Route::get('/order-price', [CheckoutController::class, 'orderPrice'])->name('order-price');
+
+        // مرحله ۴: ایجاد سفارش
+        Route::post('/create', [CheckoutController::class, 'create'])->name('create');
+
+        // صفحات نتیجه
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+        Route::get('/failed', [CheckoutController::class, 'failed'])->name('failed');
+    });
+
+    // Callback درگاه‌های پرداخت (بدون نیاز به لاگین)
+    Route::prefix('checkout')->name('checkout.')->group(function () {
+        Route::any('/finish', [CheckoutController::class, 'finishZarinPal'])->name('finish.zarin-pal');
+        Route::any('/finish-saman', [CheckoutController::class, 'finishSaman'])->name('finish.saman-bank');
+        Route::any('/finish-sadad', [CheckoutController::class, 'finishSadad'])->name('finish.sadad-bank');
+        Route::any('/finish-zibal', [CheckoutController::class, 'finishZibal'])->name('finish.zibal-bank');
     });
 
     // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
