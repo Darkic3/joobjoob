@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'ویرایش روش ارسال: {{ $shippingMethod->title }}')
+@section('tab-name')ویرایش روش ارسال: {{ $shippingMethod->title }}@endsection
 
 @section('content')
     <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">🚚 ویرایش روش ارسال: {{ $shippingMethod->title }}</h2>
