@@ -410,30 +410,7 @@
                             </div>
                         </div>
 
-                        {{-- کد تخفیف --}}
-                        <div class="neu-card p-6">
-                            <div class="flex items-center gap-2.5 mb-4">
-                                <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                    <svg class="w-4.5 h-4.5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 6h.008v.008H6V6Z"/></svg>
-                                </div>
-                                <h3 class="font-black text-base" style="color: var(--text-primary);">{{ __('messages.coupon_code') }}</h3>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <div class="relative flex-1">
-                                    <input type="text" id="discountCodeInput" class="neu-input w-full text-sm py-3 pe-10"
-                                           placeholder="کد تخفیف خود را وارد کنید" autocomplete="off">
-                                    <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"/></svg>
-                                </div>
-                                <button type="button" onclick="applyDiscountCode()"
-                                        class="neu-btn px-5 py-3 text-xs font-bold rounded-full shrink-0 transition-all duration-200 hover:scale-[1.03]"
-                                        style="background: var(--accent); color: var(--accent-contrast);">
-                                    {{ __('messages.apply') }}
-                                </button>
-                            </div>
-                            <div id="discountMessage" class="text-xs mt-3 font-bold flex items-center gap-1.5" style="display: none;"></div>
-                        </div>
-
-                        {{-- درگاه پرداخت --}}
+                        {{-- درگاه پرداخت + کد تخفیف --}}
                         <div class="neu-card p-6">
                             <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
                                 <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
@@ -443,6 +420,36 @@
                             </h2>
                             <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm">
                                 @csrf
+
+                                {{-- ─── کد تخفیف ─── --}}
+                                <div class="neu-flat-sm p-4 rounded-2xl mb-5">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 6h.008v.008H6V6Z"/></svg>
+                                        <span class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.coupon_code') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="relative flex-1">
+                                            <input type="text" id="discountCodeInput" class="neu-input w-full text-sm py-2.5 pe-10"
+                                                   placeholder="کد تخفیف خود را وارد کنید" autocomplete="off">
+                                            <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"/></svg>
+                                        </div>
+                                        <button type="button" onclick="applyDiscountCode()"
+                                                class="neu-btn px-4 py-2.5 text-xs font-bold rounded-full shrink-0 transition-all duration-200 hover:scale-[1.03]"
+                                                style="background: var(--accent); color: var(--accent-contrast);">
+                                            {{ __('messages.apply') }}
+                                        </button>
+                                    </div>
+                                    <div id="discountMessage" class="text-xs mt-2 font-bold" style="display: none;"></div>
+                                </div>
+
+                                {{-- ─── جداکننده ─── --}}
+                                <div class="mb-5 flex items-center gap-3">
+                                    <div class="flex-1 h-px" style="background: color-mix(in srgb, var(--text-primary) 8%, transparent);"></div>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-secondary);">انتخاب درگاه</span>
+                                    <div class="flex-1 h-px" style="background: color-mix(in srgb, var(--text-primary) 8%, transparent);"></div>
+                                </div>
+
+                                {{-- ─── درگاه‌های پرداخت ─── --}}
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     @forelse($banks as $bank)
                                         <label class="checkout-bank-option neu-flat-sm p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition-all duration-300"
@@ -469,15 +476,15 @@
                                     @endforelse
                                 </div>
 
-                                {{-- توضیحات --}}
+                                {{-- ─── توضیحات --}}
                                 <div class="mt-5">
                                     <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
                                     <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
                                               placeholder="مثلاً: ساعت ارسال، توضیحات خاص و ..."></textarea>
                                 </div>
 
-                                {{-- دکمه پرداخت --}}
-                                <div class="mt-6 neu-card p-5 text-center" style="background: color-mix(in srgb, var(--accent) 5%, transparent);">
+                                {{-- ─── دکمه پرداخت ─── --}}
+                                <div class="mt-6 p-5 text-center rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
                                     <p class="text-xs font-bold mb-2" style="color: var(--text-secondary);">مبلغ قابل پرداخت</p>
                                     <p class="mono font-black text-2xl mb-4" style="color: var(--accent);" dir="ltr" id="step3-total-inline">{{ number_format($cart->total()) }}</p>
                                     <button type="submit" id="payBtn"
