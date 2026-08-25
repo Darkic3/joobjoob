@@ -134,8 +134,14 @@ $siteRoutes = function () {
     Route::middleware('auth')->group(function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/account/orders', [DashboardController::class, 'orders'])->name('dashboard.orders');
+        Route::get('/account/orders/{id}', [DashboardController::class, 'orderDetail'])->name('dashboard.order-detail');
+        Route::get('/account/orders/{id}/factor', [DashboardController::class, 'orderFactor'])->name('dashboard.order-factor');
         Route::get('/account/wishlist', [DashboardController::class, 'wishlist'])->name('dashboard.wishlist');
         Route::get('/account/addresses', [DashboardController::class, 'addresses'])->name('dashboard.addresses');
+        Route::post('/account/addresses', [DashboardController::class, 'createAddress'])->name('dashboard.addresses.create');
+        Route::put('/account/addresses/{id}', [DashboardController::class, 'updateAddress'])->name('dashboard.addresses.update');
+        Route::delete('/account/addresses/{id}', [DashboardController::class, 'deleteAddress'])->name('dashboard.addresses.delete');
+        Route::get('/account/addresses/cities', [DashboardController::class, 'cities'])->name('dashboard.addresses.cities');
     });
 };
 
