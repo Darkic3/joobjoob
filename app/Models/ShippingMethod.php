@@ -9,13 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ShippingMethod extends Model
 {
-    use SoftDeletes;
-
-    protected $fillable = [
+    use SoftDeletes;    protected $fillable = [
         'title', 'price', 'price_ceiling', 'status', 'description',
+        'estimated_days_min', 'estimated_days_max', 'show_estimated_days',
         'freight_balance', 'type', 'chapar_type', 'config',
-        'sender_name', 'sender_company', 'sender_city_id', 'sender_phone',
-        'sender_mobile', 'sender_email', 'sender_address', 'sender_postal_code',
+        'sender_name', 'sender_company', 'sender_city_id', 'sender_phone', 'sender_mobile', 'sender_email', 'sender_address', 'sender_postal_code',
     ];
 
     protected $casts = [
@@ -55,5 +53,20 @@ class ShippingMethod extends Model
         return $this->attributes['freight_balance'] == 1
             ? ['title' => 'پس کرایه', 'badge' => 'success']
             : ['title' => 'پیش کرایه', 'badge' => 'info'];
+    }
+
+    /**
+     * نمایش متنی زمان تخمینی ارسال
+     */
+    public function getEstimatedDaysTextAttribute(): string
+    {
+        $min = $this->estimated_days_min ?? 1;
+        $max = $this->estimated_days_max ?? 3;
+
+        if ($min === $max) {
+            return $min . ' روز کاری';
+        }
+
+        return $min . ' تا ' . $max . ' روز کاری';
     }
 }

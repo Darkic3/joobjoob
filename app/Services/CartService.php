@@ -15,7 +15,27 @@ class CartService
 
     public function content(): Collection
     {
-        return collect(session($this->sessionKey, []));
+        $cart = collect(session($this->sessionKey, []));
+
+        // آپدیت خودکار آیتم‌های قدیمی که original_price ندارند
+        $needsUpdate = false;
+        $cart = $cart->map(function ($item) use (&$needsUpdate) {
+            if (empty($item['original_price'])) {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $variant = ! empty($item['variant_id']) ? $product->variants()->find($item['variant_id']) : null;
+                    $item['original_price'] = $variant ? $variant->price : $product->price;
+                    $needsUpdate = true;
+                }
+            }
+            return $item;
+        });
+
+        if ($needsUpdate) {
+            session([$this->sessionKey => $cart->toArray()]);
+        }
+
+        return $cart;
     }
 
     /**
@@ -30,6 +50,7 @@ class CartService
         $variant = $variantId ? $product->variants()->find($variantId) : null;
 
         $price = $variant ? $variant->final_price : $product->final_price;
+        $originalPrice = $variant ? $variant->price : $product->price;
         $stock = $variant ? $variant->stock : $product->stock;
         $weight = $variant ? ($variant->weight ?? 0) : ($product->weight ?? 0);
         $label = $variant && $variant->specifications->isNotEmpty()
@@ -52,6 +73,7 @@ class CartService
                 'name' => $product->trans('name') ?? $product->name,
                 'slug' => $product->slug,
                 'price' => $price,
+                'original_price' => $originalPrice,
                 'qty' => $qty,
                 'stock' => $stock,
                 'weight' => $weight,

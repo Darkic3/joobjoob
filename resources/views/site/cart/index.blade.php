@@ -77,10 +77,16 @@
                                     @if(!empty($item['variant_label']))
                                         <p class="text-xs mt-1 px-2 py-0.5 rounded-full inline-block" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">{{ $item['variant_label'] }}</p>
                                     @endif
-                                    <p class="text-xs mt-1.5" style="color: var(--text-secondary);">
-                                        <span class="mono font-bold" dir="ltr">{{ number_format($item['price']) }}</span>
-                                        <span class="text-[10px]"> {{ __('messages.toman') }}</span>
-                                    </p>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        @if(!empty($item['original_price']) && $item['original_price'] > $item['price'])
+                                            <span class="mono text-xs line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ number_format($item['original_price']) }}</span>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);">
+                                                {{ round((1 - $item['price'] / $item['original_price']) * 100) }}٪-
+                                            </span>
+                                        @endif
+                                        <span class="mono text-xs font-bold" style="color: var(--accent);" dir="ltr">{{ number_format($item['price']) }}</span>
+                                        <span class="text-[10px]" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
+                                    </div>
                                     @if($item['stock'] <= 0)
                                         <p class="text-xs mt-1 font-bold" style="color: var(--danger);">{{ __('messages.out_of_stock') }}</p>
                                     @elseif($item['stock'] <= 3)
@@ -157,7 +163,23 @@
                                         {{ session('coupon.code') ?? '' }}
                                     </span>
                                     <span id="cart-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
-                                </div>                                </div>
+                                </div>
+                                @php
+                                    $totalSavings = $items->sum(function ($item) {
+                                        $original = $item['original_price'] ?? $item['price'];
+                                        return max(0, ($original - $item['price']) * $item['qty']);
+                                    });
+                                @endphp
+                                @if($totalSavings > 0)
+                                    <div id="cart-savings-row" class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center gap-1.5" style="color: var(--success);">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                                            سود شما از این خرید
+                                        </span>
+                                        <span id="cart-savings" class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                    </div>
+                                @endif
+                            </div>
 
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -257,6 +279,7 @@
                                 </div>
                                 <form action="{{ localizedRoute('dashboard.addresses.create') }}" method="POST" class="space-y-3">
                                     @csrf
+                                    <input type="hidden" name="redirect_to" value="{{ localizedRoute('cart.index') }}?step=2">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div>
                                             <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">نام تحویل‌گیرنده</label>
@@ -447,7 +470,12 @@
                                             @if(!empty($item['variant_label']))
                                                 <p class="text-[11px] mt-0.5" style="color: var(--text-secondary);">{{ $item['variant_label'] }}</p>
                                             @endif
-                                            <p class="text-[11px] mt-0.5" style="color: var(--text-secondary);">{{ $item['qty'] }} × {{ number_format($item['price']) }} {{ __('messages.toman') }}</p>
+                                            <div class="flex items-center gap-1.5 mt-0.5">
+                                                @if(!empty($item['original_price']) && $item['original_price'] > $item['price'])
+                                                    <span class="mono text-[10px] line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ number_format($item['original_price']) }}</span>
+                                                @endif
+                                                <span class="text-[11px]" style="color: var(--text-secondary);">{{ $item['qty'] }} × {{ number_format($item['price']) }} {{ __('messages.toman') }}</span>
+                                            </div>
                                         </div>
                                         <p class="text-sm mono font-black shrink-0" style="color: var(--accent);" dir="ltr">{{ number_format($item['price'] * $item['qty']) }}</p>
                                     </div>
@@ -510,6 +538,12 @@
                                                 @endif
                                             </span>
                                         </div>
+                                        @if(!empty($selectedShipping->show_estimated_days) && ($selectedShipping->estimated_days_min || $selectedShipping->estimated_days_max))
+                                            <div class="flex items-center gap-1.5 mt-2 text-[11px]" style="color: var(--text-secondary);">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                                <span>زمان تخمینی تحویل: <strong style="color: var(--accent);">{{ $selectedShipping->estimated_days_text }}</strong></span>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -783,7 +817,7 @@
     <script>
     (function() {
         // ========== مدیریت مراحل ==========
-        var currentStep = {{ session('step') ?? 1 }};
+        var currentStep = {{ $currentStep ?? session('step') ?? 1 }};
         var selectedAddressId = null;
         var selectedShippingMethodId = null;
         var selectedBankId = null;
@@ -828,6 +862,11 @@
             document.getElementById('line-1-2').className = 'step-line' + (step > 1 ? ' done' : step === 2 ? ' active' : '');
             document.getElementById('line-2-3').className = 'step-line' + (step > 2 ? ' done' : step === 3 ? ' active' : '');
             document.getElementById('line-3-4').className = 'step-line' + (step > 3 ? ' done' : step === 4 ? ' active' : '');
+
+            // ذخیره مرحله در URL (بدون رفرش صفحه)
+            var url = new URL(window.location.href);
+            url.searchParams.set('step', step);
+            history.replaceState(null, '', url.toString());
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -874,7 +913,9 @@
                             '<div class="flex items-center gap-2">' + icon +
                             '<div><p class="text-sm font-bold" style="color: var(--text-primary);">' + method.title + '</p>' +
                             '<p class="text-[11px]" style="color: var(--text-secondary);">' +
-                            (method.type === 'with_weight' ? 'بر اساس وزن' : method.type === 'fixed_price' ? 'قیمت ثابت' : '') + '</p></div>' +
+                            (method.type === 'with_weight' ? 'بر اساس وزن' : method.type === 'fixed_price' ? 'قیمت ثابت' : '') +
+                            (method.show_estimated_days && method.estimated_days_min ? ' · ' + method.estimated_days_min + ' تا ' + method.estimated_days_max + ' روز کاری' : '') +
+                            '</p></div>' +
                             '</div>' +
                             '</div>' +
                             '<span class="text-sm mono font-bold" style="color: var(--accent);" dir="ltr">' + priceText + '</span>' +

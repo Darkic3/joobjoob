@@ -13,7 +13,7 @@ class CartController extends Controller
 {
     public function __construct(protected CartService $cart) {}
 
-    public function index()
+    public function index(Request $request)
     {
         if ($this->cart->count() === 0) {
             return view('site.cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart, 'addresses' => collect(), 'states' => [], 'banks' => collect()]);
@@ -34,6 +34,21 @@ class CartController extends Controller
         }
         $shippingPrice = session('checkout_shipping_price', 0);
 
+        $currentStep = $request->get('step') ? (int) $request->get('step') : null;
+
+        // اعتبارسنجی مراحل — جلوگیری از رد شدن از مراحل
+        if ($currentStep !== null) {
+            if ($currentStep >= 3 && ! session('checkout_address_id')) {
+                $currentStep = 2;
+            }
+            if ($currentStep >= 3 && ! session('checkout_shipping_method_id')) {
+                $currentStep = 2;
+            }
+            if ($currentStep >= 4 && ! session('checkout_address_id')) {
+                $currentStep = 2;
+            }
+        }
+
         return view('site.cart.index', [
             'items' => $this->cart->content(),
             'cart' => $this->cart,
@@ -43,6 +58,7 @@ class CartController extends Controller
             'selectedAddress' => $selectedAddress,
             'selectedShipping' => $selectedShipping,
             'shippingPrice' => $shippingPrice,
+            'currentStep' => $currentStep,
         ]);
     }
 

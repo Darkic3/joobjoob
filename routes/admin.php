@@ -85,6 +85,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('orders/post-code', [\App\Http\Controllers\Admin\OrderController::class, 'postCode'])->name('orders.post-code');
         Route::get('orders/{id}/factor', [\App\Http\Controllers\Admin\OrderController::class, 'factor'])->name('orders.factor');
 
+        // ========== مدیریت روش‌های ارسال ==========
+        Route::resource('shipping-methods', \App\Http\Controllers\Admin\ShippingMethodController::class);
+        Route::post('shipping-methods/{shippingMethod}/toggle-status', [\App\Http\Controllers\Admin\ShippingMethodController::class, 'toggleStatus'])->name('shipping-methods.toggle-status');
+
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
         Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');

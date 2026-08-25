@@ -89,7 +89,8 @@ class DashboardController extends Controller
             NumberHelper::persian2LatinDigit($request->receiptor_mobile)
         );
 
-        return redirect()->back()->with('success', 'آدرس با موفقیت اضافه شد');
+        $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
+        return redirect($redirect)->with('success', 'آدرس با موفقیت اضافه شد');
     }
 
     /**
@@ -117,7 +118,8 @@ class DashboardController extends Controller
             NumberHelper::persian2LatinDigit($request->receiptor_mobile)
         );
 
-        return redirect()->back()->with('success', 'آدرس با موفقیت ویرایش شد');
+        $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
+        return redirect($redirect)->with('success', 'آدرس با موفقیت ویرایش شد');
     }
 
     /**

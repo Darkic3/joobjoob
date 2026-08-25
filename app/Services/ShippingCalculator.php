@@ -105,6 +105,9 @@ class ShippingCalculator
                 'freight_balance' => $shipment->freight_balance,
                 'description' => $shipment->description,
                 'price' => $price,
+                'estimated_days_min' => $shipment->estimated_days_min ?? 1,
+                'estimated_days_max' => $shipment->estimated_days_max ?? 3,
+                'show_estimated_days' => $shipment->show_estimated_days ?? true,
             ];
         }
 
