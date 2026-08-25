@@ -31,7 +31,8 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         @if($item['image'])
-                                            <img src="{{ asset('uploads/products/' . $item['image']) }}" alt="" width="60" height="60" class="rounded me-2">
+                                            <img src="{{ asset('uploads/products/' . $item['image']) }}" alt="" width="60" height="60" class="rounded me-2"
+                                                 onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'">
                                         @endif
                                         <div>
                                             <strong>{{ $item['name'] }}</strong>

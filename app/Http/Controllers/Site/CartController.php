@@ -23,12 +23,26 @@ class CartController extends Controller
         $states = StateService::findActive();
         $banks = \App\Models\Bank::active()->orderBy('id', 'DESC')->get();
 
+        // آدرس و روش ارسال انتخاب‌شده (از سشن)
+        $selectedAddress = null;
+        if ($addressId = session('checkout_address_id')) {
+            $selectedAddress = \App\Models\Address::with(['state', 'city'])->find($addressId);
+        }
+        $selectedShipping = null;
+        if ($shippingMethodId = session('checkout_shipping_method_id')) {
+            $selectedShipping = \App\Models\ShippingMethod::find($shippingMethodId);
+        }
+        $shippingPrice = session('checkout_shipping_price', 0);
+
         return view('site.cart.index', [
             'items' => $this->cart->content(),
             'cart' => $this->cart,
             'addresses' => $addresses,
             'states' => $states,
             'banks' => $banks,
+            'selectedAddress' => $selectedAddress,
+            'selectedShipping' => $selectedShipping,
+            'shippingPrice' => $shippingPrice,
         ]);
     }
 

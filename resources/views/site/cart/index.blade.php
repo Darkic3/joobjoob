@@ -32,30 +32,23 @@
             {{-- ═══════════════════ نشانگر مراحل ═══════════════════ --}}
             <div class="neu-card px-6 py-5 mb-8" id="step-indicator">
                 <div class="flex items-center justify-center gap-0">
-                    {{-- مرحله ۱ --}}
                     <div class="step-dot active" data-step="1">
-                        <div class="step-circle">
-                            <span class="step-num">۱</span>
-                            <svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        </div>
+                        <div class="step-circle"><span class="step-num">۱</span><svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
                         <span class="step-label">{{ __('messages.cart') }}</span>
                     </div>
                     <div class="step-line" id="line-1-2"></div>
-                    {{-- مرحله ۲ --}}
                     <div class="step-dot" data-step="2">
-                        <div class="step-circle">
-                            <span class="step-num">۲</span>
-                            <svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        </div>
+                        <div class="step-circle"><span class="step-num">۲</span><svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
                         <span class="step-label">{{ __('messages.shipping_address') }}</span>
                     </div>
                     <div class="step-line" id="line-2-3"></div>
-                    {{-- مرحله ۳ --}}
                     <div class="step-dot" data-step="3">
-                        <div class="step-circle">
-                            <span class="step-num">۳</span>
-                            <svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        </div>
+                        <div class="step-circle"><span class="step-num">۳</span><svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+                        <span class="step-label">{{ __('messages.coupon_code') }}</span>
+                    </div>
+                    <div class="step-line" id="line-3-4"></div>
+                    <div class="step-dot" data-step="4">
+                        <div class="step-circle"><span class="step-num">۴</span><svg class="step-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
                         <span class="step-label">{{ __('messages.payment_method') }}</span>
                     </div>
                 </div>
@@ -67,14 +60,13 @@
                     <div class="lg:col-span-2 space-y-3">
                         @foreach($items as $item)
                             <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group">
-                                @if($item['image'])
-                                    <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
-                                       class="shrink-0 block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden neu-flat-sm relative">
-                                        <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}"
-                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy"
-                                             width="96" height="96">
-                                    </a>
-                                @endif
+                                <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
+                                   class="shrink-0 block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden neu-flat-sm relative">
+                                     <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="{{ $item['name'] }}"
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy"
+                                         onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
+                                         width="96" height="96">
+                                </a>
 
                                 <div class="flex-1 min-w-0">
                                     <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
@@ -165,20 +157,7 @@
                                         {{ session('coupon.code') ?? '' }}
                                     </span>
                                     <span id="cart-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
-                                </div>
-                            </div>
-
-                            {{-- فیلد کوپن --}}
-                            <form action="{{ localizedRoute('cart.coupon') }}" method="POST" class="flex items-center gap-2 mb-5">
-                                @csrf
-                                <input type="text" name="code" value="{{ session('coupon.code') ?? '' }}"
-                                       placeholder="{{ __('messages.coupon_code') }}"
-                                       class="neu-input flex-1 text-sm py-2.5" autocomplete="off">
-                                <button type="submit" class="neu-btn px-4 py-2.5 text-xs font-bold rounded-full shrink-0"
-                                        style="color: var(--accent);">
-                                    {{ __('messages.apply') }}
-                                </button>
-                            </form>
+                                </div>                                </div>
 
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -206,7 +185,7 @@
                             <div class="flex items-center justify-between mb-5">
                                 <h2 class="font-black text-base flex items-center gap-2.5" style="color: var(--text-primary);">
                                     <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                        <svg class="w-4.5 h-4.5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+                                        <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
                                     </div>
                                     {{ __('messages.shipping_address') }}
                                 </h2>
@@ -331,7 +310,7 @@
                         <div class="neu-card p-6 hidden" id="shippingMethodsCard">
                             <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
                                 <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                    <svg class="w-4.5 h-4.5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
                                 </div>
                                 روش ارسال
                             </h2>
@@ -370,6 +349,73 @@
                                 <button type="button" onclick="goToStep(3)" id="step2-next-btn"
                                         class="neu-btn neu-btn-primary px-4 py-3 text-xs font-bold rounded-full flex-1 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                                         disabled>
+                                    ادامه
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ═══════════════════ مرحله ۳: کد تخفیف ═══════════════════ --}}
+            <div id="checkout-step-3" class="checkout-step" style="display: none;">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    <div class="lg:col-span-2">
+                        <div class="neu-card p-6">
+                            <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
+                                <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 6h.008v.008H6V6Z"/></svg>
+                                </div>
+                                {{ __('messages.coupon_code') }}
+                            </h2>
+                            <p class="text-sm mb-5" style="color: var(--text-secondary);">اگر کد تخفیف دارید، در کادر زیر وارد کنید و دکمه اعمال را بزنید.</p>
+                            <div class="neu-flat-sm p-5 rounded-2xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="relative flex-1">
+                                        <input type="text" id="discountCodeInput" class="neu-input w-full text-sm py-3.5 pe-10"
+                                               placeholder="کد تخفیف خود را وارد کنید" autocomplete="off">
+                                        <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"/></svg>
+                                    </div>
+                                    <button type="button" onclick="applyDiscountCode()"
+                                            class="neu-btn px-6 py-3.5 text-sm font-bold rounded-full shrink-0 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+                                            style="background: var(--accent); color: var(--accent-contrast);">
+                                        {{ __('messages.apply') }}
+                                    </button>
+                                </div>
+                                <div id="discountMessage" class="text-sm mt-3 font-bold" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- خلاصه مرحله ۳ --}}
+                    <div class="lg:sticky lg:top-24">
+                        <div class="neu-card p-6">
+                            <h3 class="font-black text-base mb-5" style="color: var(--text-primary);">خلاصه سفارش</h3>
+                            <div class="space-y-3 mb-5">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span style="color: var(--text-secondary);">{{ __('messages.subtotal') }}</span>
+                                    <span id="step3-subtotal" class="mono font-bold" dir="ltr">{{ number_format($cart->subtotal()) }}</span>
+                                </div>
+                                <div id="step3-coupon-row" class="flex items-center justify-between text-sm {{ session('coupon') ? '' : 'hidden' }}">
+                                    <span style="color: var(--success);">{{ __('messages.discount') }}</span>
+                                    <span id="step3-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
+                                </div>
+                                <div id="step3-shipping-row" class="flex items-center justify-between text-sm hidden">
+                                    <span style="color: var(--text-secondary);">هزینه ارسال</span>
+                                    <span id="step3-shipping-price" class="mono font-bold" dir="ltr">۰</span>
+                                </div>
+                            </div>
+                            <div class="border-t pt-4 flex items-center justify-between mb-6"
+                                 style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
+                                <span class="font-bold text-base">{{ __('messages.total') }}</span>
+                                <span id="step3-total" class="mono font-black text-xl" style="color: var(--accent);" dir="ltr">{{ number_format($cart->total()) }}</span>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <button type="button" onclick="goToStep(2)"
+                                        class="neu-btn px-4 py-3 text-xs font-bold rounded-full flex-1 text-center transition-all duration-200">
+                                    بازگشت
+                                </button>
+                                <button type="button" onclick="goToStep(4)"
+                                        class="neu-btn neu-btn-primary px-4 py-3 text-xs font-bold rounded-full flex-1 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                                     ادامه و پرداخت
                                 </button>
                             </div>
@@ -378,15 +424,15 @@
                 </div>
             </div>
 
-            {{-- ═══════════════════ مرحله ۳: پرداخت و ثبت نهایی ═══════════════════ --}}
-            <div id="checkout-step-3" class="checkout-step" style="display: none;">
+            {{-- ═══════════════════ مرحله ۴: پرداخت و ثبت نهایی ═══════════════════ --}}
+            <div id="checkout-step-4" class="checkout-step" style="display: none;">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div class="lg:col-span-2 space-y-4">
                         {{-- خلاصه اقلام --}}
                         <div class="neu-card p-6">
                             <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
                                 <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                    <svg class="w-4.5 h-4.5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                 </div>
                                 اقلام سفارش
                             </h2>
@@ -394,9 +440,8 @@
                                 @foreach($items as $item)
                                     <div class="flex items-center gap-4 py-3.5 @if(!$loop->last) border-b @endif"
                                          style="border-color: color-mix(in srgb, var(--text-primary) 6%, transparent);">
-                                        @if($item['image'])
-                                            <img src="{{ $item['image'] }}" alt="" class="w-14 h-14 rounded-xl object-cover shrink-0 neu-flat-sm">
-                                        @endif
+                                        <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="" class="w-14 h-14 rounded-xl object-cover shrink-0 neu-flat-sm"
+                                             onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ $item['name'] }}</p>
                                             @if(!empty($item['variant_label']))
@@ -410,46 +455,76 @@
                             </div>
                         </div>
 
-                        {{-- درگاه پرداخت + کد تخفیف --}}
+                        {{-- اطلاعات آدرس و ارسال --}}
                         <div class="neu-card p-6">
                             <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
                                 <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                    <svg class="w-4.5 h-4.5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+                                </div>
+                                اطلاعات ارسال
+                            </h2>
+                            <div class="space-y-4">
+                                {{-- آدرس --}}
+                                @if($selectedAddress)
+                                    <div class="neu-flat-sm p-4 rounded-2xl">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+                                            <span class="text-xs font-bold" style="color: var(--text-secondary);">آدرس تحویل</span>
+                                        </div>
+                                        <p class="text-sm font-bold mb-1" style="color: var(--text-primary);">{{ $selectedAddress->receiptor_full_name }}</p>
+                                        <p class="text-xs leading-relaxed mb-2" style="color: var(--text-secondary);">{{ $selectedAddress->address }}</p>
+                                        <div class="flex items-center gap-3 text-[11px] flex-wrap" style="color: var(--text-secondary);">
+                                            <span class="inline-flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+                                                {{ $selectedAddress->state?->name }} - {{ $selectedAddress->city?->name }}
+                                            </span>
+                                            <span aria-hidden="true" style="opacity:.3;">•</span>
+                                            <span dir="ltr" class="inline-flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
+                                                {{ $selectedAddress->receiptor_mobile }}
+                                            </span>
+                                            @if($selectedAddress->postal_code)
+                                                <span aria-hidden="true" style="opacity:.3;">•</span>
+                                                <span class="inline-flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                                                    {{ $selectedAddress->postal_code }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                                {{-- روش ارسال --}}
+                                @if($selectedShipping)
+                                    <div class="neu-flat-sm p-4 rounded-2xl">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                                            <span class="text-xs font-bold" style="color: var(--text-secondary);">روش ارسال</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-sm font-bold" style="color: var(--text-primary);">{{ $selectedShipping->title }}</p>
+                                            <span class="text-sm mono font-bold" style="color: var(--accent);" dir="ltr">
+                                                @if($shippingPrice > 0)
+                                                    {{ number_format($shippingPrice) }} {{ __('messages.toman') }}
+                                                @else
+                                                    {{ __('messages.trust_free_shipping') }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- درگاه پرداخت --}}
+                        <div class="neu-card p-6">
+                            <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
+                                <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
                                 </div>
                                 {{ __('messages.payment_method') }}
                             </h2>
                             <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm">
                                 @csrf
-
-                                {{-- ─── کد تخفیف ─── --}}
-                                <div class="neu-flat-sm p-4 rounded-2xl mb-5">
-                                    <div class="flex items-center gap-2 mb-3">
-                                        <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 6h.008v.008H6V6Z"/></svg>
-                                        <span class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.coupon_code') }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="relative flex-1">
-                                            <input type="text" id="discountCodeInput" class="neu-input w-full text-sm py-2.5 pe-10"
-                                                   placeholder="کد تخفیف خود را وارد کنید" autocomplete="off">
-                                            <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"/></svg>
-                                        </div>
-                                        <button type="button" onclick="applyDiscountCode()"
-                                                class="neu-btn px-4 py-2.5 text-xs font-bold rounded-full shrink-0 transition-all duration-200 hover:scale-[1.03]"
-                                                style="background: var(--accent); color: var(--accent-contrast);">
-                                            {{ __('messages.apply') }}
-                                        </button>
-                                    </div>
-                                    <div id="discountMessage" class="text-xs mt-2 font-bold" style="display: none;"></div>
-                                </div>
-
-                                {{-- ─── جداکننده ─── --}}
-                                <div class="mb-5 flex items-center gap-3">
-                                    <div class="flex-1 h-px" style="background: color-mix(in srgb, var(--text-primary) 8%, transparent);"></div>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-secondary);">انتخاب درگاه</span>
-                                    <div class="flex-1 h-px" style="background: color-mix(in srgb, var(--text-primary) 8%, transparent);"></div>
-                                </div>
-
-                                {{-- ─── درگاه‌های پرداخت ─── --}}
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     @forelse($banks as $bank)
                                         <label class="checkout-bank-option neu-flat-sm p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition-all duration-300"
@@ -475,18 +550,14 @@
                                         </div>
                                     @endforelse
                                 </div>
-
-                                {{-- ─── توضیحات --}}
                                 <div class="mt-5">
                                     <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
                                     <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
                                               placeholder="مثلاً: ساعت ارسال، توضیحات خاص و ..."></textarea>
                                 </div>
-
-                                {{-- ─── دکمه پرداخت ─── --}}
                                 <div class="mt-6 p-5 text-center rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
                                     <p class="text-xs font-bold mb-2" style="color: var(--text-secondary);">مبلغ قابل پرداخت</p>
-                                    <p class="mono font-black text-2xl mb-4" style="color: var(--accent);" dir="ltr" id="step3-total-inline">{{ number_format($cart->total()) }}</p>
+                                    <p class="mono font-black text-2xl mb-4" style="color: var(--accent);" dir="ltr" id="step4-total-inline">{{ number_format($cart->total()) }}</p>
                                     <button type="submit" id="payBtn"
                                             class="neu-btn neu-btn-primary w-full py-4 text-sm font-black rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                                             disabled>
@@ -499,35 +570,34 @@
                             </form>
                         </div>
                     </div>
-
-                    {{-- خلاصه پرداخت مرحله ۳ --}}
+                    {{-- خلاصه پرداخت مرحله ۴ --}}
                     <div class="lg:sticky lg:top-24">
                         <div class="neu-card p-6">
                             <h3 class="font-black text-base mb-5" style="color: var(--text-primary);">خلاصه پرداخت</h3>
                             <div class="space-y-3 mb-5">
                                 <div class="flex items-center justify-between text-sm">
                                     <span style="color: var(--text-secondary);">{{ __('messages.subtotal') }}</span>
-                                    <span id="step3-subtotal" class="mono font-bold" dir="ltr">{{ number_format($cart->subtotal()) }}</span>
+                                    <span id="step4-subtotal" class="mono font-bold" dir="ltr">{{ number_format($cart->subtotal()) }}</span>
                                 </div>
-                                <div id="step3-coupon-row" class="flex items-center justify-between text-sm {{ session('coupon') ? '' : 'hidden' }}">
+                                <div id="step4-coupon-row" class="flex items-center justify-between text-sm {{ session('coupon') ? '' : 'hidden' }}">
                                     <span style="color: var(--success);">{{ __('messages.discount') }}</span>
-                                    <span id="step3-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
+                                    <span id="step4-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
                                 </div>
-                                <div id="step3-shipping-row" class="flex items-center justify-between text-sm hidden">
+                                <div id="step4-shipping-row" class="flex items-center justify-between text-sm hidden">
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
-                                    <span id="step3-shipping-price" class="mono font-bold" dir="ltr">۰</span>
+                                    <span id="step4-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                                 <span class="font-bold text-base">مبلغ قابل پرداخت</span>
-                                <span id="step3-total" class="mono font-black text-xl" style="color: var(--accent);" dir="ltr">{{ number_format($cart->total()) }}</span>
+                                <span id="step4-total" class="mono font-black text-xl" style="color: var(--accent);" dir="ltr">{{ number_format($cart->total()) }}</span>
                             </div>
-                            <button type="button" onclick="goToStep(2)"
+                            <button type="button" onclick="goToStep(3)"
                                     class="neu-btn px-4 py-3 text-xs font-bold rounded-full w-full text-center transition-all duration-200">
                                 <span class="flex items-center justify-center gap-1.5">
                                     <svg class="w-3.5 h-3.5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
-                                    بازگشت به انتخاب آدرس
+                                    بازگشت به کد تخفیف
                                 </span>
                             </button>
                         </div>
@@ -757,6 +827,7 @@
             });
             document.getElementById('line-1-2').className = 'step-line' + (step > 1 ? ' done' : step === 2 ? ' active' : '');
             document.getElementById('line-2-3').className = 'step-line' + (step > 2 ? ' done' : step === 3 ? ' active' : '');
+            document.getElementById('line-3-4').className = 'step-line' + (step > 3 ? ' done' : step === 4 ? ' active' : '');
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -933,7 +1004,17 @@
                             couponRow3.classList.add('hidden');
                         }
                         document.getElementById('step3-total').textContent = formatNum(total);
-                        document.getElementById('step3-total-inline').textContent = formatNum(total);
+                        // مرحله ۴
+                        document.getElementById('step4-subtotal').textContent = formatNum(priceData.final_price_sum);
+                        var couponRow4 = document.getElementById('step4-coupon-row');
+                        if (priceData.price_discount > 0) {
+                            couponRow4.classList.remove('hidden');
+                            document.getElementById('step4-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
+                        } else {
+                            couponRow4.classList.add('hidden');
+                        }
+                        document.getElementById('step4-total').textContent = formatNum(total);
+                        document.getElementById('step4-total-inline').textContent = formatNum(total);
 
                         // مرحله ۲
                         document.getElementById('step2-subtotal').textContent = formatNum(priceData.final_price_sum);
@@ -963,21 +1044,27 @@
             });
         };
 
-        // ========== به‌روزرسانی قیمت مرحله ۳ ==========
-        function updateStep3Price() {
+        // ========== به‌روزرسانی قیمت مرحله ۳ و ۴ ==========
+        function updateStep34Price() {
             var total = subtotal + shippingPrice - discount;
+            // مرحله ۳
             document.getElementById('step3-total').textContent = formatNum(total);
-            document.getElementById('step3-total-inline').textContent = formatNum(total);
             document.getElementById('step3-shipping-row').classList.toggle('hidden', shippingPrice <= 0);
             if (shippingPrice > 0) {
                 document.getElementById('step3-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
             }
+            // مرحله ۴
+            document.getElementById('step4-total').textContent = formatNum(total);
+            document.getElementById('step4-total-inline').textContent = formatNum(total);
+            document.getElementById('step4-shipping-row').classList.toggle('hidden', shippingPrice <= 0);
+            if (shippingPrice > 0) {
+                document.getElementById('step4-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
+            }
         }
 
-        // اصلاح goToStep برای به‌روزرسانی قیمت مرحله ۳
         var origGoToStep = window.goToStep;
         window.goToStep = function(step) {
-            if (step === 3) updateStep3Price();
+            if (step === 3 || step === 4) updateStep34Price();
             origGoToStep(step);
         };
 
