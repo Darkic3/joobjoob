@@ -88,6 +88,7 @@ return [
     'new_badge' => 'جدید',
     'toman' => 'تومان',
     'you_save' => 'شما :amount صرفه‌جویی می‌کنید 💰',
+    'your_savings_from_purchase' => 'سود شما از این خرید',
     'quick_view' => 'مشاهده سریع',
     'quick_view_error' => 'خطا در بارگذاری پیش‌نمایش. دوباره تلاش کنید.',
     'view_details' => 'مشاهده جزئیات',
@@ -172,6 +173,7 @@ return [
     'footer_brand_tag' => 'فروشگاه آنلاین با بهترین کیفیت و قیمت',
     'newsletter_subtitle' => 'از تخفیف‌های ویژه و محصولات جدید زودتر از همه باخبر شوید.',
     'newsletter' => 'خبرنامه',
+    'newsletter_email_placeholder' => 'ایمیل شما',
 
     'socials' => [
         'instagram' => 'اینستاگرام',

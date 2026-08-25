@@ -120,6 +120,7 @@ return [
     'new_badge' => 'YENİ',
     'toman' => 'IRT',
     'you_save' => ':amount tasarruf edersiniz 💰',
+    'your_savings_from_purchase' => 'Bu alışverişten kazancınız',
     'dont_miss_out' => 'Kaçırma',
     'trust_title' => 'Neden bizden alışveriş yapmalısınız?',
     'quick_view' => 'Hızlı Bakış',
@@ -334,4 +335,5 @@ return [
     'footer_brand_tag' => 'En iyi kalite ve fiyatlarla online mağaza',
     'footer_desc' => 'En iyi kalite ve fiyatlarla online mağaza',
     'newsletter' => 'Bülten',
+    'newsletter_email_placeholder' => 'E-posta adresiniz',
 ];

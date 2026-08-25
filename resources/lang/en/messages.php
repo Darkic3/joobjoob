@@ -97,6 +97,7 @@ return [
     'new_badge' => 'NEW',
     'toman' => 'IRT',
     'you_save' => 'You save :amount 💰',
+    'your_savings_from_purchase' => 'Your savings from this purchase',
     'dont_miss_out' => "Don't miss out",
     'trust_title' => 'Why shop with us?',
     'quick_view' => 'Quick view',
@@ -171,6 +172,7 @@ return [
     'footer_brand_tag' => 'Online store with the best quality and prices',
     'newsletter_subtitle' => 'Be the first to hear about special offers and new arrivals.',
     'newsletter' => 'Newsletter',
+    'newsletter_email_placeholder' => 'Your email',
 
     'socials' => [
         'instagram' => 'Instagram',

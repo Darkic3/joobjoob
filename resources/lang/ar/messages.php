@@ -120,6 +120,7 @@ return [
     'new_badge' => 'جديد',
     'toman' => 'IRT',
     'you_save' => 'توفر :amount 💰',
+    'your_savings_from_purchase' => 'أرباحك من هذا الشراء',
     'dont_miss_out' => 'لا تفوت الفرصة',
     'trust_title' => 'لماذا تتسوق معنا؟',
     'quick_view' => 'عرض سريع',
@@ -334,4 +335,5 @@ return [
     'footer_brand_tag' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'footer_desc' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'newsletter' => 'النشرة الإخبارية',
+    'newsletter_email_placeholder' => 'بريدك الإلكتروني',
 ];
