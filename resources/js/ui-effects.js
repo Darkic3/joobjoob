@@ -195,11 +195,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     btn.innerHTML = successText;
                     btn.classList.add('neu-btn-success');
 
-                    const count = typeof data.cart_count === 'number' ? data.cart_count : 0;
+                    const count = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
+                    const countStr = window.localizeDigits ? window.localizeDigits.convert(String(count)) : String(count);
                     ['cart-count', 'cart-count-mobile'].forEach(function (id) {
                         const badge = document.getElementById(id);
                         if (!badge) return;
-                        badge.textContent = count;
+                        badge.textContent = countStr;
                         badge.classList.remove('count-pop');
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
@@ -602,11 +603,12 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(r => r.json())
             .then(function (data) {
-                if (data && data.cart_count !== undefined) {
+                if (data && typeof data.cart_count === 'number' && isFinite(data.cart_count)) {
+                    const countStr = window.localizeDigits ? window.localizeDigits.convert(String(data.cart_count)) : String(data.cart_count);
                     ['cart-count', 'cart-count-mobile'].forEach(function (id) {
                         const badge = document.getElementById(id);
                         if (!badge) return;
-                        badge.textContent = data.cart_count;
+                        badge.textContent = countStr;
                         badge.classList.remove('count-pop');
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
