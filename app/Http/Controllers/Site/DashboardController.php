@@ -7,7 +7,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\CityService;
-use App\Services\NumberHelper;
+use App\Helpers\NumberHelper;
 use App\Services\StateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
