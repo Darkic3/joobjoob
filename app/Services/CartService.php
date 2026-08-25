@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 /**
  * سرویس سبد خرید مبتنی بر Session.
- * ساختار هر ردیف: [rowId, product_id, name, price, qty, color, size, image]
+ * ساختار هر ردیف: [rowId, product_id, variant_id, name, price, qty, weight, slug, image, ...]
  */
 class CartService
 {
@@ -20,18 +20,17 @@ class CartService
 
     /**
      * افزودن به سبد خرید
-     * اگر variant_id داده شود، قیمت/موجودی از واریانت خوانده می‌شود
      */
     public function add(Product $product, int $qty = 1, ?int $variantId = null, ?string $color = null, ?string $size = null): string
     {
         $cart = $this->content();
-        $rowId = md5($product->id.$variantId.$color.$size);
+        $rowId = md5($product->id . $variantId . $color . $size);
 
-        // واریانت انتخابی
         $variant = $variantId ? $product->variants()->find($variantId) : null;
 
         $price = $variant ? $variant->final_price : $product->final_price;
         $stock = $variant ? $variant->stock : $product->stock;
+        $weight = $variant ? ($variant->weight ?? 0) : ($product->weight ?? 0);
         $label = $variant && $variant->specifications->isNotEmpty()
             ? $variant->specifications
                 ->sortBy(fn ($s) => $s->parent_id ?? 0)
@@ -54,6 +53,7 @@ class CartService
                 'price' => $price,
                 'qty' => $qty,
                 'stock' => $stock,
+                'weight' => $weight,
                 'color' => $color,
                 'size' => $size,
                 'image' => $product->images->first()->url ?? null,
@@ -117,9 +117,26 @@ class CartService
         return $this->content()->sum('qty');
     }
 
+    /**
+     * محاسبه وزن کل سبد (گرم)
+     */
+    public function totalWeight(): float
+    {
+        return $this->content()->sum(fn ($item) => ($item['weight'] ?? 0) * $item['qty']);
+    }
+
+    /**
+     * گرد کردن وزن به بالا (هر ۱۰۰ گرم)
+     */
+    public function roundedWeight(): float
+    {
+        $weight = $this->totalWeight();
+        return ceil($weight / 100) * 100;
+    }
+
     public function applyCoupon(string $code): bool
     {
-        // نمونه‌ی ساده - در پروژه واقعی این از جدول coupons در دیتابیس خوانده می‌شود
+        // TODO: از جدول discounts در دیتابیس خوانده شود
         $coupons = [
             'WELCOME10' => ['type' => 'percent', 'value' => 10],
             'SAVE50000' => ['type' => 'fixed', 'value' => 50000],
@@ -127,10 +144,17 @@ class CartService
 
         if (isset($coupons[strtoupper($code)])) {
             session(['coupon' => array_merge($coupons[strtoupper($code)], ['code' => strtoupper($code)])]);
-
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * دریافت لیست آیتم‌های سبد به‌صورت آرایه برای ایجاد سفارش
+     */
+    public function toArray(): array
+    {
+        return $this->content()->values()->toArray();
     }
 }
