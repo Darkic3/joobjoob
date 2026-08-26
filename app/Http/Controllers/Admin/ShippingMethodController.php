@@ -17,7 +17,7 @@ class ShippingMethodController extends Controller
 
     public function create()
     {
-        $cities = City::orderBy('name')->get();
+        $cities = City::active()->select('id', 'name', 'state_id')->orderBy('name')->get();
         return view('admin.shipping-methods.create', compact('cities'));
     }
 
@@ -61,7 +61,7 @@ class ShippingMethodController extends Controller
     public function edit(ShippingMethod $shippingMethod)
     {
         $shippingMethod->load('cities');
-        $cities = City::orderBy('name')->get();
+        $cities = City::active()->select('id', 'name', 'state_id')->orderBy('name')->get();
         $selectedCityIds = $shippingMethod->cities->pluck('id')->toArray();
 
         return view('admin.shipping-methods.edit', compact('shippingMethod', 'cities', 'selectedCityIds'));
