@@ -125,7 +125,7 @@
                             <p class="site-footer-newsletter-sub">{{ __('messages.newsletter_subtitle') }}</p>
                             <form class="site-footer-newsletter" action="#" method="post" onsubmit="return false;">
                                 <input type="email" name="email" required
-                                       placeholder="{{ setting('newsletter_placeholder', __('messages.newsletter_email_placeholder')) }}"
+                                       placeholder="{{ settingOverride('newsletter_placeholder', __('messages.newsletter_email_placeholder')) }}"
                                        class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}">
                                 <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
