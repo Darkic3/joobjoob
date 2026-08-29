@@ -494,7 +494,7 @@
                                                      style="background: var(--accent);"></div>
                                             </div>
                                             @if($bank->icon)
-                                                <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" height="28" class="shrink-0">
+                                                <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" class="w-10 h-7 object-contain shrink-0">
                                             @endif
                                             <span class="text-sm font-bold" style="color: var(--text-primary);">{{ $bank->title }}</span>
                                             <input type="radio" name="bank_id" value="{{ $bank->id }}" class="hidden">

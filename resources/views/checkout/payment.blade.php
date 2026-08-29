@@ -64,7 +64,7 @@
                                     <input class="form-check-input" type="radio" name="bank_id" id="bank_{{ $bank->id }}" value="{{ $bank->id }}" required>
                                     <label class="form-check-label" for="bank_{{ $bank->id }}">
                                         @if($bank->icon)
-                                            <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" height="30" class="me-2">
+                                            <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" class="w-10 h-7 object-contain me-2">
                                         @endif
                                         {{ $bank->title }}
                                     </label>
