@@ -1,7 +1,7 @@
 @extends('layouts.admin.app')
 
 @section('tab-name')
-ویرایش روش ارسال: {{ $shippingMethod->title }}
+{{ __('admin.shipping_methods.edit_title') }}: {{ $shippingMethod->title }}
 @endsection
 
 @section('content')

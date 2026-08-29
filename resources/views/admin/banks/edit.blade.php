@@ -1,7 +1,7 @@
 @extends('layouts.admin.app')
 
 @section('tab-name')
-ویرایش درگاه پرداخت: {{ $bank->title }}
+{{ __('admin.banks.edit_title') }}: {{ $bank->title }}
 @endsection
 
 @section('content')

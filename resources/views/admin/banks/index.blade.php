@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'درگاه‌های پرداخت')
+@section('tab-name', __('admin.banks.title'))
 
 @section('content')
     <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -62,8 +62,7 @@
                                         {{ $bank->bank_type }}
                                     @endif
                                 </span>
-                                @if($bank->admin_test)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 ms-1">تست</span>
+                                @if($bank->admin_test)                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 ms-1">{{ __('admin.banks.test_label') }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

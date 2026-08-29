@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('tab-name', 'افزودن درگاه پرداخت')
+@section('tab-name', __('admin.banks.create_title'))
 
 @section('content')
     <div class="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
