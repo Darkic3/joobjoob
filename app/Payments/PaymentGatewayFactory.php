@@ -15,8 +15,8 @@ class PaymentGatewayFactory
     {
         return match ($bank->bank_type) {
             'zarinPal' => new ZarinPal($bank, $siteName),
+            'card_to_card' => new ZarinPal($bank, $siteName), // card_to_card handled separately in OrderService
             default => throw new \InvalidArgumentException("Unsupported bank type: {$bank->bank_type}"),
-            // آینده: sep, sadad, zibal, snappay, ...
         };
     }
 }

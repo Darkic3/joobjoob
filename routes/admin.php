@@ -89,6 +89,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('shipping-methods', \App\Http\Controllers\Admin\ShippingMethodController::class);
         Route::post('shipping-methods/{shippingMethod}/toggle-status', [\App\Http\Controllers\Admin\ShippingMethodController::class, 'toggleStatus'])->name('shipping-methods.toggle-status');
 
+        // ========== مدیریت درگاه‌های پرداخت ==========
+        Route::resource('banks', \App\Http\Controllers\Admin\BankController::class);
+        Route::post('banks/{bank}/toggle-status', [\App\Http\Controllers\Admin\BankController::class, 'toggleStatus'])->name('banks.toggle-status');
+
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
         Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');

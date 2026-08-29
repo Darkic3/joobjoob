@@ -9,7 +9,7 @@ class Bank extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['title', 'icon', 'status', 'admin_test', 'bank_type', 'config'];
+    protected $fillable = ['title', 'icon', 'status', 'admin_test', 'bank_type', 'config', 'card_number', 'card_holder_name', 'card_description'];
 
     protected $casts = [
         'config' => 'json',

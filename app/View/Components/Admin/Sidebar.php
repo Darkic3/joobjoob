@@ -52,7 +52,8 @@ class Sidebar extends Component
             || ($this->can)('admin.roles.index')
             || ($this->can)('admin.users.index')
             || ($this->can)('admin.languages.index')
-            || ($this->can)('admin.shipping-methods.index');
+            || ($this->can)('admin.shipping-methods.index')
+            || ($this->can)('admin.banks.index');
 
         // تعداد نظرات در انتظار تأیید
         if (($this->can)('admin.reviews.index')) {

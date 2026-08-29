@@ -111,6 +111,13 @@ class OrderService
                 ->with('error', 'درگاه پرداخت یافت نشد.');
         }
 
+        // کارت به کارت — نیاز به تأیید ادمین
+        if ($bank->bank_type === 'card_to_card') {
+            $order->update(['order_status' => 'pending_confirmation']);
+            return redirect(route('checkout.success', $order->id))
+                ->with('success', 'سفارش شما ثبت شد و پس از تأیید پرداخت، سفارشتان پردازش می‌شود.');
+        }
+
         return $this->bankPaymentService->handlePayment($bank, $order, $price);
     }
 

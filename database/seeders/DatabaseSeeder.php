@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             StateSeeder::class,
             CitySeeder::class,
             OrderShippingStatusSeeder::class,
+            BankSeeder::class,
         ]);
     }
 }

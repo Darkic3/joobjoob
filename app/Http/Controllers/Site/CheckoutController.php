@@ -165,10 +165,16 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'bank_id' => 'required|exists:banks,id',
+            'payment_receipt' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $bankId = $request->get('bank_id');
         $userDescription = $request->get('user_description');
+        $paymentReceipt = null;
+
+        if ($request->hasFile('payment_receipt')) {
+            $paymentReceipt = $request->file('payment_receipt')->store('receipts', 'public');
+        }
 
         $addressId = session('checkout_address_id');
         $shippingMethodId = session('checkout_shipping_method_id');
@@ -198,6 +204,7 @@ class CheckoutController extends Controller
             'discount_price' => $this->cart->discount(),
             'payment_price' => $this->cart->total() + intval($shippingPrice),
             'freight_balance' => $shippingMethod->freight_balance ?? 0,
+            'payment_receipt' => $paymentReceipt,
         ];
 
         try {

@@ -477,12 +477,16 @@
                                 </div>
                                 {{ __('messages.payment_method') }}
                             </h2>
-                            <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm">
+                            <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm" enctype="multipart/form-data">
                                 @csrf
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     @forelse($banks as $bank)
                                         <label class="checkout-bank-option neu-flat-sm p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition-all duration-300"
                                                data-bank-id="{{ $bank->id }}"
+                                               data-bank-type="{{ $bank->bank_type }}"
+                                               data-card-number="{{ $bank->card_number ?? '' }}"
+                                               data-card-holder="{{ $bank->card_holder_name ?? '' }}"
+                                               data-card-desc="{{ $bank->card_description ?? '' }}"
                                                onclick="selectBank({{ $bank->id }})">
                                             <div class="bank-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300"
                                                  style="border-color: color-mix(in srgb, var(--text-primary) 25%, transparent);">
@@ -504,6 +508,37 @@
                                         </div>
                                     @endforelse
                                 </div>
+
+                                {{-- اطلاعات کارت به کارت --}}
+                                <div id="cardToCardInfo" class="mt-5 hidden">
+                                    <div class="p-4 rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
+                                        <p class="text-xs font-bold mb-3" style="color: var(--text-secondary);">اطلاعات کارت مقصد</p>
+                                        <div id="cardInfoContent" class="space-y-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs" style="color: var(--text-secondary);">شماره کارت:</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="cardNumberDisplay" class="mono text-sm font-bold" style="color: var(--accent);" dir="ltr"></span>
+                                                    <button type="button" onclick="copyCardNumber()" class="text-xs px-2 py-1 rounded-lg transition-colors" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">کپی</button>
+                                                </div>
+                                            </div>
+                                            <div id="cardHolderRow" class="flex items-center justify-between" style="display:none;">
+                                                <span class="text-xs" style="color: var(--text-secondary);">صاحب کارت:</span>
+                                                <span id="cardHolderDisplay" class="text-sm font-bold" style="color: var(--text-primary);"></span>
+                                            </div>
+                                            <div id="cardDescRow" style="display:none;">
+                                                <p id="cardDescDisplay" class="text-xs leading-relaxed mt-2" style="color: var(--text-secondary);"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label class="text-xs font-bold mb-1.5 block" style="color: var(--text-secondary);">عکس فیش واریزی <span class="text-rose-500">*</span></label>
+                                        <input type="file" name="payment_receipt" accept="image/*" id="receiptInput"
+                                               class="w-full text-xs rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 p-2.5 file:ms-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:text-white"
+                                               style="file-background: var(--accent);">
+                                        <p class="text-[10px] mt-1" style="color: var(--text-secondary);">فرمت‌های مجاز: jpg, png, webp — حداکثر ۲ مگابایت</p>
+                                    </div>
+                                </div>
+
                                 <div class="mt-5">
                                     <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
                                     <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
@@ -1027,12 +1062,44 @@
             selectedBankId = bankId;
             document.querySelectorAll('.checkout-bank-option').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-bank-id="' + bankId + '"]');
+            var cardToCardInfo = document.getElementById('cardToCardInfo');
+            var receiptInput = document.getElementById('receiptInput');
             if (card) {
                 card.classList.add('selected');
                 card.querySelector('input[type="radio"]').checked = true;
+
+                // Show/hide card-to-card section
+                var bankType = card.getAttribute('data-bank-type');
+                if (bankType === 'card_to_card') {
+                    cardToCardInfo.classList.remove('hidden');
+                    receiptInput.required = true;
+                    // Populate card info
+                    var cardNum = card.getAttribute('data-card-number') || '';
+                    var cardHolder = card.getAttribute('data-card-holder') || '';
+                    var cardDesc = card.getAttribute('data-card-desc') || '';
+                    document.getElementById('cardNumberDisplay').textContent = cardNum;
+                    var holderRow = document.getElementById('cardHolderRow');
+                    var descRow = document.getElementById('cardDescRow');
+                    if (cardHolder) { holderRow.style.display = ''; document.getElementById('cardHolderDisplay').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
+                    if (cardDesc) { descRow.style.display = ''; document.getElementById('cardDescDisplay').textContent = cardDesc; } else { descRow.style.display = 'none'; }
+                } else {
+                    cardToCardInfo.classList.add('hidden');
+                    receiptInput.required = false;
+                    receiptInput.value = '';
+                }
             }
             var payBtn = document.getElementById('payBtn');
             if (payBtn) payBtn.disabled = false;
+        };
+
+        window.copyCardNumber = function() {
+            var num = document.getElementById('cardNumberDisplay').textContent.replace(/-/g, '');
+            navigator.clipboard.writeText(num).then(function() {
+                var btn = event.target;
+                var orig = btn.textContent;
+                btn.textContent = 'کپی شد!';
+                setTimeout(function() { btn.textContent = orig; }, 1500);
+            });
         };
 
         // ========== اعمال کد تخفیف ==========

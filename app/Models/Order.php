@@ -20,7 +20,7 @@ class Order extends Model
         'discount_id', 'total_weight', 'post_code',
         'shipping_price', 'total_price', 'discount_price', 'payment_price',
         'tax_price', 'current_tax', 'deposit_price', 'remaining_price',
-        'user_description', 'transaction_info',
+        'user_description', 'transaction_info', 'payment_receipt',
     ];
 
     protected $casts = [
@@ -115,6 +115,7 @@ class Order extends Model
             'paid' => ['title' => 'پرداخت شده', 'badge' => 'success'],
             'deposit_paid' => ['title' => 'بیعانه پرداخت شده', 'badge' => 'success'],
             'wait_for_verification' => ['title' => 'در انتظار تایید فیش ها', 'badge' => 'info'],
+            'pending_confirmation' => ['title' => 'در انتظار تأیید پرداخت', 'badge' => 'warning'],
             'unpaid' => ['title' => 'پرداخت نشده', 'badge' => 'danger'],
             'cancelled' => ['title' => 'لغو شده', 'badge' => 'danger'],
             default => null,

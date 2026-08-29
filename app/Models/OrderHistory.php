@@ -28,6 +28,7 @@ class OrderHistory extends Model
             'paid' => 'پرداخت شده',
             'deposit_paid' => 'بیعانه پرداخت شده',
             'wait_for_verification' => 'در انتظار تایید فیش',
+            'pending_confirmation' => 'در انتظار تأیید پرداخت',
             'unpaid' => 'پرداخت نشده',
             'cancelled' => 'لغو شده',
             default => '',

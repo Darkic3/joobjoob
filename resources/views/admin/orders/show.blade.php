@@ -29,6 +29,7 @@
                                         @csrf
                                         <select name="order_status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
                                             <option value="paying" {{ $order->order_status === 'paying' ? 'selected' : '' }}>در حال پرداخت</option>
+                                            <option value="pending_confirmation" {{ $order->order_status === 'pending_confirmation' ? 'selected' : '' }}>در انتظار تأیید پرداخت</option>
                                             <option value="paid" {{ $order->order_status === 'paid' ? 'selected' : '' }}>پرداخت شده</option>
                                             <option value="deposit_paid" {{ $order->order_status === 'deposit_paid' ? 'selected' : '' }}>بیعانه</option>
                                             <option value="unpaid" {{ $order->order_status === 'unpaid' ? 'selected' : '' }}>پرداخت نشده</option>
@@ -55,6 +56,16 @@
                             <tr><td>روش ارسال</td><td>{{ $order->shippingMethod?->title ?? '—' }}</td></tr>
                             <tr><td>درگاه پرداخت</td><td>{{ $order->bank?->title ?? '—' }}</td></tr>
                             <tr><td>کد پیگیری پستی</td><td>{{ $order->post_code ?? '—' }}</td></tr>
+                            @if($order->payment_receipt)
+                                <tr>
+                                    <td>عکس فیش واریزی</td>
+                                    <td>
+                                        <a href="{{ asset('storage/' . $order->payment_receipt) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $order->payment_receipt) }}" alt="فیش واریزی" class="img-thumbnail" style="max-height: 150px;">
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
 
                         <!-- ثبت کد پستی -->
