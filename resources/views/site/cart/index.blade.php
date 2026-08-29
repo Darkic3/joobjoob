@@ -354,6 +354,15 @@
                                     <span style="color: var(--success);">تخفیف ({{ session('coupon.code') ?? '' }})</span>
                                     <span id="step2-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
                                 </div>
+                                @if(($totalSavings ?? 0) > 0)
+                                    <div id="step2-savings-row" class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center gap-1.5" style="color: var(--success);">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                                            {{ __('messages.your_savings_from_purchase') }}
+                                        </span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                    </div>
+                                @endif
                                 <div id="step2-shipping-row" class="flex items-center justify-between text-sm hidden">
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step2-shipping-price" class="mono font-bold" dir="ltr">۰</span>
@@ -422,6 +431,15 @@
                                     <span style="color: var(--success);">{{ __('messages.discount') }}</span>
                                     <span id="step3-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
                                 </div>
+                                @if(($totalSavings ?? 0) > 0)
+                                    <div id="step3-savings-row" class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center gap-1.5" style="color: var(--success);">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                                            {{ __('messages.your_savings_from_purchase') }}
+                                        </span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                    </div>
+                                @endif
                                 <div id="step3-shipping-row" class="flex items-center justify-between text-sm hidden">
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step3-shipping-price" class="mono font-bold" dir="ltr">۰</span>
@@ -617,6 +635,15 @@
                                     <span style="color: var(--success);">{{ __('messages.discount') }}</span>
                                     <span id="step4-coupon-amount" class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ number_format($cart->discount()) }}</span>
                                 </div>
+                                @if(($totalSavings ?? 0) > 0)
+                                    <div id="step4-savings-row" class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center gap-1.5" style="color: var(--success);">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                                            {{ __('messages.your_savings_from_purchase') }}
+                                        </span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                    </div>
+                                @endif
                                 <div id="step4-shipping-row" class="flex items-center justify-between text-sm hidden">
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step4-shipping-price" class="mono font-bold" dir="ltr">۰</span>
@@ -966,14 +993,13 @@
             var total = subtotal + shippingPrice - discount;
             var shippingRow = document.getElementById('step2-shipping-row');
             if (shippingRow) {
+                shippingRow.classList.remove('hidden');
                 if (selectedShippingFreightBalance == 1) {
-                    shippingRow.classList.remove('hidden');
                     document.getElementById('step2-shipping-price').textContent = '{{ __("messages.trust_cod_shipping") }}';
                 } else if (shippingPrice > 0) {
-                    shippingRow.classList.remove('hidden');
                     document.getElementById('step2-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
                 } else {
-                    shippingRow.classList.add('hidden');
+                    document.getElementById('step2-shipping-price').textContent = '{{ __("messages.trust_free_shipping") }}';
                 }
             }
             var totalEl = document.getElementById('step2-total');
@@ -1093,19 +1119,16 @@
         // ========== به‌روزرسانی قیمت مرحله ۳ و ۴ ==========
         function updateStep34Price() {
             var total = subtotal + shippingPrice - discount;
+            var shippingText = selectedShippingFreightBalance == 1 ? '{{ __("messages.trust_cod_shipping") }}' : (shippingPrice > 0 ? formatNum(shippingPrice) + ' {{ __("messages.toman") }}' : '{{ __("messages.trust_free_shipping") }}');
             // مرحله ۳
             document.getElementById('step3-total').textContent = formatNum(total);
-            document.getElementById('step3-shipping-row').classList.toggle('hidden', shippingPrice <= 0);
-            if (shippingPrice > 0) {
-                document.getElementById('step3-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
-            }
+            document.getElementById('step3-shipping-row').classList.remove('hidden');
+            document.getElementById('step3-shipping-price').textContent = shippingText;
             // مرحله ۴
             document.getElementById('step4-total').textContent = formatNum(total);
             document.getElementById('step4-total-inline').textContent = formatNum(total);
-            document.getElementById('step4-shipping-row').classList.toggle('hidden', shippingPrice <= 0);
-            if (shippingPrice > 0) {
-                document.getElementById('step4-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
-            }
+            document.getElementById('step4-shipping-row').classList.remove('hidden');
+            document.getElementById('step4-shipping-price').textContent = shippingText;
         }
 
         var origGoToStep = window.goToStep;
