@@ -128,6 +128,7 @@ return [
     'view_details' => 'Detayları Gör',
 
     'trust_free_shipping' => 'Ücretsiz Kargo',
+    'trust_cod_shipping' => 'Kapıda Ödeme',
     'trust_free_shipping_desc' => '50$ üzeri siparişlerde',
     'trust_badges' => 'Güven rozetleri',
     'trust_authenticity' => 'Orijinallik Garantisi',

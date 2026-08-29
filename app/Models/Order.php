@@ -126,15 +126,15 @@ class Order extends Model
         $shippingPrice = intval($this->shipping_price);
         $freightBalance = $this->freight_balance;
 
-        if ($shippingPrice === 0 && $freightBalance === 0) {
+        if ($freightBalance === 1) {
+            return 'پس کرایه';
+        }
+
+        if ($shippingPrice === 0) {
             return 'ارسال رایگان';
         }
 
-        if ($shippingPrice !== 0 && $freightBalance === 0) {
-            return number_format($shippingPrice) . ' تومان';
-        }
-
-        return '';
+        return number_format($shippingPrice) . ' تومان';
     }
 
     public function getFreightBalanceNameAttribute(): array

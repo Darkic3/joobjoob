@@ -821,6 +821,7 @@
         var selectedAddressId = null;
         var selectedShippingMethodId = null;
         var selectedBankId = null;
+        var selectedShippingFreightBalance = 0;
         var shippingPrice = 0;
         var subtotal = {{ $cart->subtotal() }};
         var discount = {{ $cart->discount() }};
@@ -896,14 +897,14 @@
                 var html = '';
                 if (data.shipping_methods && data.shipping_methods.length > 0) {
                     data.shipping_methods.forEach(function(method) {
-                        var priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? formatNum(method.price) + ' {{ __("messages.toman") }}' : '{{ __("messages.trust_free_shipping") }}');
+                        var priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? formatNum(method.price) + ' {{ __("messages.toman") }}' : (method.freight_balance == 1 ? '{{ __("messages.trust_cod_shipping") }}' : '{{ __("messages.trust_free_shipping") }}'));
                         var priceVal = method.price === 'dynamic' ? 0 : parseInt(method.price);
                         var icon = method.type === 'with_weight'
                             ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>'
                             : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
                         html += '<div class="shipping-option neu-flat-sm p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-2.5" ' +
                             'data-method-id="' + method.id + '" data-price="' + priceVal + '" ' +
-                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ')">' +
+                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ', ' + (method.freight_balance || 0) + ')">' +
                             '<div class="flex items-center justify-between">' +
                             '<div class="flex items-center gap-3">' +
                             '<div class="shipping-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300" ' +
@@ -938,8 +939,9 @@
         };
 
         // ========== انتخاب روش ارسال ==========
-        window.selectShipping = function(methodId, price) {
+        window.selectShipping = function(methodId, price, freightBalance) {
             selectedShippingMethodId = methodId;
+            selectedShippingFreightBalance = freightBalance || 0;
             shippingPrice = parseInt(price) || 0;
 
             document.querySelectorAll('.shipping-option').forEach(function(c) { c.classList.remove('selected'); });
@@ -964,7 +966,10 @@
             var total = subtotal + shippingPrice - discount;
             var shippingRow = document.getElementById('step2-shipping-row');
             if (shippingRow) {
-                if (shippingPrice > 0) {
+                if (selectedShippingFreightBalance == 1) {
+                    shippingRow.classList.remove('hidden');
+                    document.getElementById('step2-shipping-price').textContent = '{{ __("messages.trust_cod_shipping") }}';
+                } else if (shippingPrice > 0) {
                     shippingRow.classList.remove('hidden');
                     document.getElementById('step2-shipping-price').textContent = formatNum(shippingPrice) + ' {{ __("messages.toman") }}';
                 } else {

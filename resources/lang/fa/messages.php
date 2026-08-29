@@ -194,6 +194,7 @@ return [
     'already_member_desc' => 'کدهای تخفیف شما به‌زودی در پنل کاربری در دسترس خواهد بود.',
 
     'trust_free_shipping' => 'ارسال رایگان',
+    'trust_cod_shipping' => 'پس کرایه',
     'trust_free_shipping_desc' => 'بالای ۵۰۰ هزار تومان',
     'trust_badges' => 'نشان‌های اعتماد',
     'trust_authenticity' => 'ضمانت اصالت کالا',

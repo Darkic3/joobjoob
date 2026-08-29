@@ -179,6 +179,7 @@ class CheckoutController extends Controller
         }
 
         $address = \App\Models\Address::with(['state', 'city'])->find($addressId);
+        $shippingMethod = \App\Models\ShippingMethod::find($shippingMethodId);
 
         $orderData = [
             'address_id' => $address->id,
@@ -196,7 +197,7 @@ class CheckoutController extends Controller
             'total_price' => $this->cart->subtotal(),
             'discount_price' => $this->cart->discount(),
             'payment_price' => $this->cart->total() + intval($shippingPrice),
-            'freight_balance' => 0,
+            'freight_balance' => $shippingMethod->freight_balance ?? 0,
         ];
 
         try {

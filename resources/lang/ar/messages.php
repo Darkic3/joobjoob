@@ -128,6 +128,7 @@ return [
     'view_details' => 'عرض التفاصيل',
 
     'trust_free_shipping' => 'شحن مجاني',
+    'trust_cod_shipping' => 'الدفع عند الاستلام',
     'trust_free_shipping_desc' => 'للطلبات فوق ٥٠ دولار',
     'trust_badges' => 'شارات الثقة',
     'trust_authenticity' => 'ضمان الأصالة',

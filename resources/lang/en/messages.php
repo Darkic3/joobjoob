@@ -193,6 +193,7 @@ return [
     'already_member_desc' => 'Your discount codes will soon be available in your user panel.',
 
     'trust_free_shipping' => 'Free Shipping',
+    'trust_cod_shipping' => 'Cash on Delivery',
     'trust_free_shipping_desc' => 'On orders over $50',
     'trust_badges' => 'Trust badges',
     'trust_authenticity' => 'Authenticity Guarantee',
