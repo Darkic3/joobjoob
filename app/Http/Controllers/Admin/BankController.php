@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ImageHandler;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BankRequest;
 use App\Models\Bank;
 use Illuminate\Http\Request;
 
@@ -19,31 +21,12 @@ class BankController extends Controller
         return view('admin.banks.create');
     }
 
-    public function store(Request $request)
+    public function store(BankRequest $request)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'bank_type' => 'required|string|max:100',
-            'status' => 'required|boolean',
-            'admin_test' => 'nullable|boolean',
-            'config' => 'nullable|string',
-            'card_number' => 'nullable|string|max:30',
-            'card_holder_name' => 'nullable|string|max:255',
-            'card_description' => 'nullable|string|max:1000',
-        ];
+        $validated = $request->validated();
 
-        if ($request->hasFile('icon')) {
-            $rules['icon'] = 'required|image|mimes:png,jpg,svg,webp|max:2048';
-        }
-
-        $validated = $request->validate($rules);
-
-        if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
-            $validated['icon'] = $request->file('icon')->store('bank', 'public');
-        } else {
-            unset($validated['icon']);
-        }
-
+        // Handle icon upload
+        $validated['icon'] = $this->handleImageUpload($request->file('icon'));
         $validated['config'] = $validated['config'] ? json_decode($validated['config'], true) : null;
         $validated['admin_test'] = $validated['admin_test'] ?? 0;
 
@@ -58,27 +41,17 @@ class BankController extends Controller
         return view('admin.banks.edit', compact('bank'));
     }
 
-    public function update(Request $request, Bank $bank)
+    public function update(BankRequest $request, Bank $bank)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'bank_type' => 'required|string|max:100',
-            'status' => 'required|boolean',
-            'admin_test' => 'nullable|boolean',
-            'config' => 'nullable|string',
-            'card_number' => 'nullable|string|max:30',
-            'card_holder_name' => 'nullable|string|max:255',
-            'card_description' => 'nullable|string|max:1000',
-        ];
+        $validated = $request->validated();
 
-        if ($request->hasFile('icon')) {
-            $rules['icon'] = 'required|image|mimes:png,jpg,svg,webp|max:2048';
-        }
-
-        $validated = $request->validate($rules);
-
+        // Handle icon upload
         if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
-            $validated['icon'] = $request->file('icon')->store('bank', 'public');
+            // Delete old icon
+            if ($bank->icon) {
+                ImageHandler::delete('bank', $bank->icon);
+            }
+            $validated['icon'] = $this->handleImageUpload($request->file('icon'));
         } else {
             unset($validated['icon']);
         }
@@ -94,6 +67,9 @@ class BankController extends Controller
 
     public function destroy(Bank $bank)
     {
+        if ($bank->icon) {
+            ImageHandler::delete('bank', $bank->icon);
+        }
         $bank->delete();
         return redirect()->route('admin.banks.index')
             ->with('success', 'درگاه پرداخت حذف شد');
@@ -103,5 +79,17 @@ class BankController extends Controller
     {
         $bank->update(['status' => $bank->status ? 0 : 1]);
         return back()->with('success', 'وضعیت تغییر کرد');
+    }
+
+    /**
+     * Handle image upload using project's ImageHandler
+     */
+    private function handleImageUpload($file): ?string
+    {
+        if (! $file || ! $file->isValid()) {
+            return null;
+        }
+
+        return ImageHandler::handle('bank', $file);
     }
 }
