@@ -1075,7 +1075,9 @@
                     var cardNum = card.getAttribute('data-card-number') || '';
                     var cardHolder = card.getAttribute('data-card-holder') || '';
                     var cardDesc = card.getAttribute('data-card-desc') || '';
-                    document.getElementById('cardNumberDisplay').textContent = cardNum;
+                    // Convert digits to Persian immediately to avoid flash
+                    var displayNum = window.localizeDigits ? window.localizeDigits.convert(cardNum) : cardNum;
+                    document.getElementById('cardNumberDisplay').textContent = displayNum;
                     var holderRow = document.getElementById('cardHolderRow');
                     var descRow = document.getElementById('cardDescRow');
                     if (cardHolder) { holderRow.style.display = ''; document.getElementById('cardHolderDisplay').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
@@ -1094,7 +1096,9 @@
         };
 
         window.copyCardNumber = function() {
-            var num = document.getElementById('cardNumberDisplay').textContent.replace(/-/g, '');
+            // Convert Persian digits back to English for clipboard
+            var displayText = document.getElementById('cardNumberDisplay').textContent;
+            var num = displayText.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/-/g, '');
             navigator.clipboard.writeText(num).then(function() {
                 var btn = event.target;
                 var orig = btn.textContent;
