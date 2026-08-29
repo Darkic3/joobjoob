@@ -147,10 +147,10 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-1">{{ __('admin.shipping_methods.destination_cities') }}</h3>
             <p class="text-xs text-gray-400 mb-2">{{ __('admin.shipping_methods.active_cities') }}</p>
-            <div class="relative mb-2">
-                <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <div class="flex items-center gap-1.5 mb-2 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input type="text" id="citySearchInput" placeholder="{{ __('admin.shipping_methods.search_cities') }}"
-                       class="w-full pr-7 pl-2 py-1 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                       class="w-full bg-transparent text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none">
             </div>
             <div id="citiesList" class="overflow-y-auto space-y-0.5" style="max-height: 7rem; scrollbar-width: thin;">
                 @foreach($cities as $city)
