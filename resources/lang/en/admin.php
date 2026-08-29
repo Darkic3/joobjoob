@@ -1005,6 +1005,7 @@ return [
         'type_card_to_card' => 'Card to Card',
         'status' => 'Status',
         'active' => 'Active',
+        'inactive' => 'Inactive',
         'admin_test' => 'Admin Test Only',
         'save' => 'Save',
         'cancel' => 'Cancel',

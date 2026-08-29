@@ -1006,6 +1006,7 @@ return [
         'type_card_to_card' => 'Kart ile Kart',
         'status' => 'Durum',
         'active' => 'Aktif',
+        'inactive' => 'Pasif',
         'admin_test' => 'Sadece Admin Testi',
         'save' => 'Kaydet',
         'cancel' => 'İptal',

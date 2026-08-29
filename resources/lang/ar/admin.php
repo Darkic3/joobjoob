@@ -1007,6 +1007,7 @@ return [
         'type_card_to_card' => 'بطاقة إلى بطاقة',
         'status' => 'الحالة',
         'active' => 'نشط',
+        'inactive' => 'غير نشط',
         'admin_test' => 'اختبار المشرف فقط',
         'save' => 'حفظ',
         'cancel' => 'إلغاء',

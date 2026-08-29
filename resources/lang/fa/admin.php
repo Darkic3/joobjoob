@@ -1041,6 +1041,7 @@ return [
         'type_card_to_card' => 'کارت به کارت',
         'status' => 'وضعیت',
         'active' => 'فعال',
+        'inactive' => 'غیرفعال',
         'admin_test' => 'فقط تست ادمین',
         'save' => 'ذخیره',
         'cancel' => 'انصراف',
