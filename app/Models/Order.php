@@ -41,7 +41,7 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->withTrashed();
+        return $this->belongsTo(User::class);
     }
 
     public function location(): BelongsTo
@@ -76,7 +76,7 @@ class Order extends Model
 
     public function discount(): BelongsTo
     {
-        return $this->belongsTo(Discount::class, 'discount_id')->withTrashed();
+        return $this->belongsTo(Discount::class, 'discount_id');
     }
 
     public function items(): HasMany
