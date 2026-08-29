@@ -469,6 +469,61 @@
             <div id="checkout-step-4" class="checkout-step" style="display: none;">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div class="lg:col-span-2 space-y-4">
+                        {{-- درگاه پرداخت --}}
+                        <div class="neu-card p-6">
+                            <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
+                                <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+                                </div>
+                                {{ __('messages.payment_method') }}
+                            </h2>
+                            <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm">
+                                @csrf
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    @forelse($banks as $bank)
+                                        <label class="checkout-bank-option neu-flat-sm p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition-all duration-300"
+                                               data-bank-id="{{ $bank->id }}"
+                                               onclick="selectBank({{ $bank->id }})">
+                                            <div class="bank-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300"
+                                                 style="border-color: color-mix(in srgb, var(--text-primary) 25%, transparent);">
+                                                <div class="bank-radio-inner w-2.5 h-2.5 rounded-full transition-all duration-300 scale-0"
+                                                     style="background: var(--accent);"></div>
+                                            </div>
+                                            @if($bank->icon)
+                                                <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" height="28" class="shrink-0">
+                                            @endif
+                                            <span class="text-sm font-bold" style="color: var(--text-primary);">{{ $bank->title }}</span>
+                                            <input type="radio" name="bank_id" value="{{ $bank->id }}" class="hidden">
+                                        </label>
+                                    @empty
+                                        <div class="text-center py-6 sm:col-span-2">
+                                            <div class="neu-icon-circle w-12 h-12 mx-auto grid place-items-center mb-3" style="background: color-mix(in srgb, var(--text-secondary) 8%, transparent);">
+                                                <svg class="w-5 h-5" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                                            </div>
+                                            <p class="text-sm" style="color: var(--text-secondary);">هیچ درگاه پرداختی فعال نیست.</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <div class="mt-5">
+                                    <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
+                                    <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
+                                              placeholder="مثلاً: ساعت ارسال، توضیحات خاص و ..."></textarea>
+                                </div>
+                                <div class="mt-6 p-5 text-center rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
+                                    <p class="text-xs font-bold mb-2" style="color: var(--text-secondary);">مبلغ قابل پرداخت</p>
+                                    <p class="mono font-black text-2xl mb-4" style="color: var(--accent);" dir="ltr" id="step4-total-inline">{{ number_format($cart->total()) }}</p>
+                                    <button type="submit" id="payBtn"
+                                            class="neu-btn neu-btn-primary w-full py-4 text-sm font-black rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                            disabled>
+                                        <span class="flex items-center justify-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+                                            {{ __('messages.place_order') }}
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                         {{-- خلاصه اقلام --}}
                         <div class="neu-card p-6">
                             <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
@@ -565,61 +620,6 @@
                                     </div>
                                 @endif
                             </div>
-                        </div>
-
-                        {{-- درگاه پرداخت --}}
-                        <div class="neu-card p-6">
-                            <h2 class="font-black text-base flex items-center gap-2.5 mb-5" style="color: var(--text-primary);">
-                                <div class="neu-icon-circle w-9 h-9 grid place-items-center shrink-0">
-                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
-                                </div>
-                                {{ __('messages.payment_method') }}
-                            </h2>
-                            <form action="{{ localizedRoute('checkout.create') }}" method="POST" id="paymentForm">
-                                @csrf
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                    @forelse($banks as $bank)
-                                        <label class="checkout-bank-option neu-flat-sm p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition-all duration-300"
-                                               data-bank-id="{{ $bank->id }}"
-                                               onclick="selectBank({{ $bank->id }})">
-                                            <div class="bank-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300"
-                                                 style="border-color: color-mix(in srgb, var(--text-primary) 25%, transparent);">
-                                                <div class="bank-radio-inner w-2.5 h-2.5 rounded-full transition-all duration-300 scale-0"
-                                                     style="background: var(--accent);"></div>
-                                            </div>
-                                            @if($bank->icon)
-                                                <img src="{{ $bank->item_image }}" alt="{{ $bank->title }}" height="28" class="shrink-0">
-                                            @endif
-                                            <span class="text-sm font-bold" style="color: var(--text-primary);">{{ $bank->title }}</span>
-                                            <input type="radio" name="bank_id" value="{{ $bank->id }}" class="hidden">
-                                        </label>
-                                    @empty
-                                        <div class="text-center py-6 sm:col-span-2">
-                                            <div class="neu-icon-circle w-12 h-12 mx-auto grid place-items-center mb-3" style="background: color-mix(in srgb, var(--text-secondary) 8%, transparent);">
-                                                <svg class="w-5 h-5" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-                                            </div>
-                                            <p class="text-sm" style="color: var(--text-secondary);">هیچ درگاه پرداختی فعال نیست.</p>
-                                        </div>
-                                    @endforelse
-                                </div>
-                                <div class="mt-5">
-                                    <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
-                                    <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
-                                              placeholder="مثلاً: ساعت ارسال، توضیحات خاص و ..."></textarea>
-                                </div>
-                                <div class="mt-6 p-5 text-center rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
-                                    <p class="text-xs font-bold mb-2" style="color: var(--text-secondary);">مبلغ قابل پرداخت</p>
-                                    <p class="mono font-black text-2xl mb-4" style="color: var(--accent);" dir="ltr" id="step4-total-inline">{{ number_format($cart->total()) }}</p>
-                                    <button type="submit" id="payBtn"
-                                            class="neu-btn neu-btn-primary w-full py-4 text-sm font-black rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-                                            disabled>
-                                        <span class="flex items-center justify-center gap-2">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
-                                            {{ __('messages.place_order') }}
-                                        </span>
-                                    </button>
-                                </div>
-                            </form>
                         </div>
                     </div>
                     {{-- خلاصه پرداخت مرحله ۴ --}}
