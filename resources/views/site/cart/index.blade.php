@@ -509,36 +509,6 @@
                                     @endforelse
                                 </div>
 
-                                {{-- اطلاعات کارت به کارت --}}
-                                <div id="cardToCardInfo" class="mt-5 hidden">
-                                    <div class="p-4 rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);">
-                                        <p class="text-xs font-bold mb-3" style="color: var(--text-secondary);">اطلاعات کارت مقصد</p>
-                                        <div id="cardInfoContent" class="space-y-2">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs" style="color: var(--text-secondary);">شماره کارت:</span>
-                                                <div class="flex items-center gap-2">
-                                                    <span id="cardNumberDisplay" class="mono text-sm font-bold" style="color: var(--accent);" dir="ltr"></span>
-                                                    <button type="button" onclick="copyCardNumber()" class="text-xs px-2 py-1 rounded-lg transition-colors" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">کپی</button>
-                                                </div>
-                                            </div>
-                                            <div id="cardHolderRow" class="flex items-center justify-between" style="display:none;">
-                                                <span class="text-xs" style="color: var(--text-secondary);">صاحب کارت:</span>
-                                                <span id="cardHolderDisplay" class="text-sm font-bold" style="color: var(--text-primary);"></span>
-                                            </div>
-                                            <div id="cardDescRow" style="display:none;">
-                                                <p id="cardDescDisplay" class="text-xs leading-relaxed mt-2" style="color: var(--text-secondary);"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="text-xs font-bold mb-1.5 block" style="color: var(--text-secondary);">عکس فیش واریزی <span class="text-rose-500">*</span></label>
-                                        <input type="file" name="payment_receipt" accept="image/*" id="receiptInput"
-                                               class="w-full text-xs rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 p-2.5 file:ms-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:text-white"
-                                               style="file-background: var(--accent);">
-                                        <p class="text-[10px] mt-1" style="color: var(--text-secondary);">فرمت‌های مجاز: jpg, png, webp — حداکثر ۲ مگابایت</p>
-                                    </div>
-                                </div>
-
                                 <div class="mt-5">
                                     <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">توضیحات سفارش (اختیاری)</label>
                                     <textarea name="user_description" class="neu-input w-full text-sm py-3" rows="2"
@@ -556,6 +526,10 @@
                                         </span>
                                     </button>
                                 </div>
+
+                                {{-- hidden input for receipt inside form --}}
+                                <input type="file" name="payment_receipt" accept="image/*" id="receiptInputForm" class="hidden">
+
                             </form>
                         </div>
 
@@ -701,6 +675,65 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    {{-- ═══════════════════ مودال کارت به کارت (خارج از reveal-on-scroll) ═══════════════════ --}}
+    <div id="cardToCardModal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70" onclick="closeCardToCardModal()"></div>
+        <div class="relative z-10 w-full max-w-md">
+            <div class="rounded-3xl shadow-2xl overflow-hidden" style="background: var(--bg-card, #fff);">
+                <div class="relative px-6 pt-6 pb-4 text-center" style="background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));">
+                    <button onclick="closeCardToCardModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, var(--text-primary) 5%, transparent);">
+                        <svg class="w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <div class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--accent) 15%, transparent);">
+                        <svg class="w-7 h-7" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-black" style="color: var(--text-primary);">اطلاعات کارت به کارت</h3>
+                    <p class="text-xs mt-1" style="color: var(--text-secondary);">لطفاً اطلاعات زیر را بررسی کرده و فیش واریزی را آپلود کنید</p>
+                </div>
+                <div class="px-6 py-5 space-y-4">
+                    <div class="p-4 rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold" style="color: var(--text-secondary);">شماره کارت مقصد</span>
+                            <button type="button" onclick="copyCardNumber()" id="copyCardBtn" class="text-xs px-3 py-1.5 rounded-xl font-bold transition-all" style="background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent);">کپی شماره کارت</button>
+                        </div>
+                        <p id="modalCardNumber" class="mono text-xl font-black tracking-wider text-center py-1" style="color: var(--accent);" dir="ltr"></p>
+                    </div>
+                    <div id="modalHolderRow" class="flex items-center justify-between px-1" style="display:none;">
+                        <span class="text-xs" style="color: var(--text-secondary);">صاحب کارت</span>
+                        <span id="modalCardHolder" class="text-sm font-bold" style="color: var(--text-primary);"></span>
+                    </div>
+                    <div id="modalDescRow" class="px-1" style="display:none;">
+                        <p id="modalCardDesc" class="text-xs leading-relaxed" style="color: var(--text-secondary);"></p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">عکس فیش واریزی <span class="text-rose-500">*</span></label>
+                        <div id="receiptDropzone" class="relative border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer" style="border-color: color-mix(in srgb, var(--accent) 20%, transparent); background: color-mix(in srgb, var(--accent) 3%, transparent);" onclick="document.getElementById('receiptInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--accent)'; this.style.background='color-mix(in srgb, var(--accent) 8%, transparent)'" ondragleave="this.style.borderColor=''; this.style.background='';" ondrop="event.preventDefault(); this.style.borderColor=''; this.style.background=''; handleReceiptDrop(event)">
+                            <div id="receiptPlaceholder">
+                                <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--accent); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <p class="text-xs font-bold" style="color: var(--text-secondary);">کلیک کنید یا فایل را بکشید</p>
+                                <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.7;">jpg, png, webp — حداکثر ۲ مگابایت</p>
+                            </div>
+                            <div id="receiptPreview" class="hidden">
+                                <img id="receiptPreviewImg" class="max-h-32 mx-auto rounded-xl shadow-sm">
+                                <p id="receiptFileName" class="text-xs mt-2 font-bold" style="color: var(--accent);"></p>
+                                <button type="button" onclick="event.stopPropagation(); clearReceipt()" class="mt-2 text-xs px-3 py-1 rounded-lg transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent); color: #ef4444;">حذف تصویر</button>
+                            </div>
+                        </div>
+                        <input type="file" accept="image/*" id="receiptInput" class="hidden" onchange="syncReceiptToForm(this)">
+                    </div>
+                </div>
+                <div class="px-6 pb-6">
+                    <button type="button" onclick="confirmCardToCard()" id="confirmCardToCardBtn" class="w-full py-3.5 rounded-2xl text-sm font-black text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style="background: var(--accent);">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                            تایید و ادامه
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- ═══════════════════ استایل‌ها ═══════════════════ --}}
@@ -861,6 +894,20 @@
         @keyframes stepFadeIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        /* When modal is open: blur everything inside .reveal-on-scroll */
+        .page-blur-active .reveal-on-scroll {
+            filter: blur(8px) !important;
+            pointer-events: none !important;
+            user-select: none !important;
+            transition: filter 0.3s ease;
         }
 
         /* ─── ریسپانسیو ─── */
@@ -1062,45 +1109,108 @@
             selectedBankId = bankId;
             document.querySelectorAll('.checkout-bank-option').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-bank-id="' + bankId + '"]');
-            var cardToCardInfo = document.getElementById('cardToCardInfo');
-            var receiptInput = document.getElementById('receiptInput');
             if (card) {
                 card.classList.add('selected');
                 card.querySelector('input[type="radio"]').checked = true;
 
-                // Show/hide card-to-card section
                 var bankType = card.getAttribute('data-bank-type');
                 if (bankType === 'card_to_card') {
-                    // Set content BEFORE showing to avoid flash
                     var cardNum = card.getAttribute('data-card-number') || '';
                     var cardHolder = card.getAttribute('data-card-holder') || '';
                     var cardDesc = card.getAttribute('data-card-desc') || '';
-                    // Convert digits to Persian immediately to avoid flash
                     var displayNum = window.localizeDigits ? window.localizeDigits.convert(cardNum) : cardNum;
-                    document.getElementById('cardNumberDisplay').textContent = displayNum;
-                    var holderRow = document.getElementById('cardHolderRow');
-                    var descRow = document.getElementById('cardDescRow');
-                    if (cardHolder) { holderRow.style.display = ''; document.getElementById('cardHolderDisplay').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
-                    if (cardDesc) { descRow.style.display = ''; document.getElementById('cardDescDisplay').textContent = cardDesc; } else { descRow.style.display = 'none'; }
-                    // Now show the div
-                    cardToCardInfo.classList.remove('hidden');
-                    receiptInput.required = true;
+
+                    document.getElementById('modalCardNumber').textContent = displayNum;
+                    var holderRow = document.getElementById('modalHolderRow');
+                    var descRow = document.getElementById('modalDescRow');
+                    if (cardHolder) { holderRow.style.display = ''; document.getElementById('modalCardHolder').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
+                    if (cardDesc) { descRow.style.display = ''; document.getElementById('modalCardDesc').textContent = cardDesc; } else { descRow.style.display = 'none'; }
+
+                    clearReceipt();
+                    document.getElementById('cardToCardModal').classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('page-blur-active');
                 } else {
-                    cardToCardInfo.classList.add('hidden');
-                    receiptInput.required = false;
-                    receiptInput.value = '';
+                    var receiptInput = document.getElementById('receiptInput');
+                    var formInput = document.getElementById('receiptInputForm');
+                    if (receiptInput) { receiptInput.required = false; receiptInput.value = ''; }
+                    if (formInput) { formInput.required = false; formInput.value = ''; }
                 }
             }
             var payBtn = document.getElementById('payBtn');
             if (payBtn) payBtn.disabled = false;
         };
 
+        window.closeCardToCardModal = function() {
+            document.getElementById('cardToCardModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.body.classList.remove('page-blur-active');
+        };
+
+        window.confirmCardToCard = function() {
+            var receiptInput = document.getElementById('receiptInput');
+            var formInput = document.getElementById('receiptInputForm');
+            if (!receiptInput.files || !receiptInput.files[0]) {
+                var dz = document.getElementById('receiptDropzone');
+                dz.style.animation = 'none'; dz.offsetHeight;
+                dz.style.animation = 'shake 0.4s ease';
+                dz.style.borderColor = '#ef4444';
+                setTimeout(function() { dz.style.borderColor = ''; }, 1500);
+                return;
+            }
+            formInput.required = true;
+            closeCardToCardModal();
+        };
+
+        window.previewReceipt = function(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('receiptPreviewImg').src = e.target.result;
+                    document.getElementById('receiptFileName').textContent = input.files[0].name;
+                    document.getElementById('receiptPlaceholder').classList.add('hidden');
+                    document.getElementById('receiptPreview').classList.remove('hidden');
+                    document.getElementById('receiptDropzone').style.borderColor = 'var(--accent)';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        window.syncReceiptToForm = function(modalInput) {
+            previewReceipt(modalInput);
+            // Sync file to form's hidden input using DataTransfer
+            var formInput = document.getElementById('receiptInputForm');
+            if (modalInput.files && modalInput.files[0] && window.DataTransfer) {
+                var dt = new DataTransfer();
+                dt.items.add(modalInput.files[0]);
+                formInput.files = dt.files;
+            }
+        };
+
+        window.clearReceipt = function() {
+            var input = document.getElementById('receiptInput');
+            if (input) input.value = '';
+            var formInput = document.getElementById('receiptInputForm');
+            if (formInput) formInput.value = '';
+            document.getElementById('receiptPlaceholder').classList.remove('hidden');
+            document.getElementById('receiptPreview').classList.add('hidden');
+            document.getElementById('receiptDropzone').style.borderColor = '';
+        };
+
+        window.handleReceiptDrop = function(e) {
+            var files = e.dataTransfer.files;
+            if (files && files[0]) {
+                var input = document.getElementById('receiptInput');
+                input.files = files;
+                syncReceiptToForm(input);
+            }
+        };
+
         window.copyCardNumber = function() {
-            // Convert Persian digits back to English for clipboard
-            var displayText = document.getElementById('cardNumberDisplay').textContent;
+            var displayText = document.getElementById('modalCardNumber').textContent;
             var num = displayText.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/-/g, '');
             navigator.clipboard.writeText(num).then(function() {
-                var btn = event.target;
+                var btn = document.getElementById('copyCardBtn');
                 var orig = btn.textContent;
                 btn.textContent = 'کپی شد!';
                 setTimeout(function() { btn.textContent = orig; }, 1500);
