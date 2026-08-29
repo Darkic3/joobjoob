@@ -527,6 +527,18 @@
                                     </button>
                                 </div>
 
+                                {{-- نمایش فیش آپلود شده --}}
+                                <div id="receiptThumbBadge" class="hidden mt-4 p-3 rounded-2xl flex items-center gap-3" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);">
+                                    <img id="receiptThumbImg" src="" alt="فیش واریزی" class="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold" style="color: var(--accent);">فیش واریزی آپلود شد ✓</p>
+                                        <p id="receiptThumbName" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                    </div>
+                                    <button type="button" onclick="document.getElementById('receiptThumbBadge').classList.add('hidden'); clearReceipt();" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent);">
+                                        <svg class="w-3.5 h-3.5" style="color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+
                                 {{-- hidden input for receipt inside form --}}
                                 <input type="file" name="payment_receipt" accept="image/*" id="receiptInputForm" class="hidden">
 
@@ -1159,6 +1171,19 @@
                 return;
             }
             formInput.required = true;
+            // Show receipt thumbnail on the page
+            var thumbBadge = document.getElementById('receiptThumbBadge');
+            var thumbImg = document.getElementById('receiptThumbImg');
+            var thumbName = document.getElementById('receiptThumbName');
+            if (thumbBadge && receiptInput.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    thumbImg.src = e.target.result;
+                    thumbName.textContent = receiptInput.files[0].name;
+                    thumbBadge.classList.remove('hidden');
+                };
+                reader.readAsDataURL(receiptInput.files[0]);
+            }
             closeCardToCardModal();
         };
 
@@ -1209,12 +1234,46 @@
         window.copyCardNumber = function() {
             var displayText = document.getElementById('modalCardNumber').textContent;
             var num = displayText.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/-/g, '');
-            navigator.clipboard.writeText(num).then(function() {
-                var btn = document.getElementById('copyCardBtn');
-                var orig = btn.textContent;
-                btn.textContent = 'کپی شد!';
-                setTimeout(function() { btn.textContent = orig; }, 1500);
-            });
+            var btn = document.getElementById('copyCardBtn');
+            var orig = btn.textContent;
+
+            function onSuccess() {
+                btn.textContent = 'کپی شد! ✓';
+                btn.style.background = 'color-mix(in srgb, #22c55e 15%, transparent)';
+                btn.style.color = '#22c55e';
+                setTimeout(function() {
+                    btn.textContent = orig;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 1500);
+            }
+
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(num).then(onSuccess).catch(function() {
+                    fallbackCopy(num, onSuccess);
+                });
+            } else {
+                fallbackCopy(num, onSuccess);
+            }
+
+            function fallbackCopy(text, callback) {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    callback();
+                } catch(e) {
+                    // Last resort: show the number for manual copy
+                    btn.textContent = 'خطا در کپی';
+                    setTimeout(function() { btn.textContent = orig; }, 2000);
+                }
+                document.body.removeChild(ta);
+            }
         };
 
         // ========== اعمال کد تخفیف ==========

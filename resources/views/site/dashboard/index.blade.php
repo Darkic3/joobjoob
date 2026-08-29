@@ -35,7 +35,7 @@
                     <div class="neu-flat-sm p-4 flex justify-between items-center text-sm">
                         <span>#{{ $order->id }}</span>
                         <span>{{ number_format($order->total) }}</span>
-                        <span class="neu-badge neu-badge-success">{{ $order->status }}</span>
+                        <span class="neu-badge neu-badge-success">{{ $order->status['title'] ?? $order->order_status }}</span>
                     </div>
                 @empty
                     <p style="color: var(--text-secondary);">—</p>

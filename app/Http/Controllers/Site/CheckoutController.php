@@ -8,6 +8,7 @@ use App\Models\Discount;
 use App\Models\Order;
 use App\Models\State;
 use App\Services\AddressService;
+use App\Helpers\ImageHandler;
 use App\Services\CartService;
 use App\Services\CityService;
 use App\Services\ShippingCalculator;
@@ -163,17 +164,22 @@ class CheckoutController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'bank_id' => 'required|exists:banks,id',
-            'payment_receipt' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
         $bankId = $request->get('bank_id');
         $userDescription = $request->get('user_description');
-        $paymentReceipt = null;
 
-        if ($request->hasFile('payment_receipt')) {
-            $paymentReceipt = $request->file('payment_receipt')->store('receipts', 'public');
+        // Upload receipt image safely
+        $paymentReceipt = null;
+        $file = $request->file('payment_receipt');
+        if ($file && $file->isValid() && $file->getSize() > 0) {
+            $request->validate([
+                'bank_id' => 'required|exists:banks,id',
+                'payment_receipt' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+            ]);
+            $paymentReceipt = ImageHandler::handle('receipts', $file);
+        } else {
+            $request->validate([
+                'bank_id' => 'required|exists:banks,id',
+            ]);
         }
 
         $addressId = session('checkout_address_id');
