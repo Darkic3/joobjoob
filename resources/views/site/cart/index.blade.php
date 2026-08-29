@@ -1071,9 +1071,7 @@
                 // Show/hide card-to-card section
                 var bankType = card.getAttribute('data-bank-type');
                 if (bankType === 'card_to_card') {
-                    cardToCardInfo.classList.remove('hidden');
-                    receiptInput.required = true;
-                    // Populate card info
+                    // Set content BEFORE showing to avoid flash
                     var cardNum = card.getAttribute('data-card-number') || '';
                     var cardHolder = card.getAttribute('data-card-holder') || '';
                     var cardDesc = card.getAttribute('data-card-desc') || '';
@@ -1082,6 +1080,9 @@
                     var descRow = document.getElementById('cardDescRow');
                     if (cardHolder) { holderRow.style.display = ''; document.getElementById('cardHolderDisplay').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
                     if (cardDesc) { descRow.style.display = ''; document.getElementById('cardDescDisplay').textContent = cardDesc; } else { descRow.style.display = 'none'; }
+                    // Now show the div
+                    cardToCardInfo.classList.remove('hidden');
+                    receiptInput.required = true;
                 } else {
                     cardToCardInfo.classList.add('hidden');
                     receiptInput.required = false;
