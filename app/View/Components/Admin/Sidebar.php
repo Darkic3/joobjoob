@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\Order;
 use App\Models\Review;
 use Closure;
 use Illuminate\View\Component;
@@ -25,6 +26,8 @@ class Sidebar extends Component
     public bool $showSettingsDivider;
 
     public int $pendingReviewsCount = 0;
+
+    public int $newOrdersCount = 0;
 
     public function __construct()
     {
@@ -58,6 +61,14 @@ class Sidebar extends Component
         // تعداد نظرات در انتظار تأیید
         if (($this->can)('admin.reviews.index')) {
             $this->pendingReviewsCount = Review::pending()->count();
+        }
+
+        // تعداد سفارشات جدید (در انتظار تأیید فیش یا پرداخت)
+        if (($this->can)('admin.orders.index')) {
+            $this->newOrdersCount = Order::whereIn('order_status', [
+                'wait_for_verification',
+                'pending_confirmation',
+            ])->count();
         }
     }
 

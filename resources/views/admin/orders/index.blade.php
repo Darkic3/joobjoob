@@ -8,7 +8,15 @@
         {{-- هدر صفحه --}}
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">{{ __('admin.orders.title') }}</h1>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">{{ __('admin.orders.title') }}</h1>
+                    @if($newOrdersCount > 0)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                            <svg class="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+                            {{ $newOrdersCount }} {{ __('admin.orders.new_orders') }}
+                        </span>
+                    @endif
+                </div>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">{{ __('admin.orders.subtitle') }}</p>
             </div>
         </div>
@@ -86,7 +94,7 @@
                     @forelse($orders as $order)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                             <td class="px-6 py-4 text-sm font-bold text-gray-800 dark:text-gray-200">{{ $order->id }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{{ jdate('d/m', $order->created_at->timestamp) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{{ show_date($order->created_at, 'd/m') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{{ $order->user?->name ?? '—' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400" dir="ltr">{{ $order->user?->mobile ?? '—' }}</td>
                             <td class="px-6 py-4">

@@ -54,7 +54,13 @@ class OrderController extends Controller
         $shippingStatuses = OrderShippingStatus::orderByDesc('id')->get();
         $shippingMethods = ShippingMethod::orderByDesc('id')->get();
 
-        return view('admin.orders.index', compact('orders', 'shippingStatuses', 'shippingMethods'));
+        // تعداد سفارشات جدید (در انتظار تأیید فیش یا پرداخت)
+        $newOrdersCount = Order::whereIn('order_status', [
+            'wait_for_verification',
+            'pending_confirmation',
+        ])->count();
+
+        return view('admin.orders.index', compact('orders', 'shippingStatuses', 'shippingMethods', 'newOrdersCount'));
     }
 
     /**
