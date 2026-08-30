@@ -58,6 +58,7 @@ return [
     'payment_method' => 'طريقة الدفع',
     'place_order' => 'تأكيد الطلب',
     'my_orders' => 'طلباتي',
+    'order_detail' => 'تفاصيل الطلب',
     'wishlist' => 'المفضلة',
     'add_to_wishlist' => 'أضف إلى المفضلة',
     'remove_from_wishlist' => 'إزالة من المفضلة',

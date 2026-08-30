@@ -58,6 +58,7 @@ return [
     'payment_method' => 'Ödeme Yöntemi',
     'place_order' => 'Siparişi Tamamla',
     'my_orders' => 'Siparişlerim',
+    'order_detail' => 'Sipariş Detayı',
     'wishlist' => 'İstek Listesi',
     'add_to_wishlist' => 'İstek listesine ekle',
     'remove_from_wishlist' => 'İstek listesinden çıkar',

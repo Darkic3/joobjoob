@@ -58,6 +58,7 @@ return [
     'payment_method' => 'Payment Method',
     'place_order' => 'Place Order',
     'my_orders' => 'My Orders',
+    'order_detail' => 'Order Detail',
     'wishlist' => 'Wishlist',
     'add_to_wishlist' => 'Add to wishlist',
     'remove_from_wishlist' => 'Remove from wishlist',

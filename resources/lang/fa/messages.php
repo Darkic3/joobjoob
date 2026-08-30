@@ -52,6 +52,7 @@ return [
     'payment_method' => 'روش پرداخت',
     'place_order' => 'ثبت نهایی سفارش',
     'my_orders' => 'سفارشات من',
+    'order_detail' => 'جزئیات سفارش',
     'wishlist' => 'علاقه‌مندی‌ها',
     'add_to_wishlist' => 'افزودن به علاقه‌مندی‌ها',
     'remove_from_wishlist' => 'حذف از علاقه‌مندی‌ها',
