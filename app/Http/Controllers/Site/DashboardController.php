@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
     public function orderDetail(int $id)
     {
-        $order = Order::with(['items.product', 'shippingStatus', 'shippingMethod', 'city', 'state'])
+        $order = Order::with(['items.product', 'items.product.images', 'items.productVariant', 'shippingStatus', 'shippingMethod', 'city', 'state', 'bank', 'histories.shippingStatus'])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
 
