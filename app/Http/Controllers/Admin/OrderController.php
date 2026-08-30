@@ -44,10 +44,20 @@ class OrderController extends Controller
             $query->whereHas('user', fn ($q) => $q->where('mobile', 'LIKE', "%{$request->mobile}%"));
         }
         if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
+            $fromDate = $request->from_date;
+            $parts = explode('/', $fromDate);
+            if (count($parts) === 3) {
+                $fromDate = jalali_to_gregorian($parts[0], $parts[1], $parts[2], '-');
+            }
+            $query->whereDate('created_at', '>=', $fromDate);
         }
         if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
+            $toDate = $request->to_date;
+            $parts = explode('/', $toDate);
+            if (count($parts) === 3) {
+                $toDate = jalali_to_gregorian($parts[0], $parts[1], $parts[2], '-');
+            }
+            $query->whereDate('created_at', '<=', $toDate);
         }
 
         $orders = $query->orderByDesc('id')->paginate(20);

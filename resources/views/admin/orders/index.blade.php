@@ -54,13 +54,17 @@
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 block">{{ __('admin.orders.from_date') }}</label>
-                    <input type="date" name="from_date" value="{{ request('from_date') }}"
-                           class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                    <input type="text" name="from_date" data-jdp data-jdp-only-date
+                           value="{{ request('from_date') }}"
+                           placeholder="۱۴۰۳/۰۵/۱۴"
+                           class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" dir="ltr">
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 block">{{ __('admin.orders.to_date') }}</label>
-                    <input type="date" name="to_date" value="{{ request('to_date') }}"
-                           class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                    <input type="text" name="to_date" data-jdp data-jdp-only-date
+                           value="{{ request('to_date') }}"
+                           placeholder="۱۴۰۳/۰۵/۱۴"
+                           class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" dir="ltr">
                 </div>
                 <div class="sm:col-span-2 lg:col-span-6 flex gap-2">
                     <button type="submit" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md">
