@@ -26,7 +26,7 @@
                     <div class="card-body">
                         <table class="table table-sm mb-0">
                             <tr><td>شماره سفارش</td><td><strong>#{{ $order->id }}</strong></td></tr>
-                            <tr><td>تاریخ ثبت</td><td>{{ jdate('d F Y - H:i', $order->created_at->timestamp) }}</td></tr>
+                            <tr><td>تاریخ ثبت</td><td>{{ show_date($order->created_at, 'd F Y - H:i') }}</td></tr>
                             <tr>
                                 <td>وضعیت سفارش</td>
                                 <td>
@@ -150,7 +150,7 @@
                         <tbody>
                             @foreach($order->histories as $history)
                                 <tr>
-                                    <td>{{ jdate('d/m/Y H:i', $history->created_at->timestamp) }}</td>
+                                    <td>{{ show_date($history->created_at, 'd/m/Y H:i') }}</td>
                                     <td>{{ $history->status_name }}</td>
                                     <td>
                                         @if($history->shippingStatus)

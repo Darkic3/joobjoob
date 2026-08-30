@@ -1036,6 +1036,7 @@ return [
     'orders' => [
         'title' => 'Siparişler',
         'subtitle' => 'Müşteri siparişlerini yönetin ve takip edin',
+        'new_orders' => 'Yeni Sipariş',
         'order_id' => 'Sipariş #',
         'date' => 'Tarih',
         'customer' => 'Müşteri',

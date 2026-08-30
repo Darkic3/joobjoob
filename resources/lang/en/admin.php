@@ -1035,6 +1035,7 @@ return [
     'orders' => [
         'title' => 'Orders',
         'subtitle' => 'Manage and track customer orders',
+        'new_orders' => 'New Order',
         'order_id' => 'Order #',
         'date' => 'Date',
         'customer' => 'Customer',

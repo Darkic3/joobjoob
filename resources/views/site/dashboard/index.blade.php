@@ -48,7 +48,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-bold" style="color: var(--text-primary);">سفارش #{{ $order->id }}</p>
-                                    <p class="text-xs mt-0.5" style="color: var(--text-secondary);">{{ jdate('d F Y - H:i', $order->created_at->timestamp) }}</p>
+                                    <p class="text-xs mt-0.5" style="color: var(--text-secondary);">{{ show_date($order->created_at, 'd F Y - H:i') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">

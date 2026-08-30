@@ -25,7 +25,7 @@
                 <!-- هدر -->
                 <div class="factor-header text-center">
                     <h3>فاکتور خرید</h3>
-                    <p class="mb-0">شماره سفارش: #{{ $order->id }} | تاریخ: {{ jdate('d F Y', $order->created_at->timestamp) }}</p>
+                    <p class="mb-0">شماره سفارش: #{{ $order->id }} | تاریخ: {{ show_date($order->created_at, 'd F Y') }}</p>
                 </div>
 
                 <div class="row mb-4">
