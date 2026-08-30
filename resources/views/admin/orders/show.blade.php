@@ -76,13 +76,34 @@
                         </form>
                     </div>
 
-                    {{-- فیش واریزی --}}
-                    @if($order->payment_receipt)
+                    {{-- فیش واریزی / کارت به کارت --}}
+                    @if($order->bank)
+                        @php
+                            $isCardToCard = in_array($order->bank->bank_type ?? '', ['card_to_card', 'card-to-card']);
+                        @endphp
                         <div class="py-2">
-                            <span class="text-gray-500 dark:text-gray-400 text-sm block mb-2">{{ __('admin.orders.payment_receipt') }}</span>
-                            <a href="{{ asset('storage/' . $order->payment_receipt) }}" target="_blank">
-                                <img src="{{ asset('storage/' . $order->payment_receipt) }}" alt="فیش" class="w-20 h-20 rounded-xl object-cover border border-gray-200 dark:border-gray-600">
-                            </a>
+                            <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ __('admin.orders.payment_receipt') }}</span>
+                            @if($order->payment_receipt)
+                                @php
+                                    $receiptPath = asset(config('paths.upload', 'uploads') . '/receipts/' . $order->payment_receipt);
+                                @endphp
+                                <a href="{{ $receiptPath }}" target="_blank"
+                                   class="block rounded-xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 transition-colors">
+                                    <img src="{{ $receiptPath }}" alt="فیش واریزی"
+                                         class="w-full max-w-xs rounded-xl object-cover">
+                                </a>
+                                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">✅ فیش واریزی دریافت شد</p>
+                            @elseif($isCardToCard)
+                                <div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                                    <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    <div>
+                                        <p class="text-xs font-bold text-red-700 dark:text-red-400">فیش واریزی ارسال نشده!</p>
+                                        <p class="text-[10px] text-red-500 dark:text-red-400">کاربر پرداخت کارت به کارت انجام داده ولی فیشی آپلود نکرده</p>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-xs text-gray-400">—</p>
+                            @endif
                         </div>
                     @endif
                 </div>

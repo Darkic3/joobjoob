@@ -194,8 +194,11 @@
                     </div>
                     <h3 class="text-sm font-bold" style="color: var(--text-primary);">فیش واریزی</h3>
                 </div>
-                <a href="{{ asset('storage/' . $order->payment_receipt) }}" target="_blank" class="block">
-                    <img src="{{ asset('storage/' . $order->payment_receipt) }}" alt="فیش واریزی"
+                @php
+                    $receiptPath = asset(config('paths.upload', 'uploads') . '/receipts/' . $order->payment_receipt);
+                @endphp
+                <a href="{{ $receiptPath }}" target="_blank" class="block">
+                    <img src="{{ $receiptPath }}" alt="فیش واریزی"
                          class="rounded-xl w-full max-w-xs border" style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                 </a>
             </div>
