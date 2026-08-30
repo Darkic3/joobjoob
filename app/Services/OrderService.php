@@ -71,6 +71,7 @@ class OrderService
             'total_weight' => $weightSum,
             'user_description' => $userDescription,
             'shipping_status_id' => $defaultStatus?->id,
+            'payment_receipt' => $orderData['payment_receipt'] ?? null,
         ]);
 
         // ایجاد آیتم‌های سفارش

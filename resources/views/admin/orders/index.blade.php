@@ -78,12 +78,30 @@
             </form>
         </div>
 
+        {{-- نوار اقدامات گروهی --}}
+        <div id="bulkActions"
+             class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-2xl shadow-2xl px-6 py-3 flex items-center gap-4 transition-all duration-300">
+            <span id="selectedCount" class="text-sm font-bold">۰ سفارش انتخاب شده</span>
+            <div class="w-px h-6 bg-gray-600 dark:bg-gray-400"></div>
+            <button onclick="printSelected()" class="inline-flex items-center gap-1.5 bg-indigo-500 hover:bg-indigo-600 text-white dark:bg-indigo-600 dark:hover:bg-indigo-700 text-sm font-semibold px-4 py-1.5 rounded-xl transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                چاپ فاکتورها
+            </button>
+            <button onclick="clearSelection()" class="text-gray-400 dark:text-gray-600 hover:text-white dark:hover:text-gray-900 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
         {{-- جدول --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
+                        <th class="px-6 py-4 w-10">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"
+                                   class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                        </th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.orders.date') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.orders.customer') }}</th>
@@ -97,6 +115,11 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($orders as $order)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            <td class="px-6 py-4 w-10">
+                                <input type="checkbox" name="order_ids[]" value="{{ $order->id }}"
+                                       onchange="updateBulkActions()"
+                                       class="order-checkbox w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            </td>
                             <td class="px-6 py-4 text-sm font-bold text-gray-800 dark:text-gray-200">{{ $order->id }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{{ show_date($order->created_at, 'd/m') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{{ $order->user?->name ?? '—' }}</td>
@@ -135,7 +158,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-16 text-center">
+                            <td colspan="9" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
                                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -155,4 +178,44 @@
             {{ $orders->withQueryString()->links() }}
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function toggleSelectAll(el) {
+            document.querySelectorAll('.order-checkbox').forEach(function(cb) {
+                cb.checked = el.checked;
+            });
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            var checked = document.querySelectorAll('.order-checkbox:checked');
+            var bar = document.getElementById('bulkActions');
+            var count = document.getElementById('selectedCount');
+            if (checked.length > 0) {
+                bar.classList.remove('hidden');
+                count.textContent = checked.length + ' سفارش انتخاب شده';
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.order-checkbox').forEach(function(cb) {
+                cb.checked = false;
+            });
+            document.getElementById('selectAll').checked = false;
+            updateBulkActions();
+        }
+
+        function printSelected() {
+            var ids = [];
+            document.querySelectorAll('.order-checkbox:checked').forEach(function(cb) {
+                ids.push(cb.value);
+            });
+            if (ids.length === 0) return;
+            window.open('{{ route("admin.orders.bulk-factor") }}?ids=' + ids.join(','), '_blank');
+        }
+    </script>
+    @endpush
 @endsection

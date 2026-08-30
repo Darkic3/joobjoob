@@ -84,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('orders/change-order-status/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'changeOrderStatus'])->name('orders.change-order-status');
         Route::post('orders/post-code', [\App\Http\Controllers\Admin\OrderController::class, 'postCode'])->name('orders.post-code');
         Route::get('orders/{id}/factor', [\App\Http\Controllers\Admin\OrderController::class, 'factor'])->name('orders.factor');
+        Route::get('orders/bulk-factor', [\App\Http\Controllers\Admin\OrderController::class, 'bulkFactor'])->name('orders.bulk-factor');
 
         // ========== مدیریت روش‌های ارسال ==========
         Route::resource('shipping-methods', \App\Http\Controllers\Admin\ShippingMethodController::class);

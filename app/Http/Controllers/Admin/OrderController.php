@@ -131,6 +131,20 @@ class OrderController extends Controller
     }
 
     /**
+     * چاپ چند فاکتور با هم
+     */
+    public function bulkFactor(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->get('ids', '')));
+        $orders = Order::with(['items.product', 'items.productVariant', 'shippingMethod'])
+            ->whereIn('id', $ids)
+            ->orderBy('id')
+            ->get();
+
+        return view('admin.orders.bulk-factor', compact('orders'));
+    }
+
+    /**
      * تغییر وضعیت سفارش
      */
     public function changeOrderStatus(Request $request, int $id)
