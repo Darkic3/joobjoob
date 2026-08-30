@@ -52,13 +52,13 @@ class OrderService
             'state_id' => $orderData['state_id'] ?? null,
             'city_id' => $orderData['city_id'] ?? null,
             'address_id' => $orderData['address_id'] ?? null,
-            'address' => json_encode([
+            'address' => [
                 'state' => $orderData['state_name'] ?? '',
                 'city' => $orderData['city_name'] ?? '',
                 'address' => $orderData['full_address'] ?? '',
                 'receiptor_mobile' => $orderData['receiptor_mobile'] ?? '',
                 'postal_code' => $orderData['postal_code'] ?? '',
-            ]),
+            ],
             'receiptor_full_name' => $orderData['receiptor_full_name'] ?? null,
             'shipping_method_id' => $orderData['shipping_method_id'] ?? null,
             'bank_id' => $orderData['bank_id'] ?? null,
