@@ -151,63 +151,86 @@ window.startCountdownTo = function (elIds, endMs) {
 
 
 // ── Fly-to-Cart animation ─────────────────────────────────────────────
-// clones the product thumbnail and animates it along a curved Bézier path to the cart icon
-// sourceEl: the add-to-cart button (used to walk up to the product card)
+// مستقیم و آرام با انحنای ملایم · requestAnimationFrame
 function flyToCart(sourceEl) {
-    // ۱) پیدا کردن تصویر محصول: ابتدا کارت، سپس تصویر داخلش
     var card = sourceEl.closest('.product-card, [data-card-link], .quick-view-content');
     var img = card ? card.querySelector('.product-image-wrap img, .quick-view-gallery img, img') : null;
 
-    // ۲) پیدا کردن آیکون سبد خرید در هدر
     var badge = document.getElementById('cart-count') || document.getElementById('cart-count-mobile');
     if (!badge) return;
     var target = badge.closest('a, button');
     if (!target) return;
 
-    // ۳) محاسبه موقعیت شروع و پایان
     var src = img ? img.getBoundingClientRect() : sourceEl.getBoundingClientRect();
     var dst = target.getBoundingClientRect();
-    var size = Math.min(src.width, src.height, 56);
 
-    // ۴) ساخت کلون متحرک
+    // ── اندازه ──
+    var startSize = Math.min(src.width * 0.75, src.height * 0.75, 72);
+    var endSize = 12;
+
+    var startX = src.left + src.width / 2;
+    var startY = src.top + src.height / 2;
+    var endX = dst.left + dst.width / 2;
+    var endY = dst.top + dst.height / 2;
+
+    // ── انحنای خیلی ملایم (فقط کمی بالاتر از مسیر مستقیم) ──
+    var arcHeight = 35;
+
+    // ── ساخت کلون ──
     var ghost = document.createElement('div');
     ghost.setAttribute('aria-hidden', 'true');
     ghost.style.cssText =
-        'position:fixed;z-index:99999;pointer-events:none;border-radius:50%;'
-        + 'width:' + size + 'px;height:' + size + 'px;'
+        'position:fixed;z-index:99999;pointer-events:none;'
+        + 'width:' + startSize + 'px;height:' + startSize + 'px;'
+        + 'border-radius:50%;'
         + 'background-image:url(' + (img ? img.src : '') + ');background-size:cover;background-position:center;'
-        + 'box-shadow:0 6px 24px rgba(0,0,0,.25);'
+        + 'box-shadow:0 8px 28px rgba(0,0,0,.3);'
         + 'will-change:transform,opacity;'
-        + 'left:' + (src.left + src.width / 2 - size / 2) + 'px;'
-        + 'top:' + (src.top + src.height / 2 - size / 2) + 'px;'
-        + 'transform:scale(1);opacity:1;transition:none;';
+        + 'left:' + (startX - startSize / 2) + 'px;'
+        + 'top:' + (startY - startSize / 2) + 'px;'
+        + 'transform:scale(1);opacity:1;';
     document.body.appendChild(ghost);
 
-    // ۵) ریفلو + شروع انیمیشن با CSS transition
-    void ghost.offsetWidth;
+    // ── easing ──
+    function easeOutQuad(t) { return 1 - (1 - t) * (1 - t); }
 
-    var dx = (dst.left + dst.width / 2) - (src.left + src.width / 2);
-    var dy = (dst.top + dst.height / 2) - (src.top + src.height / 2);
+    var duration = 1100; // ۱.۱ ثانیه
+    var t0 = performance.now();
 
-    // ترکیب: حرکت + کوچک‌شدن + چرخش + محو شدن
-    ghost.style.transition = 'left 0.75s cubic-bezier(.2,.9,.3,1.1), top 0.75s cubic-bezier(.2,.9,.3,1.1), transform 0.75s cubic-bezier(.2,.9,.3,1.1), opacity 0.75s ease-in';
-    ghost.style.left = (dst.left + dst.width / 2 - size / 2) + 'px';
-    ghost.style.top = (dst.top + dst.height / 2 - size / 2) + 'px';
-    ghost.style.transform = 'scale(0.15) rotate(' + (dx > 0 ? 180 : -180) + 'deg)';
-    ghost.style.opacity = '0.3';
+    function step(now) {
+        var elapsed = now - t0;
+        var raw = Math.min(elapsed / duration, 1);
+        var t = easeOutQuad(raw);
 
-    // ۶) پایان انیمیشن → حذف کلون + بونس آیکون سبد
-    function onEnd() {
-        ghost.removeEventListener('transitionend', onEnd);
-        ghost.remove();
-        // bounce the cart badge
-        badge.classList.remove('count-pop');
-        void badge.offsetWidth;
-        badge.classList.add('count-pop');
+        // ── مستقیم با انحنای خیلی ملایم ──
+        var cx = startX + (endX - startX) * t;
+        var linearY = startY + (endY - startY) * t;
+        var arcY = -arcHeight * Math.sin(Math.PI * raw);
+        var cy = linearY + arcY;
+
+        // ── مقیاس: نرم کوچک شدن ──
+        var s = startSize + (endSize - startSize) * t;
+
+        // ── محو شدن در ۳۰٪ پایانی ──
+        var opacity = raw < 0.7 ? 1 : 1 - ((raw - 0.7) / 0.3) * 0.85;
+
+        ghost.style.left = (cx - s / 2) + 'px';
+        ghost.style.top = (cy - s / 2) + 'px';
+        ghost.style.width = s + 'px';
+        ghost.style.height = s + 'px';
+        ghost.style.opacity = opacity;
+
+        if (raw < 1) {
+            requestAnimationFrame(step);
+        } else {
+            ghost.remove();
+            badge.classList.remove('count-pop');
+            void badge.offsetWidth;
+            badge.classList.add('count-pop');
+        }
     }
-    ghost.addEventListener('transitionend', onEnd);
-    // فوربک اگر transitionend شلیک نشد
-    setTimeout(function () { if (ghost.parentNode) onEnd(); }, 900);
+
+    requestAnimationFrame(step);
 }
 
 // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success ----------
