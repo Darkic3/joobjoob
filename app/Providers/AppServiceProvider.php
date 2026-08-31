@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
+use App\Observers\OrderObserver;
 use App\Services\CartService;
 use App\Services\RecentlyViewedService;
 use App\Services\WishlistService;
@@ -29,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Observerها
+        Order::observe(OrderObserver::class);
+
         Gate::define('admin', fn ($user) => $user->isAdmin());
 
         // داده‌های سراسری زبان/جهت/ارقام برای همهٔ ویوها (به‌جای fallback تکراری داخل لایه‌ها)

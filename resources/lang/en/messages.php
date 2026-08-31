@@ -24,6 +24,8 @@ return [
     'back_to_top' => 'Back to top',
     'add_to_cart' => 'Add to Cart',
     'added_short' => '✓ Added',
+    'stock_limit_reached' => 'Only :count available',
+    'stock_limit_sub' => 'All stock of this product is already in your cart!',
     'added_to_cart' => 'Product added to cart',
     'buy_now' => 'Buy Now',
     'featured_products' => 'Featured Products',
@@ -58,6 +60,7 @@ return [
     'payment_method' => 'Payment Method',
     'place_order' => 'Place Order',
     'my_orders' => 'My Orders',
+    'order_detail' => 'Order Detail',
     'wishlist' => 'Wishlist',
     'add_to_wishlist' => 'Add to wishlist',
     'remove_from_wishlist' => 'Remove from wishlist',
@@ -97,6 +100,7 @@ return [
     'new_badge' => 'NEW',
     'toman' => 'IRT',
     'you_save' => 'You save :amount 💰',
+    'your_savings_from_purchase' => 'Your savings from this purchase',
     'dont_miss_out' => "Don't miss out",
     'trust_title' => 'Why shop with us?',
     'quick_view' => 'Quick view',
@@ -173,6 +177,7 @@ return [
     'footer_brand_tag' => 'Online store with the best quality and prices',
     'newsletter_subtitle' => 'Be the first to hear about special offers and new arrivals.',
     'newsletter' => 'Newsletter',
+    'newsletter_email_placeholder' => 'Your email',
 
     'socials' => [
         'instagram' => 'Instagram',
@@ -193,6 +198,7 @@ return [
     'already_member_desc' => 'Your discount codes will soon be available in your user panel.',
 
     'trust_free_shipping' => 'Free Shipping',
+    'trust_cod_shipping' => 'Cash on Delivery',
     'trust_free_shipping_desc' => 'On orders over $50',
     'trust_badges' => 'Trust badges',
     'trust_authenticity' => 'Authenticity Guarantee',

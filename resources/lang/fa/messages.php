@@ -25,6 +25,8 @@ return [
     'back_to_top' => 'بازگشت به بالا',
     'add_to_cart' => 'افزودن به سبد خرید',
     'added_short' => '✓ اضافه شد',
+    'stock_limit_reached' => 'فقط :count عدد موجود است',
+    'stock_limit_sub' => 'تمام موجودی محصول در سبد خرید شما است!',
     'added_to_cart' => 'محصول به سبد خرید اضافه شد',
     'buy_now' => 'خرید سریع',
     'featured_products' => 'محصولات ویژه',
@@ -52,6 +54,7 @@ return [
     'payment_method' => 'روش پرداخت',
     'place_order' => 'ثبت نهایی سفارش',
     'my_orders' => 'سفارشات من',
+    'order_detail' => 'جزئیات سفارش',
     'wishlist' => 'علاقه‌مندی‌ها',
     'add_to_wishlist' => 'افزودن به علاقه‌مندی‌ها',
     'remove_from_wishlist' => 'حذف از علاقه‌مندی‌ها',
@@ -88,6 +91,7 @@ return [
     'new_badge' => 'جدید',
     'toman' => 'تومان',
     'you_save' => 'شما :amount صرفه‌جویی می‌کنید 💰',
+    'your_savings_from_purchase' => 'سود شما از این خرید',
     'quick_view' => 'مشاهده سریع',
     'quick_view_error' => 'خطا در بارگذاری پیش‌نمایش. دوباره تلاش کنید.',
     'view_details' => 'مشاهده جزئیات',
@@ -174,6 +178,7 @@ return [
     'footer_brand_tag' => 'فروشگاه آنلاین با بهترین کیفیت و قیمت',
     'newsletter_subtitle' => 'از تخفیف‌های ویژه و محصولات جدید زودتر از همه باخبر شوید.',
     'newsletter' => 'خبرنامه',
+    'newsletter_email_placeholder' => 'ایمیل شما',
 
     'socials' => [
         'instagram' => 'اینستاگرام',
@@ -194,6 +199,7 @@ return [
     'already_member_desc' => 'کدهای تخفیف شما به‌زودی در پنل کاربری در دسترس خواهد بود.',
 
     'trust_free_shipping' => 'ارسال رایگان',
+    'trust_cod_shipping' => 'پس کرایه',
     'trust_free_shipping_desc' => 'بالای ۵۰۰ هزار تومان',
     'trust_badges' => 'نشان‌های اعتماد',
     'trust_authenticity' => 'ضمانت اصالت کالا',

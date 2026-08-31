@@ -101,6 +101,13 @@
                     <span class="site-account-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                 </a>
             @else
+                <a href="{{ localizedRoute('cart.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
+                   title="{{ __('messages.cart') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                    </svg>
+                    <span id="cart-count-guest" class="site-badge" style="display:none;">{{ $cartCount }}</span>
+                </a>
                 <a href="{{ localizedRoute('login') }}" class="site-login-btn hidden lg:inline-flex"
                    title="{{ __('messages.login_register') }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

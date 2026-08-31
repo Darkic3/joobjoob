@@ -24,6 +24,8 @@ return [
     'back_to_top' => 'Başa Dön',
     'add_to_cart' => 'Sepete Ekle',
     'added_short' => '✓ Eklendi',
+        'stock_limit_reached' => 'Sadece :count adet mevcut',
+    'stock_limit_sub' => 'Bu ürünün tüm stoğu sepetinizde!',
     'added_to_cart' => 'Ürün sepete eklendi',
     'buy_now' => 'Hemen Al',
     'featured_products' => 'Öne Çıkan Ürünler',
@@ -58,6 +60,7 @@ return [
     'payment_method' => 'Ödeme Yöntemi',
     'place_order' => 'Siparişi Tamamla',
     'my_orders' => 'Siparişlerim',
+    'order_detail' => 'Sipariş Detayı',
     'wishlist' => 'İstek Listesi',
     'add_to_wishlist' => 'İstek listesine ekle',
     'remove_from_wishlist' => 'İstek listesinden çıkar',
@@ -122,6 +125,7 @@ return [
     'new_badge' => 'YENİ',
     'toman' => 'IRT',
     'you_save' => ':amount tasarruf edersiniz 💰',
+    'your_savings_from_purchase' => 'Bu alışverişten kazancınız',
     'dont_miss_out' => 'Kaçırma',
     'trust_title' => 'Neden bizden alışveriş yapmalısınız?',
     'quick_view' => 'Hızlı Bakış',
@@ -129,6 +133,7 @@ return [
     'view_details' => 'Detayları Gör',
 
     'trust_free_shipping' => 'Ücretsiz Kargo',
+    'trust_cod_shipping' => 'Kapıda Ödeme',
     'trust_free_shipping_desc' => '50$ üzeri siparişlerde',
     'trust_badges' => 'Güven rozetleri',
     'trust_authenticity' => 'Orijinallik Garantisi',
@@ -336,4 +341,5 @@ return [
     'footer_brand_tag' => 'En iyi kalite ve fiyatlarla online mağaza',
     'footer_desc' => 'En iyi kalite ve fiyatlarla online mağaza',
     'newsletter' => 'Bülten',
+    'newsletter_email_placeholder' => 'E-posta adresiniz',
 ];

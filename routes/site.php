@@ -71,20 +71,51 @@ $siteRoutes = function () {
         ->middleware('throttle:5,1')
         ->name('site.contact.send');
 
-    // سبد خرید (نیازمند ورود)
-    Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
+    // افزودن به سبد — مهمان هم مجاز است (سبد session-based است)
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
+    // نمایش، ویرایش و حذف اقلام سبد — بدون نیاز به لاگین
+    Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
-        Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
     });
 
-    // تسویه حساب (نیازمند ورود)
+    // کد تخفیف — نیازمند ورود
+    Route::middleware('auth')->post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
+
+    // ==================== تسویه حساب (نیازمند ورود) ====================
     Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+        // مرحله ۱: سبد خرید
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
-        Route::post('/', [CheckoutController::class, 'store'])->name('store');
+
+        // مرحله ۲: انتخاب آدرس
+        Route::get('/address', [CheckoutController::class, 'address'])->name('address');
+        Route::get('/cities', [CheckoutController::class, 'cities'])->name('cities');
+        Route::post('/shipments', [CheckoutController::class, 'shipments'])->name('shipments');
+        Route::post('/set-shipment', [CheckoutController::class, 'setShipment'])->name('set-shipment');
+        Route::get('/address-price', [CheckoutController::class, 'addressPrice'])->name('address-price');
+
+        // مرحله ۳: پرداخت
+        Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
+        Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('apply-discount');
+        Route::post('/remove-discount', [CheckoutController::class, 'removeDiscount'])->name('remove-discount');
+        Route::get('/order-price', [CheckoutController::class, 'orderPrice'])->name('order-price');
+
+        // مرحله ۴: ایجاد سفارش
+        Route::post('/create', [CheckoutController::class, 'create'])->name('create');
+
+        // صفحات نتیجه
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+        Route::get('/failed', [CheckoutController::class, 'failed'])->name('failed');
+    });
+
+    // Callback درگاه‌های پرداخت (بدون نیاز به لاگین)
+    Route::prefix('checkout')->name('checkout.')->group(function () {
+        Route::any('/finish', [CheckoutController::class, 'finishZarinPal'])->name('finish.zarin-pal');
+        Route::any('/finish-saman', [CheckoutController::class, 'finishSaman'])->name('finish.saman-bank');
+        Route::any('/finish-sadad', [CheckoutController::class, 'finishSadad'])->name('finish.sadad-bank');
+        Route::any('/finish-zibal', [CheckoutController::class, 'finishZibal'])->name('finish.zibal-bank');
     });
 
     // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
@@ -110,8 +141,14 @@ $siteRoutes = function () {
     Route::middleware('auth')->group(function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/account/orders', [DashboardController::class, 'orders'])->name('dashboard.orders');
+        Route::get('/account/orders/{id}', [DashboardController::class, 'orderDetail'])->name('dashboard.order-detail');
+        Route::get('/account/orders/{id}/factor', [DashboardController::class, 'orderFactor'])->name('dashboard.order-factor');
         Route::get('/account/wishlist', [DashboardController::class, 'wishlist'])->name('dashboard.wishlist');
         Route::get('/account/addresses', [DashboardController::class, 'addresses'])->name('dashboard.addresses');
+        Route::post('/account/addresses', [DashboardController::class, 'createAddress'])->name('dashboard.addresses.create');
+        Route::put('/account/addresses/{id}', [DashboardController::class, 'updateAddress'])->name('dashboard.addresses.update');
+        Route::delete('/account/addresses/{id}', [DashboardController::class, 'deleteAddress'])->name('dashboard.addresses.delete');
+        Route::get('/account/addresses/cities', [DashboardController::class, 'cities'])->name('dashboard.addresses.cities');
     });
 };
 

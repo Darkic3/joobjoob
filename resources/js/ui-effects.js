@@ -150,39 +150,189 @@ window.startCountdownTo = function (elIds, endMs) {
 };
 
 
+// ── Fly-to-Cart animation ─────────────────────────────────────────────
+// مستقیم و آرام با انحنای ملایم · requestAnimationFrame
+function flyToCart(sourceEl) {
+    var card = sourceEl.closest('.product-card, [data-card-link], .quick-view-content');
+    var img = card ? card.querySelector('.product-image-wrap img, .quick-view-gallery img, img') : null;
+    // صفحه جزئیات محصول: تصویر اصلی
+    if (!img) img = document.getElementById('main-image');
+
+    var badge = document.getElementById('cart-count') || document.getElementById('cart-count-mobile');
+    if (!badge) return;
+    var target = badge.closest('a, button');
+    if (!target) return;
+
+    var src = img ? img.getBoundingClientRect() : sourceEl.getBoundingClientRect();
+    var dst = target.getBoundingClientRect();
+
+    // ── اندازه ──
+    var startSize = Math.min(src.width * 0.75, src.height * 0.75, 72);
+    var endSize = 12;
+
+    var startX = src.left + src.width / 2;
+    var startY = src.top + src.height / 2;
+    var endX = dst.left + dst.width / 2;
+    var endY = dst.top + dst.height / 2;
+
+    // ── انحنای خیلی ملایم (فقط کمی بالاتر از مسیر مستقیم) ──
+    var arcHeight = 35;
+
+    // ── ساخت کلون ──
+    var ghost = document.createElement('div');
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.style.cssText =
+        'position:fixed;z-index:99999;pointer-events:none;'
+        + 'width:' + startSize + 'px;height:' + startSize + 'px;'
+        + 'border-radius:50%;'
+        + 'background-image:url(' + (img ? img.src : '') + ');background-size:cover;background-position:center;'
+        + 'box-shadow:0 8px 28px rgba(0,0,0,.3);'
+        + 'will-change:transform,opacity;'
+        + 'left:' + (startX - startSize / 2) + 'px;'
+        + 'top:' + (startY - startSize / 2) + 'px;'
+        + 'transform:scale(1);opacity:1;';
+    document.body.appendChild(ghost);
+
+    // ── easing ──
+    function easeOutQuad(t) { return 1 - (1 - t) * (1 - t); }
+
+    var duration = 1100; // ۱.۱ ثانیه
+    var t0 = performance.now();
+
+    function step(now) {
+        var elapsed = now - t0;
+        var raw = Math.min(elapsed / duration, 1);
+        var t = easeOutQuad(raw);
+
+        // ── مستقیم با انحنای خیلی ملایم ──
+        var cx = startX + (endX - startX) * t;
+        var linearY = startY + (endY - startY) * t;
+        var arcY = -arcHeight * Math.sin(Math.PI * raw);
+        var cy = linearY + arcY;
+
+        // ── مقیاس: نرم کوچک شدن ──
+        var s = startSize + (endSize - startSize) * t;
+
+        // ── محو شدن در ۳۰٪ پایانی ──
+        var opacity = raw < 0.7 ? 1 : 1 - ((raw - 0.7) / 0.3) * 0.85;
+
+        ghost.style.left = (cx - s / 2) + 'px';
+        ghost.style.top = (cy - s / 2) + 'px';
+        ghost.style.width = s + 'px';
+        ghost.style.height = s + 'px';
+        ghost.style.opacity = opacity;
+
+        if (raw < 1) {
+            requestAnimationFrame(step);
+        } else {
+            ghost.remove();
+            badge.classList.remove('count-pop');
+            void badge.offsetWidth;
+            badge.classList.add('count-pop');
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
 // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success ----------
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            const originalText = this.innerHTML;
-            const successText = this.dataset.success || '✓ اضافه شد';
+            e.stopPropagation();
+            const btn = this;
+            const originalText = btn.innerHTML;
+            const successText = btn.dataset.success || '✓ اضافه شد';
+            const cartUrl = btn.dataset.cartUrl;
+
+            // اگر URL سبد وجود ندارد (مثلاً در quick-view)، از form والد استفاده کن
+            if (!cartUrl) return;
 
             // حالت لودینگ
-            this.innerHTML = '<span class="btn-spinner"></span>';
-            this.disabled = true;
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+            btn.disabled = true;
 
-            // شبیه‌سازی درخواست — در پروژهٔ واقعی به‌جای setTimeout از fetch(url, {method: 'POST'})
-            setTimeout(() => {
-                this.innerHTML = successText;
-                this.classList.add('neu-btn-success');
+            fetch(cartUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': btn.dataset.csrf || document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ qty: 1 }),
+            })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return null;
+                }
+                if (response.status === 422) {
+                    return response.json().then(function(errData) {
+                        if (typeof showToast === 'function' && errData.message) {
+                            showToast(errData.message, 'error', errData.stock_warning_sub);
+                        }
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('neu-btn-success');
+                        btn.disabled = false;
+                        return null;
+                    });
+                }
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
 
-                // شمارندهٔ سبد — هم در هدر و هم در نوار پایین موبایل
-                ['cart-count', 'cart-count-mobile'].forEach(function (id) {
-                    const badge = document.getElementById(id);
-                    if (!badge) return;
-                    badge.textContent = (parseInt(badge.textContent || '0') + 1);
-                    badge.classList.remove('count-pop');
-                    void badge.offsetWidth;
-                    badge.classList.add('count-pop');
-                });
+                if (data.success) {
+                    btn.innerHTML = successText;
+                    btn.classList.add('neu-btn-success');
+
+                    // 🎯 انیمیشن پرواز به سبد خرید
+                    flyToCart(btn);
+
+                    const count = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
+                    const countStr = window.localizeDigits ? window.localizeDigits.convert(String(count)) : String(count);
+                    ['cart-count', 'cart-count-mobile', 'cart-count-guest'].forEach(function (id) {
+                        const badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = countStr;
+                        badge.style.display = '';
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
+
+                    // نمایش toast (اخطار موجودی یا موفقیت)
+                    if (typeof showToast === 'function') {
+                        if (data.stock_warning) {
+                            showToast(data.stock_warning, 'error', data.stock_warning_sub);
+                        } else {
+                            showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                        }
+                        // اگر مهمان است، پیام لاگین نشان بده
+                        if (!document.querySelector('meta[name="csrf-token"]') || !document.body.classList.contains('auth')) {
+                            setTimeout(function() { showToast('برای ادامه خرید وارد شوید', 'info'); }, 3800);
+                        }
+                    }
+                } else {
+                    btn.innerHTML = data.message || 'خطا';
+                }
 
                 setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.classList.remove('neu-btn-success');
-                    this.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('neu-btn-success');
+                    btn.disabled = false;
                 }, 1500);
-            }, 800);
+            })
+            .catch(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('neu-btn-success');
+                btn.disabled = false;
+            });
         });
     });
 });
@@ -566,17 +716,32 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(r => r.json())
             .then(function (data) {
-                if (data && data.cart_count !== undefined) {
-                    ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                if (data && typeof data.cart_count === 'number' && isFinite(data.cart_count)) {
+                    const countStr = window.localizeDigits ? window.localizeDigits.convert(String(data.cart_count)) : String(data.cart_count);
+                    ['cart-count', 'cart-count-mobile', 'cart-count-guest'].forEach(function (id) {
                         const badge = document.getElementById(id);
                         if (!badge) return;
-                        badge.textContent = data.cart_count;
+                        badge.textContent = countStr;
+                        badge.style.display = '';
                         badge.classList.remove('count-pop');
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
                     });
                 }
                 if (btn) { btn.textContent = window.quickViewAddedText || '✓'; }
+
+                // 🎯 انیمیشن پرواز به سبد خرید
+                if (btn) flyToCart(btn);
+
+                // نمایش toast (اخطار موجودی یا موفقیت)
+                if (typeof showToast === 'function' && data && data.success) {
+                    if (data.stock_warning) {
+                        showToast(data.stock_warning, 'error', data.stock_warning_sub);
+                    } else {
+                        showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                    }
+                }
+
                 setTimeout(function () { if (btn) { btn.disabled = false; btn.textContent = original; } }, 1200);
             })
             .catch(function () {

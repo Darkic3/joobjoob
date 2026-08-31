@@ -77,6 +77,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('contact/{contact}', [ContactController::class, 'show'])->name('contact.show');
         Route::delete('contact/{contact}', [ContactController::class, 'destroy'])->name('contact.destroy');
 
+        // ========== مدیریت سفارشات ==========
+        Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+        Route::post('orders/{id}/change-shipping-status', [\App\Http\Controllers\Admin\OrderController::class, 'changeShippingStatus'])->name('orders.change-shipping-status');
+        Route::post('orders/change-order-status/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'changeOrderStatus'])->name('orders.change-order-status');
+        Route::post('orders/post-code', [\App\Http\Controllers\Admin\OrderController::class, 'postCode'])->name('orders.post-code');
+        Route::get('orders/{id}/factor', [\App\Http\Controllers\Admin\OrderController::class, 'factor'])->name('orders.factor');
+        Route::get('orders/bulk-factor', [\App\Http\Controllers\Admin\OrderController::class, 'bulkFactor'])->name('orders.bulk-factor');
+
+        // ========== مدیریت روش‌های ارسال ==========
+        Route::resource('shipping-methods', \App\Http\Controllers\Admin\ShippingMethodController::class);
+        Route::post('shipping-methods/{shippingMethod}/toggle-status', [\App\Http\Controllers\Admin\ShippingMethodController::class, 'toggleStatus'])->name('shipping-methods.toggle-status');
+
+        // ========== مدیریت درگاه‌های پرداخت ==========
+        Route::resource('banks', \App\Http\Controllers\Admin\BankController::class);
+        Route::post('banks/{bank}/toggle-status', [\App\Http\Controllers\Admin\BankController::class, 'toggleStatus'])->name('banks.toggle-status');
+
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
         Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');

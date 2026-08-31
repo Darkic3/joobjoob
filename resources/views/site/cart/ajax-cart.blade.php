@@ -13,11 +13,13 @@
         var countBadgeMobile = document.getElementById('cart-count-mobile');
         var qtyBadge = document.getElementById('cart-qty-badge');
 
+        var cartCount = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
+        var cartCountStr = window.localizeDigits ? window.localizeDigits.convert(String(cartCount)) : String(cartCount);
         if (subtotalEl) subtotalEl.textContent = formatNum(data.subtotal);
         if (totalEl) totalEl.textContent = formatNum(data.total);
-        if (countBadge) { countBadge.textContent = data.cart_count; countBadge.classList.remove('count-pop'); void countBadge.offsetWidth; countBadge.classList.add('count-pop'); }
-        if (countBadgeMobile) { countBadgeMobile.textContent = data.cart_count; countBadgeMobile.classList.remove('count-pop'); void countBadgeMobile.offsetWidth; countBadgeMobile.classList.add('count-pop'); }
-        if (qtyBadge) qtyBadge.textContent = data.cart_count;
+        if (countBadge) { countBadge.textContent = cartCountStr; countBadge.classList.remove('count-pop'); void countBadge.offsetWidth; countBadge.classList.add('count-pop'); }
+        if (countBadgeMobile) { countBadgeMobile.textContent = cartCountStr; countBadgeMobile.classList.remove('count-pop'); void countBadgeMobile.offsetWidth; countBadgeMobile.classList.add('count-pop'); }
+        if (qtyBadge) qtyBadge.textContent = cartCountStr;
 
         // حذف/نمایش کوپن
         var couponRow = document.getElementById('cart-coupon-row');
@@ -83,7 +85,12 @@
         var max = parseInt(inp.getAttribute('max')) || 9999;
 
         if (dir === 'dec' && val <= 1) return;
-        if (dir === 'inc' && val >= max) return;
+        if (dir === 'inc' && val >= max) {
+            if (typeof showToast === 'function') {
+                showToast('موجودی این محصول تمام شده است', 'error');
+            }
+            return;
+        }
 
         var newVal = dir === 'inc' ? val + 1 : val - 1;
 
@@ -106,6 +113,10 @@
             allBtns.forEach(function(b) { b.disabled = false; });
             if (data.success) {
                 inp.value = data.item.qty;
+                // اخطار موجودی
+                if (data.stock_warning && typeof showToast === 'function') {
+                    showToast(data.stock_warning, 'error', data.stock_warning_sub);
+                }
                 // به‌روزرسانی قیمت ردیف
                 var card = form.closest('.neu-card');
                 if (card) {

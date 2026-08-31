@@ -204,6 +204,23 @@
             </a>
         @endif
 
+        {{-- سفارشات --}}
+        @if($can('admin.orders.index'))
+            <a href="{{ route('admin.orders.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.orders.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.orders') }}</span>
+                @if($newOrdersCount > 0)
+                    <span x-show="sidebarOpen" x-transition
+                          class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {{ $newOrdersCount > 99 ? '99+' : $newOrdersCount }}
+                    </span>
+                @endif
+            </a>
+        @endif
+
         @if($can('admin.contact.index'))
             {{-- پیام‌های تماس --}}
             <a href="{{ route('admin.contact.index') }}"
@@ -212,6 +229,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.contact') }}</span>
+                @if($unreadContactsCount > 0)
+                    <span x-show="sidebarOpen" x-transition
+                          class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {{ $unreadContactsCount > 99 ? '99+' : $unreadContactsCount }}
+                    </span>
+                @endif
             </a>
         @endif
 
@@ -219,6 +242,28 @@
             <div x-show="sidebarOpen" class="pt-4 pb-1">
                 <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('admin.sidebar.settings') }}</p>
             </div>
+        @endif
+
+        @if($can('admin.shipping-methods.index'))
+            {{-- روش‌های ارسال --}}
+            <a href="{{ route('admin.shipping-methods.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.shipping-methods.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.shipping_methods') }}</span>
+            </a>
+        @endif
+
+        @if($can('admin.banks.index'))
+            {{-- درگاه‌های پرداخت --}}
+            <a href="{{ route('admin.banks.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.banks.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.banks') }}</span>
+            </a>
         @endif
 
         @if($can('admin.settings.edit'))

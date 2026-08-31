@@ -2,6 +2,8 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\ContactRequest;
+use App\Models\Order;
 use App\Models\Review;
 use Closure;
 use Illuminate\View\Component;
@@ -25,6 +27,10 @@ class Sidebar extends Component
     public bool $showSettingsDivider;
 
     public int $pendingReviewsCount = 0;
+
+    public int $newOrdersCount = 0;
+
+    public int $unreadContactsCount = 0;
 
     public function __construct()
     {
@@ -51,11 +57,26 @@ class Sidebar extends Component
         $this->showSettingsDivider = ($this->can)('admin.settings.edit')
             || ($this->can)('admin.roles.index')
             || ($this->can)('admin.users.index')
-            || ($this->can)('admin.languages.index');
+            || ($this->can)('admin.languages.index')
+            || ($this->can)('admin.shipping-methods.index')
+            || ($this->can)('admin.banks.index');
 
         // تعداد نظرات در انتظار تأیید
         if (($this->can)('admin.reviews.index')) {
             $this->pendingReviewsCount = Review::pending()->count();
+        }
+
+        // تعداد سفارشات جدید (در انتظار تأیید فیش یا پرداخت)
+        if (($this->can)('admin.orders.index')) {
+            $this->newOrdersCount = Order::whereIn('order_status', [
+                'wait_for_verification',
+                'pending_confirmation',
+            ])->count();
+        }
+
+        // تعداد پیام‌های تماس خوانده‌نشده
+        if (($this->can)('admin.contact.index')) {
+            $this->unreadContactsCount = ContactRequest::unread()->count();
         }
     }
 

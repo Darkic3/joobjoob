@@ -24,6 +24,8 @@ return [
     'back_to_top' => 'العودة إلى الأعلى',
     'add_to_cart' => 'أضف إلى السلة',
     'added_short' => '✓ أُضيف',
+        'stock_limit_reached' => 'فقط :count متوفر',
+    'stock_limit_sub' => 'المخزون الكامل للمنتج في سلة التسوق الخاصة بك!',
     'added_to_cart' => 'تمت إضافة المنتج إلى السلة',
     'buy_now' => 'اشترِ الآن',
     'featured_products' => 'منتجات مميزة',
@@ -58,6 +60,7 @@ return [
     'payment_method' => 'طريقة الدفع',
     'place_order' => 'تأكيد الطلب',
     'my_orders' => 'طلباتي',
+    'order_detail' => 'تفاصيل الطلب',
     'wishlist' => 'المفضلة',
     'add_to_wishlist' => 'أضف إلى المفضلة',
     'remove_from_wishlist' => 'إزالة من المفضلة',
@@ -122,6 +125,7 @@ return [
     'new_badge' => 'جديد',
     'toman' => 'IRT',
     'you_save' => 'توفر :amount 💰',
+    'your_savings_from_purchase' => 'أرباحك من هذا الشراء',
     'dont_miss_out' => 'لا تفوت الفرصة',
     'trust_title' => 'لماذا تتسوق معنا؟',
     'quick_view' => 'عرض سريع',
@@ -129,6 +133,7 @@ return [
     'view_details' => 'عرض التفاصيل',
 
     'trust_free_shipping' => 'شحن مجاني',
+    'trust_cod_shipping' => 'الدفع عند الاستلام',
     'trust_free_shipping_desc' => 'للطلبات فوق ٥٠ دولار',
     'trust_badges' => 'شارات الثقة',
     'trust_authenticity' => 'ضمان الأصالة',
@@ -336,4 +341,5 @@ return [
     'footer_brand_tag' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'footer_desc' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'newsletter' => 'النشرة الإخبارية',
+    'newsletter_email_placeholder' => 'بريدك الإلكتروني',
 ];

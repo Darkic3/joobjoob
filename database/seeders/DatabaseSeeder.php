@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
             SpecificationSeeder::class,
             ProductSeeder::class,
             ReviewSeeder::class,
+            // --- سیستم سفارشات ---
+            StateSeeder::class,
+            CitySeeder::class,
+            OrderShippingStatusSeeder::class,
+            BankSeeder::class,
         ]);
     }
 }

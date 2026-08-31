@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\ContactRequest;
 use App\Models\Review;
 use Closure;
 use Illuminate\View\Component;
@@ -23,6 +24,8 @@ class MobileSidebar extends Component
     public string $productsTarget;
 
     public int $pendingReviewsCount = 0;
+
+    public int $unreadContactsCount = 0;
 
     public function __construct()
     {
@@ -53,6 +56,11 @@ class MobileSidebar extends Component
         // تعداد نظرات در انتظار تأیید
         if (($this->can)('admin.reviews.index')) {
             $this->pendingReviewsCount = Review::pending()->count();
+        }
+
+        // تعداد پیام‌های تماس خوانده‌نشده
+        if (($this->can)('admin.contact.index')) {
+            $this->unreadContactsCount = ContactRequest::unread()->count();
         }
     }
 
