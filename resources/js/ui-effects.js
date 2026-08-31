@@ -266,6 +266,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.href = '/login';
                     return null;
                 }
+                if (response.status === 422) {
+                    return response.json().then(function(errData) {
+                        if (typeof showToast === 'function' && errData.message) {
+                            showToast(errData.message, 'error');
+                        }
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('neu-btn-success');
+                        btn.disabled = false;
+                        return null;
+                    });
+                }
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
                 }
@@ -293,9 +304,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         badge.classList.add('count-pop');
                     });
 
-                    // نمایش toast جشن افزودن به سبد
+                    // نمایش toast (اخطار موجودی یا موفقیت)
                     if (typeof showToast === 'function') {
-                        showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                        if (data.stock_warning) {
+                            showToast(data.stock_warning, 'error');
+                        } else {
+                            showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                        }
                         // اگر مهمان است، پیام لاگین نشان بده
                         if (!document.querySelector('meta[name="csrf-token"]') || !document.body.classList.contains('auth')) {
                             setTimeout(function() { showToast('برای ادامه خرید وارد شوید', 'info'); }, 3800);
@@ -716,9 +731,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 🎯 انیمیشن پرواز به سبد خرید
                 if (btn) flyToCart(btn);
 
-                // نمایش toast جشن افزودن به سبد
+                // نمایش toast (اخطار موجودی یا موفقیت)
                 if (typeof showToast === 'function' && data && data.success) {
-                    showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                    if (data.stock_warning) {
+                        showToast(data.stock_warning, 'error');
+                    } else {
+                        showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                    }
                 }
 
                 setTimeout(function () { if (btn) { btn.disabled = false; btn.textContent = original; } }, 1200);

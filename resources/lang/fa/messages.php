@@ -25,6 +25,7 @@ return [
     'back_to_top' => 'بازگشت به بالا',
     'add_to_cart' => 'افزودن به سبد خرید',
     'added_short' => '✓ اضافه شد',
+    'stock_limit_reached' => 'فقط :count عدد موجود است',
     'added_to_cart' => 'محصول به سبد خرید اضافه شد',
     'buy_now' => 'خرید سریع',
     'featured_products' => 'محصولات ویژه',

@@ -85,7 +85,12 @@
         var max = parseInt(inp.getAttribute('max')) || 9999;
 
         if (dir === 'dec' && val <= 1) return;
-        if (dir === 'inc' && val >= max) return;
+        if (dir === 'inc' && val >= max) {
+            if (typeof showToast === 'function') {
+                showToast('موجودی این محصول تمام شده است', 'error');
+            }
+            return;
+        }
 
         var newVal = dir === 'inc' ? val + 1 : val - 1;
 
@@ -108,6 +113,10 @@
             allBtns.forEach(function(b) { b.disabled = false; });
             if (data.success) {
                 inp.value = data.item.qty;
+                // اخطار موجودی
+                if (data.stock_warning && typeof showToast === 'function') {
+                    showToast(data.stock_warning, 'error');
+                }
                 // به‌روزرسانی قیمت ردیف
                 var card = form.closest('.neu-card');
                 if (card) {

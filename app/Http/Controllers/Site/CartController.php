@@ -69,25 +69,51 @@ class CartController extends Controller
             'variant_id' => 'nullable|integer|exists:product_variants,id',
         ]);
 
-        $this->cart->add(
-            $product,
-            (int) ($request->input('qty') ?? 1),
-            $request->input('variant_id') ? (int) $request->input('variant_id') : null,
-            $request->input('color'),
-            $request->input('size')
-        );
+        $qty = (int) ($request->input('qty') ?? 1);
+        $variantId = $request->input('variant_id') ? (int) $request->input('variant_id') : null;
+
+        // ── بررسی موجودی: مجموع تعداد فعلی در سبد + تعداد درخواستی ──
+        $variant = $variantId ? $product->variants()->find($variantId) : null;
+        $stock = $variant ? $variant->stock : $product->stock;
+
+        $cart = $this->cart->content();
+        $rowId = md5($product->id . ($variantId ?? '') . ($request->input('color') ?? '') . ($request->input('size') ?? ''));
+        $currentQty = $cart->has($rowId) ? (int) $cart->get($rowId)['qty'] : 0;
+        $requestedTotal = $currentQty + $qty;
+        $stockWarning = null;
+
+        if ($requestedTotal > $stock) {
+            $stockWarning = __('messages.stock_limit_reached', ['count' => $stock]);
+            // فقط تا سقف موجودی اضافه کن
+            $qty = max(0, $stock - $currentQty);
+            if ($qty <= 0) {
+                // قبلاً به سقف موجودی رسیده
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $stockWarning,
+                        'cart_count' => $this->cart->count(),
+                        'stock_limit' => true,
+                    ], 422);
+                }
+                return back()->with('error', $stockWarning);
+            }
+        }
+
+        $this->cart->add($product, $qty, $variantId, $request->input('color'), $request->input('size'));
 
         // اگر درخواست از نوع AJAX (JSON) بود، پاسخ جیسون بده
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => __('messages.added_to_cart'),
+                'message' => $stockWarning ?? __('messages.added_to_cart'),
                 'cart_count' => $this->cart->count(),
+                'stock_warning' => $stockWarning,
             ]);
         }
 
         // در غیر این صورت، رفتار عادی (رفرش صفحه) را حفظ کن
-        return back()->with('success', __('messages.added_to_cart'));
+        return back()->with($stockWarning ? 'error' : 'success', $stockWarning ?? __('messages.added_to_cart'));
     }
 
     public function update(Request $request, string $rowId)
@@ -96,7 +122,14 @@ class CartController extends Controller
 
         $item = $this->cart->content()->get($rowId);
         $maxQty = $item['stock'] ?? PHP_INT_MAX;
-        $qty = min((int) ($request->input('qty') ?? 1), $maxQty);
+        $requestedQty = (int) $request->input('qty', 1);
+        $stockWarning = null;
+
+        if ($requestedQty > $maxQty) {
+            $stockWarning = __('messages.stock_limit_reached', ['count' => $maxQty]);
+        }
+
+        $qty = min($requestedQty, $maxQty);
 
         $this->cart->update($rowId, $qty);
 
@@ -109,6 +142,7 @@ class CartController extends Controller
                 'discount' => $this->cart->discount(),
                 'total' => $this->cart->total(),
                 'cart_count' => $this->cart->count(),
+                'stock_warning' => $stockWarning,
             ]);
         }
 

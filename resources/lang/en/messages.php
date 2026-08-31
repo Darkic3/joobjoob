@@ -24,6 +24,7 @@ return [
     'back_to_top' => 'Back to top',
     'add_to_cart' => 'Add to Cart',
     'added_short' => '✓ Added',
+    'stock_limit_reached' => 'Only :count available',
     'added_to_cart' => 'Product added to cart',
     'buy_now' => 'Buy Now',
     'featured_products' => 'Featured Products',
