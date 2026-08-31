@@ -24,7 +24,7 @@ return [
     'back_to_top' => 'Back to top',
     'add_to_cart' => 'Add to Cart',
     'added_short' => '✓ Added',
-    'stock_limit_reached' => 'Only :count available',
+    'stock_limit_reached' => 'Only :count available<br><span style="font-weight:400;font-size:12px;opacity:.85">All stock of this product is already in your cart!</span>',
     'added_to_cart' => 'Product added to cart',
     'buy_now' => 'Buy Now',
     'featured_products' => 'Featured Products',

@@ -24,6 +24,7 @@ return [
     'back_to_top' => 'العودة إلى الأعلى',
     'add_to_cart' => 'أضف إلى السلة',
     'added_short' => '✓ أُضيف',
+        'stock_limit_reached' => 'فقط :count متوفر<br><span style="font-weight:400;font-size:12px;opacity:.85">المخزون الكامل للمنتج في سلة التسوق الخاصة بك!</span>',
     'added_to_cart' => 'تمت إضافة المنتج إلى السلة',
     'buy_now' => 'اشترِ الآن',
     'featured_products' => 'منتجات مميزة',

@@ -226,7 +226,7 @@
         }
 
         var text = document.createElement('span');
-        text.textContent = message;
+        text.innerHTML = message;
         text.style.whiteSpace = 'nowrap';
 
         snackbar.appendChild(iconWrap);

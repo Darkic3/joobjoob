@@ -24,6 +24,7 @@ return [
     'back_to_top' => 'Başa Dön',
     'add_to_cart' => 'Sepete Ekle',
     'added_short' => '✓ Eklendi',
+        'stock_limit_reached' => 'Sadece :count adet mevcut<br><span style="font-weight:400;font-size:12px;opacity:.85">Bu ürünün tüm stoğu sepetinizde!</span>',
     'added_to_cart' => 'Ürün sepete eklendi',
     'buy_now' => 'Hemen Al',
     'featured_products' => 'Öne Çıkan Ürünler',
