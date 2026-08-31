@@ -229,6 +229,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.contact') }}</span>
+                @if($unreadContactsCount > 0)
+                    <span x-show="sidebarOpen" x-transition
+                          class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {{ $unreadContactsCount > 99 ? '99+' : $unreadContactsCount }}
+                    </span>
+                @endif
             </a>
         @endif
 

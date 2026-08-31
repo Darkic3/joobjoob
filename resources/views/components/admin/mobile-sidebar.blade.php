@@ -115,6 +115,20 @@
             </a>
         @endif
 
+        @if($can('admin.contact.index'))
+            <a href="{{ route('admin.contact.index') }}" class="sidebar-link {{ request()->routeIs('admin.contact.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span class="whitespace-nowrap">{{ __('admin.sidebar.contact') }}</span>
+                @if($unreadContactsCount > 0)
+                    <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {{ $unreadContactsCount > 99 ? '99+' : $unreadContactsCount }}
+                    </span>
+                @endif
+            </a>
+        @endif
+
         @if($showSettingsDivider)
             <div class="pt-4 pb-1">
                 <p class="px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('admin.sidebar.settings') }}</p>

@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Admin;
 
+use App\Models\ContactRequest;
 use App\Models\Order;
 use App\Models\Review;
 use Closure;
@@ -28,6 +29,8 @@ class Sidebar extends Component
     public int $pendingReviewsCount = 0;
 
     public int $newOrdersCount = 0;
+
+    public int $unreadContactsCount = 0;
 
     public function __construct()
     {
@@ -69,6 +72,11 @@ class Sidebar extends Component
                 'wait_for_verification',
                 'pending_confirmation',
             ])->count();
+        }
+
+        // تعداد پیام‌های تماس خوانده‌نشده
+        if (($this->can)('admin.contact.index')) {
+            $this->unreadContactsCount = ContactRequest::unread()->count();
         }
     }
 
