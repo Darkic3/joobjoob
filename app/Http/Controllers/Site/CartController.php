@@ -94,6 +94,7 @@ class CartController extends Controller
                         'message' => $stockWarning,
                         'cart_count' => $this->cart->count(),
                         'stock_limit' => true,
+                        'stock_warning_sub' => __('messages.stock_limit_sub'),
                     ], 422);
                 }
                 return back()->with('error', $stockWarning);
@@ -109,6 +110,7 @@ class CartController extends Controller
                 'message' => $stockWarning ?? __('messages.added_to_cart'),
                 'cart_count' => $this->cart->count(),
                 'stock_warning' => $stockWarning,
+                'stock_warning_sub' => __('messages.stock_limit_sub'),
             ]);
         }
 
@@ -143,6 +145,7 @@ class CartController extends Controller
                 'total' => $this->cart->total(),
                 'cart_count' => $this->cart->count(),
                 'stock_warning' => $stockWarning,
+                'stock_warning_sub' => $stockWarning ? __('messages.stock_limit_sub') : null,
             ]);
         }
 

@@ -154,7 +154,7 @@
 </style>
 
 <script>
-    function showToast(message, type) {
+    function showToast(message, type, subtitle) {
         if (typeof type === 'undefined') type = 'success';
         var container = document.getElementById('toast-container');
         if (!container) return;
@@ -230,7 +230,19 @@
         text.style.whiteSpace = 'nowrap';
 
         snackbar.appendChild(iconWrap);
-        snackbar.appendChild(text);
+        if (subtitle) {
+            var textCol = document.createElement('span');
+            textCol.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+            text.style.whiteSpace = 'nowrap';
+            var sub = document.createElement('span');
+            sub.textContent = subtitle;
+            sub.style.cssText = 'font-size:12px;font-weight:400;opacity:.8;line-height:1.4;';
+            textCol.appendChild(text);
+            textCol.appendChild(sub);
+            snackbar.appendChild(textCol);
+        } else {
+            snackbar.appendChild(text);
+        }
 
         // Progress bar for cart-add (wrapped to clip inside toast)
         if (isCartAdd) {

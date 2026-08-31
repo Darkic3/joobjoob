@@ -1062,38 +1062,49 @@
                     headers: { 'X-CSRF-TOKEN': csrfToken(), 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                     body: new FormData(addForm),
                 })
-                .then(function(r) { return r.json(); })
+                .then(function(r) {
+                    if (r.status === 401 || r.status === 403) { window.location.href = '/login'; return null; }
+                    if (r.status === 422) {
+                        return r.json().then(function(errData) {
+                            if (typeof showToast === 'function' && errData.message) showToast(errData.message, 'error', errData.stock_warning_sub);
+                            if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
+                            return null;
+                        });
+                    }
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
                 .then(function(data) {
+                    if (!data || !data.success) return;
                     if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
 
-                    if (data.success) {
-                        var cartCount = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
-                        var cartCountStr = window.localizeDigits ? window.localizeDigits.convert(String(cartCount)) : String(cartCount);
-                        ['cart-count', 'cart-count-mobile'].forEach(function(id) {
-                            var badge = document.getElementById(id);
-                            if (!badge) return;
-                            badge.textContent = cartCountStr;
-                            badge.classList.remove('count-pop');
-                            void badge.offsetWidth;
-                            badge.classList.add('count-pop');
-                        });
+                    var cartCount = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
+                    var cartCountStr = window.localizeDigits ? window.localizeDigits.convert(String(cartCount)) : String(cartCount);
+                    ['cart-count', 'cart-count-mobile'].forEach(function(id) {
+                        var badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = cartCountStr;
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
 
-                        if (typeof showToast === 'function') {
+                    if (typeof showToast === 'function') {
+                        if (data.stock_warning) {
+                            showToast(data.stock_warning, 'error', data.stock_warning_sub);
+                        } else {
                             showToast(data.message || '{{ __("messages.added_to_cart") }}', 'cart-add');
                         }
+                    }
 
-                        if (btn) {
-                            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> {{ __("messages.added_short") }}';
-                            btn.classList.add('neu-btn-success');
-                            setTimeout(function() { btn.innerHTML = origHTML; btn.classList.remove('neu-btn-success'); }, 1500);
-                        }
-                    } else {
-                        if (typeof showToast === 'function') showToast(data.message || 'خطا', 'error');
+                    if (btn) {
+                        btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> {{ __("messages.added_short") }}';
+                        btn.classList.add('neu-btn-success');
+                        setTimeout(function() { btn.innerHTML = origHTML; btn.classList.remove('neu-btn-success'); }, 1500);
                     }
                 })
                 .catch(function() {
                     if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
-                    addForm.submit();
                 });
             });
         })();

@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.status === 422) {
                     return response.json().then(function(errData) {
                         if (typeof showToast === 'function' && errData.message) {
-                            showToast(errData.message, 'error');
+                            showToast(errData.message, 'error', errData.stock_warning_sub);
                         }
                         btn.innerHTML = originalText;
                         btn.classList.remove('neu-btn-success');
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // نمایش toast (اخطار موجودی یا موفقیت)
                     if (typeof showToast === 'function') {
                         if (data.stock_warning) {
-                            showToast(data.stock_warning, 'error');
+                            showToast(data.stock_warning, 'error', data.stock_warning_sub);
                         } else {
                             showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
                         }
@@ -734,7 +734,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // نمایش toast (اخطار موجودی یا موفقیت)
                 if (typeof showToast === 'function' && data && data.success) {
                     if (data.stock_warning) {
-                        showToast(data.stock_warning, 'error');
+                        showToast(data.stock_warning, 'error', data.stock_warning_sub);
                     } else {
                         showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
                     }

@@ -115,7 +115,7 @@
                 inp.value = data.item.qty;
                 // اخطار موجودی
                 if (data.stock_warning && typeof showToast === 'function') {
-                    showToast(data.stock_warning, 'error');
+                    showToast(data.stock_warning, 'error', data.stock_warning_sub);
                 }
                 // به‌روزرسانی قیمت ردیف
                 var card = form.closest('.neu-card');
