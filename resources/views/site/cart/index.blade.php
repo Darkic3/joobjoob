@@ -988,6 +988,27 @@
             return new Intl.NumberFormat(document.documentElement.lang === 'fa' || document.documentElement.lang === 'ar' ? 'fa-IR' : 'en-US').format(n);
         }
 
+        function freeShipProgressBar(orderTotal, priceCeiling) {
+            var pct = Math.min(100, Math.round((orderTotal / priceCeiling) * 100));
+            return '<div style="margin-top:10px;">' +
+                '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;font-weight:700;">' +
+                    '<span style="color:var(--text-secondary);">' + pct + '%</span>' +
+                    '<span style="color:var(--text-secondary);">' + formatNum(priceCeiling) + ' {{ __("messages.toman") }}</span>' +
+                '</div>' +
+                '<div style="width:100%;height:8px;border-radius:99px;background:color-mix(in srgb, var(--text-primary) 8%, transparent);overflow:hidden;">' +
+                    '<div class="free-ship-bar-fill" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--success) 80%, var(--accent)));transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);" data-target-width="' + pct + '%"></div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function animateProgressBars() {
+            requestAnimationFrame(function() {
+                document.querySelectorAll('.free-ship-bar-fill').forEach(function(bar) {
+                    bar.style.width = bar.getAttribute('data-target-width');
+                });
+            });
+        }
+
         window.goToStep = function(step) {
             currentStep = step;
             document.querySelectorAll('.checkout-step').forEach(function(el) { el.style.display = 'none'; });
@@ -1153,6 +1174,7 @@
                         sidebarInfo.style.color = 'var(--success)';
                         sidebarInfo.innerHTML = savedSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(op) + '</span>');
                         sidebarInfo.style.display = 'flex';
+                        animateProgressBars();
                     }
                 } else {
                     // هنوز به سقف نرسیده
@@ -1165,8 +1187,10 @@
                         banner.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
                         banner.style.color = 'var(--accent)';
                         banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
-                            '<div>' + remainingTpl.replace('__AMOUNT__', remainingAmount) + '</div>';
+                            '<div>' + remainingTpl.replace('__AMOUNT__', remainingAmount) + freeShipProgressBar(orderTotal, pc) + '</div>';
                         banner.style.display = 'flex';
+                        animateProgressBars();
+         
                     }
                     // باکس خلاصه سفارش
                     var remainingSidebarTpl = '{{ __("messages.free_shipping_sidebar_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
@@ -1174,7 +1198,7 @@
                         sidebarInfo.className = 'rounded-xl p-3 text-xs font-bold';
                         sidebarInfo.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
                         sidebarInfo.style.color = 'var(--accent)';
-                        sidebarInfo.innerHTML = remainingSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>');
+                        sidebarInfo.innerHTML = remainingSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(orderTotal, pc);
                         sidebarInfo.style.display = 'flex';
                     }
                 }
@@ -1462,8 +1486,9 @@
                         info.className = 'rounded-xl p-3 text-xs font-bold';
                         info.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
                         info.style.color = 'var(--accent)';
-                        info.innerHTML = tpl2.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>');
+                        info.innerHTML = tpl2.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(totalWithoutShipping, selectedPriceCeiling);
                         info.style.display = 'flex';
+                        animateProgressBars();
                     }
                 } else {
                     info.style.display = 'none';
