@@ -11,6 +11,10 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">{{ __('admin.orders.detail_title') }} <span class="text-indigo-600">#{{ $order->id }}</span></h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">{{ __('admin.orders.date_full') }}: {{ show_date($order->created_at, 'd F Y - H:i') }}</p>
             </div>
+            <a href="{{ route('admin.audit-logs.order-history', $order->id) }}" class="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-400 font-semibold text-sm px-5 py-2 rounded-xl transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                تاریخچه لاگ
+            </a>
             <a href="{{ route('admin.orders.index') }}" class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold text-sm px-5 py-2 rounded-xl transition-all duration-200">
                 <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                 {{ __('admin.orders.back') }}

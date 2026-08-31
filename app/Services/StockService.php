@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\AuditService;
 
 class StockService
 {
@@ -122,6 +123,7 @@ class StockService
             'order_id' => $orderId,
             'description' => "رزرو موجودی — سفارش #{$orderId}",
         ]);
+        try { AuditService::productStockChanged($product, $product->stock + $quantity, $product->stock, 'رزرو سفارش #' . $orderId, ['order_id' => $orderId, 'quantity' => $quantity]); } catch (\Throwable $e) { Log::error('AuditLog stock failed', ['message' => $e->getMessage()]); }
     }
 
     private function decreaseVariantStock(int $productId, int $variantId, int $quantity, int $orderId): void
@@ -153,6 +155,7 @@ class StockService
             'order_id' => $orderId,
             'description' => "رزرو موجودی واریانت — سفارش #{$orderId}",
         ]);
+        try { AuditService::productStockChanged($product, $product->stock + $quantity, $product->stock, 'رزرو واریانت سفارش #' . $orderId, ['order_id' => $orderId, 'variant_id' => $variantId, 'quantity' => $quantity]); } catch (\Throwable $e) { Log::error('AuditLog variant stock failed', ['message' => $e->getMessage()]); }
     }
 
     private function increaseItemStock(int $productId, ?int $variantId, int $quantity, int $orderId): void
@@ -179,6 +182,7 @@ class StockService
             'order_id' => $orderId,
             'description' => "بازگردانی موجودی — سفارش #{$orderId} لغو شده",
         ]);
+        try { AuditService::productStockChanged($product, $product->stock - $quantity, $product->stock, 'بازگردانی سفارش #' . $orderId, ['order_id' => $orderId, 'quantity' => $quantity, 'reason' => 'cancel_or_fail']); } catch (\Throwable $e) { Log::error('AuditLog stock failed', ['message' => $e->getMessage()]); }
     }
 
     private function increaseVariantStock(int $productId, int $variantId, int $quantity, int $orderId): void
@@ -202,5 +206,6 @@ class StockService
             'order_id' => $orderId,
             'description' => "بازگردانی موجودی واریانت — سفارش #{$orderId} لغو شده",
         ]);
+        try { AuditService::productStockChanged($product, $product->stock - $quantity, $product->stock, 'بازگردانی واریانت سفارش #' . $orderId, ['order_id' => $orderId, 'variant_id' => $variantId, 'quantity' => $quantity, 'reason' => 'cancel_or_fail']); } catch (\Throwable $e) { Log::error('AuditLog variant stock failed', ['message' => $e->getMessage()]); }
     }
 }

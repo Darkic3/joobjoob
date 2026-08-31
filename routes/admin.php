@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PromoBannerController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\TrustBadgeController;
@@ -93,6 +94,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // ========== مدیریت درگاه‌های پرداخت ==========
         Route::resource('banks', \App\Http\Controllers\Admin\BankController::class);
         Route::post('banks/{bank}/toggle-status', [\App\Http\Controllers\Admin\BankController::class, 'toggleStatus'])->name('banks.toggle-status');
+
+        // ========== لاگ حسابرسی ==========
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('audit-logs/{id}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+        Route::get('audit-logs/order/{orderId}', [AuditLogController::class, 'orderHistory'])->name('audit-logs.order-history');
+        Route::get('audit-logs/product/{productId}', [AuditLogController::class, 'productHistory'])->name('audit-logs.product-history');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

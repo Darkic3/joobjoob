@@ -97,6 +97,8 @@ class OrderService
             throw $e;
         }
 
+        try { AuditService::orderCreated($order); } catch (\Throwable $e) { Log::error('AuditLog failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+
         return $order->fresh(['items.product', 'shippingStatus', 'bank']);
     }
 
@@ -165,9 +167,11 @@ class OrderService
             return redirect(route('checkout.success', $order->id));
         }
 
+        $oldStatus = $order->order_status;
         $order->update([
             'order_status' => intval($order->deposit_price) != 0 ? 'deposit_paid' : 'paid',
         ]);
+        try { AuditService::orderStatusChanged($order, $oldStatus, $order->order_status, 'سیستم - پرداخت موفق'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
 
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
         return redirect(route('checkout.success', $order->id));
@@ -178,7 +182,9 @@ class OrderService
         if ($order->order_status === 'unpaid') {
             return;
         }
+        $oldStatus = $order->order_status;
         $order->update(['order_status' => 'unpaid']);
+        try { AuditService::orderStatusChanged($order, $oldStatus, 'unpaid', 'سیستم - پرداخت ناموفق'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
         try {
             $this->stockService->restoreStock($order);
         } catch (\Exception $e) {
@@ -192,6 +198,7 @@ class OrderService
     {
         $previousStatus = $order->order_status;
         $order->update(['order_status' => 'cancelled']);
+        try { AuditService::orderStatusChanged($order, $previousStatus, 'cancelled', Auth::check() ? Auth::user()->name : 'سیستم'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
 
         if (in_array($previousStatus, ['paid', 'deposit_paid', 'pending_confirmation', 'wait_for_verification'])) {
             try {
