@@ -1100,6 +1100,7 @@
                     if (btn) {
                         btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> {{ __("messages.added_short") }}';
                         btn.classList.add('neu-btn-success');
+                        if (typeof flyToCart === 'function') flyToCart(btn);
                         setTimeout(function() { btn.innerHTML = origHTML; btn.classList.remove('neu-btn-success'); }, 1500);
                     }
                 })
