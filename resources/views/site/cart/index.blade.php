@@ -61,7 +61,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div class="lg:col-span-2 space-y-3">
                         @foreach($items as $item)
-                            <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group">
+                            <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group {{ empty($item['is_in_stock']) ? 'opacity-50 grayscale pointer-events-none' : '' }}">
                                 <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
                                    class="shrink-0 block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden neu-flat-sm relative">
                                      <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="{{ $item['name'] }}"
@@ -980,6 +980,7 @@
             applyDiscount: '{{ localizedRoute("checkout.apply-discount") }}',
             removeDiscount: '{{ localizedRoute("checkout.remove-discount") }}',
             orderPrice: '{{ localizedRoute("checkout.order-price") }}',
+            validateStock: '{{ localizedRoute("checkout.validate-stock") }}',
         };
 
         var csrfToken = function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
@@ -1550,6 +1551,86 @@
                 if (callback) callback();
             });
         }
+
+        
+        // ========== بررسی آیتم‌های ناموجود در سبد ==========
+        (function() {
+            var outOfStockCards = document.querySelectorAll(".opacity-50.grayscale");
+            if (outOfStockCards.length > 0) {
+                var names = [];
+                outOfStockCards.forEach(function(card) {
+                    var nameEl = card.querySelector("a.font-bold");
+                    if (nameEl) names.push(nameEl.textContent.trim());
+                });
+                if (names.length > 0) {
+                    setTimeout(function() {
+                        if (typeof Swal !== "undefined") {
+                            Swal.fire({
+                                title: "\u0645\u0648\u062c\u0648\u062f\u06cc \u062a\u0645\u0627\u0645 \u0634\u062f\u0647",
+                                html: "<div style=\"text-align:right;font-size:14px;line-height:1.8;\">\u0645\u0648\u062c\u0648\u062f\u06cc \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u0632\u06cc\u0631 \u062a\u0645\u0627\u0645 \u0634\u062f\u0647 \u0627\u0633\u062a:</div><ul style=\"text-align:right;list-style:none;padding:8px 0;margin:0;\">" + names.map(function(n) { return "<li style=\"padding:3px 0;color:#ef4444;font-weight:700;\">\u2022 " + n + "</li>"; }).join("") + "</ul><div style=\"font-size:12px;color:var(--text-secondary);margin-top:8px;\">\u0627\u06cc\u0646 \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u0628\u0647 \u0635\u0648\u0631\u062a \u062e\u0648\u062f\u06a9\u0627\u0631 \u0627\u0632 \u0633\u0628\u062f \u062d\u0630\u0641 \u0645\u06cc\u200c\u0634\u0648\u0646\u062f.</div>",
+                                icon: "warning",
+                                confirmButtonText: "\u0628\u0627\u0634\u0647\u002c \u062d\u0630\u0641 \u0634\u0648\u062f",
+                                confirmButtonColor: "#ef4444",
+                                allowOutsideClick: false,
+                                customClass: { popup: "swal2-rtl" }
+                            }).then(function(result) {
+                                if (result.isConfirmed) {
+                                    outOfStockCards.forEach(function(card) {
+                                        var removeBtn = card.querySelector("[data-cart-remove]");
+                                        if (removeBtn) removeBtn.click();
+                                    });
+                                    setTimeout(function() { window.location.reload(); }, 1500);
+                                }
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        })();
+
+        // ========== بررسی موجودی قبل از رفتن به مرحله ۴ ==========
+        (function() {
+            var _origGoToStep = window.goToStep;
+            window.goToStep = function(step) {
+                if (step === 4) {
+                    fetch(urls.validateStock, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken(),
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json"
+                        }
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            _origGoToStep(step);
+                        } else {
+                            if (typeof Swal !== "undefined") {
+                                Swal.fire({
+                                    title: "\u0645\u0648\u062c\u0648\u062f\u06cc \u062a\u063a\u06cc\u06cc\u0631 \u06a9\u0631\u062f\u0647",
+                                    text: "\u0622\u06cc\u062a\u0645\u200c\u0647\u0627\u06cc \u0646\u0627\u0645\u0648\u062c\u0648\u062f \u0627\u0632 \u0633\u0628\u062f \u062d\u0630\u0641 \u0634\u062f\u0646\u062f.",
+                                    icon: "warning",
+                                    confirmButtonText: "\u0628\u0627\u0634\u0647",
+                                    allowOutsideClick: false
+                                }).then(function() {
+                                    window.location.reload();
+                                });
+                            } else {
+                                alert("\u0645\u0648\u062c\u0648\u062f\u06cc \u0628\u0631\u062e\u06cc \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u062a\u063a\u06cc\u06cc\u0631 \u06a9\u0631\u062f\u0647 \u0627\u0633\u062a.");
+                                window.location.reload();
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        _origGoToStep(step);
+                    });
+                } else {
+                    _origGoToStep(step);
+                }
+            };
+        })();
 
         var origGoToStep = window.goToStep;
         window.goToStep = function(step) {

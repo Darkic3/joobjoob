@@ -97,6 +97,7 @@ $siteRoutes = function () {
         Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
         Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('apply-discount');
         Route::post('/remove-discount', [CheckoutController::class, 'removeDiscount'])->name('remove-discount');
+        Route::post('/validate-stock', [CheckoutController::class, 'validateStock'])->name('validate-stock');
         Route::get('/order-price', [CheckoutController::class, 'orderPrice'])->name('order-price');
 
         // مرحله ۴: ایجاد سفارش

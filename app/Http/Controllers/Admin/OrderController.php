@@ -20,14 +20,10 @@ class OrderController extends Controller
         $this->orderService = $orderService;
     }
 
-    /**
-     * لیست سفارشات با فیلتر
-     */
     public function index(Request $request)
     {
         $query = Order::with(['user', 'shippingStatus', 'shippingMethod', 'bank']);
 
-        // فیلترها
         if ($request->filled('id')) {
             $query->where('id', $request->id);
         }
@@ -63,8 +59,6 @@ class OrderController extends Controller
         $orders = $query->orderByDesc('id')->paginate(20);
         $shippingStatuses = OrderShippingStatus::orderByDesc('id')->get();
         $shippingMethods = ShippingMethod::orderByDesc('id')->get();
-
-        // تعداد سفارشات جدید (در انتظار تأیید فیش یا پرداخت)
         $newOrdersCount = Order::whereIn('order_status', [
             'wait_for_verification',
             'pending_confirmation',
@@ -73,66 +67,37 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'shippingStatuses', 'shippingMethods', 'newOrdersCount'));
     }
 
-    /**
-     * جزئیات سفارش
-     */
     public function show(int $id)
     {
         $order = Order::with(['items.product', 'items.productVariant', 'shippingStatus', 'shippingMethod', 'user', 'bank', 'histories.shippingStatus'])
             ->findOrFail($id);
-
         $shippingStatuses = OrderShippingStatus::orderByDesc('id')->get();
-
         return view('admin.orders.show', compact('order', 'shippingStatuses'));
     }
 
-    /**
-     * تغییر وضعیت ارسال
-     */
     public function changeShippingStatus(Request $request, int $id)
     {
         $order = Order::findOrFail($id);
         $newStatusId = $request->get('shipping_status_id');
-
         if ($order->shipping_status_id != $newStatusId) {
-            $status = OrderShippingStatus::find($newStatusId);
-
-            // TODO: اگر status->for_send == 1 باشد → ثبت سفارش چاپار/cod24
-
             $order->update(['shipping_status_id' => $newStatusId]);
-
-            // TODO: ارسال پیامک اگر sending_sms == 1
         }
-
         return redirect()->back()->with('success', 'وضعیت ارسال بروزرسانی شد.');
     }
 
-    /**
-     * ثبت کد پیگیری پستی
-     */
     public function postCode(Request $request)
     {
         $order = Order::findOrFail($request->get('order_id'));
         $order->update(['post_code' => $request->get('post_code')]);
-
-        // TODO: ارسال پیامک کد پیگیری
-
         return redirect()->back()->with('success', 'کد پیگیری پستی ثبت شد.');
     }
 
-    /**
-     * فاکتور قابل چاپ
-     */
     public function factor(int $id)
     {
         $order = Order::with(['items.product', 'shippingMethod'])->findOrFail($id);
-
         return view('admin.orders.factor', compact('order'));
     }
 
-    /**
-     * چاپ چند فاکتور با هم
-     */
     public function bulkFactor(Request $request)
     {
         $ids = array_filter(explode(',', $request->get('ids', '')));
@@ -140,17 +105,20 @@ class OrderController extends Controller
             ->whereIn('id', $ids)
             ->orderBy('id')
             ->get();
-
         return view('admin.orders.bulk-factor', compact('orders'));
     }
 
-    /**
-     * تغییر وضعیت سفارش
-     */
     public function changeOrderStatus(Request $request, int $id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['order_status' => $request->get('order_status')]);
+        $newStatus = $request->get('order_status');
+
+        if ($newStatus === 'cancelled') {
+            // استفاده از cancelOrder برای بازگردانی موجودی
+            $this->orderService->cancelOrder($order);
+        } else {
+            $order->update(['order_status' => $newStatus]);
+        }
 
         return redirect()->back()->with('success', 'وضعیت سفارش بروزرسانی شد.');
     }

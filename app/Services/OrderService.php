@@ -3,25 +3,28 @@
 namespace App\Services;
 
 use App\Models\Bank;
-use App\Models\InventoryTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShippingStatus;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 
 class OrderService
 {
     protected BankPaymentService $bankPaymentService;
+    protected StockService $stockService;
 
-    public function __construct(BankPaymentService $bankPaymentService)
+    public function __construct(BankPaymentService $bankPaymentService, StockService $stockService)
     {
         $this->bankPaymentService = $bankPaymentService;
+        $this->stockService = $stockService;
     }
 
-    // ==================== جستجو ====================
+    // === search ===
 
     public static function findById(int $id): ?Order
     {
@@ -34,13 +37,12 @@ class OrderService
         return Order::orderBy('id', 'DESC')->where($field, $value)->first();
     }
 
-    // ==================== ایجاد سفارش ====================
+    // === create order ===
 
     public function create(array $cartItems, array $orderData, ?string $userDescription = null): Order
     {
         $defaultStatus = OrderShippingStatus::default()->first();
 
-        // محاسبه وزن کل
         $weightSum = 0;
         foreach ($cartItems as $item) {
             $weight = $item['weight'] ?? 0;
@@ -74,10 +76,8 @@ class OrderService
             'payment_receipt' => $orderData['payment_receipt'] ?? null,
         ]);
 
-        // ایجاد آیتم‌های سفارش
         foreach ($cartItems as $item) {
             $weight = $item['weight'] ?? 0;
-
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item['product_id'] ?? null,
@@ -89,10 +89,18 @@ class OrderService
             ]);
         }
 
+        try {
+            $this->stockService->reserveStock($order);
+        } catch (\RuntimeException $e) {
+            Log::warning('Stock reservation failed for order #' . $order->id, ['message' => $e->getMessage()]);
+            $order->forceDelete();
+            throw $e;
+        }
+
         return $order->fresh(['items.product', 'shippingStatus', 'bank']);
     }
 
-    // ==================== checkout ====================
+    // === checkout ===
 
     public function checkout(Order $order): RedirectResponse
     {
@@ -100,19 +108,15 @@ class OrderService
             ? intval(str_replace(',', '', $order->deposit_price))
             : intval(str_replace(',', '', $order->payment_price));
 
-        // سفارش رایگان (تخفیف کامل)
         if ($order->discount_id !== null && $price <= 0) {
             return $this->handleFreeOrder($order);
         }
 
         $bank = Bank::find($order->bank_id);
-
         if (! $bank) {
-            return redirect(route('checkout.failed'))
-                ->with('error', 'درگاه پرداخت یافت نشد.');
+            return redirect(route('checkout.failed'))->with('error', 'درگاه پرداخت یافت نشد.');
         }
 
-        // کارت به کارت — نیاز به تأیید ادمین
         if ($bank->bank_type === 'card_to_card') {
             $order->update(['order_status' => 'pending_confirmation']);
             return redirect(route('checkout.success', $order->id))
@@ -125,24 +129,18 @@ class OrderService
     private function handleFreeOrder(Order $order): RedirectResponse
     {
         $order->update(['order_status' => 'paid']);
-        self::inventory($order);
-
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
-
         return redirect(route('checkout.success', $order->id));
     }
 
-    // ==================== Callback پرداخت ====================
+    // === payment callback ===
 
     public function callback(string $field, string $value, array $data): RedirectResponse
     {
         $order = self::findByField($field, $value);
-
         if (! $order) {
-            return redirect(route('cart.index'))
-                ->with('error', 'فاکتور معتبر نمی باشد');
+            return redirect(route('cart.index'))->with('error', 'فاکتور معتبر نمی باشد');
         }
-
         if (in_array($order->order_status, ['paid', 'deposit_paid'])) {
             return redirect(route('checkout.success', $order->id));
         }
@@ -152,13 +150,12 @@ class OrderService
             : intval(str_replace(',', '', $order->payment_price));
 
         $isSuccess = $this->bankPaymentService->handleVerify($order, $data, $price);
-
         if ($isSuccess) {
             return $this->handleSuccessOrderPayment($order);
         }
 
-        return redirect(route('checkout.failed'))
-            ->with('error', 'خطا در پرداخت، مجدد تلاش نمایید.');
+        $this->handleFailedPayment($order);
+        return redirect(route('checkout.failed'))->with('error', 'خطا در پرداخت، مجدد تلاش نمایید.');
     }
 
     public function handleSuccessOrderPayment(Order $order): RedirectResponse
@@ -172,71 +169,38 @@ class OrderService
             'order_status' => intval($order->deposit_price) != 0 ? 'deposit_paid' : 'paid',
         ]);
 
-        self::inventory($order);
-
-        // TODO: ارسال پیامک به کاربر و ادمین
-
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
-
         return redirect(route('checkout.success', $order->id));
     }
 
-    // ==================== مدیریت موجودی ====================
-
-    public static function inventory(Order $order): void
+    public function handleFailedPayment(Order $order): void
     {
-        foreach ($order->items as $item) {
-            self::setStockAndPrice($item);
-
-            InventoryTransaction::create([
-                'product_id' => $item->product_id,
-                'product_variant_id' => $item->product_variant_id,
-                'quantity' => $item->quantity,
-                'order_id' => $item->order_id,
-                'type' => 'add',
-                'description' => "سفارش #{$item->order_id}",
+        if ($order->order_status === 'unpaid') {
+            return;
+        }
+        $order->update(['order_status' => 'unpaid']);
+        try {
+            $this->stockService->restoreStock($order);
+        } catch (\Exception $e) {
+            Log::error('Stock restoration failed for failed payment order #' . $order->id, [
+                'message' => $e->getMessage(),
             ]);
         }
     }
 
-    public static function setStockAndPrice(OrderItem $item): void
+    public function cancelOrder(Order $order): void
     {
-        $product = Product::find($item->product_id);
+        $previousStatus = $order->order_status;
+        $order->update(['order_status' => 'cancelled']);
 
-        if (! $product) {
-            return;
-        }
-
-        if ($item->product_variant_id) {
-            $variant = ProductVariant::find($item->product_variant_id);
-
-            if ($variant) {
-                $variant->update([
-                    'stock' => max(0, intval($variant->stock) - intval($item->quantity)),
+        if (in_array($previousStatus, ['paid', 'deposit_paid', 'pending_confirmation', 'wait_for_verification'])) {
+            try {
+                $this->stockService->restoreStock($order);
+            } catch (\Exception $e) {
+                Log::error('Stock restoration failed for cancelled order #' . $order->id, [
+                    'message' => $e->getMessage(),
                 ]);
-
-                $sumStock = $product->variants()->sum('stock');
-
-                $minVariant = $product->variants()
-                    ->orderBy('final_price', 'ASC')
-                    ->where('stock', '<>', 0)
-                    ->first();
-
-                if ($minVariant) {
-                    $product->update([
-                        'price' => $minVariant->price,
-                        'discount_price' => $minVariant->discounted_price,
-                        'final_price' => $minVariant->final_price,
-                        'stock' => $sumStock,
-                    ]);
-                }
             }
-        } else {
-            $product->update([
-                'stock' => max(0, intval($product->stock) - intval($item->quantity)),
-            ]);
         }
-
-        $product->save();
     }
 }

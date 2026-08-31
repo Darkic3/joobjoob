@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\State;
 use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\StockService;
 use App\Services\CityService;
 use App\Services\ShippingCalculator;
 use App\Services\StateService;
@@ -298,5 +299,37 @@ class CheckoutController extends Controller
         $input = $request->all();
         $orderService = app(\App\Services\OrderService::class);
         return $orderService->callback('transaction_info->post->trackId', $input['trackId'] ?? '', $input);
+    }
+
+    /**
+     * بررسی موجودی آیتم‌های سبد خرید (AJAX) — مرحله ۴ قبل از پرداخت
+     */
+    public function validateStock(): JsonResponse
+    {
+        $cartItems = $this->cart->toArray();
+        $stockService = app(StockService::class);
+        $result = $stockService->validateCartItems($cartItems);
+
+        if (!empty($result['unavailable']) || !empty($result['insufficient'])) {
+            // حذف آیتم‌های ناموجود از سبد
+            foreach ($cartItems as $item) {
+                foreach ($result['unavailable'] as $unavailable) {
+                    if (($item['product_id'] ?? null) == $unavailable['product_id']
+                        && ($item['variant_id'] ?? null) == ($unavailable['variant_id'] ?? null)
+                    ) {
+                        $this->cart->remove((string) $item['rowId']);
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'unavailable' => $result['unavailable'],
+                'insufficient' => $result['insufficient'],
+                'message' => 'موجودی برخی محصولات تغییر کرده است.',
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }
