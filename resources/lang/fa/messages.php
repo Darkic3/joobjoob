@@ -127,6 +127,8 @@ return [
     'reply_placeholder' => 'پاسخ خود را بنویسید...',
     'reply_submit' => 'ارسال پاسخ',
     'reply_submitted' => 'پاسخ شما با موفقیت ثبت شد و پس از تأیید نمایش داده خواهد شد.',
+    'review_like' => 'پسندیدم',
+    'review_dislike' => 'نپسندیدم',
     'login' => 'ورود',
     'register' => 'ثبت نام',
     'login_register' => 'ورود / ثبت نام',

@@ -126,6 +126,8 @@ return [
     'reply_placeholder' => 'Write your reply...',
     'reply_submit' => 'Submit Reply',
     'reply_submitted' => 'Your reply has been submitted successfully and will be displayed after approval.',
+    'review_like' => 'Like',
+    'review_dislike' => 'Dislike',
     'login' => 'login',
     'register' => 'register',
     'login_register' => 'Login / Register',

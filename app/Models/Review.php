@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Review extends Model
@@ -53,6 +54,35 @@ class Review extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(Review::class, 'parent_id')->approved()->oldest();
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(ReviewVote::class);
+    }
+
+    /**
+     * رأی کاربر فعلی روی این نظر (اگر لاگین باشد).
+     */
+    public function currentUserVote(): HasOne
+    {
+        return $this->hasOne(ReviewVote::class)->where('user_id', auth()->id());
+    }
+
+    /**
+     * تعداد لایک‌ها
+     */
+    public function getLikesCountAttribute(): int
+    {
+        return $this->votes()->where('type', ReviewVote::TYPE_LIKE)->count();
+    }
+
+    /**
+     * تعداد دیسلاک‌ها
+     */
+    public function getDislikesCountAttribute(): int
+    {
+        return $this->votes()->where('type', ReviewVote::TYPE_DISLIKE)->count();
     }
 
     /**

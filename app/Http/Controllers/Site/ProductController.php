@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Review;
+use App\Models\ReviewVote;
 use App\Services\RecentlyViewedService;
 use App\Services\TrustBadgeService;
 use Illuminate\Http\Request;
@@ -153,7 +154,21 @@ class ProductController extends Controller
         $this->recentlyViewed->add($product);
 
         // ساخت درخت نظرات (نظرات اصلی + پاسخ‌های تو در تو)
-        $allReviews = $product->reviews()->with('user')->approved()->oldest()->get();
+        $allReviews = $product->reviews()
+            ->with(['user', 'votes'])
+            ->approved()
+            ->oldest()
+            ->get();
+
+        // رأی کاربر فعلی روی هر نظر
+        if (auth()->check()) {
+            $userVotes = $allReviews->pluck('id')
+                ->mapWithKeys(fn ($id) => [
+                    $id => ReviewVote::where('review_id', $id)
+                        ->where('user_id', auth()->id())
+                        ->value('type'),
+                ]);
+        }
         $reviewTree = $this->buildReviewTree($allReviews);
 
         // داده‌های نمایشی صفحهٔ محصول (مشخصات/واریانت‌ها/تصویر اصلی) — از ویو خارج شده
@@ -172,7 +187,9 @@ class ProductController extends Controller
 
         return view('site.products.show', array_merge(compact(
             'product', 'related', 'complement', 'reviewTree', 'trustBadges', 'dealEndsAt'
-        ), $viewData));
+        ), $viewData, [
+            'userVotes' => $userVotes ?? collect(),
+        ]));
     }
 
     /**
@@ -380,5 +397,58 @@ class ProductController extends Controller
             ->route('products.show', $product->slug)
             ->withFragment('tab-reviews')
             ->with('success', __('messages.reply_submitted'));
+    }
+
+    /**
+     * لایک یا دیسلاک یک نظر (فقط کاربران لاگین‌شده).
+     */
+    public function voteReview(Request $request, Product $product, Review $review)
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:like,dislike',
+        ]);
+
+        // اگر قبلاً رأی زده باشد، آن را به‌روزرسانی یا حذف کن (toggle)
+        $existingVote = ReviewVote::where('review_id', $review->id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($existingVote) {
+            if ($existingVote->type === $validated['type']) {
+                // کلیک مجدد روی همان نوع → حذف رأی (toggle)
+                $existingVote->delete();
+                $action = 'removed';
+            } else {
+                // تغییر نوع رأی
+                $existingVote->update(['type' => $validated['type']]);
+                $action = 'updated';
+            }
+        } else {
+            // رأی جدید
+            ReviewVote::create([
+                'review_id' => $review->id,
+                'user_id'   => auth()->id(),
+                'type'      => $validated['type'],
+            ]);
+            $action = 'added';
+        }
+
+        // اگر درخواست AJAX باشد → JSON برگردان
+        if ($request->expectsJson()) {
+            $review->refresh();
+            return response()->json([
+                'success' => true,
+                'action'  => $action,
+                'likes'   => $review->votes()->where('type', ReviewVote::TYPE_LIKE)->count(),
+                'dislikes' => $review->votes()->where('type', ReviewVote::TYPE_DISLIKE)->count(),
+                'user_vote' => ReviewVote::where('review_id', $review->id)
+                    ->where('user_id', auth()->id())
+                    ->value('type'),
+            ]);
+        }
+
+        return redirect()
+            ->route('products.show', $product->slug)
+            ->withFragment('tab-reviews');
     }
 }

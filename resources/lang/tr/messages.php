@@ -107,6 +107,8 @@ return [
     'reply_placeholder' => 'Yanıtınızı yazın...',
     'reply_submit' => 'Yanıt Gönder',
     'reply_submitted' => 'Yanıtınız başarıyla gönderildi ve onaylandıktan sonra görüntülenecektir.',
+    'review_like' => 'Beğen',
+    'review_dislike' => 'Beğenme',
     'brand' => 'Marka',
     'theme_updated' => 'Varsayılan site teması başarıyla güncellendi',
     'light_mode' => 'Açık Mod',

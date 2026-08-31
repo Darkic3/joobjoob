@@ -49,6 +49,9 @@ $siteRoutes = function () {
         ->name('products.reviews.store');
     Route::post('/products/{product:slug}/reviews/{review}/reply', [ProductController::class, 'storeReply'])
         ->name('products.reviews.reply');
+    Route::post('/products/{product:slug}/reviews/{review}/vote', [ProductController::class, 'voteReview'])
+        ->middleware('auth')
+        ->name('products.reviews.vote');
     Route::get('/products/{product:slug}/quick-view', [ProductController::class, 'quickView'])->name('products.quick-view');
     Route::get('/product-categories/{category:slug}', [ProductController::class, 'category'])->name('products.category');
 

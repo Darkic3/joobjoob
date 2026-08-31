@@ -107,6 +107,8 @@ return [
     'reply_placeholder' => 'اكتب ردك...',
     'reply_submit' => 'إرسال الرد',
     'reply_submitted' => 'تم تسجيل ردك بنجاح وسيتم عرضه بعد الموافقة.',
+    'review_like' => 'أعجبني',
+    'review_dislike' => 'لم يعجبني',
     'brand' => 'العلامة التجارية',
     'theme_updated' => 'تم تحديث السمة الافتراضية للموقع بنجاح',
     'light_mode' => 'الوضع الفاتح',

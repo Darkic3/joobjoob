@@ -480,7 +480,7 @@
             {{-- ─── لیست نظرات (درختی تو در تو) --}}
             <div class="review-list">
                 @forelse($reviewTree as $review)
-                    @include('site.products.partials.review-item', ['review' => $review, 'depth' => 0])
+                    @include('site.products.partials.review-item', ['review' => $review, 'depth' => 0, 'userVotes' => $userVotes ?? collect()])
                 @empty
                     <div class="review-empty">
                         <div class="review-empty__icon">
@@ -1095,6 +1095,48 @@
                 });
             });
         })();
+
+        // ===== لایک / دیسلاک نظر =====
+        var CSRF_TOKEN = (function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; })();
+
+        function voteReview(reviewId, type, btn) {
+            var url = '{{ url('products/' . $product->slug . '/reviews') }}/' + reviewId + '/vote';
+
+            // غیرفعال کردن موقت دکمه‌ها
+            var group = btn.closest('[data-review-vote]');
+            if (group) group.style.pointerEvents = 'none';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ type: type }),
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (group) group.style.pointerEvents = '';
+                if (!data.success) return;
+
+                // به‌روزرسانی شمارنده‌ها
+                var likeCountEl = group ? group.querySelector('[data-vote-count="like"]') : null;
+                var dislikeCountEl = group ? group.querySelector('[data-vote-count="dislike"]') : null;
+                if (likeCountEl) likeCountEl.textContent = data.likes;
+                if (dislikeCountEl) dislikeCountEl.textContent = data.dislikes;
+
+                // به‌روزرسانی وضعیت فعال
+                var likeBtn = group ? group.querySelector('.review-vote-btn--like') : null;
+                var dislikeBtn = group ? group.querySelector('.review-vote-btn--dislike') : null;
+                if (likeBtn) likeBtn.classList.toggle('review-vote-btn--active', data.user_vote === 'like');
+                if (dislikeBtn) dislikeBtn.classList.toggle('review-vote-btn--active', data.user_vote === 'dislike');
+            })
+            .catch(function() {
+                if (group) group.style.pointerEvents = '';
+            });
+        }
     </script>
 
     <style>
@@ -1584,6 +1626,44 @@
             transform: translateY(-1px);
         }
         .review-reply-btn svg { flex-shrink: 0; }
+
+        /* ── دکمه‌های لایک / دیسلاک ── */
+        .review-vote-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .review-vote-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            border: none;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            background: color-mix(in srgb, var(--text-secondary) 6%, transparent);
+        }
+        .review-vote-btn:hover {
+            transform: translateY(-1px);
+        }
+        .review-vote-btn--like:hover,
+        .review-vote-btn--like.review-vote-btn--active {
+            color: var(--success);
+            background: color-mix(in srgb, var(--success) 12%, transparent);
+        }
+        .review-vote-btn--dislike:hover,
+        .review-vote-btn--dislike.review-vote-btn--active {
+            color: var(--danger);
+            background: color-mix(in srgb, var(--danger) 12%, transparent);
+        }
+        .review-vote-btn svg { flex-shrink: 0; }
+        .review-vote-btn__count {
+            font-variant-numeric: tabular-nums;
+        }
 
         /* ── پاسخ‌ها (تو در تو) ── */
         .review-card--reply {
