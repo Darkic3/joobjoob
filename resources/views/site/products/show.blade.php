@@ -972,6 +972,14 @@
                     if (e.key === 'Enter' && !e.shiftKey) e.stopPropagation();
                 });
             }
+
+            // جلوگیری از ارسال دوبار نظر (double-submit)
+            var reviewForm = document.querySelector('.review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function() {
+                    if (submitBtn) submitBtn.disabled = true;
+                });
+            }
         })();
 
         // ===== مودال پاسخ به نظر =====
@@ -985,6 +993,10 @@
             nameEl.textContent = authorName;
             modal.classList.add('is-active');
             document.body.style.overflow = 'hidden';
+
+            // جلوگیری از ارسال دوبار پاسخ (double-submit)
+            var replyBtn = form.querySelector('button[type="submit"]');
+            form.onsubmit = function() { if (replyBtn) replyBtn.disabled = true; };
 
             // شمارنده حروف مودال
             var ta = form.querySelector('textarea[name="comment"]');
@@ -1045,7 +1057,7 @@
 
         // ===== AJAX: افزودن به سبد خرید (بدون رفرش صفحه) =====
         (function() {
-            var addForm = document.querySelector('form[action*="cart.add"]');
+            var addForm = document.querySelector('form[action*="cart/add"]');
             if (!addForm) return;
             var csrfToken = function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
 
