@@ -71,13 +71,15 @@ $siteRoutes = function () {
     // افزودن به سبد — مهمان هم مجاز است (سبد session-based است)
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 
-    // سایر عملیات سبد خرید (نیازمند ورود)
-    Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
+    // نمایش، ویرایش و حذف اقلام سبد — بدون نیاز به لاگین
+    Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
-        Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');
     });
+
+    // کد تخفیف — نیازمند ورود
+    Route::middleware('auth')->post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
 
     // ==================== تسویه حساب (نیازمند ورود) ====================
     Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {

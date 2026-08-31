@@ -15,15 +15,35 @@ class CartController extends Controller
 
     public function index(Request $request)
     {
+        $isGuest = ! auth()->check();
+
         if ($this->cart->count() === 0) {
-            return view('site.cart.index', ['items' => $this->cart->content(), 'cart' => $this->cart, 'addresses' => collect(), 'states' => [], 'banks' => collect()]);
+            return view('site.cart.index', [
+                'items' => $this->cart->content(),
+                'cart' => $this->cart,
+                'addresses' => collect(),
+                'states' => [],
+                'banks' => collect(),
+                'isGuest' => $isGuest,
+            ]);
+        }
+
+        // مهمان فقط مرحله ۱ (اقلام سبد) را می‌بیند
+        if ($isGuest) {
+            return view('site.cart.index', [
+                'items' => $this->cart->content(),
+                'cart' => $this->cart,
+                'addresses' => collect(),
+                'states' => [],
+                'banks' => collect(),
+                'isGuest' => true,
+            ]);
         }
 
         $addresses = AddressService::find()['addresses'] ?? collect();
         $states = StateService::findActive();
         $banks = \App\Models\Bank::active()->orderBy('id', 'DESC')->get();
 
-        // آدرس و روش ارسال انتخاب‌شده (از سشن)
         $selectedAddress = null;
         if ($addressId = session('checkout_address_id')) {
             $selectedAddress = \App\Models\Address::with(['state', 'city'])->find($addressId);
@@ -36,7 +56,6 @@ class CartController extends Controller
 
         $currentStep = $request->get('step') ? (int) $request->get('step') : null;
 
-        // اعتبارسنجی مراحل — جلوگیری از رد شدن از مراحل
         if ($currentStep !== null) {
             if ($currentStep >= 3 && ! session('checkout_address_id')) {
                 $currentStep = 2;
@@ -59,6 +78,7 @@ class CartController extends Controller
             'selectedShipping' => $selectedShipping,
             'shippingPrice' => $shippingPrice,
             'currentStep' => $currentStep,
+            'isGuest' => false,
         ]);
     }
 
@@ -72,22 +92,27 @@ class CartController extends Controller
         $qty = (int) ($request->input('qty') ?? 1);
         $variantId = $request->input('variant_id') ? (int) $request->input('variant_id') : null;
 
-        // ── بررسی موجودی: مجموع تعداد فعلی در سبد + تعداد درخواستی ──
         $variant = $variantId ? $product->variants()->find($variantId) : null;
         $stock = $variant ? $variant->stock : $product->stock;
 
+        // بررسی موجودی: پیدا کردن آیتم فعلی در سبد بر اساس محصول/وریانت/رنگ/سایز
         $cart = $this->cart->content();
-        $rowId = md5($product->id . ($variantId ?? '') . ($request->input('color') ?? '') . ($request->input('size') ?? ''));
-        $currentQty = $cart->has($rowId) ? (int) $cart->get($rowId)['qty'] : 0;
+        $color = $request->input('color');
+        $size = $request->input('size');
+        $existingItem = $cart->first(fn ($item) =>
+            $item['product_id'] == $product->id
+            && ($item['variant_id'] ?? null) == ($variantId ?? null)
+            && ($item['color'] ?? null) === $color
+            && ($item['size'] ?? null) === $size
+        );
+        $currentQty = $existingItem ? (int) $existingItem['qty'] : 0;
         $requestedTotal = $currentQty + $qty;
         $stockWarning = null;
 
         if ($requestedTotal > $stock) {
             $stockWarning = __('messages.stock_limit_reached', ['count' => $stock]);
-            // فقط تا سقف موجودی اضافه کن
             $qty = max(0, $stock - $currentQty);
             if ($qty <= 0) {
-                // قبلاً به سقف موجودی رسیده
                 if ($request->wantsJson()) {
                     return response()->json([
                         'success' => false,
@@ -103,7 +128,6 @@ class CartController extends Controller
 
         $this->cart->add($product, $qty, $variantId, $request->input('color'), $request->input('size'));
 
-        // اگر درخواست از نوع AJAX (JSON) بود، پاسخ جیسون بده
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -114,7 +138,6 @@ class CartController extends Controller
             ]);
         }
 
-        // در غیر این صورت، رفتار عادی (رفرش صفحه) را حفظ کن
         return back()->with($stockWarning ? 'error' : 'success', $stockWarning ?? __('messages.added_to_cart'));
     }
 

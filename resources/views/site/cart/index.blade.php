@@ -29,6 +29,7 @@
                 </a>
             </div>
         @else
+            @if(!($isGuest ?? false))
             {{-- ═══════════════════ نشانگر مراحل ═══════════════════ --}}
             <div class="neu-card px-6 py-5 mb-8" id="step-indicator">
                 <div class="flex items-center justify-center gap-0">
@@ -53,6 +54,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- ═══════════════════ مرحله ۱: اقلام سبد خرید ═══════════════════ --}}
             <div id="checkout-step-1" class="checkout-step">
@@ -189,15 +191,24 @@
                                 </span>
                             </div>
 
-                            <button type="button" onclick="goToStep(2)"
-                                    class="neu-btn neu-btn-primary w-full py-3.5 text-sm font-bold rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                                {{ __('messages.proceed_to_checkout') }}
-                            </button>
+                            @if($isGuest ?? false)
+                                <a href="{{ localizedRoute('login') }}"
+                                   class="neu-btn neu-btn-primary w-full py-3.5 text-sm font-bold rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                                    {{ __('messages.login_register') }}
+                                </a>
+                                <p class="text-xs text-center mt-2" style="color: var(--text-secondary);">برای تکمیل خرید وارد شوید</p>
+                            @else
+                                <button type="button" onclick="goToStep(2)"
+                                        class="neu-btn neu-btn-primary w-full py-3.5 text-sm font-bold rounded-full text-center block transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                                    {{ __('messages.proceed_to_checkout') }}
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
 
+            @if(!($isGuest ?? false))
             {{-- ═══════════════════ مرحله ۲: انتخاب آدرس و روش ارسال ═══════════════════ --}}
             <div id="checkout-step-2" class="checkout-step" style="display: none;">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -389,6 +400,8 @@
                 </div>
             </div>
 
+            @endif
+            @if(!($isGuest ?? false))
             {{-- ═══════════════════ مرحله ۳: کد تخفیف ═══════════════════ --}}
             <div id="checkout-step-3" class="checkout-step" style="display: none;">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -465,6 +478,8 @@
                 </div>
             </div>
 
+            @endif
+            @if(!($isGuest ?? false))
             {{-- ═══════════════════ مرحله ۴: پرداخت و ثبت نهایی ═══════════════════ --}}
             <div id="checkout-step-4" class="checkout-step" style="display: none;">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -686,6 +701,7 @@
                     </div>
                 </div>
             </div>
+            @endif {{-- isGuest step4 --}}
         @endif
     </div>
 

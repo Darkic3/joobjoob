@@ -53,6 +53,11 @@ class User extends Authenticatable
             ->orderBy('id', 'DESC');
     }
 
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);

@@ -122,6 +122,9 @@ class OtpController extends Controller
                 ->withErrors(['mobile' => __('messages.otp_session_expired')]);
         }
 
+        // ذخیره سبد مهمان قبل از لاگین
+        $guestCart = session('cart', []);
+
         $result = $this->otpService->verify($mobile, $data['code']);
 
         if (! $result['success']) {
@@ -130,6 +133,11 @@ class OtpController extends Controller
 
         $request->session()->forget('otp_mobile');
         $request->session()->regenerate();
+
+        // ادغام سبد مهمان با سبد کاربر
+        if (! empty($guestCart)) {
+            app(\App\Services\CartService::class)->mergeGuestCart($guestCart);
+        }
 
         return redirect()->intended(localizedRoute('dashboard'));
     }
