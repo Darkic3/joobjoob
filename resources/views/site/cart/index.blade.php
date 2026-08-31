@@ -348,6 +348,7 @@
                                 </div>
                                 روش ارسال
                             </h2>
+                            <div id="step2-free-ship-banner" class="hidden" style="display: none !important;"></div>
                             <div id="shippingMethodsList"></div>
                         </div>
                     </div>
@@ -378,6 +379,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step2-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step2-free-ship-info" class="hidden rounded-xl p-3 text-xs font-bold" style="display: none !important;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -457,6 +459,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step3-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step3-free-ship-info" class="rounded-xl p-3 text-xs font-bold" style="display: none;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -688,6 +691,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step4-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step4-free-ship-info" class="rounded-xl p-3 text-xs font-bold" style="display: none;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -962,6 +966,8 @@
         var selectedBankId = null;
         var selectedShippingFreightBalance = 0;
         var shippingPrice = 0;
+        var selectedPriceCeiling = 0;
+        var selectedOriginalPrice = 0;
         var subtotal = {{ $cart->subtotal() }};
         var discount = {{ $cart->discount() }};
         var totalWithoutShipping = {{ $cart->total() }};
@@ -1017,6 +1023,12 @@
             selectedShippingMethodId = null;
             shippingPrice = 0;
 
+            // مخفی کردن بنر و اطلاعات سقف رایگان (تا روش ارسال انتخاب نشده نمایش داده نشه)
+            var b = document.getElementById('step2-free-ship-banner');
+            if (b) b.style.display = 'none';
+            var s = document.getElementById('step2-free-ship-info');
+            if (s) s.style.display = 'none';
+
             document.querySelectorAll('.address-card').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-address-id="' + addressId + '"]');
             if (card) card.classList.add('selected');
@@ -1038,12 +1050,24 @@
                     data.shipping_methods.forEach(function(method) {
                         var priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? formatNum(method.price) + ' {{ __("messages.toman") }}' : (method.freight_balance == 1 ? '{{ __("messages.trust_cod_shipping") }}' : '{{ __("messages.trust_free_shipping") }}'));
                         var priceVal = method.price === 'dynamic' ? 0 : parseInt(method.price);
+                        var priceCeiling = parseInt(method.price_ceiling) || 0;
+                        var originalPrice = parseInt(method.original_price) || 0;
                         var icon = method.type === 'with_weight'
                             ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>'
                             : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+                        // نمایش برچسب سقف رایگان در کنار روش ارسال
+                        var freeShipBadge = '';
+                        var freeShipAboveTpl = '{{ __("messages.free_shipping_above", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        if (priceCeiling > 0 && method.freight_balance != 1) {
+                            freeShipBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style="background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success);">' +
+                                freeShipAboveTpl.replace('__AMOUNT__', formatNum(priceCeiling)) + '</span>';
+                        }
+
                         html += '<div class="shipping-option neu-flat-sm p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-2.5" ' +
                             'data-method-id="' + method.id + '" data-price="' + priceVal + '" ' +
-                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ', ' + (method.freight_balance || 0) + ')">' +
+                            'data-price-ceiling="' + priceCeiling + '" data-original-price="' + originalPrice + '" ' +
+                            'data-freight-balance="' + (method.freight_balance || 0) + '" ' +
+                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ', ' + (method.freight_balance || 0) + ', ' + priceCeiling + ', ' + originalPrice + ')">' +
                             '<div class="flex items-center justify-between">' +
                             '<div class="flex items-center gap-3">' +
                             '<div class="shipping-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300" ' +
@@ -1055,7 +1079,7 @@
                             '<p class="text-[11px]" style="color: var(--text-secondary);">' +
                             (method.type === 'with_weight' ? 'بر اساس وزن' : method.type === 'fixed_price' ? 'قیمت ثابت' : '') +
                             (method.show_estimated_days && method.estimated_days_min ? ' · ' + method.estimated_days_min + ' تا ' + method.estimated_days_max + ' روز کاری' : '') +
-                            '</p></div>' +
+                            '</p>' + freeShipBadge + '</div>' +
                             '</div>' +
                             '</div>' +
                             '<span class="text-sm mono font-bold" style="color: var(--accent);" dir="ltr">' + priceText + '</span>' +
@@ -1078,10 +1102,14 @@
         };
 
         // ========== انتخاب روش ارسال ==========
-        window.selectShipping = function(methodId, price, freightBalance) {
+        window.selectShipping = function(methodId, price, freightBalance, priceCeiling, originalPrice) {
             selectedShippingMethodId = methodId;
             selectedShippingFreightBalance = freightBalance || 0;
             shippingPrice = parseInt(price) || 0;
+            selectedPriceCeiling = parseInt(priceCeiling) || 0;
+            selectedOriginalPrice = parseInt(originalPrice) || 0;
+            var pc = parseInt(priceCeiling) || 0;
+            var op = parseInt(originalPrice) || 0;
 
             document.querySelectorAll('.shipping-option').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-method-id="' + methodId + '"]');
@@ -1097,6 +1125,63 @@
                 },
                 body: JSON.stringify({ shipping_method_id: methodId, shipping_price: price })
             });
+
+            // نمایش پیام سقف رایگان + به‌روزرسانی باکس خلاصه
+            var banner = document.getElementById('step2-free-ship-banner');
+            var sidebarInfo = document.getElementById('step2-free-ship-info');
+            var orderTotal = totalWithoutShipping;
+
+            if (pc > 0 && freightBalance != 1) {
+                if (orderTotal >= pc) {
+                    // ارسال رایگان شده — سود کردیم
+                    var savedTpl = '{{ __("messages.free_shipping_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    var savedAmount = '<span class="mono" dir="ltr">' + formatNum(op) + '</span>';
+
+                    if (banner) {
+                        banner.className = 'flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold mb-2.5';
+                        banner.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        banner.style.color = 'var(--success)';
+                        banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+                            '<div>' + savedTpl.replace('__AMOUNT__', savedAmount) + '</div>';
+                        banner.style.display = 'flex';
+                    }
+                    // باکس خلاصه سفارش
+                    var savedSidebarTpl = '{{ __("messages.free_shipping_sidebar_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    if (sidebarInfo) {
+                        sidebarInfo.className = 'rounded-xl p-3 text-xs font-bold';
+                        sidebarInfo.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        sidebarInfo.style.color = 'var(--success)';
+                        sidebarInfo.innerHTML = savedSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(op) + '</span>');
+                        sidebarInfo.style.display = 'flex';
+                    }
+                } else {
+                    // هنوز به سقف نرسیده
+                    var remaining = pc - orderTotal;
+                    var remainingTpl = '{{ __("messages.free_shipping_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    var remainingAmount = '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>';
+
+                    if (banner) {
+                        banner.className = 'flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold mb-2.5';
+                        banner.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        banner.style.color = 'var(--accent)';
+                        banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+                            '<div>' + remainingTpl.replace('__AMOUNT__', remainingAmount) + '</div>';
+                        banner.style.display = 'flex';
+                    }
+                    // باکس خلاصه سفارش
+                    var remainingSidebarTpl = '{{ __("messages.free_shipping_sidebar_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    if (sidebarInfo) {
+                        sidebarInfo.className = 'rounded-xl p-3 text-xs font-bold';
+                        sidebarInfo.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        sidebarInfo.style.color = 'var(--accent)';
+                        sidebarInfo.innerHTML = remainingSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>');
+                        sidebarInfo.style.display = 'flex';
+                    }
+                }
+            } else {
+                if (banner) banner.style.display = 'none';
+                if (sidebarInfo) sidebarInfo.style.display = 'none';
+            }
 
             updateStep2Price();
         };
@@ -1358,12 +1443,102 @@
             document.getElementById('step4-total-inline').textContent = formatNum(total);
             document.getElementById('step4-shipping-row').classList.remove('hidden');
             document.getElementById('step4-shipping-price').textContent = shippingText;
+
+            // اطلاعات سقف رایگان برای مراحل ۳ و ۴
+            ['step3', 'step4'].forEach(function(step) {
+                var info = document.getElementById(step + '-free-ship-info');
+                if (!info) return;
+                if (selectedPriceCeiling > 0 && selectedShippingFreightBalance != 1) {
+                    if (totalWithoutShipping >= selectedPriceCeiling) {
+                        var tpl = '{{ __("messages.free_shipping_sidebar_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        info.className = 'rounded-xl p-3 text-xs font-bold';
+                        info.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        info.style.color = 'var(--success)';
+                        info.innerHTML = tpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(selectedOriginalPrice) + '</span>');
+                        info.style.display = 'flex';
+                    } else {
+                        var remaining = selectedPriceCeiling - totalWithoutShipping;
+                        var tpl2 = '{{ __("messages.free_shipping_sidebar_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        info.className = 'rounded-xl p-3 text-xs font-bold';
+                        info.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        info.style.color = 'var(--accent)';
+                        info.innerHTML = tpl2.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>');
+                        info.style.display = 'flex';
+                    }
+                } else {
+                    info.style.display = 'none';
+                }
+            });
+        }
+
+// ========== به‌روزرسانی قیمت از سرور ==========
+        function fetchFreshPrices(callback) {
+            fetch(urls.orderPrice, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(priceData) {
+                subtotal = priceData.final_price_sum;
+                discount = priceData.price_discount;
+                totalWithoutShipping = priceData.price_cart - priceData.price_shipping;
+                shippingPrice = parseInt(priceData.price_shipping) || 0;
+
+                // مرحله ۱
+                var subEl1 = document.getElementById('cart-subtotal');
+                var totalEl1 = document.getElementById('cart-total');
+                if (subEl1) subEl1.textContent = formatNum(subtotal);
+                if (totalEl1) totalEl1.textContent = formatNum(totalWithoutShipping);
+                var couponRow1 = document.getElementById('cart-coupon-row');
+                if (couponRow1) {
+                    if (discount > 0) { couponRow1.classList.remove('hidden'); document.getElementById('cart-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow1.classList.add('hidden'); }
+                }
+
+                // مرحله ۲
+                var subEl2 = document.getElementById('step2-subtotal');
+                if (subEl2) subEl2.textContent = formatNum(subtotal);
+                var couponRow2 = document.getElementById('step2-coupon-row');
+                if (couponRow2) {
+                    if (discount > 0) { couponRow2.classList.remove('hidden'); document.getElementById('step2-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow2.classList.add('hidden'); }
+                }
+                updateStep2Price();
+
+                // مرحله ۳
+                var subEl3 = document.getElementById('step3-subtotal');
+                if (subEl3) subEl3.textContent = formatNum(subtotal);
+                var couponRow3 = document.getElementById('step3-coupon-row');
+                if (couponRow3) {
+                    if (discount > 0) { couponRow3.classList.remove('hidden'); document.getElementById('step3-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow3.classList.add('hidden'); }
+                }
+
+                // مرحله ۴
+                var subEl4 = document.getElementById('step4-subtotal');
+                if (subEl4) subEl4.textContent = formatNum(subtotal);
+                var couponRow4 = document.getElementById('step4-coupon-row');
+                if (couponRow4) {
+                    if (discount > 0) { couponRow4.classList.remove('hidden'); document.getElementById('step4-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow4.classList.add('hidden'); }
+                }
+
+                if (callback) callback();
+            });
         }
 
         var origGoToStep = window.goToStep;
         window.goToStep = function(step) {
-            if (step === 3 || step === 4) updateStep34Price();
-            origGoToStep(step);
+            if (step >= 2) {
+                fetchFreshPrices(function() {
+                    if (step === 3 || step === 4) updateStep34Price();
+                    if (step === 2 && selectedAddressId) {
+                        selectAddress(selectedAddressId);
+                    }
+                    origGoToStep(step);
+                });
+            } else {
+                origGoToStep(step);
+            }
         };
 
         // بارگذاری اولیه

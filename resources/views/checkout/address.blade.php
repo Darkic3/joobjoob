@@ -56,15 +56,15 @@
                     </div>
                 </div>
 
-                <!-- روش‌های ارسال -->
-                <div class="card mb-4" id="shippingMethodsCard" style="display:none;">
-                    <div class="card-header">
-                        <h5 class="mb-0">🚀 روش ارسال</h5>
+                <!-- روش‌های ارسال -->                    <div class="card mb-4" id="shippingMethodsCard" style="display:none;">
+                        <div class="card-header">
+                            <h5 class="mb-0">🚀 روش ارسال</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="free-ship-banner" style="display: none;"></div>
+                            <div id="shippingMethodsList"></div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div id="shippingMethodsList"></div>
-                    </div>
-                </div>
             </div>
 
             <!-- خلاصه -->
@@ -154,6 +154,10 @@
             selectedAddressId = addressId;
             selectedShippingMethodId = null;
 
+            // مخفی کردن بنر سقف رایگان
+            var b = document.getElementById('free-ship-banner');
+            if (b) b.style.display = 'none';
+
             document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
             document.querySelector(`[data-address-id="${addressId}"]`).classList.add('selected');
 
@@ -170,13 +174,24 @@
             .then(data => {
                 let html = '';
                 data.shipping_methods.forEach(method => {
-                    let priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? numberFormat(method.price) + ' تومان' : 'رایگان');
+                    let priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? numberFormat(method.price) + ' تومان' : (method.freight_balance == 1 ? 'پس کرایه' : 'رایگان'));
+                    let priceVal = method.price === 'dynamic' ? 0 : parseInt(method.price);
+                    let priceCeiling = parseInt(method.price_ceiling) || 0;
+                    let originalPrice = parseInt(method.original_price) || 0;
+
+                    let freeShipBadge = '';
+                    var freeShipAboveTpl = '{{ __("messages.free_shipping_above", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    if (priceCeiling > 0 && method.freight_balance != 1) {
+                        freeShipBadge = `<span class="badge bg-success ms-2" style="font-size:10px;">` + freeShipAboveTpl.replace('__AMOUNT__', numberFormat(priceCeiling)) + `</span>`;
+                    }
+
                     html += `
-                        <div class="card shipping-method mb-2" data-method-id="${method.id}" data-price="${method.price}" onclick="selectShipping(${method.id}, ${method.price === 'dynamic' ? 0 : method.price})">
+                        <div class="card shipping-method mb-2" data-method-id="${method.id}" data-price="${priceVal}" data-price-ceiling="${priceCeiling}" data-original-price="${originalPrice}" data-freight-balance="${method.freight_balance || 0}" onclick="selectShipping(${method.id}, ${priceVal}, ${priceCeiling}, ${originalPrice})">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <strong>${method.title}</strong>
                                     <small class="text-muted ms-2">${method.type === 'with_weight' ? '(بر اساس وزن)' : method.type === 'fixed_price' ? '(قیمت ثابت)' : ''}</small>
+                                    ${freeShipBadge}
                                 </div>
                                 <div><strong>${priceText}</strong></div>
                             </div>
@@ -188,8 +203,10 @@
             });
         }
 
-        function selectShipping(methodId, price) {
+        function selectShipping(methodId, price, priceCeiling, originalPrice) {
             selectedShippingMethodId = methodId;
+            let pc = parseInt(priceCeiling) || 0;
+            let op = parseInt(originalPrice) || 0;
 
             document.querySelectorAll('.shipping-method').forEach(c => c.classList.remove('selected'));
             document.querySelector(`[data-method-id="${methodId}"]`).classList.add('selected');
@@ -207,6 +224,27 @@
             let shippingPrice = parseInt(price) || 0;
             let subtotal = {{ $cart->subtotal() }};
             let total = subtotal + shippingPrice;
+
+            // نمایش پیام سقف رایگان
+            let banner = document.getElementById('free-ship-banner');
+            if (banner) {
+                let freightBalance = document.querySelector(`[data-method-id="${methodId}"]`).getAttribute('data-freight-balance') || 0;
+                if (pc > 0 && freightBalance != 1) {
+                    if (subtotal >= pc) {
+                        var savedTpl = '{{ __("messages.free_shipping_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        banner.className = 'alert alert-success mt-2';
+                        banner.innerHTML = savedTpl.replace('__AMOUNT__', numberFormat(op));
+                    } else {
+                        let remaining = pc - subtotal;
+                        var remainingTpl = '{{ __("messages.free_shipping_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        banner.className = 'alert alert-info mt-2';
+                        banner.innerHTML = remainingTpl.replace('__AMOUNT__', numberFormat(remaining));
+                    }
+                    banner.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
 
             document.getElementById('shippingPriceDisplay').style.display = 'flex';
             document.getElementById('shippingPriceText').textContent = numberFormat(shippingPrice) + ' تومان';
