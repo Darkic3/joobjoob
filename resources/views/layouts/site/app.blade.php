@@ -31,7 +31,7 @@
 
 {{--@include('layouts.site._partials.head')--}}
 
-<body class="min-h-screen" style="background: var(--bg);">
+<body class="min-h-screen{{ auth()->check() ? " auth" : "" }}" style="background: var(--bg);">
 
 {{-- داده‌های نوار اعلان توسط SiteLayoutComposer آماده می‌شود --}}
 <div class="announce-bar text-center text-xs md:text-sm font-semibold py-2 px-4">

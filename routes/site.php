@@ -68,10 +68,12 @@ $siteRoutes = function () {
         ->middleware('throttle:5,1')
         ->name('site.contact.send');
 
-    // سبد خرید (نیازمند ورود)
+    // افزودن به سبد — مهمان هم مجاز است (سبد session-based است)
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
+    // سایر عملیات سبد خرید (نیازمند ورود)
     Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
         Route::patch('/update/{rowId}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
         Route::post('/coupon', [CartController::class, 'applyCoupon'])->name('coupon');

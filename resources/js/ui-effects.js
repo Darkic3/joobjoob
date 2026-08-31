@@ -283,10 +283,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const count = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
                     const countStr = window.localizeDigits ? window.localizeDigits.convert(String(count)) : String(count);
-                    ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                    ['cart-count', 'cart-count-mobile', 'cart-count-guest'].forEach(function (id) {
                         const badge = document.getElementById(id);
                         if (!badge) return;
                         badge.textContent = countStr;
+                        badge.style.display = '';
                         badge.classList.remove('count-pop');
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
@@ -295,6 +296,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     // نمایش toast جشن افزودن به سبد
                     if (typeof showToast === 'function') {
                         showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                        // اگر مهمان است، پیام لاگین نشان بده
+                        if (!document.querySelector('meta[name="csrf-token"]') || !document.body.classList.contains('auth')) {
+                            setTimeout(function() { showToast('برای ادامه خرید وارد شوید', 'info'); }, 3800);
+                        }
                     }
                 } else {
                     btn.innerHTML = data.message || 'خطا';
@@ -696,10 +701,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (data) {
                 if (data && typeof data.cart_count === 'number' && isFinite(data.cart_count)) {
                     const countStr = window.localizeDigits ? window.localizeDigits.convert(String(data.cart_count)) : String(data.cart_count);
-                    ['cart-count', 'cart-count-mobile'].forEach(function (id) {
+                    ['cart-count', 'cart-count-mobile', 'cart-count-guest'].forEach(function (id) {
                         const badge = document.getElementById(id);
                         if (!badge) return;
                         badge.textContent = countStr;
+                        badge.style.display = '';
                         badge.classList.remove('count-pop');
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
