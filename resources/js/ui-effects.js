@@ -150,6 +150,66 @@ window.startCountdownTo = function (elIds, endMs) {
 };
 
 
+// ── Fly-to-Cart animation ─────────────────────────────────────────────
+// clones the product thumbnail and animates it along a curved Bézier path to the cart icon
+// sourceEl: the add-to-cart button (used to walk up to the product card)
+function flyToCart(sourceEl) {
+    // ۱) پیدا کردن تصویر محصول: ابتدا کارت، سپس تصویر داخلش
+    var card = sourceEl.closest('.product-card, [data-card-link], .quick-view-content');
+    var img = card ? card.querySelector('.product-image-wrap img, .quick-view-gallery img, img') : null;
+
+    // ۲) پیدا کردن آیکون سبد خرید در هدر
+    var badge = document.getElementById('cart-count') || document.getElementById('cart-count-mobile');
+    if (!badge) return;
+    var target = badge.closest('a, button');
+    if (!target) return;
+
+    // ۳) محاسبه موقعیت شروع و پایان
+    var src = img ? img.getBoundingClientRect() : sourceEl.getBoundingClientRect();
+    var dst = target.getBoundingClientRect();
+    var size = Math.min(src.width, src.height, 56);
+
+    // ۴) ساخت کلون متحرک
+    var ghost = document.createElement('div');
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.style.cssText =
+        'position:fixed;z-index:99999;pointer-events:none;border-radius:50%;'
+        + 'width:' + size + 'px;height:' + size + 'px;'
+        + 'background-image:url(' + (img ? img.src : '') + ');background-size:cover;background-position:center;'
+        + 'box-shadow:0 6px 24px rgba(0,0,0,.25);'
+        + 'will-change:transform,opacity;'
+        + 'left:' + (src.left + src.width / 2 - size / 2) + 'px;'
+        + 'top:' + (src.top + src.height / 2 - size / 2) + 'px;'
+        + 'transform:scale(1);opacity:1;transition:none;';
+    document.body.appendChild(ghost);
+
+    // ۵) ریفلو + شروع انیمیشن با CSS transition
+    void ghost.offsetWidth;
+
+    var dx = (dst.left + dst.width / 2) - (src.left + src.width / 2);
+    var dy = (dst.top + dst.height / 2) - (src.top + src.height / 2);
+
+    // ترکیب: حرکت + کوچک‌شدن + چرخش + محو شدن
+    ghost.style.transition = 'left 0.75s cubic-bezier(.2,.9,.3,1.1), top 0.75s cubic-bezier(.2,.9,.3,1.1), transform 0.75s cubic-bezier(.2,.9,.3,1.1), opacity 0.75s ease-in';
+    ghost.style.left = (dst.left + dst.width / 2 - size / 2) + 'px';
+    ghost.style.top = (dst.top + dst.height / 2 - size / 2) + 'px';
+    ghost.style.transform = 'scale(0.15) rotate(' + (dx > 0 ? 180 : -180) + 'deg)';
+    ghost.style.opacity = '0.3';
+
+    // ۶) پایان انیمیشن → حذف کلون + بونس آیکون سبد
+    function onEnd() {
+        ghost.removeEventListener('transitionend', onEnd);
+        ghost.remove();
+        // bounce the cart badge
+        badge.classList.remove('count-pop');
+        void badge.offsetWidth;
+        badge.classList.add('count-pop');
+    }
+    ghost.addEventListener('transitionend', onEnd);
+    // فوربک اگر transitionend شلیک نشد
+    setTimeout(function () { if (ghost.parentNode) onEnd(); }, 900);
+}
+
 // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success ----------
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.add-to-cart').forEach(button => {
@@ -194,6 +254,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     btn.innerHTML = successText;
                     btn.classList.add('neu-btn-success');
+
+                    // 🎯 انیمیشن پرواز به سبد خرید
+                    flyToCart(btn);
 
                     const count = (typeof data.cart_count === 'number' && isFinite(data.cart_count)) ? data.cart_count : 0;
                     const countStr = window.localizeDigits ? window.localizeDigits.convert(String(count)) : String(count);
@@ -620,6 +683,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
                 if (btn) { btn.textContent = window.quickViewAddedText || '✓'; }
+
+                // 🎯 انیمیشن پرواز به سبد خرید
+                if (btn) flyToCart(btn);
 
                 // نمایش toast جشن افزودن به سبد
                 if (typeof showToast === 'function' && data && data.success) {
