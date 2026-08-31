@@ -127,6 +127,8 @@ class OrderService
         $order->update(['order_status' => 'paid']);
         self::inventory($order);
 
+        session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
+
         return redirect(route('checkout.success', $order->id));
     }
 
@@ -162,6 +164,7 @@ class OrderService
     public function handleSuccessOrderPayment(Order $order): RedirectResponse
     {
         if ($order->order_status === 'paid') {
+            session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
             return redirect(route('checkout.success', $order->id));
         }
 
@@ -172,6 +175,8 @@ class OrderService
         self::inventory($order);
 
         // TODO: ارسال پیامک به کاربر و ادمین
+
+        session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
 
         return redirect(route('checkout.success', $order->id));
     }

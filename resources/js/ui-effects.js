@@ -155,6 +155,8 @@ window.startCountdownTo = function (elIds, endMs) {
 function flyToCart(sourceEl) {
     var card = sourceEl.closest('.product-card, [data-card-link], .quick-view-content');
     var img = card ? card.querySelector('.product-image-wrap img, .quick-view-gallery img, img') : null;
+    // صفحه جزئیات محصول: تصویر اصلی
+    if (!img) img = document.getElementById('main-image');
 
     var badge = document.getElementById('cart-count') || document.getElementById('cart-count-mobile');
     if (!badge) return;

@@ -246,9 +246,17 @@ class CheckoutController extends Controller
             return redirect('/')->with('error', 'این فاکتور متعلق به شما نیست');
         }
 
-        if ($order->order_status !== 'paid') {
-            return redirect('/')->with('info', 'برای اطلاعات بیشتر با پشتیبانی تماس بگیرید');
+        // کارت به کارت — ریدایرکت به صفحه اصلی با پیام موفقیت
+        if ($order->order_status === 'pending_confirmation') {
+            return redirect('/')->with('success', 'سفارش شما با موفقیت ثبت شد و بعد از تایید ادمین ارسال خواهد شد.');
         }
+
+        if ($order->order_status !== 'paid') {
+            return redirect('/')->with('error', 'برای اطلاعات بیشتر با پشتیبانی تماس بگیرید');
+        }
+
+        // پیام موفقیت پرداخت آنلاین — reflash تا روی صفحه اصلی هم نمایش داده شود
+        session()->reflash();
 
         return view('checkout.success', compact('order'));
     }
