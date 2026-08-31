@@ -542,20 +542,24 @@
                                     </button>
                                 </div>
 
-                                {{-- نمایش فیش آپلود شده --}}
-                                <div id="receiptThumbBadge" class="hidden mt-4 p-3 rounded-2xl flex items-center gap-3" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);">
-                                    <img id="receiptThumbImg" src="" alt="فیش واریزی" class="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-bold" style="color: var(--accent);">فیش واریزی آپلود شد ✓</p>
-                                        <p id="receiptThumbName" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                {{-- نمایش اطلاعات فیش --}}
+                                <div id="receiptInfoBadge" class="hidden mt-4 p-3 rounded-2xl flex items-center gap-3" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: color-mix(in srgb, var(--accent) 12%, transparent);">
+                                        <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
                                     </div>
-                                    <button type="button" onclick="document.getElementById('receiptThumbBadge').classList.add('hidden'); clearReceipt();" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent);">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold" style="color: var(--accent);">اطلاعات واریزی ثبت شد ✓</p>
+                                        <p id="receiptInfoTracking" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                        <p id="receiptInfoCard" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                    </div>
+                                    <button type="button" onclick="document.getElementById('receiptInfoBadge').classList.add('hidden'); clearReceiptInfo();" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent);">
                                         <svg class="w-3.5 h-3.5" style="color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 </div>
 
-                                {{-- hidden input for receipt inside form --}}
-                                <input type="file" name="payment_receipt" accept="image/*" id="receiptInputForm" class="hidden">
+                                {{-- hidden inputs for receipt info inside form --}}
+                                <input type="hidden" name="receipt_tracking_code" id="receiptTrackingCodeForm" value="">
+                                <input type="hidden" name="receipt_payer_card" id="receiptPayerCardForm" value="">
 
                             </form>
                         </div>
@@ -736,20 +740,18 @@
                         <p id="modalCardDesc" class="text-xs leading-relaxed" style="color: var(--text-secondary);"></p>
                     </div>
                     <div>
-                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">عکس فیش واریزی <span class="text-rose-500">*</span></label>
-                        <div id="receiptDropzone" class="relative border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer" style="border-color: color-mix(in srgb, var(--accent) 20%, transparent); background: color-mix(in srgb, var(--accent) 3%, transparent);" onclick="document.getElementById('receiptInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--accent)'; this.style.background='color-mix(in srgb, var(--accent) 8%, transparent)'" ondragleave="this.style.borderColor=''; this.style.background='';" ondrop="event.preventDefault(); this.style.borderColor=''; this.style.background=''; handleReceiptDrop(event)">
-                            <div id="receiptPlaceholder">
-                                <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--accent); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                                <p class="text-xs font-bold" style="color: var(--text-secondary);">کلیک کنید یا فایل را بکشید</p>
-                                <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.7;">jpg, png, webp — حداکثر ۲ مگابایت</p>
-                            </div>
-                            <div id="receiptPreview" class="hidden">
-                                <img id="receiptPreviewImg" class="max-h-32 mx-auto rounded-xl shadow-sm">
-                                <p id="receiptFileName" class="text-xs mt-2 font-bold" style="color: var(--accent);"></p>
-                                <button type="button" onclick="event.stopPropagation(); clearReceipt()" class="mt-2 text-xs px-3 py-1 rounded-lg transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent); color: #ef4444;">حذف تصویر</button>
-                            </div>
-                        </div>
-                        <input type="file" accept="image/*" id="receiptInput" class="hidden" onchange="syncReceiptToForm(this)">
+                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">کد پیگیری واریزی <span class="text-rose-500">*</span></label>
+                        <input type="text" id="receiptTrackingCode" inputmode="numeric" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰"
+                               class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
+                        <input type="text" id="receiptPayerCard" inputmode="numeric" placeholder="مثلاً: 6037-xxxx-xxxx-xxxx"
+                               class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr">
                     </div>
                 </div>
                 <div class="px-6 pb-6">
@@ -1154,15 +1156,15 @@
                     if (cardHolder) { holderRow.style.display = ''; document.getElementById('modalCardHolder').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
                     if (cardDesc) { descRow.style.display = ''; document.getElementById('modalCardDesc').textContent = cardDesc; } else { descRow.style.display = 'none'; }
 
-                    clearReceipt();
+                    clearReceiptInfo();
                     document.getElementById('cardToCardModal').classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                     document.body.classList.add('page-blur-active');
                 } else {
-                    var receiptInput = document.getElementById('receiptInput');
-                    var formInput = document.getElementById('receiptInputForm');
-                    if (receiptInput) { receiptInput.required = false; receiptInput.value = ''; }
-                    if (formInput) { formInput.required = false; formInput.value = ''; }
+                    var formTrackingInput = document.getElementById('receiptTrackingCodeForm');
+                    var formCardInput = document.getElementById('receiptPayerCardForm');
+                    if (formTrackingInput) formTrackingInput.value = '';
+                    if (formCardInput) formCardInput.value = '';
                 }
             }
             var payBtn = document.getElementById('payBtn');
@@ -1176,75 +1178,45 @@
         };
 
         window.confirmCardToCard = function() {
-            var receiptInput = document.getElementById('receiptInput');
-            var formInput = document.getElementById('receiptInputForm');
-            if (!receiptInput.files || !receiptInput.files[0]) {
-                var dz = document.getElementById('receiptDropzone');
-                dz.style.animation = 'none'; dz.offsetHeight;
-                dz.style.animation = 'shake 0.4s ease';
-                dz.style.borderColor = '#ef4444';
-                setTimeout(function() { dz.style.borderColor = ''; }, 1500);
+            var trackingInput = document.getElementById('receiptTrackingCode');
+            var trackingVal = trackingInput ? trackingInput.value.trim() : '';
+
+            if (!trackingVal) {
+                trackingInput.style.borderColor = '#ef4444';
+                trackingInput.style.animation = 'none'; trackingInput.offsetHeight;
+                trackingInput.style.animation = 'shake 0.4s ease';
+                setTimeout(function() { trackingInput.style.borderColor = ''; }, 1500);
                 return;
             }
-            formInput.required = true;
-            // Show receipt thumbnail on the page
-            var thumbBadge = document.getElementById('receiptThumbBadge');
-            var thumbImg = document.getElementById('receiptThumbImg');
-            var thumbName = document.getElementById('receiptThumbName');
-            if (thumbBadge && receiptInput.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    thumbImg.src = e.target.result;
-                    thumbName.textContent = receiptInput.files[0].name;
-                    thumbBadge.classList.remove('hidden');
-                };
-                reader.readAsDataURL(receiptInput.files[0]);
-            }
+
+            var cardInput = document.getElementById('receiptPayerCard');
+            var cardVal = cardInput ? cardInput.value.trim() : '';
+
+            // Set hidden form values
+            document.getElementById('receiptTrackingCodeForm').value = trackingVal;
+            document.getElementById('receiptPayerCardForm').value = cardVal;
+
+            // Show info badge on the page
+            var badge = document.getElementById('receiptInfoBadge');
+            var trackingEl = document.getElementById('receiptInfoTracking');
+            var cardEl = document.getElementById('receiptInfoCard');
+            if (trackingEl) trackingEl.textContent = 'کد پیگیری: ' + (window.localizeDigits ? window.localizeDigits.convert(trackingVal) : trackingVal);
+            if (cardEl) cardEl.textContent = cardVal ? 'کارت واریزکننده: ' + (window.localizeDigits ? window.localizeDigits.convert(cardVal) : cardVal) : '';
+            if (cardEl && !cardVal) cardEl.style.display = 'none'; else if (cardEl) cardEl.style.display = '';
+            if (badge) badge.classList.remove('hidden');
+
             closeCardToCardModal();
         };
 
-        window.previewReceipt = function(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('receiptPreviewImg').src = e.target.result;
-                    document.getElementById('receiptFileName').textContent = input.files[0].name;
-                    document.getElementById('receiptPlaceholder').classList.add('hidden');
-                    document.getElementById('receiptPreview').classList.remove('hidden');
-                    document.getElementById('receiptDropzone').style.borderColor = 'var(--accent)';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        };
-
-        window.syncReceiptToForm = function(modalInput) {
-            previewReceipt(modalInput);
-            // Sync file to form's hidden input using DataTransfer
-            var formInput = document.getElementById('receiptInputForm');
-            if (modalInput.files && modalInput.files[0] && window.DataTransfer) {
-                var dt = new DataTransfer();
-                dt.items.add(modalInput.files[0]);
-                formInput.files = dt.files;
-            }
-        };
-
-        window.clearReceipt = function() {
-            var input = document.getElementById('receiptInput');
-            if (input) input.value = '';
-            var formInput = document.getElementById('receiptInputForm');
-            if (formInput) formInput.value = '';
-            document.getElementById('receiptPlaceholder').classList.remove('hidden');
-            document.getElementById('receiptPreview').classList.add('hidden');
-            document.getElementById('receiptDropzone').style.borderColor = '';
-        };
-
-        window.handleReceiptDrop = function(e) {
-            var files = e.dataTransfer.files;
-            if (files && files[0]) {
-                var input = document.getElementById('receiptInput');
-                input.files = files;
-                syncReceiptToForm(input);
-            }
+        window.clearReceiptInfo = function() {
+            var trackingInput = document.getElementById('receiptTrackingCode');
+            var cardInput = document.getElementById('receiptPayerCard');
+            var formTracking = document.getElementById('receiptTrackingCodeForm');
+            var formCard = document.getElementById('receiptPayerCardForm');
+            if (trackingInput) trackingInput.value = '';
+            if (cardInput) cardInput.value = '';
+            if (formTracking) formTracking.value = '';
+            if (formCard) formCard.value = '';
         };
 
         window.copyCardNumber = function() {

@@ -8,7 +8,6 @@ use App\Models\Discount;
 use App\Models\Order;
 use App\Models\State;
 use App\Services\AddressService;
-use App\Helpers\ImageHandler;
 use App\Services\CartService;
 use App\Services\CityService;
 use App\Services\ShippingCalculator;
@@ -167,20 +166,24 @@ class CheckoutController extends Controller
         $bankId = $request->get('bank_id');
         $userDescription = $request->get('user_description');
 
-        // Upload receipt image safely
-        $paymentReceipt = null;
-        $file = $request->file('payment_receipt');
-        if ($file && $file->isValid() && $file->getSize() > 0) {
-            $request->validate([
-                'bank_id' => 'required|exists:banks,id',
-                'payment_receipt' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
-            ]);
-            $paymentReceipt = ImageHandler::handle('receipts', $file);
-        } else {
-            $request->validate([
-                'bank_id' => 'required|exists:banks,id',
-            ]);
+        // اطلاعات فیش واریزی (کارت به کارت)
+        $receiptTrackingCode = $request->get('receipt_tracking_code');
+        $receiptPayerCard = $request->get('receipt_payer_card');
+
+        $bank = \App\Models\Bank::find($bankId);
+        $isCardToCard = $bank && $bank->bank_type === 'card_to_card';
+
+        $rules = [
+            'bank_id' => 'required|exists:banks,id',
+        ];
+        $messages = [];
+
+        if ($isCardToCard) {
+            $rules['receipt_tracking_code'] = 'required|string|max:255';
+            $messages['receipt_tracking_code.required'] = 'کد پیگیری واریزی الزامی است.';
         }
+
+        $request->validate($rules, $messages);
 
         $addressId = session('checkout_address_id');
         $shippingMethodId = session('checkout_shipping_method_id');
@@ -210,7 +213,8 @@ class CheckoutController extends Controller
             'discount_price' => $this->cart->discount(),
             'payment_price' => $this->cart->total() + intval($shippingPrice),
             'freight_balance' => $shippingMethod->freight_balance ?? 0,
-            'payment_receipt' => $paymentReceipt,
+            'receipt_tracking_code' => $isCardToCard ? $receiptTrackingCode : null,
+            'receipt_payer_card' => $isCardToCard && $receiptPayerCard ? $receiptPayerCard : null,
         ];
 
         try {

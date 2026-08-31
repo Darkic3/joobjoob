@@ -37,6 +37,35 @@ class DashboardController extends Controller
         return view('site.dashboard.order-detail', compact('order'));
     }
 
+    /**
+     * ویرایش اطلاعات فیش واریزی (کد پیگیری و شماره کارت) — فقط برای کارت به کارت
+     */
+    public function updateReceipt(Request $request, int $id)
+    {
+        $order = Order::where('user_id', Auth::id())->findOrFail($id);
+
+        // فقط برای سفارش‌های کارت به کارت و فقط در حالت pending_confirmation
+        $isCardToCard = in_array($order->bank?->bank_type ?? '', ['card_to_card', 'card-to-card']);
+        if (! $isCardToCard || $order->order_status !== 'pending_confirmation') {
+            return redirect()->back()->with('error', 'امکان ویرایش اطلاعات فیش برای این سفارش وجود ندارد.');
+        }
+
+        $validated = $request->validate([
+            'receipt_tracking_code' => 'required|string|max:255',
+            'receipt_payer_card' => 'nullable|string|max:255',
+        ], [
+            'receipt_tracking_code.required' => 'کد پیگیری واریزی الزامی است.',
+        ]);
+
+        $order->update([
+            'receipt_tracking_code' => $validated['receipt_tracking_code'],
+            'receipt_payer_card' => $validated['receipt_payer_card'] ?? null,
+        ]);
+
+        return redirect()->route('dashboard.order-detail', $order->id)
+            ->with('success', 'اطلاعات فیش واریزی با موفقیت به‌روزرسانی شد.');
+    }
+
     public function orderFactor(int $id)
     {
         $order = Order::with(['items.product', 'shippingMethod', 'city'])
