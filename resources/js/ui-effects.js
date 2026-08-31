@@ -205,6 +205,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
                     });
+
+                    // نمایش toast جشن افزودن به سبد
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                    }
                 } else {
                     btn.innerHTML = data.message || 'خطا';
                 }
@@ -615,6 +620,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
                 if (btn) { btn.textContent = window.quickViewAddedText || '✓'; }
+
+                // نمایش toast جشن افزودن به سبد
+                if (typeof showToast === 'function' && data && data.success) {
+                    showToast(data.message || 'محصول به سبد خرید اضافه شد', 'cart-add');
+                }
+
                 setTimeout(function () { if (btn) { btn.disabled = false; btn.textContent = original; } }, 1200);
             })
             .catch(function () {

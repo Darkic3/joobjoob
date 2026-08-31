@@ -89,6 +89,8 @@
 
 <x-social-proof-toast/>
 
+<x-toast/>
+
 {{--@include('layouts.site._partials.scripts')--}}
 @stack('scripts')
 </body>

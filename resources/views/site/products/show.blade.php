@@ -1079,7 +1079,7 @@
                         });
 
                         if (typeof showToast === 'function') {
-                            showToast(data.message || '{{ __("messages.added_to_cart") }}', 'success');
+                            showToast(data.message || '{{ __("messages.added_to_cart") }}', 'cart-add');
                         }
 
                         if (btn) {
