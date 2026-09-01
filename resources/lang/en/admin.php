@@ -74,6 +74,7 @@ return [
         'roles' => 'Roles & Permissions',
         'users' => 'Users',
         'languages' => 'Languages',
+        'audit_logs' => 'Audit Logs',
         'logout' => 'Logout',
     ],
 

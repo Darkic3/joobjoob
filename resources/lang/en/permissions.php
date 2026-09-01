@@ -19,6 +19,7 @@ return [
         'reviews' => 'Reviews',
         'languages' => 'Languages',
         'contact' => 'Contact messages',
+        'audit_logs' => 'Audit Logs',
     ],
 
     'access' => [
@@ -108,6 +109,10 @@ return [
             'index' => 'View contact messages',
             'show' => 'Read contact message',
             'delete' => 'Delete contact message',
+        ],
+        'audit_logs' => [
+            'index' => 'View audit logs',
+            'show' => 'View audit log details',
         ],
     ],
 ];
