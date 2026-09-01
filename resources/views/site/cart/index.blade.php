@@ -1008,9 +1008,9 @@
         function freeShipProgressBar(orderTotal, priceCeiling) {
             var pct = Math.min(100, Math.round((orderTotal / priceCeiling) * 100));
             return '<div style="margin-top:10px;">' +
-                '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;font-weight:700;">' +
-                    '<span style="color:var(--text-secondary);">' + pct + '%</span>' +
-                    '<span style="color:var(--text-secondary);">' + formatNum(priceCeiling) + ' {{ __("messages.toman") }}</span>' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:10px;font-weight:700;">' +
+                    '<span style="color:var(--text-secondary);">' + formatNum(pct) + '  %</span>' +
+                    '<span style="color:var(--text-secondary);">' + formatNum(priceCeiling) + ' {{ __("messages.toman") }}</span>' +
                 '</div>' +
                 '<div style="width:100%;height:8px;border-radius:99px;background:color-mix(in srgb, var(--text-primary) 8%, transparent);overflow:hidden;">' +
                     '<div class="free-ship-bar-fill" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--success) 80%, var(--accent)));transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);" data-target-width="' + pct + '%"></div>' +
@@ -1130,6 +1130,7 @@
                         '</div><p class="text-sm" style="color: var(--text-secondary);">روش ارسالی یافت نشد.</p></div>';
                 }
                 document.getElementById('shippingMethodsList').innerHTML = html;
+                if (window.localizeDigits) window.localizeDigits.walk(document.getElementById('shippingMethodsList'));
                 document.getElementById('shippingMethodsCard').classList.remove('hidden');
                 // ری‌تریگ انیمیشن
                 var shipCard = document.getElementById('shippingMethodsCard');
@@ -1191,6 +1192,7 @@
                         sidebarInfo.style.color = 'var(--success)';
                         sidebarInfo.innerHTML = savedSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(op) + '</span>');
                         sidebarInfo.style.display = 'flex';
+                        if (window.localizeDigits) window.localizeDigits.walk(sidebarInfo);
                         animateProgressBars();
                     }
                 } else {
@@ -1206,6 +1208,7 @@
                         banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                             '<div>' + remainingTpl.replace('__AMOUNT__', remainingAmount) + freeShipProgressBar(orderTotal, pc) + '</div>';
                         banner.style.display = 'flex';
+                        if (window.localizeDigits) window.localizeDigits.walk(banner);
                         animateProgressBars();
          
                     }
@@ -1217,6 +1220,8 @@
                         sidebarInfo.style.color = 'var(--accent)';
                         sidebarInfo.innerHTML = remainingSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(orderTotal, pc);
                         sidebarInfo.style.display = 'flex';
+                        if (window.localizeDigits) window.localizeDigits.walk(sidebarInfo);
+                        animateProgressBars();
                     }
                 }
             } else {
@@ -1523,6 +1528,7 @@
                         info.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
                         info.style.color = 'var(--success)';
                         info.innerHTML = tpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(selectedOriginalPrice) + '</span>');
+                        if (window.localizeDigits) window.localizeDigits.walk(info);
                         info.style.display = 'flex';
                     } else {
                         var remaining = selectedPriceCeiling - totalWithoutShipping;
@@ -1532,6 +1538,7 @@
                         info.style.color = 'var(--accent)';
                         info.innerHTML = tpl2.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(totalWithoutShipping, selectedPriceCeiling);
                         info.style.display = 'flex';
+                        if (window.localizeDigits) window.localizeDigits.walk(info);
                         animateProgressBars();
                     }
                 } else {
