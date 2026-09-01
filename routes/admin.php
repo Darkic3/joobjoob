@@ -95,6 +95,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('banks', \App\Http\Controllers\Admin\BankController::class);
         Route::post('banks/{bank}/toggle-status', [\App\Http\Controllers\Admin\BankController::class, 'toggleStatus'])->name('banks.toggle-status');
 
+        // ========== مدیریت کدهای تخفیف ==========
+        Route::resource('discounts', \App\Http\Controllers\Admin\DiscountController::class)->except('show');
+        Route::get('discounts/{discount}', [\App\Http\Controllers\Admin\DiscountController::class, 'show'])->name('discounts.show');
+        Route::post('discounts/{discount}/toggle-status', [\App\Http\Controllers\Admin\DiscountController::class, 'toggleStatus'])->name('discounts.toggle-status');
+
         // ========== لاگ حسابرسی ==========
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('audit-logs/{id}', [AuditLogController::class, 'show'])->name('audit-logs.show');

@@ -117,22 +117,10 @@ class CheckoutController extends Controller
             return response()->json(['success' => false, 'message' => 'کد تخفیف را وارد نمایید.']);
         }
 
-        $discount = Discount::where('title', $code)
-            ->whereNull('deleted_at')
-            ->first();
+        $couponService = app(\App\Services\CouponService::class);
+        $result = $couponService->apply($code, $this->cart->subtotal());
 
-        if (! $discount) {
-            return response()->json(['success' => false, 'message' => 'کد تخفیف نامعتبر است.']);
-        }
-
-        // TODO: بررسی اعتبار کامل (تعداد استفاده، حداقل قیمت و ...)
-
-        $this->cart->applyCoupon($code);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'کد تخفیف با موفقیت اعمال شد.',
-        ]);
+        return response()->json($result);
     }
 
     /**
@@ -140,7 +128,8 @@ class CheckoutController extends Controller
      */
     public function removeDiscount(): JsonResponse
     {
-        session()->forget('coupon');
+        $couponService = app(\App\Services\CouponService::class);
+        $couponService->remove();
 
         return response()->json(['success' => true]);
     }

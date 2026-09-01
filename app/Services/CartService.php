@@ -371,17 +371,10 @@ class CartService
 
     public function applyCoupon(string $code): bool
     {
-        $coupons = [
-            'WELCOME10' => ['type' => 'percent', 'value' => 10],
-            'SAVE50000' => ['type' => 'fixed', 'value' => 50000],
-        ];
+        $couponService = app(\App\Services\CouponService::class);
+        $result = $couponService->apply($code, $this->subtotal());
 
-        if (isset($coupons[strtoupper($code)])) {
-            session(['coupon' => array_merge($coupons[strtoupper($code)], ['code' => strtoupper($code)])]);
-            return true;
-        }
-
-        return false;
+        return $result['success'];
     }
 
     public function toArray(): array
