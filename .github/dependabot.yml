@@ -1,0 +1,28 @@
+version: 2
+
+updates:
+  # ── Composer (PHP / Laravel) ───────────────────────────────────────
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: sunday
+    open-pull-requests-limit: 5
+    labels:
+      - php
+      - dependencies
+    commit-message:
+      prefix: "deps"
+
+  # ── npm (Vite / Alpine.js / Tailwind) ─────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: sunday
+    open-pull-requests-limit: 5
+    labels:
+      - javascript
+      - dependencies
+    commit-message:
+      prefix: "deps"
