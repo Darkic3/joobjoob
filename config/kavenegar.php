@@ -20,7 +20,7 @@ return [
     'local_mobile' => env('LOCAL_MOBILE'),
 
     // شماره‌ای که در محیط local پیامک‌های متن آزاد (send/sendarray) به آن ارسال می‌شود
-    'test_number' => env('SMS_TEST_NUMBER', '09123456789'),
+    'test_number' => env('SMS_TEST_NUMBER'),
 
     // مدت اعتبار کد یکبارمصرف (دقیقه)
     'otp_ttl_minutes' => (int) env('OTP_TTL_MINUTES', 2),

@@ -22,7 +22,7 @@ trait HasImageAttributes
             $path = "{$baseUpload}/{$uploadFolder}/{$size}/{$value}";
         }
 
-        if (env('APP_ENV') !== 'local') {
+        if (! app()->environment('local')) {
             $fullPath = base_path('public_html/'.$path);
         } else {
             $fullPath = public_path($path);

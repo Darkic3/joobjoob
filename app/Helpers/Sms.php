@@ -149,7 +149,7 @@ class Sms
      */
     public function sendSms(string $text, string $mobile)
     {
-        $testNumber = config('kavenegar.test_number', '09123456789');
+        $testNumber = config('kavenegar.test_number');
         $message = urlencode($text);
 
         if (app()->environment('local')) {
@@ -197,7 +197,7 @@ class Sms
         $texts = [];
 
         $isLocal = app()->environment('local');
-        $testNumber = config('kavenegar.test_number', '09123456789');
+        $testNumber = config('kavenegar.test_number');
 
         foreach ($messages as $row) {
             $receptors[] = $isLocal ? $testNumber : $row['receptor'];

@@ -5,8 +5,8 @@
 return [
     'owner' => [
         'name' => env('ADMIN_OWNER_NAME', 'مدیر اصلی'),
-        'email' => env('ADMIN_OWNER_EMAIL', 'admin@example.com'),
-        'mobile' => env('ADMIN_OWNER_MOBILE', '09123456789'),
+        'email' => env('ADMIN_OWNER_EMAIL'),
+        'mobile' => env('ADMIN_OWNER_MOBILE'),
         'password' => env('ADMIN_OWNER_PASSWORD'), // null → رمز تصادفی یک‌باره در سیدر
     ],
 ];

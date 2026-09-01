@@ -9,6 +9,9 @@
 .env
 .env.backup
 .env.production
+.env.local
+.env.testing
+.env.staging
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -19,8 +22,13 @@ yarn-error.log
 /.idea
 /.vscode
 /.freebuff
+/.agents
+/documents
 /documents/my-learning-guides
 /documents/features-for-run
 /documents/skill-library
-/.agents
-/documents
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
