@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DiscountRequest;
+use App\Models\Brand;
 use App\Models\Discount;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 
 class DiscountController extends Controller
@@ -38,7 +41,11 @@ class DiscountController extends Controller
      */
     public function create()
     {
-        return view('admin.discounts.create');
+        $categories = ProductCategory::orderBy('name')->get();
+        $brands = Brand::orderBy('id')->get();
+        $products = Product::orderBy('name')->get();
+
+        return view('admin.discounts.create', compact('categories', 'brands', 'products'));
     }
 
     /**
@@ -46,7 +53,9 @@ class DiscountController extends Controller
      */
     public function store(DiscountRequest $request)
     {
-        Discount::create($request->validated());
+        $discount = Discount::create($request->validated());
+
+        $this->syncDiscountable($discount, $request);
 
         return redirect()->route('admin.discounts.index')
             ->with('success', 'کد تخفیف با موفقیت ایجاد شد.');
@@ -64,6 +73,9 @@ class DiscountController extends Controller
             ->take(20)
             ->get();
 
+        // بارگذاری روابط discountable
+        $discount->load(['categories:id,name', 'brands:id,title', 'products:id,name']);
+
         return view('admin.discounts.show', compact('discount', 'recentUsage'));
     }
 
@@ -72,7 +84,13 @@ class DiscountController extends Controller
      */
     public function edit(Discount $discount)
     {
-        return view('admin.discounts.edit', compact('discount'));
+        $discount->load(['categories:id', 'brands:id', 'products:id']);
+
+        $categories = ProductCategory::orderBy('name')->get();
+        $brands = Brand::orderBy('id')->get();
+        $products = Product::orderBy('name')->get();
+
+        return view('admin.discounts.edit', compact('discount', 'categories', 'brands', 'products'));
     }
 
     /**
@@ -81,6 +99,12 @@ class DiscountController extends Controller
     public function update(DiscountRequest $request, Discount $discount)
     {
         $discount->update($request->validated());
+
+        // پاکسازی روابط قبلی و ذخیره جدید
+        $discount->categories()->detach();
+        $discount->brands()->detach();
+        $discount->products()->detach();
+        $this->syncDiscountable($discount, $request);
 
         return redirect()->route('admin.discounts.index')
             ->with('success', 'کد تخفیف با موفقیت به‌روزرسانی شد.');
@@ -108,5 +132,25 @@ class DiscountController extends Controller
             'success' => true,
             'is_active' => $discount->is_active,
         ]);
+    }
+
+    /**
+     * همگام‌سازی روابط polymorphic discountable
+     */
+    private function syncDiscountable(Discount $discount, DiscountRequest $request): void
+    {
+        $payType = $request->input('pay_type');
+        $ids = $request->input('discountable_ids', []);
+
+        if (empty($payType) || empty($ids)) {
+            return;
+        }
+
+        match ($payType) {
+            'category' => $discount->categories()->syncWithoutDetaching($ids),
+            'brand' => $discount->brands()->syncWithoutDetaching($ids),
+            'product' => $discount->products()->syncWithoutDetaching($ids),
+            default => null,
+        };
     }
 }

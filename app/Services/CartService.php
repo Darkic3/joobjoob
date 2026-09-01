@@ -343,9 +343,9 @@ class CartService
             return 0;
         }
 
-        return $coupon['type'] === 'percent'
-            ? $this->subtotal() * ($coupon['value'] / 100)
-            : min($coupon['value'], $this->subtotal());
+        $couponService = app(CouponService::class);
+
+        return $couponService->calculateForCart($this);
     }
 
     public function total(): float

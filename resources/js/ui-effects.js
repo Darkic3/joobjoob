@@ -109,12 +109,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // توابع تایمر روی window قرار می‌گیرند تا اسکریپت‌های inline داخل Blade (کامپوننت countdown-timer)
 // بتوانند آن‌ها را صدا بزنند — وگرنه Vite/Rollup آن‌ها را به‌عنوان کد استفاده‌نشده حذف می‌کند (tree-shake).
-window.startCountdown = function (elIds, totalSeconds) {
+window.startCountdown = function (elIds, totalSeconds, localizeFn) {
     // ارقام بر اساس زبان سایت: فارسی/عربی → ۰۱۲۳، سایر → 0123
     function toLocal(n) {
         var s = String(n).padStart(2, '0');
-        if (window.localizeDigits && window.localizeDigits.isPersian()) {
-            s = s.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        if (localizeFn) {
+            return localizeFn(n);
+        }
+        if (window.localizeDigits) {
+            s = window.localizeDigits.convert(s);
         }
         return s;
     }
@@ -130,12 +133,15 @@ window.startCountdown = function (elIds, totalSeconds) {
 
 // تایمر دقیق: زمان پایان (میلی‌ثانیه) را می‌گیرد و هر ثانیه از روی Date.now() محاسبه می‌کند —
 // اگر صفحه مدت‌ها باز بماند هم دقیق می‌ماند و بعد از پایان روی ۰۰:۰۰:۰۰ می‌ایستد.
-window.startCountdownTo = function (elIds, endMs) {
+window.startCountdownTo = function (elIds, endMs, localizeFn) {
     // ارقام بر اساس زبان سایت: فارسی/عربی → ۰۱۲۳، سایر → 0123
     function toLocal(n) {
         var s = String(n).padStart(2, '0');
-        if (window.localizeDigits && window.localizeDigits.isPersian()) {
-            s = s.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        if (localizeFn) {
+            return localizeFn(n);
+        }
+        if (window.localizeDigits) {
+            s = window.localizeDigits.convert(s);
         }
         return s;
     }

@@ -45,12 +45,7 @@ class Discount extends Model
         return $this->hasMany(DiscountUsage::class);
     }
 
-    public function discountable(): MorphToMany
-    {
-        return $this->morphedByMany(ProductCategory::class, 'discountable', 'discountable');
-    }
-
-    public function productCategories(): MorphToMany
+    public function categories(): MorphToMany
     {
         return $this->morphedByMany(ProductCategory::class, 'discountable', 'discountable');
     }
@@ -58,6 +53,19 @@ class Discount extends Model
     public function brands(): MorphToMany
     {
         return $this->morphedByMany(Brand::class, 'discountable', 'discountable');
+    }
+
+    public function products(): MorphToMany
+    {
+        return $this->morphedByMany(Product::class, 'discountable', 'discountable');
+    }
+
+    /**
+     * Backward-compatible alias used by seeder & old references.
+     */
+    public function discountable(): MorphToMany
+    {
+        return $this->categories();
     }
 
     // ── Accessors ──
@@ -134,17 +142,61 @@ class Discount extends Model
     }
 
     /**
-     * محاسبه مبلغ تخفیف بر اساس مبلغ سبد خرید
+     * آیا روی محصولات تخفیف‌دار اعمال می‌شود؟
      */
-    public function calculateDiscount(float $subtotal): float
+    public function appliesToDiscountedItems(): bool
+    {
+        return (bool) $this->with_discount;
+    }
+
+    /**
+     * آیا محدود به دسته/برند/محصول خاصی است؟
+     */
+    public function hasPayTypeRestriction(): bool
+    {
+        return ! empty($this->pay_type);
+    }
+
+    /**
+     * آیا آیتم سبد خرید مشمول این تخفیف است؟
+     *
+     * @param array $item  ردیف سبد خرید (product_id, variant_id, …)
+     */
+    public function isEligibleCartItem(array $item): bool
+    {
+        if (! $this->hasPayTypeRestriction()) {
+            return true;
+        }
+
+        $productId = $item['product_id'] ?? null;
+        if (! $productId) {
+            return false;
+        }
+
+        $product = Product::with('category', 'brand')->find($productId);
+        if (! $product) {
+            return false;
+        }
+
+        return match ($this->pay_type) {
+            'category' => $product->product_category_id && $this->categories()->where('product_categories.id', $product->product_category_id)->exists(),
+            'brand' => $product->brand_id && $this->brands()->where('brands.id', $product->brand_id)->exists(),
+            'product' => $this->products()->where('products.id', $productId)->exists(),
+            default => true,
+        };
+    }
+
+    /**
+     * محاسبه مبلغ تخفیف روی مبلغ مشخص (بدون بررسی eligibility).
+     */
+    public function calculateDiscount(float $amount): float
     {
         if ($this->type === 'percent') {
-            $discount = $subtotal * ((float) $this->amount / 100);
+            $discount = $amount * ((float) $this->amount / 100);
         } else {
             $discount = (float) $this->amount;
         }
 
-        // تخفیف نباید از مبلغ سبد بیشتر شود
-        return min($discount, $subtotal);
+        return min($discount, $amount);
     }
 }

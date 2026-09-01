@@ -196,6 +196,7 @@ class CheckoutController extends Controller
             'freight_balance' => $shippingMethod->freight_balance ?? 0,
             'receipt_tracking_code' => $isCardToCard ? $receiptTrackingCode : null,
             'receipt_payer_card' => $isCardToCard && $receiptPayerCard ? $receiptPayerCard : null,
+            'discount_id' => session('coupon.discount_id'),
         ];
 
         try {
@@ -207,6 +208,18 @@ class CheckoutController extends Controller
             );
 
             $result = $orderService->checkout($order);
+
+            // ثبت استفاده از کد تخفیف
+            $couponSession = session('coupon');
+            if ($order->discount_id && $couponSession) {
+                $couponService = app(\App\Services\CouponService::class);
+                $couponService->recordUsage(
+                    $order->discount_id,
+                    auth()->id(),
+                    $order->id,
+                    $couponSession['discount_amount'] ?? $order->discount_price
+                );
+            }
 
             // پاکسازی سبد
             $this->cart->clear();

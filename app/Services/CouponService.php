@@ -72,6 +72,8 @@ class CouponService
                 'value' => (float) $discount->amount,
                 'discount_amount' => $discountAmount,
                 'title' => $discount->title,
+                'with_discount' => $discount->appliesToDiscountedItems(),
+                'pay_type' => $discount->pay_type,
             ],
         ]);
 
@@ -117,6 +119,58 @@ class CouponService
         }
 
         return min($coupon['value'], $subtotal);
+    }
+
+    /**
+     * محاسبه تخفیف هوشمند بر اساس آیتم‌های سبد
+     *
+     * با در نظر گرفتن pay_type و with_discount
+     */
+    public function calculateForCart(CartService $cart): float
+    {
+        $coupon = $this->current();
+
+        if (! $coupon) {
+            return 0;
+        }
+
+        $discount = Discount::find($coupon['discount_id'] ?? null);
+        $withDiscount = $discount?->appliesToDiscountedItems() ?? true;
+
+        // اگر تخفیف pay_type ندارد و روی محصولات تخفیف‌دار هم اعمال می‌شود
+        // → محاسبه ساده روی کل سبد
+        if (empty($coupon['pay_type']) && $withDiscount) {
+            return $this->calculate($cart->subtotal());
+        }
+
+        if (! $discount) {
+            return $this->calculate($cart->subtotal());
+        }
+
+        $totalDiscount = 0.0;
+
+        foreach ($cart->content() as $item) {
+            $itemPrice = ($item['price'] ?? 0);
+            $itemQty = ($item['qty'] ?? 1);
+            $itemTotal = $itemPrice * $itemQty;
+
+            // اگر محصول تخفیف‌دار است و coupon روی محصولات تخفیف‌دار اعمال نمی‌شود
+            $originalPrice = $item['original_price'] ?? $itemPrice;
+            $isDiscountedProduct = $originalPrice > $itemPrice && $originalPrice > 0;
+
+            if ($isDiscountedProduct && ! $discount->appliesToDiscountedItems()) {
+                continue;
+            }
+
+            // بررسی eligibility بر اساس pay_type
+            if (! $discount->isEligibleCartItem((array) $item)) {
+                continue;
+            }
+
+            $totalDiscount += $discount->calculateDiscount($itemTotal);
+        }
+
+        return min($totalDiscount, $cart->subtotal());
     }
 
     /**

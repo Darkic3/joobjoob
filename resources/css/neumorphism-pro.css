@@ -1243,6 +1243,8 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    direction: ltr;
+    unicode-bidi: isolate;
 }
 .cd-unit {
     display: flex;
