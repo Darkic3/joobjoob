@@ -61,7 +61,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div class="lg:col-span-2 space-y-3">
                         @foreach($items as $item)
-                            <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group">
+                            <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group {{ empty($item['is_in_stock']) ? 'opacity-50 grayscale pointer-events-none' : '' }}">
                                 <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
                                    class="shrink-0 block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden neu-flat-sm relative">
                                      <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="{{ $item['name'] }}"
@@ -348,6 +348,7 @@
                                 </div>
                                 روش ارسال
                             </h2>
+                            <div id="step2-free-ship-banner" class="hidden" style="display: none !important;"></div>
                             <div id="shippingMethodsList"></div>
                         </div>
                     </div>
@@ -378,6 +379,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step2-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step2-free-ship-info" class="hidden rounded-xl p-3 text-xs font-bold" style="display: none !important;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -457,6 +459,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step3-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step3-free-ship-info" class="rounded-xl p-3 text-xs font-bold" style="display: none;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -542,20 +545,24 @@
                                     </button>
                                 </div>
 
-                                {{-- نمایش فیش آپلود شده --}}
-                                <div id="receiptThumbBadge" class="hidden mt-4 p-3 rounded-2xl flex items-center gap-3" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);">
-                                    <img id="receiptThumbImg" src="" alt="فیش واریزی" class="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-bold" style="color: var(--accent);">فیش واریزی آپلود شد ✓</p>
-                                        <p id="receiptThumbName" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                {{-- نمایش اطلاعات فیش --}}
+                                <div id="receiptInfoBadge" class="hidden mt-4 p-3 rounded-2xl flex items-center gap-3" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: color-mix(in srgb, var(--accent) 12%, transparent);">
+                                        <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
                                     </div>
-                                    <button type="button" onclick="document.getElementById('receiptThumbBadge').classList.add('hidden'); clearReceipt();" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent);">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold" style="color: var(--accent);">اطلاعات واریزی ثبت شد ✓</p>
+                                        <p id="receiptInfoTracking" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                        <p id="receiptInfoCard" class="text-[10px] mt-0.5 truncate" style="color: var(--text-secondary);"></p>
+                                    </div>
+                                    <button type="button" onclick="document.getElementById('receiptInfoBadge').classList.add('hidden'); clearReceiptInfo();" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent);">
                                         <svg class="w-3.5 h-3.5" style="color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 </div>
 
-                                {{-- hidden input for receipt inside form --}}
-                                <input type="file" name="payment_receipt" accept="image/*" id="receiptInputForm" class="hidden">
+                                {{-- hidden inputs for receipt info inside form --}}
+                                <input type="hidden" name="receipt_tracking_code" id="receiptTrackingCodeForm" value="">
+                                <input type="hidden" name="receipt_payer_card" id="receiptPayerCardForm" value="">
 
                             </form>
                         </div>
@@ -684,6 +691,7 @@
                                     <span style="color: var(--text-secondary);">هزینه ارسال</span>
                                     <span id="step4-shipping-price" class="mono font-bold" dir="ltr">۰</span>
                                 </div>
+                                <div id="step4-free-ship-info" class="rounded-xl p-3 text-xs font-bold" style="display: none;"></div>
                             </div>
                             <div class="border-t pt-4 flex items-center justify-between mb-6"
                                  style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
@@ -736,20 +744,18 @@
                         <p id="modalCardDesc" class="text-xs leading-relaxed" style="color: var(--text-secondary);"></p>
                     </div>
                     <div>
-                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">عکس فیش واریزی <span class="text-rose-500">*</span></label>
-                        <div id="receiptDropzone" class="relative border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer" style="border-color: color-mix(in srgb, var(--accent) 20%, transparent); background: color-mix(in srgb, var(--accent) 3%, transparent);" onclick="document.getElementById('receiptInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--accent)'; this.style.background='color-mix(in srgb, var(--accent) 8%, transparent)'" ondragleave="this.style.borderColor=''; this.style.background='';" ondrop="event.preventDefault(); this.style.borderColor=''; this.style.background=''; handleReceiptDrop(event)">
-                            <div id="receiptPlaceholder">
-                                <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--accent); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                                <p class="text-xs font-bold" style="color: var(--text-secondary);">کلیک کنید یا فایل را بکشید</p>
-                                <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.7;">jpg, png, webp — حداکثر ۲ مگابایت</p>
-                            </div>
-                            <div id="receiptPreview" class="hidden">
-                                <img id="receiptPreviewImg" class="max-h-32 mx-auto rounded-xl shadow-sm">
-                                <p id="receiptFileName" class="text-xs mt-2 font-bold" style="color: var(--accent);"></p>
-                                <button type="button" onclick="event.stopPropagation(); clearReceipt()" class="mt-2 text-xs px-3 py-1 rounded-lg transition-colors" style="background: color-mix(in srgb, #ef4444 10%, transparent); color: #ef4444;">حذف تصویر</button>
-                            </div>
-                        </div>
-                        <input type="file" accept="image/*" id="receiptInput" class="hidden" onchange="syncReceiptToForm(this)">
+                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">کد پیگیری واریزی <span class="text-rose-500">*</span></label>
+                        <input type="text" id="receiptTrackingCode" inputmode="numeric" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰"
+                               class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
+                        <input type="text" id="receiptPayerCard" inputmode="numeric" placeholder="مثلاً: 6037-xxxx-xxxx-xxxx"
+                               class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr">
                     </div>
                 </div>
                 <div class="px-6 pb-6">
@@ -960,6 +966,8 @@
         var selectedBankId = null;
         var selectedShippingFreightBalance = 0;
         var shippingPrice = 0;
+        var selectedPriceCeiling = 0;
+        var selectedOriginalPrice = 0;
         var subtotal = {{ $cart->subtotal() }};
         var discount = {{ $cart->discount() }};
         var totalWithoutShipping = {{ $cart->total() }};
@@ -972,12 +980,34 @@
             applyDiscount: '{{ localizedRoute("checkout.apply-discount") }}',
             removeDiscount: '{{ localizedRoute("checkout.remove-discount") }}',
             orderPrice: '{{ localizedRoute("checkout.order-price") }}',
+            validateStock: '{{ localizedRoute("checkout.validate-stock") }}',
         };
 
         var csrfToken = function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
 
         function formatNum(n) {
             return new Intl.NumberFormat(document.documentElement.lang === 'fa' || document.documentElement.lang === 'ar' ? 'fa-IR' : 'en-US').format(n);
+        }
+
+        function freeShipProgressBar(orderTotal, priceCeiling) {
+            var pct = Math.min(100, Math.round((orderTotal / priceCeiling) * 100));
+            return '<div style="margin-top:10px;">' +
+                '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;font-weight:700;">' +
+                    '<span style="color:var(--text-secondary);">' + pct + '%</span>' +
+                    '<span style="color:var(--text-secondary);">' + formatNum(priceCeiling) + ' {{ __("messages.toman") }}</span>' +
+                '</div>' +
+                '<div style="width:100%;height:8px;border-radius:99px;background:color-mix(in srgb, var(--text-primary) 8%, transparent);overflow:hidden;">' +
+                    '<div class="free-ship-bar-fill" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--success) 80%, var(--accent)));transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);" data-target-width="' + pct + '%"></div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function animateProgressBars() {
+            requestAnimationFrame(function() {
+                document.querySelectorAll('.free-ship-bar-fill').forEach(function(bar) {
+                    bar.style.width = bar.getAttribute('data-target-width');
+                });
+            });
         }
 
         window.goToStep = function(step) {
@@ -1015,6 +1045,12 @@
             selectedShippingMethodId = null;
             shippingPrice = 0;
 
+            // مخفی کردن بنر و اطلاعات سقف رایگان (تا روش ارسال انتخاب نشده نمایش داده نشه)
+            var b = document.getElementById('step2-free-ship-banner');
+            if (b) b.style.display = 'none';
+            var s = document.getElementById('step2-free-ship-info');
+            if (s) s.style.display = 'none';
+
             document.querySelectorAll('.address-card').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-address-id="' + addressId + '"]');
             if (card) card.classList.add('selected');
@@ -1036,12 +1072,24 @@
                     data.shipping_methods.forEach(function(method) {
                         var priceText = method.price === 'dynamic' ? 'قیمت لحظه‌ای' : (method.price > 0 ? formatNum(method.price) + ' {{ __("messages.toman") }}' : (method.freight_balance == 1 ? '{{ __("messages.trust_cod_shipping") }}' : '{{ __("messages.trust_free_shipping") }}'));
                         var priceVal = method.price === 'dynamic' ? 0 : parseInt(method.price);
+                        var priceCeiling = parseInt(method.price_ceiling) || 0;
+                        var originalPrice = parseInt(method.original_price) || 0;
                         var icon = method.type === 'with_weight'
                             ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>'
                             : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.958m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+                        // نمایش برچسب سقف رایگان در کنار روش ارسال
+                        var freeShipBadge = '';
+                        var freeShipAboveTpl = '{{ __("messages.free_shipping_above", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        if (priceCeiling > 0 && method.freight_balance != 1) {
+                            freeShipBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style="background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success);">' +
+                                freeShipAboveTpl.replace('__AMOUNT__', formatNum(priceCeiling)) + '</span>';
+                        }
+
                         html += '<div class="shipping-option neu-flat-sm p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-2.5" ' +
                             'data-method-id="' + method.id + '" data-price="' + priceVal + '" ' +
-                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ', ' + (method.freight_balance || 0) + ')">' +
+                            'data-price-ceiling="' + priceCeiling + '" data-original-price="' + originalPrice + '" ' +
+                            'data-freight-balance="' + (method.freight_balance || 0) + '" ' +
+                            'onclick="selectShipping(' + method.id + ', ' + priceVal + ', ' + (method.freight_balance || 0) + ', ' + priceCeiling + ', ' + originalPrice + ')">' +
                             '<div class="flex items-center justify-between">' +
                             '<div class="flex items-center gap-3">' +
                             '<div class="shipping-radio w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300" ' +
@@ -1053,7 +1101,7 @@
                             '<p class="text-[11px]" style="color: var(--text-secondary);">' +
                             (method.type === 'with_weight' ? 'بر اساس وزن' : method.type === 'fixed_price' ? 'قیمت ثابت' : '') +
                             (method.show_estimated_days && method.estimated_days_min ? ' · ' + method.estimated_days_min + ' تا ' + method.estimated_days_max + ' روز کاری' : '') +
-                            '</p></div>' +
+                            '</p>' + freeShipBadge + '</div>' +
                             '</div>' +
                             '</div>' +
                             '<span class="text-sm mono font-bold" style="color: var(--accent);" dir="ltr">' + priceText + '</span>' +
@@ -1076,10 +1124,14 @@
         };
 
         // ========== انتخاب روش ارسال ==========
-        window.selectShipping = function(methodId, price, freightBalance) {
+        window.selectShipping = function(methodId, price, freightBalance, priceCeiling, originalPrice) {
             selectedShippingMethodId = methodId;
             selectedShippingFreightBalance = freightBalance || 0;
             shippingPrice = parseInt(price) || 0;
+            selectedPriceCeiling = parseInt(priceCeiling) || 0;
+            selectedOriginalPrice = parseInt(originalPrice) || 0;
+            var pc = parseInt(priceCeiling) || 0;
+            var op = parseInt(originalPrice) || 0;
 
             document.querySelectorAll('.shipping-option').forEach(function(c) { c.classList.remove('selected'); });
             var card = document.querySelector('[data-method-id="' + methodId + '"]');
@@ -1095,6 +1147,66 @@
                 },
                 body: JSON.stringify({ shipping_method_id: methodId, shipping_price: price })
             });
+
+            // نمایش پیام سقف رایگان + به‌روزرسانی باکس خلاصه
+            var banner = document.getElementById('step2-free-ship-banner');
+            var sidebarInfo = document.getElementById('step2-free-ship-info');
+            var orderTotal = totalWithoutShipping;
+
+            if (pc > 0 && freightBalance != 1) {
+                if (orderTotal >= pc) {
+                    // ارسال رایگان شده — سود کردیم
+                    var savedTpl = '{{ __("messages.free_shipping_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    var savedAmount = '<span class="mono" dir="ltr">' + formatNum(op) + '</span>';
+
+                    if (banner) {
+                        banner.className = 'flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold mb-2.5';
+                        banner.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        banner.style.color = 'var(--success)';
+                        banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+                            '<div>' + savedTpl.replace('__AMOUNT__', savedAmount) + '</div>';
+                        banner.style.display = 'flex';
+                    }
+                    // باکس خلاصه سفارش
+                    var savedSidebarTpl = '{{ __("messages.free_shipping_sidebar_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    if (sidebarInfo) {
+                        sidebarInfo.className = 'rounded-xl p-3 text-xs font-bold';
+                        sidebarInfo.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        sidebarInfo.style.color = 'var(--success)';
+                        sidebarInfo.innerHTML = savedSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(op) + '</span>');
+                        sidebarInfo.style.display = 'flex';
+                        animateProgressBars();
+                    }
+                } else {
+                    // هنوز به سقف نرسیده
+                    var remaining = pc - orderTotal;
+                    var remainingTpl = '{{ __("messages.free_shipping_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    var remainingAmount = '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>';
+
+                    if (banner) {
+                        banner.className = 'flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold mb-2.5';
+                        banner.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        banner.style.color = 'var(--accent)';
+                        banner.innerHTML = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+                            '<div>' + remainingTpl.replace('__AMOUNT__', remainingAmount) + freeShipProgressBar(orderTotal, pc) + '</div>';
+                        banner.style.display = 'flex';
+                        animateProgressBars();
+         
+                    }
+                    // باکس خلاصه سفارش
+                    var remainingSidebarTpl = '{{ __("messages.free_shipping_sidebar_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                    if (sidebarInfo) {
+                        sidebarInfo.className = 'rounded-xl p-3 text-xs font-bold';
+                        sidebarInfo.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        sidebarInfo.style.color = 'var(--accent)';
+                        sidebarInfo.innerHTML = remainingSidebarTpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(orderTotal, pc);
+                        sidebarInfo.style.display = 'flex';
+                    }
+                }
+            } else {
+                if (banner) banner.style.display = 'none';
+                if (sidebarInfo) sidebarInfo.style.display = 'none';
+            }
 
             updateStep2Price();
         };
@@ -1154,15 +1266,15 @@
                     if (cardHolder) { holderRow.style.display = ''; document.getElementById('modalCardHolder').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
                     if (cardDesc) { descRow.style.display = ''; document.getElementById('modalCardDesc').textContent = cardDesc; } else { descRow.style.display = 'none'; }
 
-                    clearReceipt();
+                    clearReceiptInfo();
                     document.getElementById('cardToCardModal').classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                     document.body.classList.add('page-blur-active');
                 } else {
-                    var receiptInput = document.getElementById('receiptInput');
-                    var formInput = document.getElementById('receiptInputForm');
-                    if (receiptInput) { receiptInput.required = false; receiptInput.value = ''; }
-                    if (formInput) { formInput.required = false; formInput.value = ''; }
+                    var formTrackingInput = document.getElementById('receiptTrackingCodeForm');
+                    var formCardInput = document.getElementById('receiptPayerCardForm');
+                    if (formTrackingInput) formTrackingInput.value = '';
+                    if (formCardInput) formCardInput.value = '';
                 }
             }
             var payBtn = document.getElementById('payBtn');
@@ -1176,75 +1288,45 @@
         };
 
         window.confirmCardToCard = function() {
-            var receiptInput = document.getElementById('receiptInput');
-            var formInput = document.getElementById('receiptInputForm');
-            if (!receiptInput.files || !receiptInput.files[0]) {
-                var dz = document.getElementById('receiptDropzone');
-                dz.style.animation = 'none'; dz.offsetHeight;
-                dz.style.animation = 'shake 0.4s ease';
-                dz.style.borderColor = '#ef4444';
-                setTimeout(function() { dz.style.borderColor = ''; }, 1500);
+            var trackingInput = document.getElementById('receiptTrackingCode');
+            var trackingVal = trackingInput ? trackingInput.value.trim() : '';
+
+            if (!trackingVal) {
+                trackingInput.style.borderColor = '#ef4444';
+                trackingInput.style.animation = 'none'; trackingInput.offsetHeight;
+                trackingInput.style.animation = 'shake 0.4s ease';
+                setTimeout(function() { trackingInput.style.borderColor = ''; }, 1500);
                 return;
             }
-            formInput.required = true;
-            // Show receipt thumbnail on the page
-            var thumbBadge = document.getElementById('receiptThumbBadge');
-            var thumbImg = document.getElementById('receiptThumbImg');
-            var thumbName = document.getElementById('receiptThumbName');
-            if (thumbBadge && receiptInput.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    thumbImg.src = e.target.result;
-                    thumbName.textContent = receiptInput.files[0].name;
-                    thumbBadge.classList.remove('hidden');
-                };
-                reader.readAsDataURL(receiptInput.files[0]);
-            }
+
+            var cardInput = document.getElementById('receiptPayerCard');
+            var cardVal = cardInput ? cardInput.value.trim() : '';
+
+            // Set hidden form values
+            document.getElementById('receiptTrackingCodeForm').value = trackingVal;
+            document.getElementById('receiptPayerCardForm').value = cardVal;
+
+            // Show info badge on the page
+            var badge = document.getElementById('receiptInfoBadge');
+            var trackingEl = document.getElementById('receiptInfoTracking');
+            var cardEl = document.getElementById('receiptInfoCard');
+            if (trackingEl) trackingEl.textContent = 'کد پیگیری: ' + (window.localizeDigits ? window.localizeDigits.convert(trackingVal) : trackingVal);
+            if (cardEl) cardEl.textContent = cardVal ? 'کارت واریزکننده: ' + (window.localizeDigits ? window.localizeDigits.convert(cardVal) : cardVal) : '';
+            if (cardEl && !cardVal) cardEl.style.display = 'none'; else if (cardEl) cardEl.style.display = '';
+            if (badge) badge.classList.remove('hidden');
+
             closeCardToCardModal();
         };
 
-        window.previewReceipt = function(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('receiptPreviewImg').src = e.target.result;
-                    document.getElementById('receiptFileName').textContent = input.files[0].name;
-                    document.getElementById('receiptPlaceholder').classList.add('hidden');
-                    document.getElementById('receiptPreview').classList.remove('hidden');
-                    document.getElementById('receiptDropzone').style.borderColor = 'var(--accent)';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        };
-
-        window.syncReceiptToForm = function(modalInput) {
-            previewReceipt(modalInput);
-            // Sync file to form's hidden input using DataTransfer
-            var formInput = document.getElementById('receiptInputForm');
-            if (modalInput.files && modalInput.files[0] && window.DataTransfer) {
-                var dt = new DataTransfer();
-                dt.items.add(modalInput.files[0]);
-                formInput.files = dt.files;
-            }
-        };
-
-        window.clearReceipt = function() {
-            var input = document.getElementById('receiptInput');
-            if (input) input.value = '';
-            var formInput = document.getElementById('receiptInputForm');
-            if (formInput) formInput.value = '';
-            document.getElementById('receiptPlaceholder').classList.remove('hidden');
-            document.getElementById('receiptPreview').classList.add('hidden');
-            document.getElementById('receiptDropzone').style.borderColor = '';
-        };
-
-        window.handleReceiptDrop = function(e) {
-            var files = e.dataTransfer.files;
-            if (files && files[0]) {
-                var input = document.getElementById('receiptInput');
-                input.files = files;
-                syncReceiptToForm(input);
-            }
+        window.clearReceiptInfo = function() {
+            var trackingInput = document.getElementById('receiptTrackingCode');
+            var cardInput = document.getElementById('receiptPayerCard');
+            var formTracking = document.getElementById('receiptTrackingCodeForm');
+            var formCard = document.getElementById('receiptPayerCardForm');
+            if (trackingInput) trackingInput.value = '';
+            if (cardInput) cardInput.value = '';
+            if (formTracking) formTracking.value = '';
+            if (formCard) formCard.value = '';
         };
 
         window.copyCardNumber = function() {
@@ -1386,12 +1468,183 @@
             document.getElementById('step4-total-inline').textContent = formatNum(total);
             document.getElementById('step4-shipping-row').classList.remove('hidden');
             document.getElementById('step4-shipping-price').textContent = shippingText;
+
+            // اطلاعات سقف رایگان برای مراحل ۳ و ۴
+            ['step3', 'step4'].forEach(function(step) {
+                var info = document.getElementById(step + '-free-ship-info');
+                if (!info) return;
+                if (selectedPriceCeiling > 0 && selectedShippingFreightBalance != 1) {
+                    if (totalWithoutShipping >= selectedPriceCeiling) {
+                        var tpl = '{{ __("messages.free_shipping_sidebar_saved", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        info.className = 'rounded-xl p-3 text-xs font-bold';
+                        info.style.background = 'color-mix(in srgb, var(--success) 10%, transparent)';
+                        info.style.color = 'var(--success)';
+                        info.innerHTML = tpl.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(selectedOriginalPrice) + '</span>');
+                        info.style.display = 'flex';
+                    } else {
+                        var remaining = selectedPriceCeiling - totalWithoutShipping;
+                        var tpl2 = '{{ __("messages.free_shipping_sidebar_remaining", ["amount" => "__AMOUNT__", "currency" => __("messages.toman")]) }}';
+                        info.className = 'rounded-xl p-3 text-xs font-bold';
+                        info.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+                        info.style.color = 'var(--accent)';
+                        info.innerHTML = tpl2.replace('__AMOUNT__', '<span class="mono" dir="ltr">' + formatNum(remaining) + '</span>') + freeShipProgressBar(totalWithoutShipping, selectedPriceCeiling);
+                        info.style.display = 'flex';
+                        animateProgressBars();
+                    }
+                } else {
+                    info.style.display = 'none';
+                }
+            });
         }
+
+// ========== به‌روزرسانی قیمت از سرور ==========
+        function fetchFreshPrices(callback) {
+            fetch(urls.orderPrice, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(priceData) {
+                subtotal = priceData.final_price_sum;
+                discount = priceData.price_discount;
+                totalWithoutShipping = priceData.price_cart - priceData.price_shipping;
+                shippingPrice = parseInt(priceData.price_shipping) || 0;
+
+                // مرحله ۱
+                var subEl1 = document.getElementById('cart-subtotal');
+                var totalEl1 = document.getElementById('cart-total');
+                if (subEl1) subEl1.textContent = formatNum(subtotal);
+                if (totalEl1) totalEl1.textContent = formatNum(totalWithoutShipping);
+                var couponRow1 = document.getElementById('cart-coupon-row');
+                if (couponRow1) {
+                    if (discount > 0) { couponRow1.classList.remove('hidden'); document.getElementById('cart-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow1.classList.add('hidden'); }
+                }
+
+                // مرحله ۲
+                var subEl2 = document.getElementById('step2-subtotal');
+                if (subEl2) subEl2.textContent = formatNum(subtotal);
+                var couponRow2 = document.getElementById('step2-coupon-row');
+                if (couponRow2) {
+                    if (discount > 0) { couponRow2.classList.remove('hidden'); document.getElementById('step2-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow2.classList.add('hidden'); }
+                }
+                updateStep2Price();
+
+                // مرحله ۳
+                var subEl3 = document.getElementById('step3-subtotal');
+                if (subEl3) subEl3.textContent = formatNum(subtotal);
+                var couponRow3 = document.getElementById('step3-coupon-row');
+                if (couponRow3) {
+                    if (discount > 0) { couponRow3.classList.remove('hidden'); document.getElementById('step3-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow3.classList.add('hidden'); }
+                }
+
+                // مرحله ۴
+                var subEl4 = document.getElementById('step4-subtotal');
+                if (subEl4) subEl4.textContent = formatNum(subtotal);
+                var couponRow4 = document.getElementById('step4-coupon-row');
+                if (couponRow4) {
+                    if (discount > 0) { couponRow4.classList.remove('hidden'); document.getElementById('step4-coupon-amount').textContent = '-' + formatNum(discount); }
+                    else { couponRow4.classList.add('hidden'); }
+                }
+
+                if (callback) callback();
+            });
+        }
+
+        
+        // ========== بررسی آیتم‌های ناموجود در سبد ==========
+        (function() {
+            var outOfStockCards = document.querySelectorAll(".opacity-50.grayscale");
+            if (outOfStockCards.length > 0) {
+                var names = [];
+                outOfStockCards.forEach(function(card) {
+                    var nameEl = card.querySelector("a.font-bold");
+                    if (nameEl) names.push(nameEl.textContent.trim());
+                });
+                if (names.length > 0) {
+                    setTimeout(function() {
+                        if (typeof Swal !== "undefined") {
+                            Swal.fire({
+                                title: "\u0645\u0648\u062c\u0648\u062f\u06cc \u062a\u0645\u0627\u0645 \u0634\u062f\u0647",
+                                html: "<div style=\"text-align:right;font-size:14px;line-height:1.8;\">\u0645\u0648\u062c\u0648\u062f\u06cc \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u0632\u06cc\u0631 \u062a\u0645\u0627\u0645 \u0634\u062f\u0647 \u0627\u0633\u062a:</div><ul style=\"text-align:right;list-style:none;padding:8px 0;margin:0;\">" + names.map(function(n) { return "<li style=\"padding:3px 0;color:#ef4444;font-weight:700;\">\u2022 " + n + "</li>"; }).join("") + "</ul><div style=\"font-size:12px;color:var(--text-secondary);margin-top:8px;\">\u0627\u06cc\u0646 \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u0628\u0647 \u0635\u0648\u0631\u062a \u062e\u0648\u062f\u06a9\u0627\u0631 \u0627\u0632 \u0633\u0628\u062f \u062d\u0630\u0641 \u0645\u06cc\u200c\u0634\u0648\u0646\u062f.</div>",
+                                icon: "warning",
+                                confirmButtonText: "\u0628\u0627\u0634\u0647\u002c \u062d\u0630\u0641 \u0634\u0648\u062f",
+                                confirmButtonColor: "#ef4444",
+                                allowOutsideClick: false,
+                                customClass: { popup: "swal2-rtl" }
+                            }).then(function(result) {
+                                if (result.isConfirmed) {
+                                    outOfStockCards.forEach(function(card) {
+                                        var removeBtn = card.querySelector("[data-cart-remove]");
+                                        if (removeBtn) removeBtn.click();
+                                    });
+                                    setTimeout(function() { window.location.reload(); }, 1500);
+                                }
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        })();
+
+        // ========== بررسی موجودی قبل از رفتن به مرحله ۴ ==========
+        (function() {
+            var _origGoToStep = window.goToStep;
+            window.goToStep = function(step) {
+                if (step === 4) {
+                    fetch(urls.validateStock, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken(),
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json"
+                        }
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            _origGoToStep(step);
+                        } else {
+                            if (typeof Swal !== "undefined") {
+                                Swal.fire({
+                                    title: "\u0645\u0648\u062c\u0648\u062f\u06cc \u062a\u063a\u06cc\u06cc\u0631 \u06a9\u0631\u062f\u0647",
+                                    text: "\u0622\u06cc\u062a\u0645\u200c\u0647\u0627\u06cc \u0646\u0627\u0645\u0648\u062c\u0648\u062f \u0627\u0632 \u0633\u0628\u062f \u062d\u0630\u0641 \u0634\u062f\u0646\u062f.",
+                                    icon: "warning",
+                                    confirmButtonText: "\u0628\u0627\u0634\u0647",
+                                    allowOutsideClick: false
+                                }).then(function() {
+                                    window.location.reload();
+                                });
+                            } else {
+                                alert("\u0645\u0648\u062c\u0648\u062f\u06cc \u0628\u0631\u062e\u06cc \u0645\u062d\u0635\u0648\u0644\u0627\u062a \u062a\u063a\u06cc\u06cc\u0631 \u06a9\u0631\u062f\u0647 \u0627\u0633\u062a.");
+                                window.location.reload();
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        _origGoToStep(step);
+                    });
+                } else {
+                    _origGoToStep(step);
+                }
+            };
+        })();
 
         var origGoToStep = window.goToStep;
         window.goToStep = function(step) {
-            if (step === 3 || step === 4) updateStep34Price();
-            origGoToStep(step);
+            if (step >= 2) {
+                fetchFreshPrices(function() {
+                    if (step === 3 || step === 4) updateStep34Price();
+                    if (step === 2 && selectedAddressId) {
+                        selectAddress(selectedAddressId);
+                    }
+                    origGoToStep(step);
+                });
+            } else {
+                origGoToStep(step);
+            }
         };
 
         // بارگذاری اولیه

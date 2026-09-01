@@ -205,5 +205,13 @@ return [
                 'destroy' => 'permissions.access.contact.delete',
             ],
         ],
+
+        'audit_logs' => [
+            'title' => 'permissions.groups.audit_logs',
+            'access' => [
+                'index' => 'permissions.access.audit_logs.index',
+                'show' => 'permissions.access.audit_logs.show',
+            ],
+        ],
     ],
 ];

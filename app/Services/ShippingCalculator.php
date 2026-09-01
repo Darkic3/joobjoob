@@ -47,6 +47,28 @@ class ShippingCalculator
     }
 
     /**
+     * محاسبه قیمت خام ارسال (بدون اعمال سقف رایگان)
+     */
+    protected static function calculateRaw(ShippingMethod $shippingMethod, float $weightSum, float $finalPriceSum, ?Address $address): float
+    {
+        $price = 0;
+
+        match ($shippingMethod->type) {
+            'fixed_price' => $price = $shippingMethod->price ?? 0,
+            'with_weight' => $price = ($weightSum / 100) * ($shippingMethod->price ?? 0),
+            'chapar' => $price = self::chaparQuote($shippingMethod, $weightSum, $finalPriceSum, $address),
+            default => $price = $shippingMethod->price ?? 0,
+        };
+
+        // پس کرایه → ارسال رایگان (این همیشه اعمال می‌شود)
+        if ($shippingMethod->freight_balance == 1) {
+            $price = 0;
+        }
+
+        return floatval($price);
+    }
+
+    /**
      * استعلام قیمت چاپار
      */
     protected static function chaparQuote(ShippingMethod $shippingMethod, float $weightSum, float $finalPriceSum, ?Address $address): string
@@ -98,6 +120,15 @@ class ShippingCalculator
                 $price = 'dynamic';
             }
 
+            // محاسبه قیمت اصلی ارسال (قبل از اعمال سقف رایگان) برای نمایش مبلغ سود
+            $originalPrice = is_numeric($price) ? $price : 0;
+            if ($shipment->price_ceiling > 0 && $shipment->freight_balance != 1) {
+                // اگر ارسال به خاطر سقف رایگان رایگان شده، قیمت اصلی را محاسبه کن
+                if (is_numeric($price) && $price == 0 && $finalPriceSum >= $shipment->price_ceiling) {
+                    $originalPrice = self::calculateRaw($shipment, $shipmentWeightSum, $finalPriceSum, $address);
+                }
+            }
+
             $methods[] = [
                 'id' => $shipment->id,
                 'title' => $shipment->title,
@@ -105,6 +136,8 @@ class ShippingCalculator
                 'freight_balance' => $shipment->freight_balance,
                 'description' => $shipment->description,
                 'price' => $price,
+                'original_price' => is_numeric($originalPrice) ? $originalPrice : 0,
+                'price_ceiling' => $shipment->price_ceiling ?? 0,
                 'estimated_days_min' => $shipment->estimated_days_min ?? 1,
                 'estimated_days_max' => $shipment->estimated_days_max ?? 3,
                 'show_estimated_days' => $shipment->show_estimated_days ?? true,

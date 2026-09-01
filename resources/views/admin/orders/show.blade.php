@@ -11,6 +11,10 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">{{ __('admin.orders.detail_title') }} <span class="text-indigo-600">#{{ $order->id }}</span></h1>
                 <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">{{ __('admin.orders.date_full') }}: {{ show_date($order->created_at, 'd F Y - H:i') }}</p>
             </div>
+            <a href="{{ route('admin.audit-logs.order-history', $order->id) }}" class="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-400 font-semibold text-sm px-5 py-2 rounded-xl transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                تاریخچه لاگ
+            </a>
             <a href="{{ route('admin.orders.index') }}" class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold text-sm px-5 py-2 rounded-xl transition-all duration-200">
                 <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                 {{ __('admin.orders.back') }}
@@ -76,35 +80,39 @@
                         </form>
                     </div>
 
-                    {{-- فیش واریزی / کارت به کارت --}}
+                    {{-- اطلاعات فیش واریزی / کارت به کارت --}}
                     @if($order->bank)
                         @php
                             $isCardToCard = in_array($order->bank->bank_type ?? '', ['card_to_card', 'card-to-card']);
                         @endphp
-                        <div class="py-2">
-                            <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ __('admin.orders.payment_receipt') }}</span>
-                            @if($order->payment_receipt)
-                                @php
-                                    $receiptPath = asset(config('paths.upload', 'uploads') . '/receipts/' . $order->payment_receipt);
-                                @endphp
-                                <a href="{{ $receiptPath }}" target="_blank"
-                                   class="block rounded-xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 transition-colors">
-                                    <img src="{{ $receiptPath }}" alt="فیش واریزی"
-                                         class="w-full max-w-xs rounded-xl object-cover">
-                                </a>
-                                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">✅ فیش واریزی دریافت شد</p>
-                            @elseif($isCardToCard)
-                                <div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-                                    <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                    <div>
-                                        <p class="text-xs font-bold text-red-700 dark:text-red-400">فیش واریزی ارسال نشده!</p>
-                                        <p class="text-[10px] text-red-500 dark:text-red-400">کاربر پرداخت کارت به کارت انجام داده ولی فیشی آپلود نکرده</p>
+                        @if($isCardToCard)
+                            <div class="py-2">
+                                <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ __('admin.orders.payment_receipt') }}</span>
+                                @if($order->receipt_tracking_code)
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">کد پیگیری</span>
+                                            <span class="text-sm font-bold text-gray-800 dark:text-gray-200" dir="ltr">{{ $order->receipt_tracking_code }}</span>
+                                        </div>
+                                        @if($order->receipt_payer_card)
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">شماره کارت واریزکننده</span>
+                                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200" dir="ltr">{{ $order->receipt_payer_card }}</span>
+                                            </div>
+                                        @endif
+                                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400">✅ اطلاعات فیش واریزی دریافت شد</p>
                                     </div>
-                                </div>
-                            @else
-                                <p class="text-xs text-gray-400">—</p>
-                            @endif
-                        </div>
+                                @else
+                                    <div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                                        <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                        <div>
+                                            <p class="text-xs font-bold text-red-700 dark:text-red-400">اطلاعات فیش ارسال نشده!</p>
+                                            <p class="text-[10px] text-red-500 dark:text-red-400">کاربر پرداخت کارت به کارت انجام داده ولی اطلاعات فیش را وارد نکرده</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\StockService;
 use Illuminate\Support\Collection;
 
 /**
@@ -61,6 +62,10 @@ class CartService
             }
         }
 
+        // بروزرسانی موجودی لحظه‌ای
+        $stockService = app(StockService::class);
+        $items = $stockService->enrichCartItemsWithStockStatus($items);
+
         return $items->mapWithKeys(fn ($item) => [$item->id => [
             'rowId'          => $item->id,
             'product_id'     => $item->product_id,
@@ -76,6 +81,8 @@ class CartService
             'color'          => $item->color,
             'size'           => $item->size,
             'image'          => $item->image,
+            'is_in_stock'     => $item['is_in_stock'] ?? true,
+            'current_stock'   => $item['current_stock'] ?? $item['stock'],
         ]]);
     }
 

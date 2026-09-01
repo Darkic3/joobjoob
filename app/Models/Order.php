@@ -20,7 +20,8 @@ class Order extends Model
         'discount_id', 'total_weight', 'post_code',
         'shipping_price', 'total_price', 'discount_price', 'payment_price',
         'tax_price', 'current_tax', 'deposit_price', 'remaining_price',
-        'user_description', 'transaction_info', 'payment_receipt',
+        'user_description', 'transaction_info',
+        'receipt_tracking_code', 'receipt_payer_card',
     ];
 
     protected $casts = [
@@ -150,12 +151,22 @@ class Order extends Model
         $transaction = $this->transaction_info ?? [];
         $bankType = $this->bank?->bank_type;
 
+        // کارت به کارت — کد پیگیری وارد شده توسط کاربر
+        if ($bankType === 'card_to_card' && $this->receipt_tracking_code) {
+            return $this->receipt_tracking_code;
+        }
+
         return match ($bankType) {
             'sep' => $transaction['verify']['TraceNo'] ?? '',
             'zarinPal' => $transaction['verify']['RefID'] ?? '',
             'sadad' => $transaction['verify']['RetrivalRefNo'] ?? '',
             default => '',
         };
+    }
+
+    public function getIsCardToCardAttribute(): bool
+    {
+        return in_array($this->bank?->bank_type ?? '', ['card_to_card', 'card-to-card']);
     }
 
     // ==================== Methods ====================

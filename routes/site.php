@@ -100,6 +100,7 @@ $siteRoutes = function () {
         Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
         Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('apply-discount');
         Route::post('/remove-discount', [CheckoutController::class, 'removeDiscount'])->name('remove-discount');
+        Route::post('/validate-stock', [CheckoutController::class, 'validateStock'])->name('validate-stock');
         Route::get('/order-price', [CheckoutController::class, 'orderPrice'])->name('order-price');
 
         // مرحله ۴: ایجاد سفارش
@@ -142,6 +143,7 @@ $siteRoutes = function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/account/orders', [DashboardController::class, 'orders'])->name('dashboard.orders');
         Route::get('/account/orders/{id}', [DashboardController::class, 'orderDetail'])->name('dashboard.order-detail');
+        Route::patch('/account/orders/{id}/receipt', [DashboardController::class, 'updateReceipt'])->name('dashboard.order-receipt.update');
         Route::get('/account/orders/{id}/factor', [DashboardController::class, 'orderFactor'])->name('dashboard.order-factor');
         Route::get('/account/wishlist', [DashboardController::class, 'wishlist'])->name('dashboard.wishlist');
         Route::get('/account/addresses', [DashboardController::class, 'addresses'])->name('dashboard.addresses');
