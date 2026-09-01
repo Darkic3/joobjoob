@@ -121,11 +121,11 @@ class StaticPagesTest extends TestCase
         $role = Role::create(['name' => 'contact-role', 'is_system' => false]);
         foreach ($permissionNames as $name) {
             $parts = explode('.', $name);
-            $role->permissions()->attach(Permission::create([
-                'name' => $name,
-                'group' => $parts[1] ?? 'misc',
-                'label_key' => "permissions.access.{$parts[1]}.index",
-            ])->id);
+            $role->permissions()->attach(Permission::firstOrCreate(
+            ['name' => $name],
+            ['group' => $parts[1] ?? 'misc',
+                'label_key' => "permissions.access.{$parts[1]}.index"]
+        )->id);
         }
 
         $user = User::factory()->create(['is_admin' => false, 'is_active' => true]);

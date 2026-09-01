@@ -20,6 +20,8 @@ return [
         'languages' => 'Languages',
         'contact' => 'Contact messages',
         'audit_logs' => 'Audit Logs',
+        'shipping_methods' => 'Shipping Methods',
+        'banks' => 'Payment Gateways',
     ],
 
     'access' => [

@@ -186,6 +186,11 @@ return [
             'access' => [
                 'index' => 'permissions.access.orders.index',
                 'show' => 'permissions.access.orders.show',
+                'change-shipping-status' => 'permissions.access.orders.change_status',
+                'change-order-status' => 'permissions.access.orders.change_status',
+                'post-code' => 'permissions.access.orders.change_status',
+                'factor' => 'permissions.access.orders.show',
+                'bulk-factor' => 'permissions.access.orders.show',
             ],
         ],
 
@@ -193,6 +198,8 @@ return [
             'title' => 'permissions.groups.reviews',
             'access' => [
                 'index' => 'permissions.access.reviews.index',
+                'approval' => 'permissions.access.reviews.approve',
+                'featured' => 'permissions.access.reviews.approve',
                 'destroy' => 'permissions.access.reviews.delete',
             ],
         ],
@@ -206,11 +213,39 @@ return [
             ],
         ],
 
-        'audit_logs' => [
+        'shipping-methods' => [
+            'title' => 'permissions.groups.shipping_methods',
+            'access' => [
+                'index' => 'permissions.access.shipping_methods.index',
+                'create' => 'permissions.access.shipping_methods.create',
+                'store' => 'permissions.access.shipping_methods.create',
+                'edit' => 'permissions.access.shipping_methods.edit',
+                'update' => 'permissions.access.shipping_methods.edit',
+                'destroy' => 'permissions.access.shipping_methods.delete',
+                'toggle-status' => 'permissions.access.shipping_methods.edit',
+            ],
+        ],
+
+        'banks' => [
+            'title' => 'permissions.groups.banks',
+            'access' => [
+                'index' => 'permissions.access.banks.index',
+                'create' => 'permissions.access.banks.create',
+                'store' => 'permissions.access.banks.create',
+                'edit' => 'permissions.access.banks.edit',
+                'update' => 'permissions.access.banks.edit',
+                'destroy' => 'permissions.access.banks.delete',
+                'toggle-status' => 'permissions.access.banks.edit',
+            ],
+        ],
+
+        'audit-logs' => [
             'title' => 'permissions.groups.audit_logs',
             'access' => [
                 'index' => 'permissions.access.audit_logs.index',
                 'show' => 'permissions.access.audit_logs.show',
+                'order-history' => 'permissions.access.audit_logs.show',
+                'product-history' => 'permissions.access.audit_logs.show',
             ],
         ],
     ],
