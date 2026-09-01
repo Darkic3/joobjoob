@@ -4,7 +4,7 @@
     محاسبهٔ زمان پایان (endMs) در کلاس انجام می‌شود.
 --}}
 
-<div class="cd-wrap" id="{{ $id }}-wrap" role="timer" aria-label="{{ __('messages.deal_ends_in') }}">
+<div class="cd-wrap" id="{{ $id }}-wrap" dir="ltr" role="timer" aria-label="{{ __('messages.deal_ends_in') }}">
     <div class="cd-unit">
         <div class="cd-chip mono" id="{{ $id }}-h">00</div>
         <span class="cd-label">{{ __('messages.hours') }}</span>
