@@ -84,7 +84,7 @@
                     @if($order->shipping_price > 0)
                         <div class="flex items-center justify-between py-2" style="border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);">
                             <span class="text-xs" style="color: var(--text-secondary);">هزینه ارسال</span>
-                            <span class="text-sm font-semibold" style="color: var(--text-primary);">{{ number_format($order->shipping_price) }} تومان</span>
+                            <span class="text-sm font-semibold" style="color: var(--text-primary);">{{ format_price($order->shipping_price) }} تومان</span>
                         </div>
                     @elseif($order->shippingMethod)
                         <div class="flex items-center justify-between py-2" style="border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);">
@@ -273,12 +273,12 @@
                             <div class="flex items-center gap-3 mt-1">
                                 <span class="text-[10px]" style="color: var(--text-secondary);">تعداد: {{ $item->quantity }}</span>
                                 @if($item->weight)
-                                    <span class="text-[10px]" style="color: var(--text-secondary);">{{ number_format($item->weight) }} گرم</span>
+                                    <span class="text-[10px]" style="color: var(--text-secondary);">{{ format_price($item->weight) }} گرم</span>
                                 @endif
                             </div>
                         </div>
                         <div class="text-left shrink-0">
-                            <p class="text-sm font-black mono" style="color: var(--accent);" dir="ltr">{{ number_format($item->price * $item->quantity) }}</p>
+                            <p class="text-sm font-black mono" style="color: var(--accent);" dir="ltr">{{ format_price($item->price * $item->quantity) }}</p>
                             <p class="text-[10px]" style="color: var(--text-secondary);">تومان</p>
                         </div>
                     </div>
@@ -297,23 +297,23 @@
             <div class="space-y-2">
                 <div class="flex items-center justify-between py-1.5">
                     <span class="text-xs" style="color: var(--text-secondary);">جمع کل محصولات</span>
-                    <span class="text-sm font-bold mono" style="color: var(--text-primary);" dir="ltr">{{ number_format($order->total_price) }} <span class="text-[10px]">تومان</span></span>
+                    <span class="text-sm font-bold mono" style="color: var(--text-primary);" dir="ltr">{{ format_price($order->total_price) }} <span class="text-[10px]">تومان</span></span>
                 </div>
                 @if($order->discount_price > 0)
                     <div class="flex items-center justify-between py-1.5">
                         <span class="text-xs" style="color: var(--success);">تخفیف</span>
-                        <span class="text-sm font-bold mono" style="color: var(--success);" dir="ltr">-{{ number_format($order->discount_price) }} <span class="text-[10px]">تومان</span></span>
+                        <span class="text-sm font-bold mono" style="color: var(--success);" dir="ltr">-{{ format_price($order->discount_price) }} <span class="text-[10px]">تومان</span></span>
                     </div>
                 @endif
                 @if($order->shipping_price > 0)
                     <div class="flex items-center justify-between py-1.5">
                         <span class="text-xs" style="color: var(--text-secondary);">هزینه ارسال</span>
-                        <span class="text-sm font-bold mono" style="color: var(--text-primary);" dir="ltr">{{ number_format($order->shipping_price) }} <span class="text-[10px]">تومان</span></span>
+                        <span class="text-sm font-bold mono" style="color: var(--text-primary);" dir="ltr">{{ format_price($order->shipping_price) }} <span class="text-[10px]">تومان</span></span>
                     </div>
                 @endif
                 <div class="flex items-center justify-between py-3 mt-2" style="border-top: 2px solid color-mix(in srgb, var(--accent) 15%, transparent);">
                     <span class="text-sm font-bold" style="color: var(--text-primary);">مبلغ قابل پرداخت</span>
-                    <span class="text-lg font-black mono" style="color: var(--accent);" dir="ltr">{{ number_format($order->payment_price) }} <span class="text-xs font-bold">تومان</span></span>
+                    <span class="text-lg font-black mono" style="color: var(--accent);" dir="ltr">{{ format_price($order->payment_price) }} <span class="text-xs font-bold">تومان</span></span>
                 </div>
             </div>
         </div>

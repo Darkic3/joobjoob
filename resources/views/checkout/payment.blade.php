@@ -31,8 +31,8 @@
                                     <tr>
                                         <td>{{ $item['name'] }}</td>
                                         <td>{{ $item['qty'] }}</td>
-                                        <td>{{ number_format($item['price']) }}</td>
-                                        <td>{{ number_format($item['price'] * $item['qty']) }}</td>
+                                        <td>{{ format_price($item['price']) }}</td>
+                                        <td>{{ format_price($item['price'] * $item['qty']) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -83,7 +83,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100" id="payBtn">💰 پرداخت {{ number_format($total) }} تومان</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="payBtn">💰 پرداخت {{ format_price($total) }} تومان</button>
                 </form>
             </div>
 
@@ -95,18 +95,18 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-2">
                             <span>جمع کل اقلام:</span>
-                            <span>{{ number_format($subtotal) }} تومان</span>
+                            <span>{{ format_price($subtotal) }} تومان</span>
                         </div>
                         @if($discount > 0)
                             <div class="d-flex justify-content-between mb-2 text-success">
                                 <span>تخفیف:</span>
-                                <span>-{{ number_format($discount) }} تومان</span>
+                                <span>-{{ format_price($discount) }} تومان</span>
                             </div>
                         @endif
                         @if($shipping_price > 0)
                             <div class="d-flex justify-content-between mb-2">
                                 <span>هزینه ارسال:</span>
-                                <span>{{ number_format($shipping_price) }} تومان</span>
+                                <span>{{ format_price($shipping_price) }} تومان</span>
                             </div>
                         @else
                             <div class="d-flex justify-content-between mb-2 text-success">
@@ -117,7 +117,7 @@
                         <hr>
                         <div class="d-flex justify-content-between">
                             <strong>مبلغ قابل پرداخت:</strong>
-                            <strong class="text-primary fs-4">{{ number_format($total) }} تومان</strong>
+                            <strong class="text-primary fs-4">{{ format_price($total) }} تومان</strong>
                         </div>
                     </div>
                 </div>

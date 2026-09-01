@@ -43,7 +43,7 @@ class QuickViewTest extends TestCase
         $this->get(route('products.quick-view', ['product' => $product->slug]))
             ->assertOk()
             ->assertSee('محصول پیش‌نمایش')
-            ->assertSee(number_format(150000), false)
+            ->assertSee(format_price(150000), false)
             ->assertSee('data-quick-view-add', false)
             ->assertSee(__('messages.view_details'));
     }

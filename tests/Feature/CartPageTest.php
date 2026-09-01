@@ -102,7 +102,7 @@ class CartPageTest extends TestCase
         $this->get('/cart')
             ->assertOk()
             ->assertSee('محصول تست')
-            ->assertSee(number_format(300000), false);
+            ->assertSee(format_price(300000), false);
     }
 
     public function test_cart_item_can_be_removed(): void

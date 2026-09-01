@@ -196,8 +196,8 @@
                                 @endif
                             </td>
                             <td>{{ $item->quantity }}</td>
-                            <td>{{ number_format($item->price) }}</td>
-                            <td>{{ number_format($item->price * $item->quantity) }}</td>
+                            <td>{{ format_price($item->price) }}</td>
+                            <td>{{ format_price($item->price * $item->quantity) }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -212,19 +212,19 @@
             <div class="inv-totals-box">
                 <div class="inv-total-row">
                     <span>جمع کل محصولات</span>
-                    <span>{{ number_format($order->total_price) }} تومان</span>
+                    <span>{{ format_price($order->total_price) }} تومان</span>
                 </div>
                 @if($order->discount_price > 0)
                     <div class="inv-total-row discount">
                         <span>تخفیف</span>
-                        <span>-{{ number_format($order->discount_price) }} تومان</span>
+                        <span>-{{ format_price($order->discount_price) }} تومان</span>
                     </div>
                 @endif
                 <div class="inv-total-row">
                     <span>هزینه ارسال</span>
                     <span>
                         @if($order->shipping_price > 0)
-                            {{ number_format($order->shipping_price) }} تومان
+                            {{ format_price($order->shipping_price) }} تومان
                         @elseif($order->freight_balance)
                             پس کرایه
                         @else
@@ -234,7 +234,7 @@
                 </div>
                 <div class="inv-total-row grand">
                     <span>مبلغ قابل پرداخت</span>
-                    <span>{{ number_format($order->payment_price) }} تومان</span>
+                    <span>{{ format_price($order->payment_price) }} تومان</span>
                 </div>
             </div>
         </div>

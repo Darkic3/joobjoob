@@ -83,7 +83,7 @@
                 <div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"
                      style="background: color-mix(in srgb, var(--gold) 10%, transparent);">
                     <svg class="w-3 h-3" style="color: var(--gold);" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <span class="text-[11px] font-bold" style="color: var(--gold);">{{ number_format($rating, 1) }}</span>
+                    <span class="text-[11px] font-bold" style="color: var(--gold);">{{ format_price($rating, 1) }}</span>
                 </div>
                 <span class="text-[10px]" style="color: var(--text-secondary);">({{ $reviewCount }})</span>
             </div>
@@ -96,7 +96,7 @@
                 @if($hasDiscount)
                     <div class="flex items-center gap-1.5 mb-1">
                         <span class="mono text-[11px] font-semibold line-through" style="color: var(--text-secondary); opacity: .8;" dir="ltr">
-                            {{ number_format($originalPrice) }}
+                            {{ format_price($originalPrice) }}
                         </span>
                         <span class="price-off">{{ $discountPercent }}٪-</span>
                     </div>
@@ -105,7 +105,7 @@
                 {{-- قیمت نهایی — بزرگ، بولد و با هاله برای جلب توجه --}}
                 <div class="flex items-baseline gap-1.5">
                     <span class="mono font-black text-xl leading-none price-glow" style="color: var(--accent);" dir="ltr">
-                        {{ number_format($finalPrice) }}
+                        {{ format_price($finalPrice) }}
                     </span>
                     <span class="text-[11px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
                 </div>

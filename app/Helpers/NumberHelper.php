@@ -14,8 +14,8 @@ class NumberHelper
         }
 
         $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        $arabic  = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        $latin   = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $latin = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         $input = str_replace($persian, $latin, $input);
         $input = str_replace($arabic, $latin, $input);
@@ -32,14 +32,25 @@ class NumberHelper
     }
 
     /**
-     * حذف جداکننده و تبدیل به عدد
+     * فرمت قیمت با جداکننده هزار متناسب با زبان جاری
+     *
+     * fa/ar -> ۵٬۰۰۰٬۰۰۰
+     * en/tr -> 5,000,000
      */
-    public static function cleanNumber($input): int
+    public static function formatPrice($amount, ?string $locale = null): string
     {
-        $cleaned = self::persian2LatinDigit($input);
-        $cleaned = str_replace(',', '', $cleaned);
-        $cleaned = str_replace(' ', '', $cleaned);
+        $locale = $locale ?? app()->getLocale();
 
-        return intval($cleaned);
+        $separator = match ($locale) {
+            'fa', 'ar' => self::ARABIC_THOUSANDS_SEP,
+            default => ',',
+        };
+
+        return number_format(intval($amount), 0, '.', $separator);
     }
+
+    /**
+     * جداکننده هزار عربی/فارسی (٬)
+     */
+    private const ARABIC_THOUSANDS_SEP = "\u{066C}";
 }

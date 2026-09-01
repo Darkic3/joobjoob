@@ -85,14 +85,14 @@
                                     {{-- Old Price — Vazirmatn برای ارقام فارسی (مونو گلیف فارسی ندارد) --}}
                                     @if($slide->old_price > $slide->price)
                                         <span class="hero-old-price hero-num mb-1" dir="ltr">
-                                            {{ number_format($slide->old_price) }}
+                                            {{ format_price($slide->old_price) }}
                                             {{ $slide->currencyLabel() }}
                                         </span>
                                     @endif
 
                                     {{-- Current Price — Vazirmatn 900، بزرگ‌ترین عنصر متن --}}
                                     <span class="hero-price-num hero-num" dir="ltr">
-                                        {{ number_format($slide->price) }}
+                                        {{ format_price($slide->price) }}
                                         <small>{{ $slide->currencyLabel() }}</small>
                                     </span>
                                 </div>

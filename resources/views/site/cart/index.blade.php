@@ -81,12 +81,12 @@
                                     @endif
                                     <div class="flex items-center gap-2 mt-1.5">
                                         @if(!empty($item['original_price']) && $item['original_price'] > $item['price'])
-                                            <span class="mono text-xs line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ number_format($item['original_price']) }}</span>
+                                            <span class="mono text-xs line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ format_price($item['original_price']) }}</span>
                                             <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);">
                                                 {{ round((1 - $item['price'] / $item['original_price']) * 100) }}٪-
                                             </span>
                                         @endif
-                                        <span class="mono text-xs font-bold" style="color: var(--accent);" dir="ltr">{{ number_format($item['price']) }}</span>
+                                        <span class="mono text-xs font-bold" style="color: var(--accent);" dir="ltr">{{ format_price($item['price']) }}</span>
                                         <span class="text-[10px]" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
                                     </div>
                                     @if($item['stock'] <= 0)
@@ -138,7 +138,7 @@
 
                                 <div class="text-end shrink-0">
                                     <p data-cart-item-total class="mono font-black text-sm md:text-base" style="color: var(--accent);" dir="ltr">
-                                        {{ number_format($item['price'] * $item['qty']) }}
+                                        {{ format_price($item['price'] * $item['qty']) }}
                                     </p>
                                     <p class="text-[10px]" style="color: var(--text-secondary);">{{ __('messages.toman') }}</p>
                                 </div>
@@ -178,7 +178,7 @@
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
                                             {{ __('messages.your_savings_from_purchase') }}
                                         </span>
-                                        <span id="cart-savings" class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                        <span id="cart-savings" class="mono font-bold" style="color: var(--success);" dir="ltr">{{ format_price($totalSavings) }} {{ __('messages.toman') }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -372,7 +372,7 @@
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
                                             {{ __('messages.your_savings_from_purchase') }}
                                         </span>
-                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ format_price($totalSavings) }} {{ __('messages.toman') }}</span>
                                     </div>
                                 @endif
                                 <div id="step2-shipping-row" class="flex items-center justify-between text-sm hidden">
@@ -452,7 +452,7 @@
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
                                             {{ __('messages.your_savings_from_purchase') }}
                                         </span>
-                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ format_price($totalSavings) }} {{ __('messages.toman') }}</span>
                                     </div>
                                 @endif
                                 <div id="step3-shipping-row" class="flex items-center justify-between text-sm hidden">
@@ -588,12 +588,12 @@
                                             @endif
                                             <div class="flex items-center gap-1.5 mt-0.5">
                                                 @if(!empty($item['original_price']) && $item['original_price'] > $item['price'])
-                                                    <span class="mono text-[10px] line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ number_format($item['original_price']) }}</span>
+                                                    <span class="mono text-[10px] line-through" style="color: var(--text-secondary); opacity:.6;" dir="ltr">{{ format_price($item['original_price']) }}</span>
                                                 @endif
-                                                <span class="text-[11px]" style="color: var(--text-secondary);">{{ $item['qty'] }} × {{ number_format($item['price']) }} {{ __('messages.toman') }}</span>
+                                                <span class="text-[11px]" style="color: var(--text-secondary);">{{ $item['qty'] }} × {{ format_price($item['price']) }} {{ __('messages.toman') }}</span>
                                             </div>
                                         </div>
-                                        <p class="text-sm mono font-black shrink-0" style="color: var(--accent);" dir="ltr">{{ number_format($item['price'] * $item['qty']) }}</p>
+                                        <p class="text-sm mono font-black shrink-0" style="color: var(--accent);" dir="ltr">{{ format_price($item['price'] * $item['qty']) }}</p>
                                     </div>
                                 @endforeach
                             </div>
@@ -648,7 +648,7 @@
                                             <p class="text-sm font-bold" style="color: var(--text-primary);">{{ $selectedShipping->title }}</p>
                                             <span class="text-sm mono font-bold" style="color: var(--accent);" dir="ltr">
                                                 @if($shippingPrice > 0)
-                                                    {{ number_format($shippingPrice) }} {{ __('messages.toman') }}
+                                                    {{ format_price($shippingPrice) }} {{ __('messages.toman') }}
                                                 @else
                                                     {{ __('messages.trust_free_shipping') }}
                                                 @endif
@@ -684,7 +684,7 @@
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
                                             {{ __('messages.your_savings_from_purchase') }}
                                         </span>
-                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ number_format($totalSavings) }} {{ __('messages.toman') }}</span>
+                                        <span class="mono font-bold" style="color: var(--success);" dir="ltr">{{ format_price($totalSavings) }} {{ __('messages.toman') }}</span>
                                     </div>
                                 @endif
                                 <div id="step4-shipping-row" class="flex items-center justify-between text-sm hidden">
@@ -986,7 +986,23 @@
         var csrfToken = function() { var m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
 
         function formatNum(n) {
-            return new Intl.NumberFormat(document.documentElement.lang === 'fa' || document.documentElement.lang === 'ar' ? 'fa-IR' : 'en-US').format(n);
+            var locale = document.documentElement.lang || 'en';
+            var isFaAr = locale === 'fa' || locale === 'ar';
+            var sep = isFaAr ? '٬' : ',';
+            var digits = isFaAr ? '۰۱۲۳۴۵۶۷۸۹' : '0123456789';
+            var s = Math.round(n).toString();
+            var result = '';
+            var count = 0;
+            for (var i = s.length - 1; i >= 0; i--) {
+                if (count > 0 && count % 3 === 0) result = sep + result;
+                if (isFaAr) {
+                    result = digits[parseInt(s[i])] + result;
+                } else {
+                    result = s[i] + result;
+                }
+                count++;
+            }
+            return result;
         }
 
         function freeShipProgressBar(orderTotal, priceCeiling) {
