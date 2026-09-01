@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
-use App\Models\City;
+use App\Models\Address;
+use App\Models\Bank;
 use App\Models\Discount;
 use App\Models\Order;
-use App\Models\State;
+use App\Models\ShippingMethod;
 use App\Services\AddressService;
 use App\Services\CartService;
-use App\Services\StockService;
 use App\Services\CityService;
+use App\Services\OrderService;
 use App\Services\ShippingCalculator;
-use App\Services\StateService;
+use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -40,6 +41,7 @@ class CheckoutController extends Controller
     public function cities(Request $request): JsonResponse
     {
         $cities = CityService::findActiveByState($request->get('state_id'));
+
         return response()->json(['cities' => $cities]);
     }
 
@@ -139,6 +141,7 @@ class CheckoutController extends Controller
     public function removeDiscount(): JsonResponse
     {
         session()->forget('coupon');
+
         return response()->json(['success' => true]);
     }
 
@@ -162,29 +165,17 @@ class CheckoutController extends Controller
 
     // ==================== مرحله ۴: ایجاد سفارش ====================
 
-    public function create(Request $request)
+    public function create(CardToCardCheckoutRequest $request)
     {
-        $bankId = $request->get('bank_id');
-        $userDescription = $request->get('user_description');
+        $bankId = $request->input('bank_id');
+        $userDescription = $request->input('user_description');
 
         // اطلاعات فیش واریزی (کارت به کارت)
-        $receiptTrackingCode = $request->get('receipt_tracking_code');
-        $receiptPayerCard = $request->get('receipt_payer_card');
+        $receiptTrackingCode = $request->input('receipt_tracking_code');
+        $receiptPayerCard = $request->input('receipt_payer_card');
 
-        $bank = \App\Models\Bank::find($bankId);
+        $bank = Bank::find($bankId);
         $isCardToCard = $bank && $bank->bank_type === 'card_to_card';
-
-        $rules = [
-            'bank_id' => 'required|exists:banks,id',
-        ];
-        $messages = [];
-
-        if ($isCardToCard) {
-            $rules['receipt_tracking_code'] = 'required|string|max:255';
-            $messages['receipt_tracking_code.required'] = 'کد پیگیری واریزی الزامی است.';
-        }
-
-        $request->validate($rules, $messages);
 
         $addressId = session('checkout_address_id');
         $shippingMethodId = session('checkout_shipping_method_id');
@@ -194,8 +185,8 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'اطلاعات تکمیل نیست.');
         }
 
-        $address = \App\Models\Address::with(['state', 'city'])->find($addressId);
-        $shippingMethod = \App\Models\ShippingMethod::find($shippingMethodId);
+        $address = Address::with(['state', 'city'])->find($addressId);
+        $shippingMethod = ShippingMethod::find($shippingMethodId);
 
         $orderData = [
             'address_id' => $address->id,
@@ -219,7 +210,7 @@ class CheckoutController extends Controller
         ];
 
         try {
-            $orderService = app(\App\Services\OrderService::class);
+            $orderService = app(OrderService::class);
             $order = $orderService->create(
                 $this->cart->toArray(),
                 $orderData,
@@ -238,6 +229,7 @@ class CheckoutController extends Controller
             return $result;
         } catch (\Exception $e) {
             \Log::error('Order creation failed', ['message' => $e->getMessage()]);
+
             return redirect()->route('checkout.failed')
                 ->with('error', 'خطا در ایجاد سفارش، مجدد تلاش نمایید.');
         }
@@ -276,28 +268,32 @@ class CheckoutController extends Controller
     public function finishZarinPal(Request $request)
     {
         $input = $request->all();
-        $orderService = app(\App\Services\OrderService::class);
+        $orderService = app(OrderService::class);
+
         return $orderService->callback('transaction_info->post->Authority', $input['Authority'] ?? '', $input);
     }
 
     public function finishSaman(Request $request)
     {
         $input = $request->all();
-        $orderService = app(\App\Services\OrderService::class);
+        $orderService = app(OrderService::class);
+
         return $orderService->callback('transaction_info->post->token', $input['Token'] ?? '', $input);
     }
 
     public function finishSadad(Request $request)
     {
         $input = $request->all();
-        $orderService = app(\App\Services\OrderService::class);
+        $orderService = app(OrderService::class);
+
         return $orderService->callback('id', $input['OrderId'] ?? '', $input);
     }
 
     public function finishZibal(Request $request)
     {
         $input = $request->all();
-        $orderService = app(\App\Services\OrderService::class);
+        $orderService = app(OrderService::class);
+
         return $orderService->callback('transaction_info->post->trackId', $input['trackId'] ?? '', $input);
     }
 
@@ -310,7 +306,7 @@ class CheckoutController extends Controller
         $stockService = app(StockService::class);
         $result = $stockService->validateCartItems($cartItems);
 
-        if (!empty($result['unavailable']) || !empty($result['insufficient'])) {
+        if (! empty($result['unavailable']) || ! empty($result['insufficient'])) {
             // حذف آیتم‌های ناموجود از سبد
             foreach ($cartItems as $item) {
                 foreach ($result['unavailable'] as $unavailable) {

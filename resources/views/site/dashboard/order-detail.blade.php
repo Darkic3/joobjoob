@@ -202,7 +202,7 @@
                         @method('PATCH')
                         <div>
                             <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">کد پیگیری <span class="text-rose-500">*</span></label>
-                            <input type="text" name="receipt_tracking_code" value="{{ $order->receipt_tracking_code }}" inputmode="numeric"
+                            <input type="text" name="receipt_tracking_code" value="{{ $order->receipt_tracking_code }}" inputmode="numeric" pattern="\d{6,16}" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                    placeholder="کد پیگیری واریزی"
                                    class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
                                    style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
@@ -211,7 +211,7 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
-                            <input type="text" name="receipt_payer_card" value="{{ $order->receipt_payer_card }}" inputmode="numeric"
+                            <input type="text" name="receipt_payer_card" value="{{ $order->receipt_payer_card }}" inputmode="numeric" pattern="(\d{4}-?){3}\d{4}" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                    placeholder="شماره کارت واریزکننده"
                                    class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
                                    style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"

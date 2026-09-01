@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\Helpers\NumberHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\UpdateReceiptRequest;
 use App\Models\Address;
 use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\CityService;
-use App\Helpers\NumberHelper;
 use App\Services\StateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ class DashboardController extends Controller
     public function index()
     {
         $orders = Auth::user()->orders()->latest()->take(5)->get();
+
         return view('site.dashboard.index', compact('orders'));
     }
 
@@ -25,6 +27,7 @@ class DashboardController extends Controller
     public function orders()
     {
         $orders = Auth::user()->orders()->latest()->paginate(10);
+
         return view('site.dashboard.orders', compact('orders'));
     }
 
@@ -40,7 +43,7 @@ class DashboardController extends Controller
     /**
      * ویرایش اطلاعات فیش واریزی (کد پیگیری و شماره کارت) — فقط برای کارت به کارت
      */
-    public function updateReceipt(Request $request, int $id)
+    public function updateReceipt(UpdateReceiptRequest $request, int $id)
     {
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
 
@@ -50,16 +53,9 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'امکان ویرایش اطلاعات فیش برای این سفارش وجود ندارد.');
         }
 
-        $validated = $request->validate([
-            'receipt_tracking_code' => 'required|string|max:255',
-            'receipt_payer_card' => 'nullable|string|max:255',
-        ], [
-            'receipt_tracking_code.required' => 'کد پیگیری واریزی الزامی است.',
-        ]);
-
         $order->update([
-            'receipt_tracking_code' => $validated['receipt_tracking_code'],
-            'receipt_payer_card' => $validated['receipt_payer_card'] ?? null,
+            'receipt_tracking_code' => $request->validated('receipt_tracking_code'),
+            'receipt_payer_card' => $request->validated('receipt_payer_card') ?? null,
         ]);
 
         return redirect()->route('dashboard.order-detail', $order->id)
@@ -91,6 +87,7 @@ class DashboardController extends Controller
     public function cities(Request $request)
     {
         $cities = CityService::findActiveByState($request->get('state_id'));
+
         return response()->json(['cities' => $cities]);
     }
 
@@ -119,6 +116,7 @@ class DashboardController extends Controller
         );
 
         $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
+
         return redirect($redirect)->with('success', 'آدرس با موفقیت اضافه شد');
     }
 
@@ -148,6 +146,7 @@ class DashboardController extends Controller
         );
 
         $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
+
         return redirect($redirect)->with('success', 'آدرس با موفقیت ویرایش شد');
     }
 

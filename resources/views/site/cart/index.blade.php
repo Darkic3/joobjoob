@@ -745,14 +745,14 @@
                     </div>
                     <div>
                         <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">کد پیگیری واریزی <span class="text-rose-500">*</span></label>
-                        <input type="text" id="receiptTrackingCode" inputmode="numeric" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰"
+                        <input type="text" id="receiptTrackingCode" inputmode="numeric" pattern="\d{6,16}" maxlength="16" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
                                style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
                                dir="ltr">
                     </div>
                     <div>
                         <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
-                        <input type="text" id="receiptPayerCard" inputmode="numeric" placeholder="مثلاً: 6037-xxxx-xxxx-xxxx"
+                        <input type="text" id="receiptPayerCard" inputmode="numeric" pattern="(\d{4}-?){3}\d{4}" maxlength="16" placeholder="مثلاً: 6037xxxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
                                style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
                                dir="ltr">
@@ -1299,8 +1299,35 @@
                 return;
             }
 
+            // ── اعتبارسنجی کد پیگیری: فقط عدد، حداقل ۶ رقم ──
+            var cleanTracking = trackingVal.replace(/[\s\-]/g, '');
+            if (!/^\d{6,16}$/.test(cleanTracking)) {
+                trackingInput.style.borderColor = '#ef4444';
+                trackingInput.style.animation = 'none'; trackingInput.offsetHeight;
+                trackingInput.style.animation = 'shake 0.4s ease';
+                trackingInput.setAttribute('title', 'کد پیگیری باید فقط عدد باشد (۶ تا ۱۶ رقم)');
+                setTimeout(function() { trackingInput.style.borderColor = ''; trackingInput.removeAttribute('title'); }, 2000);
+                return;
+            }
+            // مقدار تمیزشده را ذخیره کن (بدون فاصله و خط تیره)
+            trackingVal = cleanTracking;
+
             var cardInput = document.getElementById('receiptPayerCard');
             var cardVal = cardInput ? cardInput.value.trim() : '';
+
+            // ── اعتبارسنجی شماره کارت (اختیاری): ۱۶ رقم با خط تیره اختیاری ──
+            if (cardVal) {
+                var cleanCard = cardVal.replace(/[\s\-]/g, '');
+                if (!/^\d{16}$/.test(cleanCard)) {
+                    cardInput.style.borderColor = '#ef4444';
+                    cardInput.style.animation = 'none'; cardInput.offsetHeight;
+                    cardInput.style.animation = 'shake 0.4s ease';
+                    cardInput.setAttribute('title', 'شماره کارت باید ۱۶ رقم باشد');
+                    setTimeout(function() { cardInput.style.borderColor = ''; cardInput.removeAttribute('title'); }, 2000);
+                    return;
+                }
+                cardVal = cleanCard;
+            }
 
             // Set hidden form values
             document.getElementById('receiptTrackingCodeForm').value = trackingVal;
