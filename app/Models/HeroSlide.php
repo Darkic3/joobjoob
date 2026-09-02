@@ -37,7 +37,6 @@ class HeroSlide extends Model
     {
         // linkable برای fallback تصویر (وقتی اسلاید تصویری ندارد، از مدل لینک‌شده می‌گیرد)
         return $query->where('is_active', true)
-            ->with('linkable')
             ->orderBy('sort_order', 'asc');
     }
 
