@@ -35,6 +35,11 @@ class Discount extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'discount_users')->withTimestamps();
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'discount_id');

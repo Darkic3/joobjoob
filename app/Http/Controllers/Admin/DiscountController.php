@@ -44,8 +44,9 @@ class DiscountController extends Controller
         $categories = ProductCategory::orderBy('name')->get();
         $brands = Brand::orderBy('id')->get();
         $products = Product::orderBy('name')->get();
+        $users = \App\Models\User::select('id', 'name', 'mobile', 'email')->orderBy('name')->get();
 
-        return view('admin.discounts.create', compact('categories', 'brands', 'products'));
+        return view('admin.discounts.create', compact('categories', 'brands', 'products', 'users'));
     }
 
     /**
@@ -56,6 +57,7 @@ class DiscountController extends Controller
         $discount = Discount::create($request->validated());
 
         $this->syncDiscountable($discount, $request);
+        $this->syncUsers($discount, $request);
 
         return redirect()->route('admin.discounts.index')
             ->with('success', 'کد تخفیف با موفقیت ایجاد شد.');
@@ -84,13 +86,14 @@ class DiscountController extends Controller
      */
     public function edit(Discount $discount)
     {
-        $discount->load(['categories:id', 'brands:id', 'products:id']);
+        $discount->load(['categories:id', 'brands:id', 'products:id', 'users:id']);
 
         $categories = ProductCategory::orderBy('name')->get();
         $brands = Brand::orderBy('id')->get();
         $products = Product::orderBy('name')->get();
+        $users = \App\Models\User::select('id', 'name', 'mobile', 'email')->orderBy('name')->get();
 
-        return view('admin.discounts.edit', compact('discount', 'categories', 'brands', 'products'));
+        return view('admin.discounts.edit', compact('discount', 'categories', 'brands', 'products', 'users'));
     }
 
     /**
@@ -105,6 +108,7 @@ class DiscountController extends Controller
         $discount->brands()->detach();
         $discount->products()->detach();
         $this->syncDiscountable($discount, $request);
+        $this->syncUsers($discount, $request);
 
         return redirect()->route('admin.discounts.index')
             ->with('success', 'کد تخفیف با موفقیت به‌روزرسانی شد.');
@@ -152,5 +156,11 @@ class DiscountController extends Controller
             'product' => $discount->products()->syncWithoutDetaching($ids),
             default => null,
         };
+    }
+
+    private function syncUsers(Discount $discount, DiscountRequest $request): void
+    {
+        $userIds = $request->input('user_ids', []);
+        $discount->users()->sync($userIds);
     }
 }

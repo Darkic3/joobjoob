@@ -65,8 +65,9 @@
                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $discount->usage_records_count ?? 0 }} / {{ $discount->count }}</td>
                                 <td class="px-6 py-4">
                                     <button onclick="toggleDiscountStatus({{ $discount->id }}, this)"
-                                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {{ $discount->is_active ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600' }}">
-                                        <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform {{ $discount->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                            data-active="{{ $discount->is_active ? '1' : '0' }}"
+                                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out {{ $discount->is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-500' }}">
+                                        <span class="absolute start-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out {{ $discount->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
                                     </button>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
@@ -123,7 +124,7 @@
 
     <script>
         function toggleDiscountStatus(id, btn) {
-            fetch('{{ route("admin.discounts.toggle-status", ":id") }}'.replace(':id', id), {
+            fetch('{{ route('admin.discounts.toggle-status', ':id') }}'.replace(':id', id), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,15 +139,15 @@
                     const track = btn;
                     const thumb = track.querySelector('span');
                     if (data.is_active) {
-                        track.classList.remove('bg-gray-300', 'dark:bg-gray-600');
-                        track.classList.add('bg-green-500');
-                        thumb.classList.remove('translate-x-1');
-                        thumb.classList.add('translate-x-6');
+                        track.classList.remove('bg-gray-300', 'dark:bg-gray-500');
+                        track.classList.add('bg-emerald-500');
+                        thumb.classList.remove('translate-x-0');
+                        thumb.classList.add('translate-x-5');
                     } else {
-                        track.classList.remove('bg-green-500');
-                        track.classList.add('bg-gray-300', 'dark:bg-gray-600');
-                        thumb.classList.remove('translate-x-6');
-                        thumb.classList.add('translate-x-1');
+                        track.classList.remove('bg-emerald-500');
+                        track.classList.add('bg-gray-300', 'dark:bg-gray-500');
+                        thumb.classList.remove('translate-x-5');
+                        thumb.classList.add('translate-x-0');
                     }
                 }
             });

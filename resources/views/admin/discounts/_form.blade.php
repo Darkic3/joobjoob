@@ -116,17 +116,50 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-3">شرایط</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">تاریخ شروع</label>
-                    <input type="datetime-local" name="starts_at" value="{{ old('starts_at', $d?->starts_at?->format('Y-m-d\TH:i') ?? '') }}" class="input-custom !py-1.5 !text-sm" dir="ltr">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">تاریخ انقضا</label>
-                    <input type="datetime-local" name="expires_at" value="{{ old('expires_at', $d?->expires_at?->format('Y-m-d\TH:i') ?? '') }}" class="input-custom !py-1.5 !text-sm" dir="ltr">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">مخصوص کاربر خاص</label>
-                    <input type="number" name="user_id" value="{{ old('user_id', $d?->user_id ?? '') }}" class="input-custom !py-1.5 !text-sm" min="0" dir="ltr" placeholder="خالی = همه کاربران">
+                <x-admin.jalali-datetime name="starts_at" :value="old('starts_at', $d?->starts_at ?? '')" label="تاریخ شروع" placeholder="۱۴۰۴/۰۶/۱۱ ۱۰:۳۰" />
+                <x-admin.jalali-datetime name="expires_at" :value="old('expires_at', $d?->expires_at ?? '')" label="تاریخ انقضا" placeholder="۱۴۰۴/۰۶/۱۱ ۱۰:۳۰" />
+                <div x-data="userPicker()" class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">محدود به کاربر خاص</label>
+                    <div class="relative">
+                        <input type="text"
+                               x-model="search"
+                               @input="filterUsers()"
+                               @click="open = true"
+                               @click.outside="open = false"
+                               placeholder="جستجو بر اساس نام یا شماره موبایل..."
+                               class="input-custom !py-1.5 !text-sm w-full">
+                        <div x-show="open && filteredUsers.length > 0" x-transition
+                             class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                            <template x-for="user in filteredUsers" :key="user.id">
+                                <div @click="toggleUser(user)"
+                                     class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                     :class="isSelected(user.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''">
+                                    <div class="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0"
+                                         :class="isSelected(user.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 dark:border-gray-500'">
+                                        <svg x-show="isSelected(user.id)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-800 dark:text-white truncate" x-text="user.name"></p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="user.mobile + (user.email ? ' · ' + user.email : '')"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <template x-for="uid in selectedUserIds" :key="uid">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
+                                <span x-text="getUserById(uid)?.name || uid"></span>
+                                <button type="button" @click="removeUser(uid)" class="ml-0.5 hover:text-indigo-900 dark:hover:text-indigo-100">&times;</button>
+                            </span>
+                        </template>
+                    </div>
+                    <template x-for="uid in selectedUserIds" :key="uid+'-input'">
+                        <input type="hidden" name="user_ids[]" :value="uid">
+                    </template>
+                    <p class="text-xs text-gray-400 mt-1">خالی = همه کاربران</p>
                 </div>
             </div>
         </div>
@@ -167,6 +200,46 @@
 
 @push('scripts')
 <script>
+function userPicker() {
+    return {
+        open: false,
+        search: '',
+        allUsers: @json($users ?? []),
+        filteredUsers: @json($users ?? []),
+        selectedUserIds: @json(old('user_ids', $d?->users?->pluck('id')?->toArray() ?? [])),
+
+        filterUsers() {
+            const q = this.search.toLowerCase();
+            if (!q) {
+                this.filteredUsers = this.allUsers;
+                return;
+            }
+            this.filteredUsers = this.allUsers.filter(u =>
+                (u.name && u.name.toLowerCase().includes(q)) ||
+                (u.mobile && u.mobile.includes(q)) ||
+                (u.email && u.email.toLowerCase().includes(q))
+            );
+        },
+        toggleUser(user) {
+            const idx = this.selectedUserIds.indexOf(user.id);
+            if (idx > -1) {
+                this.selectedUserIds.splice(idx, 1);
+            } else {
+                this.selectedUserIds.push(user.id);
+            }
+        },
+        removeUser(uid) {
+            this.selectedUserIds = this.selectedUserIds.filter(id => id !== uid);
+        },
+        isSelected(uid) {
+            return this.selectedUserIds.includes(uid);
+        },
+        getUserById(uid) {
+            return this.allUsers.find(u => u.id === uid);
+        }
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const typeSelect = document.getElementById('discountTypeSelect');
     const amountInput = document.getElementById('discountAmountInput');
