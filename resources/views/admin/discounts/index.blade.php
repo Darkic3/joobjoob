@@ -63,15 +63,19 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $discount->usage_records_count ?? 0 }} / {{ $discount->count }}</td>
-                                <td class="px-6 py-4">
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox"
-                                               data-discount-id="{{ $discount->id }}"
-                                               {{ $discount->is_active ? 'checked' : '' }}
-                                               onchange="toggleDiscountStatus({{ $discount->id }}, this.checked)"
-                                               class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                                    </label>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <form action="{{ route('admin.discounts.toggle-status', $discount->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @if($discount->is_active)
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> فعال
+                                            </button>
+                                        @else
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-gray-600/50 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500/50 transition-colors">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> غیرفعال
+                                            </button>
+                                        @endif
+                                    </form>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @if($discount->expires_at)
@@ -125,30 +129,5 @@
         </div>
     </div>
 
-    <script>
-        function toggleDiscountStatus(id, isChecked) {
-            fetch('{{ route('admin.discounts.toggle-status', ':id') }}'.replace(':id', id), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (!data.success) {
-                    // Revert checkbox on error
-                    const checkbox = document.querySelector('[data-discount-id="' + id + '"]');
-                    if (checkbox) checkbox.checked = !isChecked;
-                }
-            })
-            .catch(() => {
-                // Revert checkbox on network error
-                const checkbox = document.querySelector('[data-discount-id="' + id + '"]');
-                if (checkbox) checkbox.checked = !isChecked;
-            });
-        }
-    </script>
+
 @endsection

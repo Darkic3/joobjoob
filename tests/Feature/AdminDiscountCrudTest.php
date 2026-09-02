@@ -334,7 +334,7 @@ class AdminDiscountCrudTest extends TestCase
         $discount = $this->createDiscount(['is_active' => true]);
 
         $this->actingAs($this->admin)->post(route('admin.discounts.toggle-status', $discount))
-            ->assertJson(['success' => true, 'is_active' => false]);
+            ->assertStatus(302);
 
         $discount->refresh();
         $this->assertFalse($discount->is_active);
@@ -345,7 +345,7 @@ class AdminDiscountCrudTest extends TestCase
         $discount = $this->createDiscount(['is_active' => false]);
 
         $this->actingAs($this->admin)->post(route('admin.discounts.toggle-status', $discount))
-            ->assertJson(['success' => true, 'is_active' => true]);
+            ->assertStatus(302);
 
         $discount->refresh();
         $this->assertTrue($discount->is_active);

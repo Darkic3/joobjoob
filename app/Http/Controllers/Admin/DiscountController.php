@@ -132,10 +132,7 @@ class DiscountController extends Controller
     {
         $discount->update(['is_active' => ! $discount->is_active]);
 
-        return response()->json([
-            'success' => true,
-            'is_active' => $discount->is_active,
-        ]);
+        return back()->with('success', 'وضعیت تغییر کرد');
     }
 
     /**
