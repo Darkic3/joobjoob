@@ -20,8 +20,10 @@ class BlogController extends Controller
         return view('site.blogs.index', compact('blogs', 'categories'));
     }
 
-    public function show(Blog $blog)
+    public function show(string $blog)
     {
+        $blog = Blog::where('slug', $blog)->firstOrFail();
+
         abort_unless($blog->is_active, 404);
 
         $blog->load('category');
@@ -38,8 +40,10 @@ class BlogController extends Controller
         return view('site.blogs.show', compact('blog', 'related'));
     }
 
-    public function category(BlogCategory $category)
+    public function category(string $category)
     {
+        $category = BlogCategory::where('slug', $category)->firstOrFail();
+
         abort_unless($category->is_active, 404);
 
         // مقالات این دسته + تمام زیردسته‌ها (در هر عمقی)

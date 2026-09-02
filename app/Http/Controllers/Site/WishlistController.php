@@ -16,8 +16,10 @@ class WishlistController extends Controller
         return view('site.wishlist.index', ['items' => $this->wishlist->content()]);
     }
 
-    public function toggle(Product $product): JsonResponse
+    public function toggle(string $product): JsonResponse
     {
+        $product = Product::where('slug', $product)->firstOrFail();
+
         $inWishlist = $this->wishlist->toggle($product);
 
         return response()->json([

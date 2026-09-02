@@ -99,8 +99,10 @@ class ProductController extends Controller
     /**
      * مودال پیش‌نمایش سریع محصول — فقط پارشال رندر می‌کند (داخل مودال سراسری قرار می‌گیرد).
      */
-    public function quickView(Product $product)
+    public function quickView(string $product)
     {
+        $product = Product::where('slug', $product)->firstOrFail();
+
         $product->load(['images', 'category', 'brand', 'reviews']);
 
         return view('site.products.partials.quick-view', compact('product'));
@@ -109,8 +111,10 @@ class ProductController extends Controller
     /**
      * صفحهٔ یک دسته‌بندی محصول — محصولات خود دسته + تمام زیرشاخه‌ها.
      */
-    public function category(ProductCategory $category)
+    public function category(string $category)
     {
+        $category = ProductCategory::where('slug', $category)->firstOrFail();
+
         abort_unless($category->is_active, 404);
 
         $category->load('parent');
@@ -123,8 +127,10 @@ class ProductController extends Controller
         return view('site.product-categories.show', compact('category', 'products'));
     }
 
-    public function show(Product $product)
+    public function show(string $product)
     {
+        $product = Product::where('slug', $product)->firstOrFail();
+
         $product->load([
             'images',
             'category',
@@ -285,8 +291,10 @@ class ProductController extends Controller
     /**
      * ثبت نظر جدید برای محصول.
      */
-    public function storeReview(Request $request, Product $product)
+    public function storeReview(Request $request, string $product)
     {
+        $product = Product::where('slug', $product)->firstOrFail();
+
         $isGuest = !auth()->check();
 
         $rules = [
@@ -337,8 +345,11 @@ class ProductController extends Controller
     /**
      * ثبت پاسخ به یک نظر.
      */
-    public function storeReply(Request $request, Product $product, Review $review)
+    public function storeReply(Request $request, string $product, int|string $review)
     {
+        $product = Product::where('slug', $product)->firstOrFail();
+        $review = Review::findOrFail($review);
+
         $isGuest = ! auth()->check();
 
         $rules = [
