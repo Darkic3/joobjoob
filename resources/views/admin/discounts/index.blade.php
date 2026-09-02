@@ -64,11 +64,14 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $discount->usage_records_count ?? 0 }} / {{ $discount->count }}</td>
                                 <td class="px-6 py-4">
-                                    <button onclick="toggleDiscountStatus({{ $discount->id }}, this)"
-                                            data-active="{{ $discount->is_active ? '1' : '0' }}"
-                                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out {{ $discount->is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-500' }}">
-                                        <span class="absolute start-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out {{ $discount->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
-                                    </button>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox"
+                                               data-discount-id="{{ $discount->id }}"
+                                               {{ $discount->is_active ? 'checked' : '' }}
+                                               onchange="toggleDiscountStatus({{ $discount->id }}, this.checked)"
+                                               class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                    </label>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @if($discount->expires_at)
@@ -123,7 +126,7 @@
     </div>
 
     <script>
-        function toggleDiscountStatus(id, btn) {
+        function toggleDiscountStatus(id, isChecked) {
             fetch('{{ route('admin.discounts.toggle-status', ':id') }}'.replace(':id', id), {
                 method: 'POST',
                 headers: {
@@ -135,21 +138,16 @@
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) {
-                    const track = btn;
-                    const thumb = track.querySelector('span');
-                    if (data.is_active) {
-                        track.classList.remove('bg-gray-300', 'dark:bg-gray-500');
-                        track.classList.add('bg-emerald-500');
-                        thumb.classList.remove('translate-x-0');
-                        thumb.classList.add('translate-x-5');
-                    } else {
-                        track.classList.remove('bg-emerald-500');
-                        track.classList.add('bg-gray-300', 'dark:bg-gray-500');
-                        thumb.classList.remove('translate-x-5');
-                        thumb.classList.add('translate-x-0');
-                    }
+                if (!data.success) {
+                    // Revert checkbox on error
+                    const checkbox = document.querySelector('[data-discount-id="' + id + '"]');
+                    if (checkbox) checkbox.checked = !isChecked;
                 }
+            })
+            .catch(() => {
+                // Revert checkbox on network error
+                const checkbox = document.querySelector('[data-discount-id="' + id + '"]');
+                if (checkbox) checkbox.checked = !isChecked;
             });
         }
     </script>

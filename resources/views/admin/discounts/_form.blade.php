@@ -171,18 +171,9 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-3">وضعیت</h3>
             <div class="space-y-3">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $d?->is_active ?? 1) ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">فعال</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="first_purchase" value="1" {{ old('first_purchase', $d?->first_purchase ?? 0) ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">فقط خرید اول</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="with_discount" value="1" {{ old('with_discount', $d?->with_discount ?? 0) ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">قابل اعمال روی محصولات تخفیف‌دار</span>
-                </label>
+                <x-admin.toggle name="is_active" label="فعال" :checked="old('is_active', $d?->is_active ?? 1)" />
+                <x-admin.toggle name="first_purchase" label="فقط خرید اول" :checked="old('first_purchase', $d?->first_purchase ?? 0)" />
+                <x-admin.toggle name="with_discount" label="قابل اعمال روی محصولات تخفیف‌دار" :checked="old('with_discount', $d?->with_discount ?? 0)" />
             </div>
         </div>
 
