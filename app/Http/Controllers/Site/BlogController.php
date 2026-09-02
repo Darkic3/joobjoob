@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
@@ -20,9 +21,9 @@ class BlogController extends Controller
         return view('site.blogs.index', compact('blogs', 'categories'));
     }
 
-    public function show(string $blog)
+    public function show(Request $request)
     {
-        $blog = Blog::where('slug', $blog)->firstOrFail();
+        $blog = Blog::where('slug', $request->route('blog'))->firstOrFail();
 
         abort_unless($blog->is_active, 404);
 
@@ -40,9 +41,9 @@ class BlogController extends Controller
         return view('site.blogs.show', compact('blog', 'related'));
     }
 
-    public function category(string $category)
+    public function category(Request $request)
     {
-        $category = BlogCategory::where('slug', $category)->firstOrFail();
+        $category = BlogCategory::where('slug', $request->route('category'))->firstOrFail();
 
         abort_unless($category->is_active, 404);
 

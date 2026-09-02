@@ -82,9 +82,9 @@ class CartController extends Controller
         ]);
     }
 
-    public function add(Request $request, string $product)
+    public function add(Request $request)
     {
-        $product = Product::where('id', $product)->orWhere('slug', $product)->firstOrFail();
+        $product = Product::where('id', $request->route('product'))->orWhere('slug', $request->route('product'))->firstOrFail();
 
         $request->validate([
             'qty' => 'nullable|integer|min:1',

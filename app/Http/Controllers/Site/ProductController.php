@@ -99,9 +99,9 @@ class ProductController extends Controller
     /**
      * مودال پیش‌نمایش سریع محصول — فقط پارشال رندر می‌کند (داخل مودال سراسری قرار می‌گیرد).
      */
-    public function quickView(string $product)
+    public function quickView(Request $request)
     {
-        $product = Product::where('slug', $product)->firstOrFail();
+        $product = Product::where('slug', $request->route('product'))->firstOrFail();
 
         $product->load(['images', 'category', 'brand', 'reviews']);
 
@@ -111,9 +111,9 @@ class ProductController extends Controller
     /**
      * صفحهٔ یک دسته‌بندی محصول — محصولات خود دسته + تمام زیرشاخه‌ها.
      */
-    public function category(string $category)
+    public function category(Request $request)
     {
-        $category = ProductCategory::where('slug', $category)->firstOrFail();
+        $category = ProductCategory::where('slug', $request->route('category'))->firstOrFail();
 
         abort_unless($category->is_active, 404);
 
@@ -127,9 +127,9 @@ class ProductController extends Controller
         return view('site.product-categories.show', compact('category', 'products'));
     }
 
-    public function show(string $product)
+    public function show(Request $request)
     {
-        $product = Product::where('slug', $product)->firstOrFail();
+        $product = Product::where('slug', $request->route('product'))->firstOrFail();
 
         $product->load([
             'images',
@@ -291,9 +291,9 @@ class ProductController extends Controller
     /**
      * ثبت نظر جدید برای محصول.
      */
-    public function storeReview(Request $request, string $product)
+    public function storeReview(Request $request)
     {
-        $product = Product::where('slug', $product)->firstOrFail();
+        $product = Product::where('slug', $request->route('product'))->firstOrFail();
 
         $isGuest = !auth()->check();
 
@@ -345,10 +345,10 @@ class ProductController extends Controller
     /**
      * ثبت پاسخ به یک نظر.
      */
-    public function storeReply(Request $request, string $product, int|string $review)
+    public function storeReply(Request $request)
     {
-        $product = Product::where('slug', $product)->firstOrFail();
-        $review = Review::findOrFail($review);
+        $product = Product::where('slug', $request->route('product'))->firstOrFail();
+        $review = Review::findOrFail($request->route('review'));
 
         $isGuest = ! auth()->check();
 
