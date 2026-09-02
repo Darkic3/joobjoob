@@ -119,7 +119,55 @@
                 <x-admin.jalali-datetime name="starts_at" :value="old('starts_at', $d?->starts_at ?? '')" label="تاریخ شروع" placeholder="۱۴۰۴/۰۶/۱۱ ۱۰:۳۰" />
                 <x-admin.jalali-datetime name="expires_at" :value="old('expires_at', $d?->expires_at ?? '')" label="تاریخ انقضا" placeholder="۱۴۰۴/۰۶/۱۱ ۱۰:۳۰" />
                 <div x-data="userPicker()" class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">محدود به کاربر خاص</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">محدود به کاربر خاص</label>
+                    
+                    {{-- فیلترهای هوشمند --}}
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button type="button" @click="loadFilter('new_week')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'new_week' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            ثبت‌نام یک هفته اخیر
+                        </button>
+                        <button type="button" @click="loadFilter('new_month')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'new_month' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            ثبت‌نام یک ماه اخیر
+                        </button>
+                        <button type="button" @click="loadFilter('no_orders')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'no_orders' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            بدون سفارش
+                        </button>
+                        <button type="button" @click="loadFilter('no_paid_orders')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'no_paid_orders' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            خرید اولی‌ها
+                        </button>
+                        <button type="button" @click="loadFilter('has_orders')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'has_orders' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                            دارای سفارش
+                        </button>
+                        <button type="button" @click="loadFilter('active_7d')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'active_7d' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            فعال ۷ روز اخیر
+                        </button>
+                        <button type="button" @click="loadFilter('inactive_30d')" :disabled="loadingFilter"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+                                :class="activeFilter === 'inactive_30d' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-300 dark:hover:border-indigo-600'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            غیرفعال ۳۰ روز اخیر
+                        </button>
+                    </div>
+
+                    {{-- جستجو --}}
                     <div class="relative">
                         <input type="text"
                                x-model="search"
@@ -148,6 +196,8 @@
                             </template>
                         </div>
                     </div>
+
+                    {{-- کاربران انتخاب شده --}}
                     <div class="flex flex-wrap gap-2 mt-2">
                         <template x-for="uid in selectedUserIds" :key="uid">
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
@@ -156,10 +206,20 @@
                             </span>
                         </template>
                     </div>
+
+                    {{-- ارسال hidden inputs --}}
                     <template x-for="uid in selectedUserIds" :key="uid+'-input'">
                         <input type="hidden" name="user_ids[]" :value="uid">
                     </template>
-                    <p class="text-xs text-gray-400 mt-1">خالی = همه کاربران</p>
+
+                    {{-- وضعیت بارگذاری --}}
+                    <div x-show="loadingFilter" class="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        <span>در حال بارگذاری کاربران...</span>
+                    </div>
+                    <div x-show="filterResult" x-text="filterResult" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1"></div>
+
+                    <p class="text-xs text-gray-400 mt-2">خالی = همه کاربران</p>
                 </div>
             </div>
         </div>
@@ -195,6 +255,9 @@ function userPicker() {
     return {
         open: false,
         search: '',
+        loadingFilter: false,
+        activeFilter: null,
+        filterResult: '',
         allUsers: @json($users ?? []),
         filteredUsers: @json($users ?? []),
         selectedUserIds: @json(old('user_ids', $d?->users?->pluck('id')?->toArray() ?? [])),
@@ -211,6 +274,54 @@ function userPicker() {
                 (u.email && u.email.toLowerCase().includes(q))
             );
         },
+
+        async loadFilter(filter) {
+            // اگر همین فیلتر فعال است، غیرفعالش کن (بازگشت به لیست اولیه)
+            if (this.activeFilter === filter) {
+                this.activeFilter = null;
+                this.allUsers = @json($users ?? []);
+                this.filteredUsers = this.allUsers;
+                this.filterResult = '';
+                return;
+            }
+
+            this.loadingFilter = true;
+            this.activeFilter = filter;
+            this.filterResult = '';
+
+            try {
+                const response = await fetch('{{ route('admin.discounts.users.filter') }}?filter=' + filter, {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                this.allUsers = data.users;
+                this.filteredUsers = data.users;
+                this.search = '';
+                this.open = true;
+
+                // نمایش تعداد نتایج
+                const filterNames = {
+                    'new_week': 'ثبت‌نام یک هفته اخیر',
+                    'new_month': 'ثبت‌نام یک ماه اخیر',
+                    'no_orders': 'بدون سفارش',
+                    'no_paid_orders': 'خرید اولی‌ها',
+                    'has_orders': 'دارای سفارش',
+                    'active_7d': 'فعال ۷ روز اخیر',
+                    'inactive_30d': 'غیرفعال ۳۰ روز اخیر'
+                };
+                this.filterResult = data.users.length + ' کاربر با فیلتر "' + (filterNames[filter] || filter) + '" یافت شد';
+            } catch (e) {
+                console.error('Filter error:', e);
+                this.filterResult = 'خطا در بارگذاری اطلاعات';
+            } finally {
+                this.loadingFilter = false;
+            }
+        },
+
         toggleUser(user) {
             const idx = this.selectedUserIds.indexOf(user.id);
             if (idx > -1) {

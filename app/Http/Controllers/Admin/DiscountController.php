@@ -160,4 +160,61 @@ class DiscountController extends Controller
         $userIds = $request->input('user_ids', []);
         $discount->users()->sync($userIds);
     }
+
+    /**
+     * فیلتر هوشمند کاربران بر اساس معیارهای مختلف (AJAX)
+     */
+    public function filterUsers(Request $request)
+    {
+        $filter = $request->get('filter');
+
+        $query = \App\Models\User::select('id', 'name', 'mobile', 'email');
+
+        switch ($filter) {
+            case 'new_month':
+                // کاربرانی که در یک ماه اخیر ثبت نام کرده‌اند
+                $query->where('created_at', '>=', now()->subMonth());
+                break;
+
+            case 'new_week':
+                // کاربرانی که در یک هفته اخیر ثبت نام کرده‌اند
+                $query->where('created_at', '>=', now()->subWeek());
+                break;
+
+            case 'no_orders':
+                // کاربرانی که تا به حال سفارشی نداشته‌اند
+                $query->whereDoesntHave('orders');
+                break;
+
+            case 'has_orders':
+                // کاربرانی که حداقل یک سفارش داشته‌اند
+                $query->has('orders');
+                break;
+
+            case 'no_paid_orders':
+                // کاربرانی که سفارش پرداخت شده ندارند (خرید اولی‌ها)
+                $query->whereDoesntHave('orders', function ($q) {
+                    $q->where('order_status', 'paid');
+                });
+                break;
+
+            case 'inactive_30d':
+                // کاربرانی که ۳۰ روز است فعالیت نداشته‌اند
+                $query->where('updated_at', '<=', now()->subDays(30));
+                break;
+
+            case 'active_7d':
+                // کاربرانی که در ۷ روز اخیر فعال بوده‌اند
+                $query->where('updated_at', '>=', now()->subWeek());
+                break;
+
+            default:
+                // بدون فیلتر — همه کاربران
+                break;
+        }
+
+        $users = $query->orderBy('name')->limit(500)->get();
+
+        return response()->json(['users' => $users]);
+    }
 }

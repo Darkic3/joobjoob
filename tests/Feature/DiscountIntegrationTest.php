@@ -745,4 +745,92 @@ class DiscountIntegrationTest extends TestCase
         $this->assertNotContains('V3', $valid);
         $this->assertNotContains('V4', $valid);
     }
+
+    // ═══ R. User Filter API ═══
+
+    public function test_filter_users_new_month_returns_recent_users(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        // Create old user (60 days ago)
+        User::factory()->create(['created_at' => now()->subDays(60)]);
+
+        // Create recent user (10 days ago)
+        $recentUser = User::factory()->create(['created_at' => now()->subDays(10)]);
+
+        $this->actingAs($admin)->getJson(route('admin.discounts.users.filter', ['filter' => 'new_month']))
+            ->assertOk()
+            ->assertJsonFragment(['id' => $recentUser->id]);
+
+        // Verify old user is NOT in the results
+        $response = $this->getJson(route('admin.discounts.users.filter', ['filter' => 'new_month']));
+        $userIds = collect($response->json('users'))->pluck('id')->toArray();
+        $this->assertNotContains(User::where('created_at', '<=', now()->subDays(60))->first()->id, $userIds);
+    }
+
+    public function test_filter_users_no_orders_returns_users_without_orders(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        $userWithNoOrders = User::factory()->create();
+        $userWithOrders = User::factory()->create();
+        $userWithOrders->orders()->create([
+            'order_status' => 'paid',
+            'total_price' => 100000,
+            'payment_price' => 100000,
+            'address' => ['state' => '', 'city' => '', 'address' => ''],
+        ]);
+
+        $this->actingAs($admin)->getJson(route('admin.discounts.users.filter', ['filter' => 'no_orders']))
+            ->assertOk()
+            ->assertJsonFragment(['id' => $userWithNoOrders->id])
+            ->assertJsonMissing(['id' => $userWithOrders->id]);
+    }
+
+    public function test_filter_users_no_paid_orders_returns_users_without_paid_orders(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        $newUser = User::factory()->create();
+        $paidUser = User::factory()->create();
+        $paidUser->orders()->create([
+            'order_status' => 'paid',
+            'total_price' => 100000,
+            'payment_price' => 100000,
+            'address' => ['state' => '', 'city' => '', 'address' => ''],
+        ]);
+
+        $this->actingAs($admin)->getJson(route('admin.discounts.users.filter', ['filter' => 'no_paid_orders']))
+            ->assertOk()
+            ->assertJsonFragment(['id' => $newUser->id])
+            ->assertJsonMissing(['id' => $paidUser->id]);
+    }
+
+    public function test_filter_users_has_orders_returns_users_with_orders(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        $userWithNoOrders = User::factory()->create();
+        $userWithOrders = User::factory()->create();
+        $userWithOrders->orders()->create([
+            'order_status' => 'paid',
+            'total_price' => 100000,
+            'payment_price' => 100000,
+            'address' => ['state' => '', 'city' => '', 'address' => ''],
+        ]);
+
+        $this->actingAs($admin)->getJson(route('admin.discounts.users.filter', ['filter' => 'has_orders']))
+            ->assertOk()
+            ->assertJsonFragment(['id' => $userWithOrders->id])
+            ->assertJsonMissing(['id' => $userWithNoOrders->id]);
+    }
+
+    public function test_filter_users_returns_json_array(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_active' => true]);
+
+        $this->actingAs($admin)->getJson(route('admin.discounts.users.filter', ['filter' => 'new_week']))
+            ->assertOk()
+            ->assertJsonStructure(['users' => [['id', 'name', 'mobile', 'email']]]);
+    }
 }

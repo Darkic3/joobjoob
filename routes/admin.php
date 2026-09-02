@@ -99,6 +99,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('discounts', \App\Http\Controllers\Admin\DiscountController::class)->except('show');
         Route::get('discounts/{discount}', [\App\Http\Controllers\Admin\DiscountController::class, 'show'])->name('discounts.show');
         Route::post('discounts/{discount}/toggle-status', [\App\Http\Controllers\Admin\DiscountController::class, 'toggleStatus'])->name('discounts.toggle-status');
+        Route::get('discounts/users/filter', [\App\Http\Controllers\Admin\DiscountController::class, 'filterUsers'])->name('discounts.users.filter');
 
         // ========== لاگ حسابرسی ==========
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
