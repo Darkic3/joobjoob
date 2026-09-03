@@ -52,7 +52,7 @@
             <div class="neu-card">
                 <div class="flex items-start gap-3 mb-3">
                     <div class="w-9 h-9 rounded-xl grid place-items-center shrink-0" style="background: color-mix(in srgb, var(--accent) 10%, transparent);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
-                    <div class="flex-1 min-w-0"><p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ $address->receiptor_full_name }}</p><p class="text-[11px]" style="color: var(--text-secondary);">{{ ?->name }} — {{ ?->name }}</p></div>
+                    <div class="flex-1 min-w-0"><p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ $address->receiptor_full_name }}</p><p class="text-[11px]" style="color: var(--text-secondary);">{{ $address->state?->name }} — {{ $address->city?->name }}</p></div>
                 </div>
                 <p class="text-xs leading-relaxed mb-3" style="color: var(--text-secondary);">{{ $address->receiptor_full_name }}</p>
                 <div class="flex items-center gap-3 text-[11px]" style="color: var(--text-secondary);"><span dir="ltr">{{ $address->receiptor_full_name }}</span><span>|</span><span dir="ltr">{{ $address->receiptor_full_name }}</span></div>
