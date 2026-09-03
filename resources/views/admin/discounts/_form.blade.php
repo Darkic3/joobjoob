@@ -290,13 +290,21 @@ function userPicker() {
             this.filterResult = '';
 
             try {
-                const response = await fetch('{{ route('admin.discounts.users.filter') }}?filter=' + filter, {
+                const url = '{{ url('admin/discounts/users/filter') }}?filter=' + encodeURIComponent(filter);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'same-origin',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
                     }
                 });
+
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
                 const data = await response.json();
                 this.allUsers = data.users;
                 this.filteredUsers = data.users;
