@@ -4,15 +4,9 @@
 
 @section('content')
 <div class=\"grid md:grid-cols-4 gap-6\">
-    <aside class=\"neu-card h-fit space-y-2\">
-        <a href=\"{{ route('dashboard') }}\" class=\"block px-4 py-2 rounded-lg hover:opacity-80\">{{ __('messages.account_info') }}</a>
-        <a href=\"{{ route('dashboard.orders') }}\" class=\"block px-4 py-2 rounded-lg font-semibold\" style=\"color: var(--accent);\">{{ __('messages.my_orders') }}</a>
-        <a href=\"{{ route('dashboard.wishlist') }}\" class=\"block px-4 py-2 rounded-lg hover:opacity-80\">{{ __('messages.wishlist') }}</a>
-        <a href=\"{{ route('dashboard.addresses') }}\" class=\"block px-4 py-2 rounded-lg hover:opacity-80\">{{ __('messages.addresses') }}</a>
-
-        <form action=\"{{ localizedRoute('logout') }}\" method=\"POST\" class=\"pt-2 mt-2\" style=\"border-top: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);\">\n            @csrf
-            <button type=\"submit\" class=\"flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80\" style=\"color: var(--danger);\">\n                <svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\n                    <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/>\n                    <path d=\"m16 17 5-5-5-5\"/><path d=\"M21 12H9\"/>\n                </svg>\n                {{ __('messages.logout') }}\n            </button>\n        </form>
-    </aside>
+    <div class="neu-card p-4 h-fit sticky top-24">
+            @include('site.dashboard._sidebar')
+        </div>
 
     <div class=\"md:col-span-3 space-y-4\">
         <div class=\"flex items-center justify-between mb-2\">\n            <h2 class=\"text-lg font-bold\" style=\"color: var(--text-primary);\">{{ __('messages.my_orders') }}</h2>\n            <a href=\"{{ route('dashboard') }}\" class=\"text-xs font-bold\" style=\"color: var(--text-secondary);\">← بازگشت</a>\n        </div>

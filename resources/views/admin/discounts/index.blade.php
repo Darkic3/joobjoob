@@ -79,7 +79,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @if($discount->expires_at)
-                                        {{ jdate($discount->expires_at)->format('Y/m/d') }}
+                                        {{ show_date($discount->expires_at, 'Y/m/d') }}
                                         @if($discount->expires_at->isPast())
                                             <span class="text-red-500 text-xs">(منقضی)</span>
                                         @endif

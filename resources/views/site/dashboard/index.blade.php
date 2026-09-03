@@ -4,84 +4,122 @@
 
 @section('content')
 <div class="grid md:grid-cols-4 gap-6">
-    <aside class="neu-card h-fit space-y-2">
-        <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded-lg font-semibold" style="color: var(--accent);">{{ __('messages.account_info') }}</a>
-        <a href="{{ route('dashboard.orders') }}" class="block px-4 py-2 rounded-lg hover:opacity-80">{{ __('messages.my_orders') }}</a>
-        <a href="{{ route('dashboard.wishlist') }}" class="block px-4 py-2 rounded-lg hover:opacity-80">{{ __('messages.wishlist') }}</a>
-        <a href="{{ route('dashboard.addresses') }}" class="block px-4 py-2 rounded-lg hover:opacity-80">{{ __('messages.addresses') }}</a>
+    {{-- سایدبار --}}
+    <div class="md:col-span-1">
+        <div class="neu-card p-4 h-fit sticky top-24">
+            @include('site.dashboard._sidebar')
+        </div>
+    </div>
 
-        <form action="{{ localizedRoute('logout') }}" method="POST" class="pt-2 mt-2" style="border-top: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);">
-            @csrf
-            <button type="submit" class="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80" style="color: var(--danger);">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
-                </svg>
-                {{ __('messages.logout') }}
-            </button>
-        </form>
-    </aside>
+    {{-- محتوای اصلی --}}
+    <div class="md:col-span-3 space-y-5">
 
-    <div class="md:col-span-3 space-y-6">
+        {{-- کارت اطلاعات کاربر --}}
         <div class="neu-card">
-            <h2 class="font-bold mb-2" style="color: var(--text-primary);">{{ __('messages.account_info') }}</h2>
-            <p class="text-sm" style="color: var(--text-secondary);">{{ auth()->user()->name }} — {{ auth()->user()->email }}</p>
-            @if(auth()->user()->mobile)
-                <p class="text-sm mt-1" style="color: var(--text-secondary);" dir="ltr">{{ auth()->user()->mobile }}</p>
-            @endif
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-2xl grid place-items-center shrink-0"
+                     style="background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="font-bold" style="color: var(--text-primary);">{{ __('messages.account_info') }}</h2>
+                    <p class="text-xs" style="color: var(--text-secondary);">{{ __('messages.welcome_back') }}</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="p-3 rounded-xl" style="background: color-mix(in srgb, var(--text-primary) 4%, transparent);">
+                    <p class="text-[10px] mb-1" style="color: var(--text-secondary);">نام</p>
+                    <p class="text-sm font-bold" style="color: var(--text-primary);">{{ auth()->user()->name }}</p>
+                </div>
+                @if(auth()->user()->mobile)
+                    <div class="p-3 rounded-xl" style="background: color-mix(in srgb, var(--text-primary) 4%, transparent);">
+                        <p class="text-[10px] mb-1" style="color: var(--text-secondary);">موبایل</p>
+                        <p class="text-sm font-bold" style="color: var(--text-primary);" dir="ltr">{{ auth()->user()->mobile }}</p>
+                    </div>
+                @endif
+                @if(auth()->user()->email)
+                    <div class="p-3 rounded-xl" style="background: color-mix(in srgb, var(--text-primary) 4%, transparent);">
+                        <p class="text-[10px] mb-1" style="color: var(--text-secondary);">ایمیل</p>
+                        <p class="text-sm font-bold truncate" style="color: var(--text-primary);" dir="ltr">{{ auth()->user()->email }}</p>
+                    </div>
+                @endif
+            </div>
         </div>
 
+        {{-- کارت کد تخفیف خوشامدگویی --}}
+        @php
+            $welcomeDiscount = \App\Models\Discount::where('user_id', auth()->id())
+                ->where('title', 'تخفیف خوشامدگویی')
+                ->where('is_active', true)
+                ->whereNull('deleted_at')
+                ->first();
+        @endphp
+        @if($welcomeDiscount && !$welcomeDiscount->hasReachedLimit(auth()->id()))
+            <div class="neu-card relative overflow-hidden">
+                <div aria-hidden="true"
+                     style="position: absolute; inset-inline-end: -30px; top: -30px; width: 120px; height: 120px; border-radius: 999px;
+                            background: radial-gradient(circle, color-mix(in srgb, var(--success) 12%, transparent), transparent 70%); pointer-events: none;"></div>
+                <div class="relative flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl grid place-items-center shrink-0"
+                         style="background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 12 20 22 4 22 4 12"/>
+                            <rect x="2" y="7" width="20" height="5"/>
+                            <line x1="12" y1="22" x2="12" y2="7"/>
+                            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold" style="color: var(--text-primary);">🎁 کد تخفیف خوشامدگویی شما</p>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-black tracking-wider"
+                                  style="background: color-mix(in srgb, var(--success) 10%, transparent); color: var(--success);"
+                                  dir="ltr">{{ $welcomeDiscount->code }}</span>
+                            <button onclick="navigator.clipboard.writeText('{{ $welcomeDiscount->code }}').then(() => this.textContent = '✓ کپی شد')"
+                                    class="text-[11px] font-bold px-2 py-1 rounded-lg transition-all hover:opacity-80"
+                                    style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">
+                                کپی
+                            </button>
+                        </div>
+                        <p class="text-[11px] mt-2" style="color: var(--text-secondary);">
+                            {{ $welcomeDiscount->amount }}٪ تخفیف — تا {{ show_date($welcomeDiscount->expires_at, 'd F Y') }} معتبر
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- آخرین سفارشات --}}
         <div class="neu-card">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold" style="color: var(--text-primary);">{{ __('messages.my_orders') }}</h2>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl grid place-items-center" style="background: color-mix(in srgb, var(--accent) 10%, transparent);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
+                            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <h2 class="font-bold" style="color: var(--text-primary);">{{ __('messages.my_orders') }}</h2>
+                </div>
                 @if($orders->isNotEmpty())
                     <a href="{{ route('dashboard.orders') }}" class="text-xs font-bold" style="color: var(--accent);">مشاهده همه →</a>
                 @endif
             </div>
+
             @if($orders->isNotEmpty())
                 <div class="space-y-3">
                     @foreach($orders as $order)
-                        <a href="{{ route('dashboard.order-detail', $order->id) }}" class="neu-flat-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 hover:translate-y-[-1px] block" style="text-decoration: none; color: inherit;">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: color-mix(in srgb, var(--accent) 10%, transparent);">
-                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold" style="color: var(--text-primary);">سفارش #{{ $order->id }}</p>
-                                    <p class="text-xs mt-0.5" style="color: var(--text-secondary);">{{ show_date($order->created_at, 'd F Y - H:i') }}</p>
-                                </div>
+                        <a href="{{ route('dashboard.order-detail', $order->id) }}"
+                           class="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 hover:translate-y-[-1px]"
+                           style="background: color-mix(in srgb, var(--text-primary) 3%, transparent); text-decoration: none; color: inherit;">
+                            <div class="w-10 h-10 rounded-xl grid place-items-center shrink-0" style="background: color-mix(in srgb, var(--accent) 10%, transparent);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
+                                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
                             </div>
-                            <div class="flex items-center gap-3">
-                                @if($order->shippingMethod)
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full" style="background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent);">{{ $order->shippingMethod->title }}</span>
-                                @endif
-                                @if($order->status)
-                                    @php
-                                        $badgeColor = match($order->status['badge'] ?? '') {
-                                            'success' => 'var(--success)',
-                                            'warning' => '#f59e0b',
-                                            'danger' => 'var(--danger)',
-                                            default => 'var(--text-secondary)',
-                                        };
-                                    @endphp
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: color-mix(in srgb, {{ $badgeColor }} 12%, transparent); color: {{ $badgeColor }};">{{ $order->status['title'] }}</span>
-                                @endif
-                                <span class="mono font-black text-sm" style="color: var(--accent);" dir="ltr">{{ format_price($order->payment_price) }}</span>
-                                <svg class="w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center py-10">
-                    <div class="neu-icon-circle w-16 h-16 mx-auto grid place-items-center mb-4" style="background: color-mix(in srgb, var(--text-secondary) 8%, transparent);">
-                        <svg class="w-7 h-7" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    </div>
-                    <p class="text-sm font-bold mb-1" style="color: var(--text-primary);">هنوز سفارشی ثبت نکرده‌اید</p>
-                    <a href="{{ localizedRoute('products.index') }}" class="text-xs font-bold inline-block mt-2" style="color: var(--accent);">مشاهده محصولات →</a>
-                </div>
-            @endif
-        </div>
-    </div>
-</div>
-@endsection
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold truncate" style="color: var(--text-primary);">سفارش #{{ $order->id }}</p>
+     
