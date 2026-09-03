@@ -348,4 +348,16 @@ return [
     'newsletter' => 'Bülten',
     'newsletter_email_placeholder' => 'E-posta adresiniz',
     'welcome_back' => 'Tekrar hoş geldiniz',
+
+    'no_orders_yet' => 'Henüz sipariş vermediniz',
+
+    'start_shopping' => 'Alışverişe başlamak için ürünlerimize göz atın',
+
+    'order_number' => 'Sipariş #',
+
+    'details' => 'Detaylar',
+
+    'invoice' => 'Fatura',
+
+    'back' => 'Geri',
 ];

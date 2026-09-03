@@ -348,4 +348,16 @@ return [
     'newsletter' => 'النشرة الإخبارية',
     'newsletter_email_placeholder' => 'بريدك الإلكتروني',
     'welcome_back' => 'مرحبا بعودك',
+
+    'no_orders_yet' => 'لم تقم بطلب أي طلبات بعد',
+
+    'start_shopping' => 'لبدء التسوق، تصفح منتجاتنا',
+
+    'order_number' => 'طلب رقم #',
+
+    'details' => 'التفاصيل',
+
+    'invoice' => 'الفاتورة',
+
+    'back' => 'رجوع',
 ];

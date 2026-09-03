@@ -349,4 +349,16 @@ return [
     'breadcrumb' => 'مسیر صفحه',
     'quick_links' => 'دسترسی سریع',
     'welcome_back' => 'خوش آمدید',
+
+    'no_orders_yet' => 'هنوز سفارشی ثبت نکرده‌اید',
+
+    'start_shopping' => 'برای شروع خرید، محصولات ما را ببینید',
+
+    'order_number' => 'سفارش #',
+
+    'details' => 'جزئیات',
+
+    'invoice' => 'فاکتور',
+
+    'back' => 'بازگشت',
 ];

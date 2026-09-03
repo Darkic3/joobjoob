@@ -348,4 +348,16 @@ return [
     'breadcrumb' => 'Page trail',
     'quick_links' => 'Quick links',
     'welcome_back' => 'Welcome back',
+
+    'no_orders_yet' => 'You haven't placed any orders yet',
+
+    'start_shopping' => 'To start shopping, browse our products',
+
+    'order_number' => 'Order #',
+
+    'details' => 'Details',
+
+    'invoice' => 'Invoice',
+
+    'back' => 'Back',
 ];
