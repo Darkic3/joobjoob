@@ -48,20 +48,20 @@
         </div>
         @else
         <div class="grid sm:grid-cols-2 gap-4">
-            <?php foreach($states as $state): ?>
+            @foreach($addresses as $address)
             <div class="neu-card">
                 <div class="flex items-start gap-3 mb-3">
                     <div class="w-9 h-9 rounded-xl grid place-items-center shrink-0" style="background: color-mix(in srgb, var(--accent) 10%, transparent);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
-                    <div class="flex-1 min-w-0"><p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{  }}</p><p class="text-[11px]" style="color: var(--text-secondary);">{{ ?->name }} — {{ ?->name }}</p></div>
+                    <div class="flex-1 min-w-0"><p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ $address->receiptor_full_name }}</p><p class="text-[11px]" style="color: var(--text-secondary);">{{ ?->name }} — {{ ?->name }}</p></div>
                 </div>
-                <p class="text-xs leading-relaxed mb-3" style="color: var(--text-secondary);">{{  }}</p>
-                <div class="flex items-center gap-3 text-[11px]" style="color: var(--text-secondary);"><span dir="ltr">{{  }}</span><span>|</span><span dir="ltr">{{  }}</span></div>
+                <p class="text-xs leading-relaxed mb-3" style="color: var(--text-secondary);">{{ $address->receiptor_full_name }}</p>
+                <div class="flex items-center gap-3 text-[11px]" style="color: var(--text-secondary);"><span dir="ltr">{{ $address->receiptor_full_name }}</span><span>|</span><span dir="ltr">{{ $address->receiptor_full_name }}</span></div>
                 <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);">
-                    <button @click="editAddress({{ json_encode() }})" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">ویرایش</button>
-                    <form action="{{ route("dashboard.addresses.delete", ) }}" method="POST" onsubmit="return confirm("آیا مطمئن هستید؟")">@csrf @method("DELETE")<button type="submit" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger);">حذف</button></form>
+                    <button @click="editAddress({{ json_encode($address) }})" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">ویرایش</button>
+                    <form action="{{ route('dashboard.addresses.delete', $address->id) }}" method="POST" onsubmit="return confirm('آیا مطمئن هستید؟')">@csrf @method('DELETE')<button type="submit" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger);">حذف</button></form>
                 </div>
             </div>
-            <?php endforeach; ?>
+            @endforeach
         </div>
         @endif
     </div>
@@ -75,7 +75,7 @@ function addressManager() {
         form: { name:"", mobile:"", state_id:"", city_id:"", address:"", postal_code:"" },
         resetForm() { this.editingId = null; this.form = { name:"", mobile:"", state_id:"", city_id:"", address:"", postal_code:"" }; this.cities = []; },
         editAddress(a) { this.editingId = a.id; this.form = { name:a.receiptor_full_name, mobile:a.receiptor_mobile, state_id:a.state_id, city_id:a.city_id, address:a.address, postal_code:a.postal_code }; this.loadCities(a.state_id); this.showForm = true; },
-        async loadCities(s) { if(!s){this.cities=[];return;} const r = await fetch("{{ route("dashboard.addresses.cities") }}?state_id="+s); const d = await r.json(); this.cities = d.cities||[]; }
+        async loadCities(s) { if(!s){this.cities=[];return;} const r = await fetch('{{ route("dashboard.addresses.cities") }}?state_id='+s); const d = await r.json(); this.cities = d.cities||[]; }
     };
 }
 </script>

@@ -347,4 +347,5 @@ return [
     'footer_desc' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'newsletter' => 'النشرة الإخبارية',
     'newsletter_email_placeholder' => 'بريدك الإلكتروني',
+    'welcome_back' => 'مرحبا بعودك',
 ];

@@ -347,4 +347,5 @@ return [
     'footer_desc' => 'En iyi kalite ve fiyatlarla online mağaza',
     'newsletter' => 'Bülten',
     'newsletter_email_placeholder' => 'E-posta adresiniz',
+    'welcome_back' => 'Tekrar hoş geldiniz',
 ];

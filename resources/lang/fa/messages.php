@@ -348,4 +348,5 @@ return [
 
     'breadcrumb' => 'مسیر صفحه',
     'quick_links' => 'دسترسی سریع',
+    'welcome_back' => 'خوش آمدید',
 ];

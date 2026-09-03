@@ -347,4 +347,5 @@ return [
 
     'breadcrumb' => 'Page trail',
     'quick_links' => 'Quick links',
+    'welcome_back' => 'Welcome back',
 ];
