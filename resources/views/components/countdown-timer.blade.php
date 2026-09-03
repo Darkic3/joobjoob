@@ -4,7 +4,7 @@
     محاسبهٔ زمان پایان (endMs) در کلاس انجام می‌شود.
 --}}
 
-<div class="cd-wrap" id="{{ $id }}-wrap" role="timer" aria-label="{{ __('messages.deal_ends_in') }}">
+<div class="cd-wrap" id="{{ $id }}-wrap" dir="ltr" style="direction: ltr; unicode-bidi: isolate;" role="timer" aria-label="{{ __('messages.deal_ends_in') }}">
     <div class="cd-unit">
         <div class="cd-chip mono" id="{{ $id }}-h">00</div>
         <span class="cd-label">{{ __('messages.hours') }}</span>
@@ -23,10 +23,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        function _cdLocal(n) {
+            var s = String(n).padStart(2, '0');
+            if (window.localizeDigits) {
+                s = window.localizeDigits.convert(s);
+            }
+            return s;
+        }
         @if($endMs !== null)
-            startCountdownTo({ h: '{{ $id }}-h', m: '{{ $id }}-m', s: '{{ $id }}-s' }, {{ $endMs }});
+            startCountdownTo({ h: '{{ $id }}-h', m: '{{ $id }}-m', s: '{{ $id }}-s' }, {{ $endMs }}, _cdLocal);
         @else
-            startCountdown({ h: '{{ $id }}-h', m: '{{ $id }}-m', s: '{{ $id }}-s' }, {{ (int) ($endsInSeconds ?? 3600) }});
+            startCountdown({ h: '{{ $id }}-h', m: '{{ $id }}-m', s: '{{ $id }}-s' }, {{ (int) ($endsInSeconds ?? 3600) }}, _cdLocal);
         @endif
     });
 </script>

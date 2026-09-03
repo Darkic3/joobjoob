@@ -16,11 +16,13 @@ class AdminPermissionTest extends TestCase
     {
         $parts = explode('.', $name);
 
-        return Permission::create([
-            'name' => $name,
-            'group' => $parts[1] ?? 'misc',
-            'label_key' => "permissions.access.{$parts[1]}.index",
-        ]);
+        return Permission::firstOrCreate(
+            ['name' => $name],
+            [
+                'group' => $parts[1] ?? 'misc',
+                'label_key' => "permissions.access.{$parts[1]}.index",
+            ]
+        );
     }
 
     private function actingAsUserWith(string ...$permissionNames): User

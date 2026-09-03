@@ -12,7 +12,14 @@ class HeroSlideService
 
     public static function getSlides()
     {
-        return HeroSlide::active()->get();
+        $slides = HeroSlide::active()->get();
+
+        // Only eager-load 'linkable' for slides whose linkable_type is a real Eloquent model class
+        // (skip special types like 'page' and 'url' which are plain strings, not classes)
+        $slides->filter(fn ($s) => $s->linkable_type && class_exists($s->linkable_type))
+            ->load('linkable');
+
+        return $slides;
     }
 
     /**

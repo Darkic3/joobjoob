@@ -146,12 +146,12 @@
                         <div class="flex items-center gap-3" data-price-view>
                             <span class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr"
                                   id="display-final-price">
-                                {{ number_format($minVariant->final_price) }}
+                                {{ format_price($minVariant->final_price) }}
                             </span>
                             @if($minVariant->discounted_price > 0 && $minVariant->discounted_price < $minVariant->price)
                                 <span class="text-lg line-through" style="color: var(--text-secondary);" dir="ltr"
                                       id="display-old-price">
-                                    {{ number_format($minVariant->price) }}
+                                    {{ format_price($minVariant->price) }}
                                 </span>
                                 <span class="text-xs font-bold bg-red-500 text-white px-2 py-1 rounded-full"
                                       id="display-percent">
@@ -169,24 +169,24 @@
                         @endif
                     @else
                         <div class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr">
-                            {{ number_format($product->final_price) }}
+                            {{ format_price($product->final_price) }}
                         </div>
                     @endif
                 @else
                     <div class="flex items-center gap-3">
                         @if($product->has_discount)
                             <span class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr">
-                                {{ number_format($product->final_price) }}
+                                {{ format_price($product->final_price) }}
                             </span>
                             <span class="text-lg line-through" style="color: var(--text-secondary);" dir="ltr">
-                                {{ number_format($product->price) }}
+                                {{ format_price($product->price) }}
                             </span>
                             <span class="text-xs font-bold bg-red-500 text-white px-2 py-1 rounded-full">
                                 {{ $product->discount_percentage }}٪-
                             </span>
                         @else
                             <span class="text-3xl font-extrabold" style="color: var(--accent);" dir="ltr">
-                                {{ number_format($product->final_price) }}
+                                {{ format_price($product->final_price) }}
                             </span>
                         @endif
                     </div>
@@ -432,7 +432,7 @@
         <div class="sticky-cart-bar__inner">
             <div class="sticky-cart-bar__info">
                 <span class="sticky-cart-bar__price mono font-black text-lg" style="color: var(--accent);" dir="ltr">
-                    {{ number_format($product->final_price) }}
+                    {{ format_price($product->final_price) }}
                 </span>
                 <span class="sticky-cart-bar__toman text-[10px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
             </div>

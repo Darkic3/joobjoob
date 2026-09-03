@@ -194,8 +194,8 @@
                             <td class="px-6 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $item->productVariant?->label ?? '—' }}</td>
                             <td class="px-6 py-3 text-sm text-gray-800 dark:text-gray-200">{{ $item->quantity }}</td>
                             <td class="px-6 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $item->weight ? number_format($item->weight) . 'g' : '—' }}</td>
-                            <td class="px-6 py-3 text-sm text-gray-800 dark:text-gray-200" dir="ltr">{{ number_format($item->price) }}</td>
-                            <td class="px-6 py-3 text-sm font-bold text-indigo-600 dark:text-indigo-400" dir="ltr">{{ number_format($item->price * $item->quantity) }}</td>
+                            <td class="px-6 py-3 text-sm text-gray-800 dark:text-gray-200" dir="ltr">{{ format_price($item->price) }}</td>
+                            <td class="px-6 py-3 text-sm font-bold text-indigo-600 dark:text-indigo-400" dir="ltr">{{ format_price($item->price * $item->quantity) }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -215,12 +215,12 @@
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
                     <span class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.subtotal') }}</span>
-                    <span class="font-semibold text-gray-800 dark:text-gray-200" dir="ltr">{{ number_format($order->total_price) }} {{ __('messages.toman') }}</span>
+                    <span class="font-semibold text-gray-800 dark:text-gray-200" dir="ltr">{{ format_price($order->total_price) }} {{ __('messages.toman') }}</span>
                 </div>
                 @if($order->discount_price > 0)
                     <div class="flex justify-between">
                         <span class="text-emerald-600 dark:text-emerald-400">{{ __('admin.orders.discount') }}</span>
-                        <span class="font-semibold text-emerald-600 dark:text-emerald-400" dir="ltr">-{{ number_format($order->discount_price) }} {{ __('messages.toman') }}</span>
+                        <span class="font-semibold text-emerald-600 dark:text-emerald-400" dir="ltr">-{{ format_price($order->discount_price) }} {{ __('messages.toman') }}</span>
                     </div>
                 @endif
                 <div class="flex justify-between">
@@ -229,7 +229,7 @@
                 </div>
                 <div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-3 flex justify-between">
                     <span class="font-bold text-gray-800 dark:text-white">{{ __('admin.orders.final_total') }}</span>
-                    <span class="font-black text-lg text-indigo-600 dark:text-indigo-400" dir="ltr">{{ number_format($order->payment_price) }} {{ __('messages.toman') }}</span>
+                    <span class="font-black text-lg text-indigo-600 dark:text-indigo-400" dir="ltr">{{ format_price($order->payment_price) }} {{ __('messages.toman') }}</span>
                 </div>
                 @if($order->bankTrackingCode)
                     <div class="pt-2">

@@ -69,6 +69,7 @@ return [
         'reviews' => 'Product Reviews',
         'shipping_methods' => 'Shipping Methods',
         'banks' => 'Payment Gateways',
+        'discounts' => 'Discount Codes',
         'orders' => 'Orders',
         'settings' => 'Settings',
         'roles' => 'Roles & Permissions',

@@ -37,13 +37,25 @@ class HeroSlide extends Model
     {
         // linkable برای fallback تصویر (وقتی اسلاید تصویری ندارد، از مدل لینک‌شده می‌گیرد)
         return $query->where('is_active', true)
-            ->with('linkable')
             ->orderBy('sort_order', 'asc');
     }
 
     public function linkable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * دریافت امن مدل لینک‌شده — فقط برای انواع واقعی مدل‌ها (Product, Category, Blog و...)
+     * برای مقادیر غیرکلاسی مثل 'url' و 'page' null برمی‌گرداند.
+     */
+    public function linkableModel(): ?Model
+    {
+        if (! $this->linkable_type || in_array($this->linkable_type, ['url', 'page'])) {
+            return null;
+        }
+
+        return $this->linkable;
     }
 
     public function trans(string $field): string
@@ -242,7 +254,7 @@ class HeroSlide extends Model
      */
     private function linkedModelImage(): ?string
     {
-        $model = $this->linkable;
+        $model = $this->linkableModel();
         if (! $model) {
             return null;
         }
@@ -263,7 +275,7 @@ class HeroSlide extends Model
      */
     public function linkableFormSeed(): ?array
     {
-        $model = $this->linkable;
+        $model = $this->linkableModel();
         if (! $model) {
             return null;
         }

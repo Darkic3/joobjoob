@@ -32,7 +32,7 @@
                     @endif
                     <span class="mono">{{ $blog->localizedDate() }}</span>
                     <span class="w-px h-3" style="background: var(--shadow-dark);"></span>
-                    <span>{{ number_format($blog->views) }} {{ __('messages.views') }}</span>
+                    <span>{{ format_price($blog->views) }} {{ __('messages.views') }}</span>
                 </div>
 
                 <h1 class="text-2xl md:text-3xl font-black leading-snug mb-6">{{ $blog->title }}</h1>

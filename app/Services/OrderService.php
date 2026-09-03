@@ -68,6 +68,7 @@ class OrderService
             'shipping_price' => $orderData['shipping_price'] ?? 0,
             'total_price' => $orderData['total_price'] ?? 0,
             'discount_price' => $orderData['discount_price'] ?? 0,
+            'discount_id' => $orderData['discount_id'] ?? null,
             'payment_price' => $orderData['payment_price'] ?? 0,
             'freight_balance' => $orderData['freight_balance'] ?? 0,
             'total_weight' => $weightSum,

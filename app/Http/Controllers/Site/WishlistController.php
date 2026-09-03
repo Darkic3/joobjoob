@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\WishlistService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class WishlistController extends Controller
 {
@@ -16,8 +17,10 @@ class WishlistController extends Controller
         return view('site.wishlist.index', ['items' => $this->wishlist->content()]);
     }
 
-    public function toggle(Product $product): JsonResponse
+    public function toggle(Request $request): JsonResponse
     {
+        $product = Product::where('slug', $request->route('product'))->firstOrFail();
+
         $inWishlist = $this->wishlist->toggle($product);
 
         return response()->json([

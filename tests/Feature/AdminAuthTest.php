@@ -122,11 +122,11 @@ class AdminAuthTest extends TestCase
     public function test_user_with_role_can_login_and_access_only_their_pages(): void
     {
         // نقش «فقط محصولات»
-        $permission = Permission::create([
-            'name' => 'admin.products.index',
-            'group' => 'products',
-            'label_key' => 'permissions.access.products.index',
-        ]);
+        $permission = Permission::firstOrCreate(
+            ['name' => 'admin.products.index'],
+            ['group' => 'products',
+            'label_key' => 'permissions.access.products.index']
+        );
         $role = Role::create(['name' => 'products-only', 'is_system' => false]);
         $role->permissions()->attach($permission);
 

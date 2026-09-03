@@ -25,11 +25,11 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex items-center justify-between">
                             <span style="color: var(--text-secondary);">مبلغ کل</span>
-                            <span class="mono font-bold" dir="ltr">{{ number_format($order->payment_price) }} {{ __('messages.toman') }}</span>
+                            <span class="mono font-bold" dir="ltr">{{ format_price($order->payment_price) }} {{ __('messages.toman') }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span style="color: var(--text-secondary);">هزینه ارسال</span>
-                            <span class="mono font-bold" dir="ltr">{{ number_format($order->shipping_price) }} {{ __('messages.toman') }}</span>
+                            <span class="mono font-bold" dir="ltr">{{ format_price($order->shipping_price) }} {{ __('messages.toman') }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span style="color: var(--text-secondary);">وضعیت</span>

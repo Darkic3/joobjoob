@@ -69,6 +69,7 @@ return [
         'reviews' => 'Ürün Yorumları',
         'shipping_methods' => 'Kargo Yöntemleri',
         'banks' => 'Ödeme Kapıları',
+        'discounts' => 'İndirim Kodları',
         'orders' => 'Siparişler',
         'settings' => 'Ayarlar',
         'roles' => 'Roller ve İzinler',

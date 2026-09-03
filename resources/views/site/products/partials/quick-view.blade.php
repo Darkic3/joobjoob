@@ -39,11 +39,11 @@
         <div class="flex items-end gap-2 mb-5">
             @if($product->has_discount)
                 <span class="mono text-sm line-through mb-1" style="color: var(--text-secondary); opacity: .8;" dir="ltr">
-                    {{ number_format($product->price) }}
+                    {{ format_price($product->price) }}
                 </span>
             @endif
             <span class="mono font-black text-2xl leading-none" style="color: var(--accent);" dir="ltr">
-                {{ number_format($product->final_price) }}
+                {{ format_price($product->final_price) }}
             </span>
             <span class="text-xs font-bold mb-0.5" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
         </div>
