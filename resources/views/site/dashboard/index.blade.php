@@ -123,3 +123,29 @@
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-bold truncate" style="color: var(--text-primary);">سفارش #{{ $order->id }}</p>
      
+                                <p class="text-[11px]" style="color: var(--text-secondary);">{{ show_date($order->created_at, "d F Y - H:i") }}</p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if($order->status)
+                                    @php $badgeColor = match($order->status["badge"] ?? "") { "success" => "var(--success)", "warning" => "#f59e0b", "danger" => "var(--danger)", default => "var(--text-secondary)" }; @endphp
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: color-mix(in srgb, {{ $badgeColor }} 12%, transparent); color: {{ $badgeColor }};">{{ $order->status["title"] }}</span>
+                                @endif
+                                <span class="text-sm font-black mono" style="color: var(--accent);" dir="ltr">{{ format_price($order->payment_price) }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 rounded-3xl grid place-items-center mx-auto mb-4" style="background: color-mix(in srgb, var(--text-secondary) 8%, transparent);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary);"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <p class="text-sm font-bold mb-1" style="color: var(--text-primary);">هنوز سفارشی ثبت نکرده‌اید</p>
+                    <p class="text-xs mb-3" style="color: var(--text-secondary);">برای شروع خرید، محصولات ما را ببینید</p>
+                    <a href="{{ localizedRoute("products.index") }}" class="neu-btn neu-btn-primary px-5 py-2.5 text-xs font-bold rounded-full">مشاهده محصولات</a>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection
