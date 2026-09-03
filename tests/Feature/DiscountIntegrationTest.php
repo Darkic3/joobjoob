@@ -833,4 +833,67 @@ class DiscountIntegrationTest extends TestCase
             ->assertOk()
             ->assertJsonStructure(['users' => [['id', 'name', 'mobile', 'email']]]);
     }
+
+    // ═══ Q. Welcome Discount for New Users ═══
+
+    /** کاربر جدید باید کد تخفیف خوشامدگویی دریافت کند */
+    public function test_new_user_gets_welcome_discount()
+    {
+        $user = User::create([
+            'name' => 'تست کاربر',
+            'mobile' => '09121112233',
+            'password' => bcrypt('test'),
+            'is_active' => true,
+        ]);
+
+        $service = new \App\Services\WelcomeDiscountService();
+        $discount = $service->createForUser($user);
+
+        $this->assertNotNull($discount, 'تخفیف خوشامدگویی باید ایجاد شود');
+        $this->assertDatabaseHas('discounts', ['code' => $discount->code]);
+        $this->assertDatabaseHas('discount_users', [
+            'discount_id' => $discount->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /** مشخصات کد تخفیف خوشامدگویی باید صحیح باشد */
+    public function test_welcome_discount_config()
+    {
+        $user = User::create([
+            'name' => 'تست کاربر دوم',
+            'mobile' => '09123334455',
+            'password' => bcrypt('test'),
+            'is_active' => true,
+        ]);
+
+        $service = new \App\Services\WelcomeDiscountService();
+        $discount = $service->createForUser($user);
+
+        $this->assertEquals('percent', $discount->type);
+        $this->assertEquals(10, $discount->amount);
+        $this->assertEquals(1, $discount->count);
+        $this->assertEquals(1, $discount->max_usage_per_user);
+        $this->assertTrue((bool) $discount->first_purchase);
+        $this->assertTrue((bool) $discount->is_active);
+        $this->assertEquals(0, $discount->basket_minimum_price);
+        $this->assertNull($discount->pay_type);
+        $this->assertTrue($discount->expires_at->isAfter(now()->addDays(29)));
+        $this->assertTrue($discount->expires_at->isBefore(now()->addDays(31)));
+        $this->assertStringStartsWith('WELCOME-', $discount->code);
+    }
+
+    /** کدهای خوشامدگویی دو کاربر مختلف باید یکتا باشند */
+    public function test_welcome_discount_code_is_unique()
+    {
+        $service = new \App\Services\WelcomeDiscountService();
+
+        $user1 = User::create(['name' => 'کاربر اول', 'mobile' => '09125556677', 'password' => bcrypt('test'), 'is_active' => true]);
+        $user2 = User::create(['name' => 'کاربر دوم', 'mobile' => '09127778899', 'password' => bcrypt('test'), 'is_active' => true]);
+
+        $d1 = $service->createForUser($user1);
+        $d2 = $service->createForUser($user2);
+
+        $this->assertNotEquals($d1->code, $d2->code, 'کدهای تخفیف دو کاربر باید متفاوت باشند');
+    }
 }

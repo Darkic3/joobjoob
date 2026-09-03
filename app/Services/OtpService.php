@@ -94,7 +94,11 @@ class OtpService
                 'password' => Str::random(32),
                 'is_active' => true,
             ]);
+
+            // ایجاد کد تخفیف خوشامدگویی ۱۰٪ برای کاربر جدید
+            app(\App\Services\WelcomeDiscountService::class)->createForUser($user);
         }
+
 
         $code = $this->generateCode();
         $user->update([
