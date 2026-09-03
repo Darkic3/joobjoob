@@ -111,4 +111,8 @@ return [
             'delete' => 'حذف رسالة تواصل',
         ],
     ],
+
+    'groups.notifications' => 'الإشعارات',
+
+    'access.notifications.index' => 'عرض الإشعارات',
 ];

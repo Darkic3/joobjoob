@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\OrderShippingStatus;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -100,6 +101,27 @@ class OrderService
 
         try { AuditService::orderCreated($order); } catch (\Throwable $e) { Log::error('AuditLog failed for order #' . $order->id, ['message' => $e->getMessage()]); }
 
+        // ── Notification: new order ──
+        try {
+            $notifService = app(NotificationService::class);
+            $paymentPrice = number_format($order->payment_price);
+            $notifService->notifyUser(
+                $order->user,
+                'order.created',
+                'سفارش شما ثبت شد',
+                "سفارش #{$order->id} به مبلغ {$paymentPrice} تومان ثبت شد.",
+                route('dashboard.order-detail', $order->id),
+                ['order_id' => $order->id, 'amount' => $order->payment_price]
+            );
+            $notifService->notifyAdmins(
+                'order.new',
+                'سفارش جدید ثبت شد',
+                "سفارش #{$order->id} از {$order->user->name} به مبلغ {$paymentPrice} تومان",
+                route('admin.orders.show', $order->id),
+                ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
+            );
+        } catch (\Throwable $e) { Log::error('Notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+
         return $order->fresh(['items.product', 'shippingStatus', 'bank']);
     }
 
@@ -174,6 +196,27 @@ class OrderService
         ]);
         try { AuditService::orderStatusChanged($order, $oldStatus, $order->order_status, 'سیستم - پرداخت موفق'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
 
+        // ── Notification: payment success ──
+        try {
+            $notifService = app(NotificationService::class);
+            $paymentPrice = number_format($order->payment_price);
+            $notifService->notifyUser(
+                $order->user,
+                'order.paid',
+                'پرداخت سفارش تایید شد',
+                "پرداخت سفارش #{$order->id} به مبلغ {$paymentPrice} تومان با موفقیت انجام شد.",
+                route('dashboard.order-detail', $order->id),
+                ['order_id' => $order->id, 'amount' => $order->payment_price]
+            );
+            $notifService->notifyAdmins(
+                'order.paid_admin',
+                'پرداخت سفارش تایید شد',
+                "پرداخت سفارش #{$order->id} از {$order->user->name} به مبلغ {$paymentPrice} تومان تایید شد.",
+                route('admin.orders.show', $order->id),
+                ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
+            );
+        } catch (\Throwable $e) { Log::error('Notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
         return redirect(route('checkout.success', $order->id));
     }
@@ -200,6 +243,19 @@ class OrderService
         $previousStatus = $order->order_status;
         $order->update(['order_status' => 'cancelled']);
         try { AuditService::orderStatusChanged($order, $previousStatus, 'cancelled', Auth::check() ? Auth::user()->name : 'سیستم'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
+
+        // ── Notification: order cancelled ──
+        try {
+            $notifService = app(NotificationService::class);
+            $notifService->notifyUser(
+                $order->user,
+                'order.cancelled',
+                'سفارش شما لغو شد',
+                "سفارش #{$order->id} لغو شد.",
+                route('dashboard.order-detail', $order->id),
+                ['order_id' => $order->id]
+            );
+        } catch (\Throwable $e) { Log::error('Notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
 
         if (in_array($previousStatus, ['paid', 'deposit_paid', 'pending_confirmation', 'wait_for_verification'])) {
             try {

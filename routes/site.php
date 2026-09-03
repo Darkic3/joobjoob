@@ -20,6 +20,7 @@ use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\OtpController;
 use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProductController;
+use App\Http\Controllers\Site\NotificationController;
 use App\Http\Controllers\Site\SiteAuthController;
 use App\Http\Controllers\Site\WishlistController;
 
@@ -151,6 +152,12 @@ $siteRoutes = function () {
         Route::put('/account/addresses/{id}', [DashboardController::class, 'updateAddress'])->name('dashboard.addresses.update');
         Route::delete('/account/addresses/{id}', [DashboardController::class, 'deleteAddress'])->name('dashboard.addresses.delete');
         Route::get('/account/addresses/cities', [DashboardController::class, 'cities'])->name('dashboard.addresses.cities');
+
+        // اعلانات
+        Route::get('/account/notifications', [NotificationController::class, 'index'])->name('dashboard.notifications');
+        Route::get('/api/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
+        Route::post('/api/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('api.notifications.mark-read');
+        Route::post('/api/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('api.notifications.mark-all-read');
     });
 };
 

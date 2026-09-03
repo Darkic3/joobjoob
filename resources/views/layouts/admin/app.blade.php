@@ -71,6 +71,67 @@
 
 @stack('modals')
 <x-admin.scripts/>
+
+<script>
+function adminNotificationBell() {
+    return {
+        open: false,
+        count: {{ $unreadNotificationCount ?? 0 }},
+        items: [],
+
+        toggle() {
+            this.open = !this.open;
+            if (this.open && this.items.length === 0) {
+                this.fetchNotifications();
+            }
+        },
+
+        async fetchNotifications() {
+            try {
+                const res = await fetch('{{ route("admin.api.notifications.unread-count") }}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                this.count = data.count ?? 0;
+            } catch (e) {}
+
+            try {
+                const res = await fetch('{{ route("admin.notifications.index") }}?format=json', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.items = (data.data || []).slice(0, 8);
+                }
+            } catch (e) {}
+        },
+
+        async markRead(id) {
+            try {
+                await fetch('{{ url("/admin/api/notifications") }}/' + id + '/read', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const item = this.items.find(i => i.id === id);
+                if (item) item.is_read = true;
+                if (this.count > 0) this.count--;
+            } catch (e) {}
+        },
+
+        async markAllRead() {
+            try {
+                await fetch('{{ url("/admin/api/notifications/read-all") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                this.items.forEach(i => i.is_read = true);
+                this.count = 0;
+            } catch (e) {}
+        }
+    };
+}
+</script>
+
 @stack('scripts')
 </body>
 </html>

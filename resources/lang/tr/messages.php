@@ -360,4 +360,18 @@ return [
     'invoice' => 'Fatura',
 
     'back' => 'Geri',
+
+    'notifications' => 'Bildirimler',
+
+    'mark_all_read' => 'Tümünü okundu işaretle',
+
+    'no_notifications' => 'Bildirim yok',
+
+    'view_all_notifications' => 'Tüm bildirimleri görüntüle',
+
+    'notifications_empty_desc' => 'Bildirimleriniz burada görünecek.',
+
+    'notifications_manage_desc' => 'Alınan bildirimleri yönetin',
+
+    'unread' => 'Okunmamış',
 ];

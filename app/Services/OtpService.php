@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\Helper;
 use App\Helpers\Sms;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -97,6 +98,19 @@ class OtpService
 
             // ایجاد کد تخفیف خوشامدگویی ۱۰٪ برای کاربر جدید
             app(\App\Services\WelcomeDiscountService::class)->createForUser($user);
+
+            // ── Notification: welcome discount ──
+            try {
+                $notifService = app(NotificationService::class);
+                $notifService->notifyUser(
+                    $user,
+                    'discount.welcome',
+                    'کد تخفیف خوشامدگویی',
+                    'تبریک! یک کد تخفیف ۱۰٪ برای اولین خرید شما ایجاد شد.',
+                    route('dashboard'),
+                    ['user_id' => $user->id]
+                );
+            } catch (\Throwable $e) { Log::error('Welcome notification failed for user #' . $user->id, ['message' => $e->getMessage()]); }
         }
 
 

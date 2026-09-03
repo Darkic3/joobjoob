@@ -7,6 +7,7 @@ use App\Observers\OrderObserver;
 use App\Services\CartService;
 use App\Services\RecentlyViewedService;
 use App\Services\WishlistService;
+use App\View\Composers\AdminLayoutComposer;
 use App\View\Composers\FooterComposer;
 use App\View\Composers\LocaleComposer;
 use App\View\Composers\SiteLayoutComposer;
@@ -41,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
 
         // نوار اعلان چیدمان سایت
         View::composer('layouts.site.app', SiteLayoutComposer::class);
+
+        // داده‌های اعلانات پنل ادمین
+        View::composer('layouts.admin.app', AdminLayoutComposer::class);
 
         // نشان‌های اعتماد نوار پایین فوتر (اینماد، درگاه پرداخت و…)
         View::composer('components.footer', FooterComposer::class);

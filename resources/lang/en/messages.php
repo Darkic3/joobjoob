@@ -360,4 +360,18 @@ return [
     'invoice' => 'Invoice',
 
     'back' => 'Back',
+
+    'notifications' => 'Notifications',
+
+    'mark_all_read' => 'Mark all read',
+
+    'no_notifications' => 'No notifications',
+
+    'view_all_notifications' => 'View all notifications',
+
+    'notifications_empty_desc' => 'Your notifications will appear here.',
+
+    'notifications_manage_desc' => 'Manage received notifications',
+
+    'unread' => 'Unread',
 ];

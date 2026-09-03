@@ -132,4 +132,8 @@ return [
             'delete' => 'حذف درگاه پرداخت',
         ],
     ],
+
+    'groups.notifications' => 'اعلانات',
+
+    'access.notifications.index' => 'مشاهده اعلانات',
 ];

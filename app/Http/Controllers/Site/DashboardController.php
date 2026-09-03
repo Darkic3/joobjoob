@@ -9,9 +9,11 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\CityService;
+use App\Services\NotificationService;
 use App\Services\StateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -57,6 +59,20 @@ class DashboardController extends Controller
             'receipt_tracking_code' => $request->validated('receipt_tracking_code'),
             'receipt_payer_card' => $request->validated('receipt_payer_card') ?? null,
         ]);
+
+        // ── Notification: card-to-card receipt submitted ──
+        try {
+            $notifService = app(NotificationService::class);
+            $paymentPrice = number_format($order->payment_price);
+            $trackingCode = $request->validated('receipt_tracking_code');
+            $notifService->notifyAdmins(
+                'order.card_to_card',
+                'فیش واریزی جدید دریافت شد',
+                "کاربر {$order->user->name} فیش سفارش #{$order->id} (کد پیگیری: {$trackingCode}) به مبلغ {$paymentPrice} تومان ارسال کرد.",
+                route('admin.orders.show', $order->id),
+                ['order_id' => $order->id, 'user_name' => $order->user->name, 'tracking_code' => $trackingCode]
+            );
+        } catch (\Throwable $e) { Log::error('Card-to-card notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
 
         return redirect()->route('dashboard.order-detail', $order->id)
             ->with('success', 'اطلاعات فیش واریزی با موفقیت به‌روزرسانی شد.');

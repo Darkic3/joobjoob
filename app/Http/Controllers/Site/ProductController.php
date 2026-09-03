@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Review;
 use App\Models\ReviewVote;
+use App\Services\NotificationService;
 use App\Services\RecentlyViewedService;
 use App\Services\TrustBadgeService;
 use Illuminate\Http\Request;
@@ -352,6 +353,19 @@ class ProductController extends Controller
         }
 
         $product->reviews()->create($data);
+
+        // ── Notification: new review ──
+        try {
+            $reviewerName = $isGuest ? ($validated['guest_name'] ?? 'مهمان') : (auth()->user()->name ?? 'کاربر');
+            $productName = $product->trans('name') ?? $product->name ?? 'محصول';
+            app(NotificationService::class)->notifyAdmins(
+                'review.new',
+                'نظر جدید ثبت شد',
+                "نظر جدید از {$reviewerName} برای محصول «{$productName}» ثبت شد.",
+                route('admin.reviews.index'),
+                ['product_id' => $product->id, 'reviewer' => $reviewerName]
+            );
+        } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::error('Review notification failed', ['message' => $e->getMessage()]); }
 
         return redirect()
             ->route('products.show', $product->slug)

@@ -239,6 +239,16 @@ return [
             ],
         ],
 
+        'notifications' => [
+            'title' => 'permissions.groups.notifications',
+            'access' => [
+                'index' => 'permissions.access.notifications.index',
+                'mark-read' => 'permissions.access.notifications.index',
+                'mark-all-read' => 'permissions.access.notifications.index',
+                'unread-count' => 'permissions.access.notifications.index',
+            ],
+        ],
+
         'audit-logs' => [
             'title' => 'permissions.groups.audit_logs',
             'access' => [

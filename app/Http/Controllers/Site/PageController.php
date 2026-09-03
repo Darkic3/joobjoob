@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactRequest;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -42,6 +44,17 @@ class PageController extends Controller
         ]);
 
         ContactRequest::create($validated);
+
+        // ── Notification: new contact message ──
+        try {
+            app(NotificationService::class)->notifyAdmins(
+                'contact.new',
+                'پیام تماس جدید',
+                "پیام جدید از {$validated['name']} ({$validated['email']}) دریافت شد.",
+                route('admin.contact.index'),
+                ['name' => $validated['name'], 'email' => $validated['email']]
+            );
+        } catch (\Throwable $e) { Log::error('Contact notification failed', ['message' => $e->getMessage()]); }
 
         return back()->with('success', __('messages.pages.contact.success'));
     }

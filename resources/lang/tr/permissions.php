@@ -111,4 +111,8 @@ return [
             'delete' => 'İletişim mesajını sil',
         ],
     ],
+
+    'groups.notifications' => 'Bildirimler',
+
+    'access.notifications.index' => 'Bildirimleri görüntüle',
 ];

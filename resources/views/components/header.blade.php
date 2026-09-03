@@ -1,4 +1,4 @@
-@props(['cartCount' => 0, 'wishlistCount' => 0])
+@props(['cartCount' => 0, 'wishlistCount' => 0, 'unreadNotificationCount' => 0])
 
 @php
     $siteName = setting('site_name', __('messages.site_name'));
@@ -78,7 +78,7 @@
                 <span class="neu-toggle-dot"></span>
             </button>
 
-            {{-- سبد/علاقه‌مندی/حساب فقط برای اعضا؛ مهمان فقط دکمهٔ ورود/ثبت‌نام --}}
+            {{-- سبد/علاقه‌مندی/اعلانات/حساب فقط برای اعضا؛ مهمان فقط دکمهٔ ورود/ثبت‌نام --}}
             @auth
                 <a href="{{ localizedRoute('wishlist.index') }}" class="neu-btn neu-btn-icon site-action-btn relative hidden lg:inline-flex"
                    title="{{ __('messages.wishlist') }}">
@@ -95,6 +95,68 @@
                 </svg>
                 <span id="cart-count" class="site-badge">{{ $cartCount }}</span>
             </a>
+
+                {{-- زنگوله اعلانات --}}
+                <div x-data="notificationBell()" class="relative hidden lg:block">
+                    <button type="button" @click="toggle()"
+                            class="neu-btn neu-btn-icon site-action-btn relative"
+                            title="{{ __('messages.notifications') }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                        </svg>
+                        <span x-show="count > 0" x-text="count > 99 ? '99+' : count"
+                              x-transition
+                              class="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full grid place-items-center"
+                              style="background: var(--danger); color: #fff;"></span>
+                    </button>
+
+                    {{-- Dropdown اعلانات --}}
+                    <div x-show="open" @click.away="open = false" x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute end-0 top-full mt-2 w-80 rounded-2xl overflow-hidden z-50"
+                         style="background: var(--bg-elevated); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent); box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+                        <div class="flex items-center justify-between px-4 py-3" style="border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);">
+                            <p class="text-sm font-bold" style="color: var(--text-primary);">{{ __('messages.notifications') }}</p>
+                            <button x-show="count > 0" @click="markAllRead()" type="button"
+                                    class="text-[11px] font-bold transition-opacity hover:opacity-70"
+                                    style="color: var(--accent);">
+                                {{ __('messages.mark_all_read') }}
+                            </button>
+                        </div>
+                        <div class="max-h-72 overflow-y-auto">
+                            <template x-if="items.length === 0">
+                                <div class="px-4 py-8 text-center">
+                                    <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--text-secondary); opacity: 0.4;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+                                    <p class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.no_notifications') }}</p>
+                                </div>
+                            </template>
+                            <template x-for="item in items" :key="item.id">
+                                <a :href="item.link || '#'
+                                   @click="!item.is_read && markRead(item.id)"
+                                   class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
+                                   :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--accent) 5%, transparent);'">
+                                    <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold truncate" style="color: var(--text-primary);" x-text="item.title"></p>
+                                        <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-secondary);" x-text="item.body"></p>
+                                        <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.6;" x-text="item.created_at"></p>
+                                    </div>
+                                    <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--accent);"></span>
+                                </a>
+                            </template>
+                        </div>
+                        <a href="{{ route('dashboard.notifications') }}"
+                           class="block text-center py-2.5 text-xs font-bold transition-opacity hover:opacity-80"
+                           style="color: var(--accent); border-top: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);">
+                            {{ __('messages.view_all_notifications') }}
+                        </a>
+                    </div>
+                </div>
 
                 <a href="{{ localizedRoute('dashboard') }}" class="site-account-btn relative hidden lg:inline-flex"
                    title="{{ auth()->user()->name }}" aria-label="{{ __('messages.dashboard') }}">
@@ -202,3 +264,63 @@
         </div>
     </div>
 </div>
+
+<script>
+function notificationBell() {
+    return {
+        open: false,
+        count: {{ $unreadNotificationCount ?? 0 }},
+        items: [],
+
+        toggle() {
+            this.open = !this.open;
+            if (this.open && this.items.length === 0) {
+                this.fetchNotifications();
+            }
+        },
+
+        async fetchNotifications() {
+            try {
+                const res = await fetch('{{ route("api.notifications.unread-count") }}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                this.count = data.count ?? 0;
+            } catch (e) {}
+
+            try {
+                const res = await fetch('{{ route("dashboard.notifications") }}?format=json', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.items = (data.data || []).slice(0, 8);
+                }
+            } catch (e) {}
+        },
+
+        async markRead(id) {
+            try {
+                await fetch('{{ url("/api/notifications") }}/' + id + '/read', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const item = this.items.find(i => i.id === id);
+                if (item) item.is_read = true;
+                if (this.count > 0) this.count--;
+            } catch (e) {}
+        },
+
+        async markAllRead() {
+            try {
+                await fetch('{{ url("/api/notifications/read-all") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                this.items.forEach(i => i.is_read = true);
+                this.count = 0;
+            } catch (e) {}
+        }
+    };
+}
+</script>

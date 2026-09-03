@@ -361,4 +361,18 @@ return [
     'invoice' => 'فاکتور',
 
     'back' => 'بازگشت',
+
+    'notifications' => 'اعلانات',
+
+    'mark_all_read' => 'خوانده‌شده همه',
+
+    'no_notifications' => 'اعلانی ندارید',
+
+    'view_all_notifications' => 'مشاهده همه اعلانات',
+
+    'notifications_empty_desc' => 'اعلان‌های شما اینجا نمایش داده خواهند شد.',
+
+    'notifications_manage_desc' => 'مدیریت اعلان‌های دریافتی',
+
+    'unread' => 'خوانده‌نشده',
 ];

@@ -7,9 +7,11 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShippingStatus;
 use App\Models\ShippingMethod;
+use App\Services\NotificationService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -81,6 +83,22 @@ class OrderController extends Controller
         $newStatusId = $request->get('shipping_status_id');
         if ($order->shipping_status_id != $newStatusId) {
             $order->update(['shipping_status_id' => $newStatusId]);
+
+            // ── Notification: shipping status changed ──
+            try {
+                $shippingStatus = OrderShippingStatus::find($newStatusId);
+                if ($shippingStatus && $order->user) {
+                    $statusName = $shippingStatus->title ?? 'جدید';
+                    app(NotificationService::class)->notifyUser(
+                        $order->user,
+                        'order.shipped',
+                        'وضعیت ارسال سفارش تغییر کرد',
+                        "وضعیت ارسال سفارش #{$order->id} به «{$statusName}» تغییر یافت.",
+                        route('dashboard.order-detail', $order->id),
+                        ['order_id' => $order->id, 'status' => $statusName]
+                    );
+                }
+            } catch (\Throwable $e) { Log::error('Shipping notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
         }
         return redirect()->back()->with('success', 'وضعیت ارسال بروزرسانی شد.');
     }

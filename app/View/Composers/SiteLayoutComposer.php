@@ -3,7 +3,9 @@
 namespace App\View\Composers;
 
 use App\Services\CartService;
+use App\Services\NotificationService;
 use App\Services\WishlistService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -14,6 +16,7 @@ class SiteLayoutComposer
     public function __construct(
         protected CartService $cart,
         protected WishlistService $wishlist,
+        protected NotificationService $notificationService,
     ) {}
 
     public function compose(View $view): void
@@ -30,6 +33,7 @@ class SiteLayoutComposer
             // شمارندهٔ واقعی سبد و علاقه‌مندی‌ها (هدر + نوار پایین موبایل)
             'cartCount' => $this->cart->count(),
             'wishlistCount' => $this->wishlist->count(),
+            'unreadNotificationCount' => Auth::check() ? $this->notificationService->getUnreadCount(Auth::user()) : 0,
         ]);
     }
 }

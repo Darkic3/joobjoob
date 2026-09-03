@@ -360,4 +360,18 @@ return [
     'invoice' => 'الفاتورة',
 
     'back' => 'رجوع',
+
+    'notifications' => 'الإشعارات',
+
+    'mark_all_read' => 'تحديد الكل كمقروء',
+
+    'no_notifications' => 'لا توجد إشعارات',
+
+    'view_all_notifications' => 'عرض كل الإشعارات',
+
+    'notifications_empty_desc' => 'ستظهر إشعاراتك هنا.',
+
+    'notifications_manage_desc' => 'إدارة الإشعارات المستلمة',
+
+    'unread' => 'غير مقروء',
 ];

@@ -102,6 +102,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('discounts/{discount}', [\App\Http\Controllers\Admin\DiscountController::class, 'show'])->name('discounts.show');
         Route::post('discounts/{discount}/toggle-status', [\App\Http\Controllers\Admin\DiscountController::class, 'toggleStatus'])->name('discounts.toggle-status');
 
+        // ========== اعلانات ==========
+        Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('api/notifications/unread-count', [\App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
+        Route::post('api/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markRead'])->name('api.notifications.mark-read');
+        Route::post('api/notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('api.notifications.mark-all-read');
+
         // ========== لاگ حسابرسی ==========
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('audit-logs/{id}', [AuditLogController::class, 'show'])->name('audit-logs.show');

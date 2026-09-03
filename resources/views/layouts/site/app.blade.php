@@ -40,7 +40,7 @@
         </span>
 </div>
 
-<x-header :cart-count="$cartCount" :wishlist-count="$wishlistCount"/>
+<x-header :cart-count="$cartCount" :wishlist-count="$wishlistCount" :unread-notification-count="$unreadNotificationCount"/>
 
 <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
     @yield('content')

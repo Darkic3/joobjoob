@@ -117,4 +117,8 @@ return [
             'show' => 'View audit log details',
         ],
     ],
+
+    'groups.notifications' => 'Notifications',
+
+    'access.notifications.index' => 'View notifications',
 ];
