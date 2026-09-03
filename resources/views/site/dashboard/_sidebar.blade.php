@@ -27,7 +27,10 @@
     {{-- لینک‌های ناوبری --}}
     @foreach($navItems as $item)
         @php
-            $isActive = $currentRoute === $item['route'] || str_starts_with($currentRoute, $item['route'] . '.');
+            // Exact match for dashboard index, prefix match for sub-routes
+            $isActive = $item['route'] === 'dashboard'
+                ? $currentRoute === 'dashboard'
+                : ($currentRoute === $item['route'] || str_starts_with($currentRoute, $item['route'] . '.'));
         @endphp
         <a href="{{ route($item['route']) }}"
            class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200"
