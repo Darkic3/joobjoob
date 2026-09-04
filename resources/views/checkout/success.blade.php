@@ -17,7 +17,7 @@
                     شماره سفارش: <span class="mono font-bold" dir="ltr">#{{ $order->id }}</span>
                 </p>
                 <p class="text-sm mb-6" style="color: var(--text-secondary);">
-                    تاریخ: {{ jdate('d F Y - H:i', $order->created_at->timestamp) }}
+                    تاریخ: {{ show_date($order->created_at, 'd F Y - H:i') }}
                 </p>
 
                 <div class="neu-flat-sm rounded-2xl p-4 mb-6 text-right">

@@ -95,13 +95,13 @@
                 <div class="space-y-3 text-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-gray-500 dark:text-gray-400">تاریخ شروع</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">{{ $discount->starts_at ? jdate($discount->starts_at)->format('Y/m/d H:i') : '—' }}</span>
+                        <span class="font-semibold text-gray-800 dark:text-white">{{ $discount->starts_at ? show_date($discount->starts_at, 'Y/m/d H:i') : '—' }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-500 dark:text-gray-400">تاریخ انقضا</span>
                         <span class="font-semibold text-gray-800 dark:text-white">
                             @if($discount->expires_at)
-                                {{ jdate($discount->expires_at)->format('Y/m/d H:i') }}
+                                {{ show_date($discount->expires_at, 'Y/m/d H:i') }}
                                 @if($discount->expires_at->isPast())
                                     <span class="text-red-500 text-xs">(منقضی)</span>
                                 @endif
@@ -189,7 +189,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-3 text-sm font-semibold text-red-600 dark:text-red-400" dir="ltr">-{{ number_format($usage->discount_amount) }}</td>
-                                    <td class="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">{{ jdate($usage->used_at)->format('Y/m/d H:i') }}</td>
+                                    <td class="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">{{ show_date($usage->used_at, 'Y/m/d H:i') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
