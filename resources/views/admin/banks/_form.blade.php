@@ -39,7 +39,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.banks.field_card_number') }} <span class="text-rose-500">*</span></label>
-                    <input type="text" name="card_number" value="{{ old('card_number', $bank->card_number ?? '') }}" class="input-custom !py-1.5 !text-sm" dir="ltr" placeholder="6037-XXXX-XXXX-XXXX" id="cardNumberInput">
+                    <input type="text" name="card_number" value="{{ format_card_number(old('card_number', $bank->card_number ?? '')) }}" class="input-custom !py-1.5 !text-sm" dir="ltr" placeholder="6037-XXXX-XXXX-XXXX" id="cardNumberInput" data-card-format>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.banks.field_card_holder_name') }}</label>
@@ -89,15 +89,6 @@
             });
         }
 
-        // Format card number with dashes
-        var cardInput = document.getElementById('cardNumberInput');
-        if (cardInput) {
-            cardInput.addEventListener('input', function() {
-                var v = this.value.replace(/[^0-9]/g, '');
-                var formatted = v.match(/.{1,4}/g);
-                this.value = formatted ? formatted.join('-') : '';
-            });
-        }
 
         // Show validation errors as toasts
         @if(isset($errors) && $errors->any())

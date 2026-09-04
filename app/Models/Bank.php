@@ -18,6 +18,14 @@ class Bank extends Model
 
     protected $appends = ['item_image'];
 
+    /**
+     * حذف فرمت از شماره کارت هنگام ذخیره در دیتابیس
+     */
+    public function setCardNumberAttribute(?string $value): void
+    {
+        $this->attributes['card_number'] = clean_card_number($value);
+    }
+
     public function getItemImageAttribute(): ?string
     {
         $icon = $this->attributes['icon'] ?? null;

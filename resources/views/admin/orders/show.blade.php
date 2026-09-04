@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-500 dark:text-gray-400">شماره کارت واریزکننده</span>
-                                    <span class="font-semibold {{ $order->receipt_payer_card ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic' }}" dir="ltr">{{ $order->receipt_payer_card ?: 'خالی' }}</span>
+                                    <span class="font-semibold {{ $order->receipt_payer_card ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic' }}" dir="ltr">{{ format_card_number($order->receipt_payer_card) ?: 'خالی' }}</span>
                                 </div>
                             </div>
                         @endif

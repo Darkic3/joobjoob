@@ -49,7 +49,7 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $bank->title }}</div>
                                 @if($bank->card_number && $bank->bank_type === 'card_to_card')
-                                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" dir="ltr">{{ $bank->card_number }}</div>
+                                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" dir="ltr">{{ format_card_number($bank->card_number) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

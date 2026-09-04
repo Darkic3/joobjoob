@@ -198,11 +198,11 @@
                     </div>
                     <div>
                         <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
-                        <input type="text" name="receipt_payer_card" value="{{ $order->receipt_payer_card }}" inputmode="numeric" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        <input type="text" name="receipt_payer_card" value="{{ format_card_number($order->receipt_payer_card) }}"
                                placeholder="شماره کارت واریزکننده"
                                class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
                                style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
-                               dir="ltr">
+                               dir="ltr" data-card-format>
                     </div>
                     <button type="submit" class="w-full py-2.5 rounded-xl text-xs font-black text-white transition-all hover:scale-[1.01]"
                             style="background: var(--accent);">

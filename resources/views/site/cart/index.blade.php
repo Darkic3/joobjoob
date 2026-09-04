@@ -773,10 +773,10 @@
                     </div>
                     <div>
                         <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
-                        <input type="text" id="receiptPayerCard" inputmode="numeric" pattern="(\d{4}-?){3}\d{4}" maxlength="16" placeholder="مثلاً: 6037xxxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        <input type="text" id="receiptPayerCard" placeholder="مثلاً: 6037-xxxx-xxxx-xxxx"
                                class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
                                style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
-                               dir="ltr">
+                               dir="ltr" data-card-format>
                     </div>
                 </div>
                 <div class="px-6 pb-6">
@@ -1300,7 +1300,8 @@
                     var cardNum = card.getAttribute('data-card-number') || '';
                     var cardHolder = card.getAttribute('data-card-holder') || '';
                     var cardDesc = card.getAttribute('data-card-desc') || '';
-                    var displayNum = window.localizeDigits ? window.localizeDigits.convert(cardNum) : cardNum;
+                    var displayNum = cardNum.replace(/(\d{4})(?=\d)/g, '$1-');
+                    displayNum = window.localizeDigits ? window.localizeDigits.convert(displayNum) : displayNum;
 
                     document.getElementById('modalCardNumber').textContent = displayNum;
                     var holderRow = document.getElementById('modalHolderRow');

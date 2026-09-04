@@ -38,7 +38,7 @@
     {{-- SweetAlert2 — محلی (برای سوال‌های تأیید، خطاهای فرم و ...) --}}
     <script src="{{ asset('assets/admin/js/sweetalert2.all.min.js') }}"></script>
 
-    @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js'])
+    @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js', 'resources/js/card-format.js'])
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50">

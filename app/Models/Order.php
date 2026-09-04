@@ -31,6 +31,14 @@ class Order extends Model
         'total_weight' => 'double',
     ];
 
+    /**
+     * حذف فرمت از شماره کارت واریزکننده هنگام ذخیره در دیتابیس
+     */
+    public function setReceiptPayerCardAttribute(?string $value): void
+    {
+        $this->attributes['receipt_payer_card'] = clean_card_number($value);
+    }
+
     // ==================== Scopes ====================
 
     public function scopeAuthUser($query)

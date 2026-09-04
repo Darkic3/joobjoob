@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/ui-effects.js',
                 'resources/js/app.js',
                 'resources/js/app-admin.js',
+                'resources/js/card-format.js',
             ],
             refresh: true,
         }),
