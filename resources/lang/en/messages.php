@@ -349,7 +349,7 @@ return [
     'quick_links' => 'Quick links',
     'welcome_back' => 'Welcome back',
 
-    'no_orders_yet' => 'You haven't placed any orders yet',
+    'no_orders_yet' => "You haven't placed any orders yet",
 
     'start_shopping' => 'To start shopping, browse our products',
 
