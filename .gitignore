@@ -24,11 +24,10 @@ yarn-error.log
 /.freebuff
 /.agents
 /documents
+/docs
 /documents/my-learning-guides
 /documents/features-for-run
 /documents/skill-library
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
-*~
+
