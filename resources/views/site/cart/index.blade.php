@@ -5,6 +5,27 @@
 @section('content')
     <div class="reveal-on-scroll">
         {{-- هدر --}}
+        @if(session('error'))
+            <div class="neu-card p-4 mb-4 border-l-4" style="border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 5%, transparent);">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 shrink-0" style="color: var(--danger);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                    <p class="text-sm font-bold" style="color: var(--danger);">{{ session('error') }}</p>
+                </div>
+            </div>
+        @endif
+        @if($errors->any())
+            <div id="validation-errors" class="neu-card p-4 mb-4 border-l-4" style="border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 5%, transparent);">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 shrink-0 mt-0.5" style="color: var(--danger);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                    <div>
+                        @foreach($errors->all() as $error)
+                            <p class="text-sm font-bold" style="color: var(--danger);">{{ $error }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="flex items-center justify-between flex-wrap gap-3 mb-8">
             <h1 class="text-2xl font-black" style="color: var(--text-primary);">{{ __('messages.cart') }}</h1>
             @if($items->isNotEmpty())
