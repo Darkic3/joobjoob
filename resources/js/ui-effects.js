@@ -352,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function () {
         link.addEventListener('click', function (e) {
             if (e.target.closest('button, [data-wishlist-toggle], [data-quick-view-url]')) {
                 e.preventDefault();
-                e.stopPropagation();
             }
         });
     });
