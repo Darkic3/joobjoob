@@ -43,7 +43,7 @@ class ReviewController extends Controller
 
     public function show(Review $review): View
     {
-        $review->load('product', 'user');
+        $review->load('product', 'user', 'replies.user');
 
         return view('admin.reviews.show', compact('review'));
     }
