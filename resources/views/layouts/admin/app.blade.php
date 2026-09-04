@@ -73,6 +73,7 @@
 <x-admin.scripts/>
 
 <script>
+{{-- window.notifIcon از باندل Vite می‌آید: resources/js/admin/notification-icon.js --}}
 function adminNotificationBell() {
     return {
         open: false,

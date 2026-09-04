@@ -8,6 +8,9 @@ import 'swiper/css/pagination';
 // بومی‌سازی ارقام بر اساس زبان سایت (fa/ar → فارسی، سایر → انگلیسی)
 import './localize-digits.js';
 
+// آیکون SVG اعلان‌های ادمین (دراپ‌داون هدر) — window.notifIcon
+import './admin/notification-icon.js';
+
 // پیش‌نمایش زندهٔ سبک‌های بارش جشن در تنظیمات (موتور مشترک با سایت)
 import { createFestiveRain } from './festive-particles.js';
 

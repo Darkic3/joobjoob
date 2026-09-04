@@ -19,6 +19,22 @@ class NotificationController extends Controller
         $filter = $request->get('filter');
         $notifications = $this->notificationService->getAdminNotifications(20, $filter);
 
+        if ($request->get('format') === 'json' || $request->wantsJson()) {
+            return response()->json([
+                'data' => $notifications->getCollection()->map(fn ($n) => [
+                    'id' => $n->id,
+                    'type' => $n->type,
+                    'title' => $n->title,
+                    'body' => $n->body,
+                    'icon' => $n->icon,
+                    'link' => $n->link,
+                    'is_read' => (bool) $n->is_read,
+                    'created_at' => $n->created_at?->diffForHumans(),
+                ])->values(),
+                'count' => $this->notificationService->getAdminUnreadCount(),
+            ]);
+        }
+
         return view('admin.notifications.index', compact('notifications', 'filter'));
     }
 
