@@ -88,6 +88,14 @@ function adminNotificationBell() {
             }
         },
 
+        // نمایش هماهنگ با زبان از همان اول (بدون چشمک انگلیسی→فارسی)
+        displayCount() {
+            const raw = this.count > 99 ? '99+' : String(this.count);
+            return (window.localizeDigits && window.localizeDigits.convert)
+                ? window.localizeDigits.convert(raw)
+                : raw;
+        },
+
         async fetchNotifications() {
             this.loading = true;
             try {
@@ -106,7 +114,13 @@ function adminNotificationBell() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    this.items = (data.data || []).slice(0, 8);
+                    const loc = (window.localizeDigits && window.localizeDigits.convert)
+                        ? window.localizeDigits.convert
+                        : (s) => s;
+                    this.items = (data.data || []).slice(0, 8).map((item) => ({
+                        ...item,
+                        created_at: item.created_at ? loc(item.created_at) : item.created_at,
+                    }));
                     if (typeof data.count === 'number') this.count = data.count;
                 }
             } catch (e) {}

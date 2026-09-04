@@ -374,4 +374,8 @@ return [
     'notifications_manage_desc' => 'Alınan bildirimleri yönetin',
 
     'unread' => 'Okunmamış',
+
+    'orders' => 'Siparişler',
+
+    'loading' => 'Yükleniyor...',
 ];

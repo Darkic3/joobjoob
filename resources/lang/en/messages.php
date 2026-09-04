@@ -374,4 +374,8 @@ return [
     'notifications_manage_desc' => 'Manage received notifications',
 
     'unread' => 'Unread',
+
+    'orders' => 'Orders',
+
+    'loading' => 'Loading...',
 ];

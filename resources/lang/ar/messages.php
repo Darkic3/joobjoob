@@ -374,4 +374,8 @@ return [
     'notifications_manage_desc' => 'إدارة الإشعارات المستلمة',
 
     'unread' => 'غير مقروء',
+
+    'orders' => 'الطلبات',
+
+    'loading' => 'جارٍ التحميل...',
 ];

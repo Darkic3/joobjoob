@@ -78,9 +78,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
-                    <span x-show="count > 0" x-text="count > 99 ? '99+' : count"
+                    <span x-show="count > 0" x-text="displayCount()"
                           x-transition
-                          class="absolute top-1.5 left-1.5 min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full grid place-items-center bg-red-500 text-white ring-2 ring-white dark:ring-gray-800"></span>
+                          class="absolute top-1.5 left-1.5 min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full grid place-items-center bg-red-500 text-white ring-2 ring-white dark:ring-gray-800">{{ \App\Helpers\NumberHelper::localizeDigits(($unreadNotificationCount ?? 0) > 99 ? '99+' : ($unreadNotificationCount ?? 0), $digitFamily ?? 'latin') }}</span>
                 </button>
 
                 {{-- Notifications Dropdown --}}
@@ -99,7 +99,7 @@
                     </div>
                     <div class="max-h-72 overflow-y-auto">
                         <template x-if="loading">
-                            <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">...</p>
+                            <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('messages.loading') }}</p>
                         </template>
                         <template x-if="!loading && items.length === 0">
                             <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('admin.layout.no_notifications') }}</p>

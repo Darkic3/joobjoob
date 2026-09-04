@@ -375,4 +375,8 @@ return [
     'notifications_manage_desc' => 'مدیریت اعلان‌های دریافتی',
 
     'unread' => 'خوانده‌نشده',
+
+    'orders' => 'سفارش‌ها',
+
+    'loading' => 'در حال بارگذاری...',
 ];

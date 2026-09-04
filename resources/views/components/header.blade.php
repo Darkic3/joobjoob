@@ -104,10 +104,10 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
                         </svg>
-                        <span x-show="count > 0" x-text="count > 99 ? '99+' : count"
+                        <span x-show="count > 0" x-text="displayCount()"
                               x-transition
                               class="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full grid place-items-center"
-                              style="background: var(--danger); color: #fff;"></span>
+                              style="background: var(--danger); color: #fff;">{{ \App\Helpers\NumberHelper::localizeDigits(($unreadNotificationCount ?? 0) > 99 ? '99+' : ($unreadNotificationCount ?? 0), $digitFamily ?? 'latin') }}</span>
                     </button>
 
                     {{-- Dropdown اعلانات --}}
@@ -131,7 +131,7 @@
                         <div class="max-h-72 overflow-y-auto">
                             <template x-if="loading">
                                 <div class="px-4 py-8 text-center">
-                                    <p class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.loading') ?? 'در حال بارگذاری...' }}</p>
+                                    <p class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.loading') }}</p>
                                 </div>
                             </template>
                             <template x-if="!loading && items.length === 0">
@@ -285,6 +285,15 @@ function notificationBell() {
             }
         },
 
+        // نمایش هماهنگ با زبان از همان اول (بدون چشمک انگلیسی→فارسی)؛
+        // localize-digits با debounce روی MutationObserver کار می‌کند.
+        displayCount() {
+            const raw = this.count > 99 ? '99+' : String(this.count);
+            return (window.localizeDigits && window.localizeDigits.convert)
+                ? window.localizeDigits.convert(raw)
+                : raw;
+        },
+
         async fetchNotifications() {
             this.loading = true;
             try {
@@ -303,7 +312,13 @@ function notificationBell() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    this.items = (data.data || []).slice(0, 8);
+                    const loc = (window.localizeDigits && window.localizeDigits.convert)
+                        ? window.localizeDigits.convert
+                        : (s) => s;
+                    this.items = (data.data || []).slice(0, 8).map((item) => ({
+                        ...item,
+                        created_at: item.created_at ? loc(item.created_at) : item.created_at,
+                    }));
                     if (typeof data.count === 'number') this.count = data.count;
                 }
             } catch (e) {}
