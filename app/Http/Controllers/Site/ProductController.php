@@ -192,8 +192,11 @@ class ProductController extends Controller
             $dealEndsAt = $product->deal_ends_at;
         }
 
+        // بررسی علاقه‌مندی
+        $inWishlist = app(\App\Services\WishlistService::class)->has($product);
+
         return view('site.products.show', array_merge(compact(
-            'product', 'related', 'complement', 'reviewTree', 'trustBadges', 'dealEndsAt'
+            'product', 'related', 'complement', 'reviewTree', 'trustBadges', 'dealEndsAt', 'inWishlist'
         ), $viewData, [
             'userVotes' => $userVotes ?? collect(),
         ]));

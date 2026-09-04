@@ -246,6 +246,22 @@
                         </svg>
                         {{ __('messages.add_to_cart') }}
                     </button>
+
+                    {{-- دکمه علاقه‌مندی --}}
+                    <button type="button"
+                            class="neu-btn neu-btn-icon w-12 h-12 flex items-center justify-center rounded-xl wishlist-heart {{ $inWishlist ? 'active' : '' }}"
+                            data-wishlist-toggle
+                            data-wishlist-url="{{ localizedRoute('wishlist.toggle', ['product' => $product->slug]) }}"
+                            data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
+                            data-add-label="{{ __('messages.add_to_wishlist') }}"
+                            data-remove-label="{{ __('messages.remove_from_wishlist') }}"
+                            aria-label="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}"
+                            title="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+                        </svg>
+                    </button>
                 </div>
 
                 {{-- وضعیت موجودی --}}
