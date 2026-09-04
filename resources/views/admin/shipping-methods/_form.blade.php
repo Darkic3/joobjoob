@@ -152,6 +152,12 @@
                 <input type="text" id="citySearchInput" placeholder="{{ __('admin.shipping_methods.search_cities') }}"
                        class="w-full bg-transparent text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none">
             </div>
+            <div class="flex items-center justify-between mb-1">
+                <button type="button" id="toggleAllCities" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors">
+                    {{ __('admin.shipping_methods.select_all') }}
+                </button>
+                <span id="citiesSelectedCount" class="text-[10px] text-gray-400"></span>
+            </div>
             <div id="citiesList" class="overflow-y-auto space-y-0.5" style="max-height: 7rem; scrollbar-width: thin;">
                 @foreach($cities as $city)
                     <label class="city-item flex items-center gap-2 px-1.5 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
@@ -207,6 +213,33 @@
                 });
                 if (noResult) noResult.classList.toggle('hidden', visibleCount > 0);
             });
+        }
+
+        // Select All / Deselect All cities
+        var toggleBtn = document.getElementById('toggleAllCities');
+        var counterEl = document.getElementById('citiesSelectedCount');
+        var selectAllText = @json(__('admin.shipping_methods.select_all'));
+        var deselectAllText = @json(__('admin.shipping_methods.deselect_all'));
+        function updateCityCount() {
+            if (!counterEl || !citiesList) return;
+            var total = citiesList.querySelectorAll('.city-item').length;
+            var checked = citiesList.querySelectorAll('input[type="checkbox"]:checked').length;
+            counterEl.textContent = checked + ' / ' + total;
+            if (toggleBtn) toggleBtn.textContent = checked === total ? deselectAllText : selectAllText;
+        }
+        if (toggleBtn && citiesList) {
+            toggleBtn.addEventListener('click', function() {
+                var allItems = citiesList.querySelectorAll('.city-item');
+                var allChecked = true;
+                allItems.forEach(function(item) { if (item.style.display === 'none') return; if (!item.querySelector('input').checked) allChecked = false; });
+                allItems.forEach(function(item) {
+                    if (item.style.display === 'none') return;
+                    item.querySelector('input').checked = !allChecked;
+                });
+                updateCityCount();
+            });
+            citiesList.addEventListener('change', updateCityCount);
+            updateCityCount();
         }
     });
 </script>

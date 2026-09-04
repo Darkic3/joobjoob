@@ -1008,6 +1008,8 @@ return [
         'active_cities' => 'شهرهای فعال:',
         'search_cities' => 'جستجوی شهر...',
         'no_results' => 'شهری یافت نشد',
+        'select_all' => 'انتخاب همه',
+        'deselect_all' => 'حذف انتخاب همه',
         'save' => 'ذخیره',
         'cancel' => 'انصراف',
         'no_methods' => 'هیچ روش ارسالی تعریف نشده',

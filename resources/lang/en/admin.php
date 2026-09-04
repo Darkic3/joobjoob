@@ -974,6 +974,8 @@ return [
         'active_cities' => 'Active cities:',
         'search_cities' => 'Search city...',
         'no_results' => 'No cities found',
+        'select_all' => 'Select all',
+        'deselect_all' => 'Deselect all',
         'save' => 'Save',
         'cancel' => 'Cancel',
         'no_methods' => 'No shipping methods defined',

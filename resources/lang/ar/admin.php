@@ -974,6 +974,8 @@ return [
         'active_cities' => 'المدن النشطة:',
         'search_cities' => 'بحث عن مدينة...',
         'no_results' => 'لم يتم العثور على مدن',
+        'select_all' => 'تحديد الكل',
+        'deselect_all' => 'إلغاء تحديد الكل',
         'save' => 'حفظ',
         'cancel' => 'إلغاء',
         'no_methods' => 'لم يتم تعريف طرق شحن',

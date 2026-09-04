@@ -974,6 +974,8 @@ return [
         'active_cities' => 'Aktif şehirler:',
         'search_cities' => 'Şehir ara...',
         'no_results' => 'Şehir bulunamadı',
+        'select_all' => 'Tümünü seç',
+        'deselect_all' => 'Tüm seçimi kaldır',
         'save' => 'Kaydet',
         'cancel' => 'İptal',
         'no_methods' => 'Tanımlanmış kargo yöntemi yok',
