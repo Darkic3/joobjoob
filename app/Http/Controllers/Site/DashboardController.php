@@ -49,10 +49,10 @@ class DashboardController extends Controller
     {
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
 
-        // فقط برای سفارش‌های کارت به کارت و فقط در حالت pending_confirmation
+        // فقط برای سفارش‌های کارت به کارت
         $isCardToCard = in_array($order->bank?->bank_type ?? '', ['card_to_card', 'card-to-card']);
-        if (! $isCardToCard || $order->order_status !== 'pending_confirmation') {
-            return redirect()->back()->with('error', 'امکان ویرایش اطلاعات فیش برای این سفارش وجود ندارد.');
+        if (! $isCardToCard) {
+            return redirect()->back()->with('error', 'امکان ویرایش اطلاعات پرداخت برای این سفارش وجود ندارد.');
         }
 
         $order->update([

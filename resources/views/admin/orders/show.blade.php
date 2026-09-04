@@ -68,49 +68,21 @@
                         <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $order->bank?->title ?? '—' }}</span>
                     </div>
 
-                    {{-- کد پیگیری پستی --}}
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-                        <span class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.tracking_code') }}</span>
-                        <form action="{{ route('admin.orders.post-code') }}" method="POST" class="flex items-center gap-1.5">
-                            @csrf
-                            <input type="hidden" name="order_id" value="{{ $order->id }}">
-                            <input type="text" name="post_code" value="{{ $order->post_code }}" placeholder="{{ __('admin.orders.tracking_code_placeholder') }}"
-                                   class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-800 dark:text-gray-200 w-28 focus:ring-2 focus:ring-indigo-500 outline-none" dir="ltr">
-                            <button class="text-xs font-semibold px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors">{{ __('admin.orders.save_tracking') }}</button>
-                        </form>
-                    </div>
-
-                    {{-- اطلاعات فیش واریزی / کارت به کارت --}}
+                    {{-- اطلاعات کارت به کارت --}}
                     @if($order->bank)
                         @php
                             $isCardToCard = in_array($order->bank->bank_type ?? '', ['card_to_card', 'card-to-card']);
                         @endphp
                         @if($isCardToCard)
-                            <div class="py-2">
-                                <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ __('admin.orders.payment_receipt') }}</span>
-                                @if($order->receipt_tracking_code)
-                                    <div class="space-y-2">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">کد پیگیری</span>
-                                            <span class="text-sm font-bold text-gray-800 dark:text-gray-200" dir="ltr">{{ $order->receipt_tracking_code }}</span>
-                                        </div>
-                                        @if($order->receipt_payer_card)
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">شماره کارت واریزکننده</span>
-                                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200" dir="ltr">{{ $order->receipt_payer_card }}</span>
-                                            </div>
-                                        @endif
-                                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400">✅ اطلاعات فیش واریزی دریافت شد</p>
-                                    </div>
-                                @else
-                                    <div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-                                        <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                        <div>
-                                            <p class="text-xs font-bold text-red-700 dark:text-red-400">اطلاعات فیش ارسال نشده!</p>
-                                            <p class="text-[10px] text-red-500 dark:text-red-400">کاربر پرداخت کارت به کارت انجام داده ولی اطلاعات فیش را وارد نکرده</p>
-                                        </div>
-                                    </div>
-                                @endif
+                            <div class="py-2 border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="text-gray-500 dark:text-gray-400">کد پیگیری</span>
+                                    <span class="font-semibold {{ $order->receipt_tracking_code ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic' }}" dir="ltr">{{ $order->receipt_tracking_code ?: 'خالی' }}</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="text-gray-500 dark:text-gray-400">شماره کارت واریزکننده</span>
+                                    <span class="font-semibold {{ $order->receipt_payer_card ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic' }}" dir="ltr">{{ $order->receipt_payer_card ?: 'خالی' }}</span>
+                                </div>
                             </div>
                         @endif
                     @endif

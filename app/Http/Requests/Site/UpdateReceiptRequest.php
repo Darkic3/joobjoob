@@ -14,7 +14,7 @@ class UpdateReceiptRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'receipt_tracking_code' => 'required|numeric|min:6|max:16',
+            'receipt_tracking_code' => 'required|digits_between:6,16',
             'receipt_payer_card' => 'nullable|string|regex:/^(\d{4}-?){3}\d{4}$/',
         ];
     }

@@ -174,63 +174,41 @@
             </div>
         </div>
 
-        {{-- اطلاعات فیش واریزی (کارت به کارت) --}}
+        {{-- اطلاعات کارت به کارت (قابل ویرایش) --}}
         @if($order->isCardToCard)
             <div class="neu-card">
                 <div class="flex items-center gap-2 mb-4">
                     <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: color-mix(in srgb, var(--accent) 10%, transparent);">
                         <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5Z"/></svg>
                     </div>
-                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">اطلاعات فیش واریزی</h3>
+                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">اطلاعات پرداخت کارت به کارت</h3>
                 </div>
 
-                @if($order->order_status === 'pending_confirmation')
-                    {{-- حالت قابل ویرایش --}}
-                    <form action="{{ route('dashboard.order-receipt.update', $order->id) }}" method="POST" class="space-y-3">
-                        @csrf
-                        @method('PATCH')
-                        <div>
-                            <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">کد پیگیری <span class="text-rose-500">*</span></label>
-                            <input type="text" name="receipt_tracking_code" value="{{ $order->receipt_tracking_code }}" inputmode="numeric" pattern="\d{6,16}" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                   placeholder="کد پیگیری واریزی"
-                                   class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
-                                   style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
-                                   dir="ltr" required>
-                            @error('receipt_tracking_code')<p class="text-[10px] text-rose-500 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
-                            <input type="text" name="receipt_payer_card" value="{{ $order->receipt_payer_card }}" inputmode="numeric" pattern="(\d{4}-?){3}\d{4}" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                   placeholder="شماره کارت واریزکننده"
-                                   class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
-                                   style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
-                                   dir="ltr">
-                        </div>
-                        <button type="submit" class="w-full py-2.5 rounded-xl text-xs font-black text-white transition-all hover:scale-[1.01]"
-                                style="background: var(--accent);">
-                            ذخیره اطلاعات
-                        </button>
-                    </form>
-                @else
-                    {{-- حالت فقط نمایش --}}
-                    <div class="space-y-2">
-                        @if($order->receipt_tracking_code)
-                            <div class="flex items-center justify-between py-2" style="border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);">
-                                <span class="text-xs" style="color: var(--text-secondary);">کد پیگیری</span>
-                                <span class="text-sm font-bold mono" dir="ltr">{{ $order->receipt_tracking_code }}</span>
-                            </div>
-                        @endif
-                        @if($order->receipt_payer_card)
-                            <div class="flex items-center justify-between py-2">
-                                <span class="text-xs" style="color: var(--text-secondary);">شماره کارت واریزکننده</span>
-                                <span class="text-sm font-bold mono" dir="ltr">{{ $order->receipt_payer_card }}</span>
-                            </div>
-                        @endif
-                        @if(! $order->receipt_tracking_code)
-                            <p class="text-xs" style="color: var(--text-secondary);">اطلاعاتی ثبت نشده است.</p>
-                        @endif
+                <form action="{{ route('dashboard.order-receipt.update', $order->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">کد پیگیری <span class="text-rose-500">*</span></label>
+                        <input type="text" name="receipt_tracking_code" value="{{ $order->receipt_tracking_code }}" inputmode="numeric" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                               placeholder="کد پیگیری واریزی"
+                               class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr" required>
+                        @error('receipt_tracking_code')<p class="text-[10px] text-rose-500 mt-1">{{ $message }}</p>@enderror
                     </div>
-                @endif
+                    <div>
+                        <label class="text-xs font-bold mb-1 block" style="color: var(--text-secondary);">شماره کارت واریزکننده <span class="text-[10px] font-normal">(اختیاری)</span></label>
+                        <input type="text" name="receipt_payer_card" value="{{ $order->receipt_payer_card }}" inputmode="numeric" maxlength="16" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                               placeholder="شماره کارت واریزکننده"
+                               class="w-full px-4 py-2.5 rounded-xl text-sm font-bold transition-all outline-none"
+                               style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
+                               dir="ltr">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 rounded-xl text-xs font-black text-white transition-all hover:scale-[1.01]"
+                            style="background: var(--accent);">
+                        ذخیره اطلاعات
+                    </button>
+                </form>
             </div>
         @endif
 
