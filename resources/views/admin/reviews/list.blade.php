@@ -143,6 +143,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                                         </svg>
                                     </button>
+                                    <button type="button"
+                                            onclick="openReplyModal({{ $review->id }}, '{{ addslashes($review->display_name) }}')"
+                                            class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                                            title="{{ __('admin.reviews.reply') }}">                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                        </svg>
+                                    </button>
                                     @if(auth()->user()->canAccess('admin.reviews.index'))
                                         <a href="{{ route('admin.reviews.show', $review) }}"
                                            class="p-2 text-gray-400 dark:text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
@@ -278,6 +285,14 @@
                         {{-- دکمه‌های اقدام --}}
                         <div class="flex items-center gap-1">
                             <button type="button"
+                                    onclick="openReplyModal({{ $review->id }}, '{{ addslashes($review->display_name) }}')"
+                                    class="p-2.5 rounded-lg transition-all text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                    title="{{ __('admin.reviews.reply') }}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                </svg>
+                            </button>
+                            <button type="button"
                                     onclick="toggleFeatured({{ $review->id }}, this)"
                                     class="p-2.5 rounded-lg transition-all {{ $review->is_featured ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-gray-400 dark:text-gray-500 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20' }}"
                                     title="{{ __('admin.reviews.show_home') }}">
@@ -354,8 +369,132 @@
         </style>
     @endpush
 
+    {{-- ═══ مودال پاسخ به نظر ═══ --}}
+    <div id="replyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm admin-backdrop" onclick="closeReplyModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg pointer-events-auto admin-modal-panel">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ __('admin.reviews.reply_to_review') }}</h3>
+                    <p id="replyModalAuthor" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5"></p>
+                </div>
+                <button onclick="closeReplyModal()" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form id="replyForm" class="p-6">
+                @csrf
+                <input type="hidden" name="review_id" id="replyReviewId">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('admin.reviews.comment') }}</label>
+                    <textarea name="comment" id="replyComment" rows="4" required
+                              class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                              placeholder="{{ __('admin.reviews.reply_placeholder') }}"></textarea>
+                </div>
+                <div id="replyError" class="hidden mt-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm"></div>
+                <div class="flex items-center justify-end gap-3 mt-5">
+                    <button type="button" onclick="closeReplyModal()"
+                            class="px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                        {{ __('admin.common.cancel') }}
+                    </button>
+                    <button type="submit" id="replySubmitBtn"
+                            class="px-6 py-2.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all shadow-sm hover:shadow-md">
+                        <span id="replySubmitText">{{ __('admin.reviews.reply') }}</span>
+                        <span id="replySubmitSpinner" class="hidden">
+                            <svg class="animate-spin h-4 w-4 inline-block" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @push('scripts')
         <script>
+            // ── Reply Modal ──
+            function openReplyModal(reviewId, authorName) {
+                document.getElementById('replyReviewId').value = reviewId;
+                document.getElementById('replyModalAuthor').textContent = '{{ __('admin.reviews.reply_to') }}: ' + authorName;
+                document.getElementById('replyComment').value = '';
+                document.getElementById('replyError').classList.add('hidden');
+                var modal = document.getElementById('replyModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                setTimeout(function() { document.getElementById('replyComment').focus(); }, 200);
+            }
+
+            function closeReplyModal() {
+                var modal = document.getElementById('replyModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+
+            document.getElementById('replyForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var comment = document.getElementById('replyComment').value.trim();
+                var errorEl = document.getElementById('replyError');
+                var submitBtn = document.getElementById('replySubmitBtn');
+                var submitText = document.getElementById('replySubmitText');
+                var submitSpinner = document.getElementById('replySubmitSpinner');
+
+                if (!comment) {
+                    errorEl.textContent = '{{ __('admin.reviews.reply_empty') }}';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                errorEl.classList.add('hidden');
+                submitBtn.disabled = true;
+                submitText.classList.add('hidden');
+                submitSpinner.classList.remove('hidden');
+
+                fetch('{{ route('admin.reviews.reply') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        review_id: document.getElementById('replyReviewId').value,
+                        comment: comment,
+                    }),
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        closeReplyModal();
+                        // Show success toast
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: '{{ __("admin.reviews.reply_sent") }}',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: { popup: 'swal2-rtl' },
+                            });
+                        } else {
+                            alert('{{ __("admin.reviews.reply_sent") }}');
+                        }
+                    } else {
+                        errorEl.textContent = data.message || '{{ __("admin.common.request_error") }}';
+                        errorEl.classList.remove('hidden');
+                    }
+                })
+                .catch(function() {
+                    errorEl.textContent = '{{ __("admin.common.request_error") }}';
+                    errorEl.classList.remove('hidden');
+                })
+                .finally(function() {
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('hidden');
+                    submitSpinner.classList.add('hidden');
+                });
+            });
+
             function toggleFeatured(reviewId, button) {
                 button.disabled = true;
 

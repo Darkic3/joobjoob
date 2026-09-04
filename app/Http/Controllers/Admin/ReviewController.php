@@ -82,6 +82,39 @@ class ReviewController extends Controller
     }
 
     /**
+     * پاسخ ادمین به نظر کاربر (AJAX)
+     */
+    public function reply(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'review_id' => 'required|integer|exists:reviews,id',
+            'comment'   => 'required|string|max:2000',
+        ]);
+
+        $parentReview = Review::findOrFail($request->review_id);
+
+        $reply = Review::create([
+            'product_id'  => $parentReview->product_id,
+            'user_id'     => auth()->id(),
+            'parent_id'   => $parentReview->id,
+            'rating'      => $parentReview->rating,
+            'comment'     => $request->comment,
+            'is_approved' => Review::STATUS_APPROVED,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('admin.reviews.reply_sent'),
+            'reply'   => [
+                'id'           => $reply->id,
+                'display_name' => $reply->display_name,
+                'comment'      => $reply->comment,
+                'created_at'   => $reply->created_at->diffForHumans(),
+            ],
+        ]);
+    }
+
+    /**
      * تغییر وضعیت نمایش در صفحه اول (AJAX)
      */
     public function toggleFeatured(Request $request): \Illuminate\Http\JsonResponse
