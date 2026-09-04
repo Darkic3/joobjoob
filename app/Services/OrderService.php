@@ -76,6 +76,8 @@ class OrderService
             'user_description' => $userDescription,
             'shipping_status_id' => $defaultStatus?->id,
             'payment_receipt' => $orderData['payment_receipt'] ?? null,
+            'receipt_tracking_code' => $orderData['receipt_tracking_code'] ?? null,
+            'receipt_payer_card' => $orderData['receipt_payer_card'] ?? null,
         ]);
 
         foreach ($cartItems as $item) {
