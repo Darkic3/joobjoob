@@ -112,7 +112,13 @@
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-500 dark:text-gray-400">مخصوص کاربر</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">{{ $discount->user_id ? '#' . $discount->user_id : 'همه کاربران' }}</span>
+                        @if($discount->user)
+                            <button type="button" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors cursor-pointer" data-bs-toggle="modal" data-bs-target="#userDetailModal">
+                                {{ $discount->user->name }}
+                            </button>
+                        @else
+                            <span class="font-semibold text-gray-800 dark:text-white">همه کاربران</span>
+                        @endif
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-500 dark:text-gray-400">تعداد استفاده</span>
@@ -198,4 +204,59 @@
             </div>
         </div>
     </div>
+
+@if($discount->user)
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-dark text-start">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">جزئیات کاربر</h5>
+                <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        @if($discount->user->avatar)
+                            <img src="{{ asset('storage/' . $discount->user->avatar) }}" alt="{{ $discount->user->name }}" class="w-16 h-16 rounded-full object-cover">
+                        @else
+                            {{ mb_substr($discount->user->name, 0, 1) }}
+                        @endif
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 dark:text-white">{{ $discount->user->name }}</h4>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ $discount->user->is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
+                            {{ $discount->user->is_active ? 'فعال' : 'غیرفعال' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <span class="text-gray-500 dark:text-gray-400">ایمیل</span>
+                        <span class="font-semibold text-gray-800 dark:text-white" dir="ltr">{{ $discount->user->email ?? '—' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <span class="text-gray-500 dark:text-gray-400">موبایل</span>
+                        <span class="font-semibold text-gray-800 dark:text-white" dir="ltr">{{ $discount->user->mobile ?? '—' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <span class="text-gray-500 dark:text-gray-400">زبان</span>
+                        <span class="font-semibold text-gray-800 dark:text-white">{{ $discount->user->locale ?? '—' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <span class="text-gray-500 dark:text-gray-400">تاریخ عضویت</span>
+                        <span class="font-semibold text-gray-800 dark:text-white">{{ show_date($discount->user->created_at, 'Y/m/d') }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                        <span class="text-gray-500 dark:text-gray-400">تعداد سفارشات</span>
+                        <span class="font-semibold text-gray-800 dark:text-white">{{ $discount->user->orders()->count() }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection

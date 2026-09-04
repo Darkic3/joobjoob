@@ -75,8 +75,8 @@ class DiscountController extends Controller
             ->take(20)
             ->get();
 
-        // بارگذاری روابط discountable
-        $discount->load(['categories:id,name', 'brands:id,title', 'products:id,name']);
+        // بارگذاری روابط discountable + کاربر مرتبط
+        $discount->load(['categories:id,name', 'brands:id,title', 'products:id,name', 'user:id,name,email,mobile,is_active,locale,created_at']);
 
         return view('admin.discounts.show', compact('discount', 'recentUsage'));
     }
