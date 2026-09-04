@@ -79,21 +79,25 @@ function adminNotificationBell() {
         open: false,
         count: {{ $unreadNotificationCount ?? 0 }},
         items: [],
+        loading: false,
 
         toggle() {
             this.open = !this.open;
-            if (this.open && this.items.length === 0) {
+            if (this.open) {
                 this.fetchNotifications();
             }
         },
 
         async fetchNotifications() {
+            this.loading = true;
             try {
                 const res = await fetch('{{ route("admin.api.notifications.unread-count") }}', {
                     headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                 });
-                const data = await res.json();
-                this.count = data.count ?? 0;
+                if (res.ok) {
+                    const data = await res.json();
+                    this.count = data.count ?? 0;
+                }
             } catch (e) {}
 
             try {
@@ -103,8 +107,10 @@ function adminNotificationBell() {
                 if (res.ok) {
                     const data = await res.json();
                     this.items = (data.data || []).slice(0, 8);
+                    if (typeof data.count === 'number') this.count = data.count;
                 }
             } catch (e) {}
+            this.loading = false;
         },
 
         async markRead(id) {

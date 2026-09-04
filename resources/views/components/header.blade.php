@@ -129,7 +129,12 @@
                             </button>
                         </div>
                         <div class="max-h-72 overflow-y-auto">
-                            <template x-if="items.length === 0">
+                            <template x-if="loading">
+                                <div class="px-4 py-8 text-center">
+                                    <p class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.loading') ?? 'در حال بارگذاری...' }}</p>
+                                </div>
+                            </template>
+                            <template x-if="!loading && items.length === 0">
                                 <div class="px-4 py-8 text-center">
                                     <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--text-secondary); opacity: 0.4;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
                                     <p class="text-xs font-bold" style="color: var(--text-secondary);">{{ __('messages.no_notifications') }}</p>
@@ -271,21 +276,25 @@ function notificationBell() {
         open: false,
         count: {{ $unreadNotificationCount ?? 0 }},
         items: [],
+        loading: false,
 
         toggle() {
             this.open = !this.open;
-            if (this.open && this.items.length === 0) {
+            if (this.open) {
                 this.fetchNotifications();
             }
         },
 
         async fetchNotifications() {
+            this.loading = true;
             try {
                 const res = await fetch('{{ route("api.notifications.unread-count") }}', {
                     headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                 });
-                const data = await res.json();
-                this.count = data.count ?? 0;
+                if (res.ok) {
+                    const data = await res.json();
+                    this.count = data.count ?? 0;
+                }
             } catch (e) {}
 
             try {
@@ -295,8 +304,10 @@ function notificationBell() {
                 if (res.ok) {
                     const data = await res.json();
                     this.items = (data.data || []).slice(0, 8);
+                    if (typeof data.count === 'number') this.count = data.count;
                 }
             } catch (e) {}
+            this.loading = false;
         },
 
         async markRead(id) {

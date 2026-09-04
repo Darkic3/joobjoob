@@ -14,10 +14,27 @@ class NotificationController extends Controller
 
     /**
      * صفحه لیست اعلانات کاربر
+     * اگر ?format=json یا Accept: application/json باشد، لیست JSON برای دراپ‌داون هدر برمی‌گرداند
      */
-    public function index()
+    public function index(Request $request)
     {
         $notifications = $this->notificationService->getUserNotifications(Auth::user());
+
+        if ($request->get('format') === 'json' || $request->wantsJson()) {
+            return response()->json([
+                'data' => collect($notifications->items())->map(fn ($n) => [
+                    'id' => $n->id,
+                    'type' => $n->type,
+                    'title' => $n->title,
+                    'body' => $n->body,
+                    'icon' => $n->icon,
+                    'link' => $n->link,
+                    'is_read' => (bool) $n->is_read,
+                    'created_at' => $n->created_at?->diffForHumans(),
+                ])->values(),
+                'count' => $this->notificationService->getUnreadCount(Auth::user()),
+            ]);
+        }
 
         return view('site.dashboard.notifications', compact('notifications'));
     }

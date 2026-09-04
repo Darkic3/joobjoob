@@ -98,7 +98,10 @@
                         </button>
                     </div>
                     <div class="max-h-72 overflow-y-auto">
-                        <template x-if="items.length === 0">
+                        <template x-if="loading">
+                            <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">...</p>
+                        </template>
+                        <template x-if="!loading && items.length === 0">
                             <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('admin.layout.no_notifications') }}</p>
                         </template>
                         <template x-for="item in items" :key="item.id">
