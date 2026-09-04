@@ -306,8 +306,6 @@ class ProductService
             return;
         }
 
-        $sumStock = $product->variants()->sum('stock');
-
         $minVariant = $product->variants()
             ->where('stock', '>', 0)
             ->where('final_price', '>', 0)
@@ -319,12 +317,7 @@ class ProductService
                 'price' => $minVariant->price,
                 'discounted_price' => $minVariant->discounted_price,
                 'final_price' => $minVariant->final_price,
-                'stock' => $sumStock,
             ]);
-        } else {
-            // هیچ واریانتِ موجود و قیمت‌داری نیست — فقط موجودی را جمع کن
-            // قیمت اصلی محصول حفظ می‌شود تا بعداً با حذف واریانت‌ها از بین نرود
-            $product->update(['stock' => $sumStock]);
         }
     }
 
