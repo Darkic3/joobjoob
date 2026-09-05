@@ -31,7 +31,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ── همه بخش‌های محافظت‌شده پنل ──────────────────────────────────
     // ⚠️ هیچ روت ادمینی نباید خارج از این گروه تعریف شود (پیش‌فرض = باز)
-    Route::middleware(['auth', 'adminPermission', 'log.admin'])->group(function () {
+    Route::middleware(['auth', 'adminPermission', 'log.admin', 'refreshRememberMe'])->group(function () {
 
         Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
 

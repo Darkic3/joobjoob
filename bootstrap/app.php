@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminPermission;
 use App\Http\Middleware\LogAdminRequests;
+use App\Http\Middleware\RefreshRememberMeCookie;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTheme;
 use Illuminate\Foundation\Application;
@@ -17,8 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'adminPermission' => AdminPermission::class,
-            'log.admin' => LogAdminRequests::class,
+            'adminPermission'  => AdminPermission::class,
+            'log.admin'        => LogAdminRequests::class,
+            'refreshRememberMe' => RefreshRememberMeCookie::class,
         ]);
 
         $middleware->web([
