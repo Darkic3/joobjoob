@@ -31,7 +31,7 @@
                     <span class="text-3xl shrink-0 mt-1">{{ $notification->icon ?? '🔔' }}</span>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 class="text-lg font-bold" style="color: var(--text-primary);">{{ $notification->title }}</h1>
+                            <h1 class="text-lg font-bold" style="color: var(--text-primary);">{{ e($notification->title) }}</h1>
                             @if(!$notification->is_read)
                                 <span class="w-2 h-2 rounded-full shrink-0" style="background: var(--accent);"></span>
                             @endif
@@ -44,7 +44,7 @@
                             <div class="mt-4 p-4 rounded-2xl"
                                  style="background: color-mix(in srgb, var(--text-primary) 4%, transparent);">
                                 <p class="text-sm leading-relaxed" style="color: var(--text-primary);">
-                                    {{ $notification->body }}
+                                    {{ e($notification->body) }}
                                 </p>
                             </div>
                         @endif
@@ -52,7 +52,7 @@
                         <div class="mt-4 pt-4 border-t border-gray-200"
                              style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                             <div class="flex items-center justify-between text-xs" style="color: var(--text-secondary);">
-                                <span>نوع: {{ $notification->type }}</span>
+                                <span>نوع: {{ e($notification->type) }}</span>
                                 <span>{{ $notification->is_read ? 'خوانده‌شده' : 'برخی‌نشده' }}</span>
                             </div>
 
