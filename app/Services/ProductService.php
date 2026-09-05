@@ -32,6 +32,11 @@ class ProductService
 
             $product = Product::create($data);
 
+            // موجودیِ محصول واریانت‌دار از تجمیع واریانت‌ها می‌آید؛ ورودی مستقیم نادیده گرفته می‌شود
+            if ($product->variants()->exists()) {
+                $product->update(['stock' => (int) $product->variants()->sum('stock')]);
+            }
+
             // آپلود تصاویر جدید
             $newImages = $this->appendImages($product, $dto->getImages());
 
@@ -55,6 +60,11 @@ class ProductService
     {
         return DB::transaction(function () use ($product, $dto) {
             $data = $this->prepareData($dto);
+
+            // موجودی کلِ محصولِ واریانت‌دار قابل ویرایش مستقیم نیست = جمع واریانت‌ها
+            if ($product->variants()->exists()) {
+                unset($data['stock']);
+            }
 
             $product->update($data);
 
@@ -305,6 +315,9 @@ class ProductService
         if (! $product->variants()->exists()) {
             return;
         }
+
+        // موجودی محصول همیشه = جمع موجودی همهٔ واریانت‌ها (تغییرناپذیر مستقیم)
+        $product->update(['stock' => (int) $product->variants()->sum('stock')]);
 
         $minVariant = $product->variants()
             ->where('stock', '>', 0)

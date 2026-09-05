@@ -785,6 +785,7 @@ return [
         'timer_start' => 'Timer Start',
         'timer_end' => 'Timer End',
         'stock' => 'Stock',
+        'stock_from_variants_hint' => 'This product has variants; total stock = sum of all variant stocks. To change stock, edit each variant separately in the “Specs & Variants” tab.',
         'field_sku' => 'SKU',
         'sku_ph' => 'PRD-12345',
         'field_weight' => 'Weight (grams)',

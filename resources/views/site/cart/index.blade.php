@@ -130,7 +130,7 @@
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                                 </button>
                                                 <input type="number" name="qty" value="{{ $item['qty'] }}" min="1"
-                                                       max="{{ $item['stock'] }}"
+                                                       max="{{ $item['current_stock'] ?? $item['stock'] }}"
                                                        class="w-12 bg-transparent text-center text-sm font-bold py-1.5 outline-none mono"
                                                        aria-label="{{ __('messages.quantity') }}" readonly>
                                                 <button type="button" data-cart-qty="inc"

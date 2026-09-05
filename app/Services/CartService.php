@@ -40,27 +40,8 @@ class CartService
     {
         $items = Cart::where('user_id', auth()->id())->get();
 
-        // آپدیت خودکار original_price برای آیتم‌های قدیمی
-        $needsUpdate = false;
-        $items = $items->map(function ($item) use (&$needsUpdate) {
-            if (empty($item->original_price)) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $variant = ! empty($item->variant_id) ? $product->variants()->find($item->variant_id) : null;
-                    $item->original_price = $variant ? $variant->price : $product->price;
-                    $needsUpdate = true;
-                }
-            }
-            return $item;
-        });
-
-        if ($needsUpdate) {
-            foreach ($items as $item) {
-                if (is_null($item->getOriginal('original_price')) && ! empty($item->original_price)) {
-                    $item->save();
-                }
-            }
-        }
+        // قیمت/موجودی سبد تا قبل از ثبت سفارش همیشه با قیمت روز سایت همگام است
+        $this->refreshDbPrices($items);
 
         // بروزرسانی موجودی لحظه‌ای
         $stockService = app(StockService::class);
@@ -84,6 +65,55 @@ class CartService
             'is_in_stock'     => $item['is_in_stock'] ?? true,
             'current_stock'   => $item['current_stock'] ?? $item['stock'],
         ]]);
+    }
+
+    /**
+     * همگام‌سازی قیمت/موجودی ردیف‌های سبد دیتابیس با قیمت روز محصول/واریانت.
+     * قیمت تا قبل از نهایی‌شدن سفارش باید با سایت یکی باشد (قفل قیمت فقط بعد از ثبت سفارش).
+     */
+    private function refreshDbPrices(Collection $items): void
+    {
+        $productIds = $items->pluck('product_id')->unique()->filter()->all();
+        if (empty($productIds)) {
+            return;
+        }
+
+        $products = Product::with('variants')->findMany($productIds);
+
+        foreach ($items as $item) {
+            $product = $products->get($item->product_id);
+            if (! $product) {
+                continue;
+            }
+
+            // ترمیم ردیف‌های قدیمیِ بدون واریانت (محصول واریانت‌دار که قبل از این فیکس اضافه شده)
+            if (empty($item->variant_id) && $product->has_variants) {
+                $default = $product->variants->sortByDesc('stock')->firstWhere(fn ($v) => $v->stock > 0)
+                    ?? $product->variants->first();
+                if ($default) {
+                    $item->variant_id = $default->id;
+                    $item->variant_label = $default->label ?: $item->variant_label;
+                }
+            }
+
+            $variant = ! empty($item->variant_id)
+                ? $product->variants->firstWhere('id', $item->variant_id)
+                : null;
+
+            $freshPrice = $variant ? $variant->final_price : $product->final_price;
+            $freshOriginal = $variant ? $variant->price : $product->price;
+            $freshStock = $variant ? (int) $variant->stock : (int) $product->stock;
+
+            if ((int) $item->price !== (int) $freshPrice
+                || (int) $item->original_price !== (int) $freshOriginal
+                || (int) $item->stock !== $freshStock
+                || $item->isDirty('variant_id')) {
+                $item->price = $freshPrice;
+                $item->original_price = $freshOriginal;
+                $item->stock = $freshStock;
+                $item->save();
+            }
+        }
     }
 
     private function dbAdd(Product $product, int $qty, ?int $variantId, ?string $color, ?string $size): string
@@ -155,20 +185,48 @@ class CartService
     {
         $cart = collect(session($this->sessionKey, []));
 
-        $needsUpdate = false;
-        $cart = $cart->map(function ($item) use (&$needsUpdate) {
-            if (empty($item['original_price'])) {
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    $variant = ! empty($item['variant_id']) ? $product->variants()->find($item['variant_id']) : null;
-                    $item['original_price'] = $variant ? $variant->price : $product->price;
-                    $needsUpdate = true;
+        $changed = false;
+        $productIds = $cart->pluck('product_id')->unique()->filter()->all();
+        $products = empty($productIds) ? collect() : Product::with('variants')->findMany($productIds);
+
+        $cart = $cart->map(function ($item) use ($products, &$changed) {
+            $product = $products->get($item['product_id'] ?? null);
+            if (! $product) {
+                return $item;
+            }
+
+            // ترمیم ردیف‌های قدیمیِ بدون واریانت + همگام‌سازی قیمت/موجودی با قیمت روز
+            if (empty($item['variant_id']) && $product->has_variants) {
+                $default = $product->variants->sortByDesc('stock')->firstWhere(fn ($v) => $v->stock > 0)
+                    ?? $product->variants->first();
+                if ($default) {
+                    $item['variant_id'] = $default->id;
+                    $item['variant_label'] = $default->label ?: ($item['variant_label'] ?? null);
+                    $changed = true;
                 }
             }
+
+            $variant = ! empty($item['variant_id'])
+                ? $product->variants->firstWhere('id', $item['variant_id'])
+                : null;
+
+            $freshPrice = $variant ? $variant->final_price : $product->final_price;
+            $freshOriginal = $variant ? $variant->price : $product->price;
+            $freshStock = $variant ? (int) $variant->stock : (int) $product->stock;
+
+            if ((int) ($item['price'] ?? 0) !== (int) $freshPrice
+                || (int) ($item['original_price'] ?? 0) !== (int) $freshOriginal
+                || (int) ($item['stock'] ?? 0) !== $freshStock) {
+                $item['price'] = $freshPrice;
+                $item['original_price'] = $freshOriginal;
+                $item['stock'] = $freshStock;
+                $changed = true;
+            }
+
             return $item;
         });
 
-        if ($needsUpdate) {
+        if ($changed) {
             session([$this->sessionKey => $cart->toArray()]);
         }
 

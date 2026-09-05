@@ -94,6 +94,14 @@ class CartController extends Controller
         $qty = (int) ($request->input('qty') ?? 1);
         $variantId = $request->input('variant_id') ? (int) $request->input('variant_id') : null;
 
+        // محصول واریانت‌دار بدون انتخاب مشخصه (افزودن از صفحهٔ اصلی/فهرست) → واریانت پیش‌فرض
+        if (empty($variantId) && $product->has_variants) {
+            $default = $product->default_variant;
+            if ($default) {
+                $variantId = $default->id;
+            }
+        }
+
         $variant = $variantId ? $product->variants()->find($variantId) : null;
         $stock = $variant ? $variant->stock : $product->stock;
 
@@ -148,7 +156,10 @@ class CartController extends Controller
         $request->validate(['qty' => 'required|integer|min:1']);
 
         $item = $this->cart->content()->get($rowId);
-        $maxQty = $item['stock'] ?? PHP_INT_MAX;
+
+        // موجودی زندهٔ همان واریانت/محصول — نه اسنپ‌شات قدیمی ردیف سبد
+        $maxQty = app(\App\Services\StockService::class)
+            ->getAvailableStock((int) $item['product_id'], $item['variant_id'] ?? null);
         $requestedQty = (int) $request->input('qty', 1);
         $stockWarning = null;
 
@@ -156,7 +167,12 @@ class CartController extends Controller
             $stockWarning = __('messages.stock_limit_reached', ['count' => $maxQty]);
         }
 
+        // درخواستِ بیش از موجودی رد نمی‌شود (clamp نمی‌کنیم)؛ تعداد فعلی حفظ می‌شود
         $qty = min($requestedQty, $maxQty);
+
+        if ($qty !== $requestedQty) {
+            $qty = (int) $item['qty'];
+        }
 
         $this->cart->update($rowId, $qty);
 

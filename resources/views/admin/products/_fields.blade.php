@@ -129,9 +129,26 @@
             <x-admin.jalali-datetime name="end_timer" :value="$oldVal('end_timer')" :label="__('admin.products.timer_end')" />
         </div>
 
+        @php
+            // در حالت ویرایش: اگر محصول واریانت دارد، موجودی کل قابل ویرایش مستقیم نیست
+            $hasVariants = isset($product) && $product->exists && $product->has_variants;
+        @endphp
         <div>
             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{{ __('admin.products.stock') }} <span class="text-rose-500">*</span></label>
-            <input type="number" name="stock" value="{{ $oldVal('stock', 0) }}" class="input-custom" placeholder="50" required>
+            @if($hasVariants)
+                <input type="number" name="stock" value="{{ $product->stock }}"
+                       class="input-custom bg-gray-100 dark:bg-gray-700/60 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                       disabled aria-readonly="true">
+                <input type="hidden" name="stock" value="{{ $product->stock }}">
+                <p class="text-amber-600 dark:text-amber-400 text-xs mt-1.5 flex items-start gap-1">
+                    <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                    <span>{{ __('admin.products.stock_from_variants_hint') }}</span>
+                </p>
+            @else
+                <input type="number" name="stock" value="{{ $oldVal('stock', 0) }}" class="input-custom" placeholder="50" required>
+            @endif
             @error('stock') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 

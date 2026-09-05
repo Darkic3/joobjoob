@@ -784,6 +784,7 @@ return [
         'timer_start' => 'Zamanlayıcı Başlangıcı',
         'timer_end' => 'Zamanlayıcı Bitişi',
         'stock' => 'Stok',
+        'stock_from_variants_hint' => 'Bu ürünün varyantları var; toplam stok = tüm varyant stoklarının toplamı. Stoğu değiştirmek için her varyantı “Özellikler & Varyantlar” sekmesinde ayrı ayrı düzenleyin.',
         'field_sku' => 'Ürün Kodu (SKU)',
         'sku_ph' => 'PRD-12345',
         'field_weight' => 'Ağırlık (gram)',

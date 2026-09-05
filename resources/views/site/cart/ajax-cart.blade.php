@@ -87,7 +87,7 @@
         if (dir === 'dec' && val <= 1) return;
         if (dir === 'inc' && val >= max) {
             if (typeof showToast === 'function') {
-                showToast('موجودی این محصول تمام شده است', 'error');
+                showToast(max > 0 ? '{{ __('messages.stock_limit_reached', ['count' => ':count']) }}'.replace(':count', formatNum(max)) : '{{ __('messages.out_of_stock') }}', 'error', '{{ __('messages.stock_limit_sub') }}');
             }
             return;
         }

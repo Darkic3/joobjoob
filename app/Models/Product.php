@@ -227,6 +227,24 @@ class Product extends Model
             : $this->variants()->exists();
     }
 
+    /**
+     * واریانت پیش‌فرض محصول (برای افزودن به سبد از صفحات فهرست بدون انتخاب مشخصه).
+     * اولویت: بیشترین موجودیِ غیرصفر → اولین واریانت موجود → اولین واریانت.
+     */
+    public function getDefaultVariantAttribute(): ?ProductVariant
+    {
+        if (! $this->has_variants) {
+            return null;
+        }
+
+        $variants = $this->relationLoaded('variants')
+            ? $this->variants
+            : $this->variants()->get();
+
+        return $variants->sortByDesc('stock')->firstWhere(fn ($v) => (int) $v->stock > 0)
+            ?? $variants->first();
+    }
+
     public function getAverageRatingAttribute(): float
     {
         if ($this->relationLoaded('reviews')) {
