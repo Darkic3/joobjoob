@@ -65,6 +65,7 @@ return [
     'related_products' => 'محصولات مرتبط',
     'select_color' => 'انتخاب رنگ',
     'select_size' => 'انتخاب سایز',
+    'in_stock_with_count' => 'موجود (:count عدد)',
     'in_stock' => 'موجود',
     'out_of_stock' => 'ناموجود',
     'low_stock' => 'موجودی کم',

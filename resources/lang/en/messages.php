@@ -71,6 +71,7 @@ return [
     'related_products' => 'Related Products',
     'select_color' => 'Select Color',
     'select_size' => 'Select Size',
+    'in_stock_with_count' => 'In Stock (:count)',
     'in_stock' => 'In Stock',
     'out_of_stock' => 'Out of Stock',
     'low_stock' => 'Low Stock',

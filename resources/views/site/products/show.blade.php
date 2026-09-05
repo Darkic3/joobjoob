@@ -270,7 +270,7 @@
                     <span class="w-2 h-2 rounded-full"
                           style="background-color: {{ $product->stock > 0 ? 'var(--success)' : 'var(--danger)' }}"></span>
                     <span
-                        id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock') . " ({$product->stock} عدد)" : __('messages.out_of_stock') }}</span>
+                        id="stock-text">{{ $product->stock > 0 ? __('messages.in_stock_with_count', ['count' => \App\Helpers\NumberHelper::localizeDigits($product->stock)]) : __('messages.out_of_stock') }}</span>
                 </p>
 
                 {{-- نشان‌های اعتماد --}}
@@ -734,7 +734,12 @@
                 if (selectedVariant.stock > 0) {
                     btn.disabled = false;
                     status.style.color = 'var(--success)';
-                    stockText.textContent = '{{ __("messages.in_stock") }} (' + selectedVariant.stock + ' عدد)';
+                    // از همان اول با ارقامِ هماهنگ با زبان رندر کن (بدون چشمک انگلیسی→فارسی)
+                    const rawStockText = @json(__('messages.in_stock_with_count', ['count' => ':count']));
+                    const withCount = rawStockText.replace(':count', selectedVariant.stock);
+                    stockText.textContent = (window.localizeDigits && window.localizeDigits.convert)
+                        ? window.localizeDigits.convert(withCount)
+                        : withCount;
                     qtyInput.max = selectedVariant.stock;
                     if (parseInt(qtyInput.value) > selectedVariant.stock) qtyInput.value = selectedVariant.stock;
                 } else {

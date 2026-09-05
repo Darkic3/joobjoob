@@ -71,6 +71,7 @@ return [
     'related_products' => 'منتجات ذات صلة',
     'select_color' => 'اختر اللون',
     'select_size' => 'اختر المقاس',
+    'in_stock_with_count' => 'متوفر (:count)',
     'in_stock' => 'متوفر',
     'out_of_stock' => 'غير متوفر',
     'low_stock' => 'مخزون منخفض',

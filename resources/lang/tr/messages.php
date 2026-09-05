@@ -71,6 +71,7 @@ return [
     'related_products' => 'İlgili Ürünler',
     'select_color' => 'Renk Seç',
     'select_size' => 'Beden Seç',
+    'in_stock_with_count' => 'Stokta Var (:count)',
     'in_stock' => 'Stokta Var',
     'out_of_stock' => 'Stokta Yok',
     'low_stock' => 'Az Stok',
