@@ -169,6 +169,7 @@ return [
     'otp_resent' => 'کد جدید ارسال شد',
     'otp_login_success' => 'خوش آمدید!',
     'otp_mobile_invalid' => 'شماره موبایل معتبر نیست',
+    'otp_mobile_registered' => 'این شماره موبایل قبلاً ثبت‌نام کرده است',
     'otp_mobile_blocked' => 'دسترسی به این شماره امکان‌پذیر نیست',
     'otp_code_invalid' => 'کد واردشده صحیح نیست',
     'otp_code_expired' => 'کد منقضی شده است؛ دوباره درخواست دهید',
@@ -380,4 +381,54 @@ return [
     'orders' => 'سفارش‌ها',
 
     'loading' => 'در حال بارگذاری...',
+
+    // ── ترجمهٔ اعلان‌ها (همهٔ انواعベーث بعد از آن).
+    //    این کلیدها در NotificationService با __(...) خوانده می‌شوند.
+    //    bodyها با dataแพ้ย 가져왔다 پارامترهای پویا (مثلاً :order_id, :amount).
+    'notifications' => [
+        'order.created' => [
+            'title' => 'سفارش شما ثبت شد',
+            'body'  => 'سفارش #\u{3A6}:order_id به مبلغ :amount تومان ثبت شد.',
+        ],
+        'order.paid' => [
+            'title' => 'پرداخت سفارش تایید شد',
+            'body'  => 'پرداخت سفارش #\u{3A6}:order_id به مبلغ :amount تومان با موفقیت انجام شد.',
+        ],
+        'order.shipped' => [
+            'title' => 'وضعیت ارسال سفارش تغییر کرد',
+            'body'  => 'وضعیت ارسال سفارش #\u{3A6}:order_id به «\u{3A6}:status» تغییر یافت.',
+        ],
+        'order.cancelled' => [
+            'title' => 'سفارش شما لغو شد',
+            'body'  => 'سفارش #\u{3A6}:order_id لغو شد.',
+        ],
+        'discount.welcome' => [
+            'title' => 'کد تخفیف خوشامدگویی',
+            'body'  => 'تبریک! یک کد تخفیف ۱۰٪ برای اولین خرید شما ایجاد شد.',
+        ],
+        'discount.expiring' => [
+            'title' => 'کد تخفیف به‌زودی منقضی می‌شود',
+            'body'  => 'کد تخفیف شما به‌زودی منقضی می‌شود. حتماً استفاده کنید.',
+        ],
+        'order.new' => [
+            'title' => 'سفارش جدید ثبت شد',
+            'body'  => 'سفارش #\u{3A6}:order_id از \u{3A6}:user_name به مبلغ :amount تومان ثبت شد.',
+        ],
+        'order.paid_admin' => [
+            'title' => 'پرداخت سفارش تایید شد',
+            'body'  => 'پرداخت سفارش #\u{3A6}:order_id از \u{3A6}:user_name به مبلغ :amount تومان تایید شد.',
+        ],
+        'order.card_to_card' => [
+            'title' => 'فیش واریزی جدید دریافت شد',
+            'body'  => 'کاربر \u{3A6}:user_name فیش سفارش #\u{3A6}:order_id (کد پیگیری: \u{3A6}:tracking_code) به مبلغ :amount تومان ارسال کرد.',
+        ],
+        'review.new' => [
+            'title' => 'نظر جدید ثبت شد',
+            'body'  => 'نظر جدید از \u{3A6}:reviewer برای محصول «\u{3A6}:product_name» ثبت شد.',
+        ],
+        'contact.new' => [
+            'title' => 'پیام تماس جدید',
+            'body'  => 'پیام جدید از \u{3A6}:name (\u{3A6}:email) دریافت شد.',
+        ],
+    ],
 ];
