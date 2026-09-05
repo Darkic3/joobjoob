@@ -28,7 +28,8 @@ class NotificationController extends Controller
                     'title' => $n->title,
                     'body' => $n->body,
                     'icon' => $n->icon,
-                    'link' => $n->link,
+                    // ارجاع به صفحه جزئیات اعلان در سایت
+                    'link' => route('dashboard.notification-detail', $n->id),
                     'is_read' => (bool) $n->is_read,
                     'created_at' => $n->created_at?->diffForHumans(),
                 ])->values(),

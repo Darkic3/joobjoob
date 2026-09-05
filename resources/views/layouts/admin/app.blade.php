@@ -148,6 +148,31 @@ function adminNotificationBell() {
                 this.items.forEach(i => i.is_read = true);
                 this.count = 0;
             } catch (e) {}
+        },
+
+        detailOpen: false,
+        detailLoading: false,
+        currentDetail: null,
+
+        async openNotificationDetail(id) {
+            this.detailOpen = true;
+            this.detailLoading = true;
+            this.currentDetail = null;
+            try {
+                const res = await fetch('/admin/notifications/' + id + '?format=json', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.currentDetail = data.data || data;
+                    // Mark as read after showing
+                    await fetch('{{ url("/admin/api/notifications") }}/' + id + '/read', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                }
+            } catch (e) {}
+            this.detailLoading = false;
         }
     };
 }
