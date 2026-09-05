@@ -109,7 +109,7 @@
                             <a :href="item.link"
                                class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                                :style="item.is_read ? '' : 'background: rgba(59,130,246,0.05);'"
-                               @click.prevent="!item.is_read && markRead(item.id); document.querySelector('a[href=\"' + item.link + '\"]").click()">
+                               @click.prevent="!item.is_read && markRead(item.id)">
                                 <span x-html="notifIcon(item.type)" class="shrink-0"></span>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate" x-text="item.title"></p>
@@ -124,76 +124,6 @@
                        class="block text-center px-4 py-2.5 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700">
                         {{ __('messages.view_all_notifications') }}
                     </a>
-                </div>
-
-                {{-- Modal جزئیات اعلان --}}
-                <div x-show="detailOpen" x-cloak
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div class="fixed inset-0 bg-black/50" @click="detailOpen = false"></div>
-                    <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                            <h2 class="text-lg font-bold text-gray-800 dark:text-white">{{ __('admin.layout.notifications') }}</h2>
-                            <button @click="detailOpen = false" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="overflow-y-auto p-6">
-                            <template x-if="detailLoading">
-                                <div class="flex items-center justify-center py-12">
-                                    <svg class="w-8 h-8 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 4 4.868 4 9.487c0 5.125 4.695 10.722 9.487 11.487a1 1 0 11-1.487.513A8 8 0 014 12z"/>
-                                    </svg>
-                                </div>
-                            </template>
-                            <template x-if="!detailLoading && currentDetail">
-                                <div class="flex items-start gap-4 mb-4">
-                                    <span class="text-3xl" x-text="currentDetail.icon || '🔔'"></span>
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-bold text-gray-800 dark:text-white" x-text="currentDetail.title"></h3>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" x-text="currentDetail.created_at"></p>
-                                    </div>
-                                    <span x-show="!currentDetail.is_read"
-                                          class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></span>
-                                </div>
-                                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 mb-4">
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed" x-text="currentDetail.body"></p>
-                                </div>
-                                <div class="grid grid-cols-2 gap-3 text-sm mb-4">
-                                    <div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">نوع</p>
-                                        <p class="font-semibold text-gray-800 dark:text-gray-200" x-text="currentDetail.type"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">وضعیت</p>
-                                        <p class="font-semibold" :class="currentDetail.is_read ? 'text-gray-500 dark:text-gray-400' : 'text-indigo-600 dark:text-indigo-400'" x-text="currentDetail.is_read ? 'خوانده‌شده' : 'برخی‌نشده'"></p>
-                                    </div>
-                                </div>
-                                <div x-show="currentDetail.link" class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">مشاهده جزئیات:</p>
-                                    <a :href="currentDetail.link"
-                                       target="_blank"
-                                       class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                        </svg>
-                                        مشاهده جزئیات
-                                    </a>
-                                </div>
-                            </template>
-                        </div>
-                        <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                            <button @click="detailOpen = false" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                بستن
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
