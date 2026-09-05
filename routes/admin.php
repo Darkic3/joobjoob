@@ -106,6 +106,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // ========== اعلانات ==========
         Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
         Route::get('api/notifications/unread-count', [\App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
+        Route::get('notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('notifications.show');
         Route::get('notifications/{id}/go', [\App\Http\Controllers\Admin\NotificationController::class, 'go'])->name('notifications.go');
         Route::post('api/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markRead'])->name('api.notifications.mark-read');
         Route::post('api/notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('api.notifications.mark-all-read');

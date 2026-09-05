@@ -40,6 +40,26 @@ class NotificationController extends Controller
     }
 
     /**
+     * نمایش جزئیات یک اعلان
+     */
+    public function show(int $id)
+    {
+        $notification = $this->notificationService->getUserNotifications(Auth::user())
+            ->getCollection()
+            ->firstWhere('id', $id);
+
+        if (! $notification) {
+            return redirect()->route('dashboard.notifications')
+                ->with('error', 'اعلان یافت نشد.');
+        }
+
+        // علامت‌گذاری به عنوان خوانده‌شده
+        $this->notificationService->markAsRead($id, Auth::user());
+
+        return view('site.dashboard.notification-detail', compact('notification'));
+    }
+
+    /**
      * تعداد اعلان‌های خوانده‌نشده (AJAX)
      */
     public function unreadCount(): JsonResponse
