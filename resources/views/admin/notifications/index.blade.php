@@ -54,11 +54,10 @@
     @if($notifications->total() > 0)
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             @foreach($notifications as $notification)
-                @php $notifLink = $notification->link ?: '#'; @endphp
+                @php $notifLink = $notification->link ? route('admin.notifications.go', $notification->id) : '#'; @endphp
                 <a href="{{ $notifLink }}"
                    class="flex items-start gap-4 px-5 py-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors {{ $notification->is_read ? '' : 'bg-primary-50/50 dark:bg-primary-900/10' }}"
-                   data-notification-id="{{ $notification->id }}"
-                   onclick="markRead({{ $notification->id }})">
+                   data-notification-id="{{ $notification->id }}">
                     <x-admin.notification-icon :type="$notification->type" :icon="$notification->icon" />
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">

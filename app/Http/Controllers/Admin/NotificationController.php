@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,8 @@ class NotificationController extends Controller
                     'title' => $n->title,
                     'body' => $n->body,
                     'icon' => $n->icon,
-                    'link' => $n->link,
+                    // از مسیر go می‌گذریم تا با کلیک، اعلان سمت سرور خوانده‌شده شود
+                    'link' => $n->link ? route('admin.notifications.go', $n->id) : null,
                     'is_read' => (bool) $n->is_read,
                     'created_at' => $n->created_at?->diffForHumans(),
                 ])->values(),
@@ -46,6 +48,24 @@ class NotificationController extends Controller
         $count = $this->notificationService->getAdminUnreadCount();
 
         return response()->json(['count' => $count]);
+    }
+
+    /**
+     * رفتن به مقصد اعلان + علامت‌گذاری خوانده‌شده (سمت سرور — بدون ریسک لغو AJAX هنگام ناوبری)
+     */
+    public function go(Request $request, int $id)
+    {
+        $this->notificationService->markAsRead($id, $request->user());
+
+        $notification = Notification::forUser($request->user()->id)->find($id);
+        $target = $notification?->link ?: route('admin.notifications.index');
+
+        // فقط مسیرهای داخلی — جلوگیری از open-redirect
+        if (! str_starts_with($target, '/') && ! str_starts_with($target, url('/'))) {
+            $target = route('admin.notifications.index');
+        }
+
+        return redirect()->to($target);
     }
 
     /**
