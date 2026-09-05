@@ -28,8 +28,8 @@ class NotificationController extends Controller
                     'title' => $n->title,
                     'body' => $n->body,
                     'icon' => $n->icon,
-                    // از مسیر go می‌گذریم تا با کلیک، اعلان سمت سرور خوانده‌شده شود
-                    'link' => $n->link ? route('admin.notifications.go', $n->id) : null,
+                    // ارجاع به صفحه جزئیات اعلان در پنل
+                    'link' => route('admin.notifications.show', $n->id),
                     'is_read' => (bool) $n->is_read,
                     'created_at' => $n->created_at?->diffForHumans(),
                 ])->values(),

@@ -27,8 +27,7 @@
         @if($notifications->total() > 0)
             <div class="space-y-3" id="notifications-list">
                 @foreach($notifications as $notification)
-                    @php $notifLink = $notification->link ?: '#'; @endphp
-                    <a href="{{ $notifLink }}"
+                    <a href="{{ route('dashboard.notification-detail', $notification->id) }}"
                        class="flex items-start gap-3 p-4 rounded-2xl transition-all duration-200 hover:translate-y-[-1px] {{ $notification->is_read ? '' : 'ring-1' }}"
                        style="background: var(--bg-elevated); {{ $notification->is_read ? '' : 'ring-color: color-mix(in srgb, var(--accent) 20%, transparent);' }}"
                        data-notification-id="{{ $notification->id }}"
