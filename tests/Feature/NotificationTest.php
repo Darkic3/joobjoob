@@ -244,6 +244,47 @@ class NotificationTest extends TestCase
         $this->assertCount(2, $notifications);
     }
 
+    public function test_user_notifications_exclude_admin_types()
+    {
+        // Create a user notification for the admin user
+        $this->service->notifyUser($this->admin, 'order.created', 'Test 1');
+        // Create admin notifications for the admin user
+        $this->service->notifyAdmins('order.new', 'Admin Test', null, '/admin/orders/1');
+        $this->service->notifyAdmins('order.paid_admin', 'Admin Paid', null, '/admin/orders/2');
+
+        $notifications = $this->service->getUserNotifications($this->admin);
+
+        // Only user-type notifications should be returned, not admin-type
+        $this->assertCount(1, $notifications);
+        $this->assertEquals('order.created', $notifications->first()->type);
+    }
+
+    public function test_user_notifications_endpoint_only_returns_user_types()
+    {
+        // Create a user notification for the admin user
+        $this->service->notifyUser(
+            $this->admin,
+            'order.created',
+            'Test',
+            'Test body',
+            '/account/orders/1'
+        );
+        $this->service->notifyAdmins('order.new', 'Admin Test', null, '/admin/orders/1');
+
+        $response = $this->actingAs($this->admin)
+            ->getJson('/account/notifications?format=json');
+
+        $response->assertOk();
+        $data = $response->json();
+
+        // Only user notifications, not admin notifications
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals('order.created', $data['data'][0]['type']);
+
+        // Link should be a site route, not admin
+        $this->assertStringStartsNotWith('/admin', $data['data'][0]['link']);
+    }
+
     // ==================== Route Tests ====================
 
     public function test_user_can_view_notifications_page()

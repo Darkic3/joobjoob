@@ -49,6 +49,21 @@ class Notification extends Model
         return $query->where('type', $type);
     }
 
+    /**
+     * فقط اعلان‌های کاربری — فیلتر کردن اعلان‌های ادمین
+     * چون کاربرهای ادمین هم می‌بینند اعلان‌های کاربری در site notifications
+     */
+    public function scopeUserNotifications(Builder $query): Builder
+    {
+        return $query->whereNotIn('type', [
+            'order.new',
+            'order.paid_admin',
+            'order.card_to_card',
+            'review.new',
+            'contact.new',
+        ]);
+    }
+
     // ==================== Methods ====================
 
     public function markAsRead(): bool

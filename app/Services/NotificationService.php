@@ -130,10 +130,12 @@ class NotificationService
 
     /**
      * لیست اعلانات کاربر
+     * فقط اعلان‌های کاربری (نه اعلان‌های ادمین که برای کاربرهای ادمین هم ارسال می‌شوند)
      */
     public function getUserNotifications(User $user, int $perPage = 20): LengthAwarePaginator
     {
         return Notification::forUser($user->id)
+            ->userNotifications()
             ->latest()
             ->paginate($perPage);
     }
