@@ -50,7 +50,7 @@ class PageController extends Controller
             app(NotificationService::class)->notifyAdmins(
                 'contact.new',
                 'پیام تماس جدید',
-                "پیام جدید از {$validated['name']} ({$validated['email']}) دریافت شد.",
+                null,
                 route('admin.contact.index'),
                 ['name' => $validated['name'], 'email' => $validated['email']]
             );

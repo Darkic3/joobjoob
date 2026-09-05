@@ -106,7 +106,7 @@ class OtpService
                     $user,
                     'discount.welcome',
                     'کد تخفیف خوشامدگویی',
-                    'تبریک! یک کد تخفیف ۱۰٪ برای اولین خرید شما ایجاد شد.',
+                    null,
                     route('dashboard'),
                     ['user_id' => $user->id]
                 );

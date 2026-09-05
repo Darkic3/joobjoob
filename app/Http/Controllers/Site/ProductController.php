@@ -364,9 +364,9 @@ class ProductController extends Controller
             app(NotificationService::class)->notifyAdmins(
                 'review.new',
                 'نظر جدید ثبت شد',
-                "نظر جدید از {$reviewerName} برای محصول «{$productName}» ثبت شد.",
+                null,
                 route('admin.reviews.index'),
-                ['product_id' => $product->id, 'reviewer' => $reviewerName]
+                ['product_id' => $product->id, 'reviewer' => $reviewerName, 'product_name' => $productName]
             );
         } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::error('Review notification failed', ['message' => $e->getMessage()]); }
 

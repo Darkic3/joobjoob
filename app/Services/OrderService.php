@@ -111,14 +111,14 @@ class OrderService
                 $order->user,
                 'order.created',
                 'سفارش شما ثبت شد',
-                "سفارش #{$order->id} به مبلغ {$paymentPrice} تومان ثبت شد.",
+                null,
                 route('dashboard.order-detail', $order->id),
                 ['order_id' => $order->id, 'amount' => $order->payment_price]
             );
             $notifService->notifyAdmins(
                 'order.new',
                 'سفارش جدید ثبت شد',
-                "سفارش #{$order->id} از {$order->user->name} به مبلغ {$paymentPrice} تومان",
+                null,
                 route('admin.orders.show', $order->id),
                 ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
             );
@@ -206,14 +206,14 @@ class OrderService
                 $order->user,
                 'order.paid',
                 'پرداخت سفارش تایید شد',
-                "پرداخت سفارش #{$order->id} به مبلغ {$paymentPrice} تومان با موفقیت انجام شد.",
+                null,
                 route('dashboard.order-detail', $order->id),
                 ['order_id' => $order->id, 'amount' => $order->payment_price]
             );
             $notifService->notifyAdmins(
                 'order.paid_admin',
                 'پرداخت سفارش تایید شد',
-                "پرداخت سفارش #{$order->id} از {$order->user->name} به مبلغ {$paymentPrice} تومان تایید شد.",
+                null,
                 route('admin.orders.show', $order->id),
                 ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
             );
@@ -253,7 +253,7 @@ class OrderService
                 $order->user,
                 'order.cancelled',
                 'سفارش شما لغو شد',
-                "سفارش #{$order->id} لغو شد.",
+                null,
                 route('dashboard.order-detail', $order->id),
                 ['order_id' => $order->id]
             );

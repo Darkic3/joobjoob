@@ -68,9 +68,9 @@ class DashboardController extends Controller
             $notifService->notifyAdmins(
                 'order.card_to_card',
                 'فیش واریزی جدید دریافت شد',
-                "کاربر {$order->user->name} فیش سفارش #{$order->id} (کد پیگیری: {$trackingCode}) به مبلغ {$paymentPrice} تومان ارسال کرد.",
+                null,
                 route('admin.orders.show', $order->id),
-                ['order_id' => $order->id, 'user_name' => $order->user->name, 'tracking_code' => $trackingCode]
+                ['order_id' => $order->id, 'user_name' => $order->user->name, 'tracking_code' => $trackingCode, 'amount' => $order->payment_price]
             );
         } catch (\Throwable $e) { Log::error('Card-to-card notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
 

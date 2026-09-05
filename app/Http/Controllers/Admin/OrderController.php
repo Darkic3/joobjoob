@@ -93,7 +93,7 @@ class OrderController extends Controller
                         $order->user,
                         'order.shipped',
                         'وضعیت ارسال سفارش تغییر کرد',
-                        "وضعیت ارسال سفارش #{$order->id} به «{$statusName}» تغییر یافت.",
+                        null,
                         route('dashboard.order-detail', $order->id),
                         ['order_id' => $order->id, 'status' => $statusName]
                     );
