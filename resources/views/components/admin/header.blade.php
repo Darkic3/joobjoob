@@ -106,9 +106,10 @@
                             <p class="px-4 py-6 text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('admin.layout.no_notifications') }}</p>
                         </template>
                         <template x-for="item in items" :key="item.id">
-                            <div class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
-                                 :style="item.is_read ? '' : 'background: rgba(59,130,246,0.05);'"
-                                 @click="openNotificationDetail(item.id)">
+                            <a :href="item.link"
+                               class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                               :style="item.is_read ? '' : 'background: rgba(59,130,246,0.05);'"
+                               @click.prevent="!item.is_read && markRead(item.id); document.querySelector('a[href=\"' + item.link + '\"]").click()">
                                 <span x-html="notifIcon(item.type)" class="shrink-0"></span>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate" x-text="item.title"></p>
@@ -116,7 +117,7 @@
                                     <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1" x-text="item.created_at"></p>
                                 </div>
                                 <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5 bg-primary-500"></span>
-                            </div>
+                            </a>
                         </template>
                     </div>
                     <a href="{{ route('admin.notifications.index') }}"
@@ -171,7 +172,7 @@
                                     </div>
                                     <div>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">وضعیت</p>
-                                        <p class="font-semibold {{ currentDetail.is_read ? 'text-gray-500' : 'text-indigo-600' }} dark:text-{{ currentDetail.is_read ? 'gray-400' : 'indigo-400' }}" x-text="currentDetail.is_read ? 'خوانده‌شده' : 'برخی‌نشده'"></p>
+                                        <p class="font-semibold" :class="currentDetail.is_read ? 'text-gray-500 dark:text-gray-400' : 'text-indigo-600 dark:text-indigo-400'" x-text="currentDetail.is_read ? 'خوانده‌شده' : 'برخی‌نشده'"></p>
                                     </div>
                                 </div>
                                 <div x-show="currentDetail.link" class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
