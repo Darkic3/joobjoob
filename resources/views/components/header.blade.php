@@ -141,17 +141,31 @@
                                 </div>
                             </template>
                             <template x-for="item in items" :key="item.id">
-                                <a :href="item.link"
-                                   class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
-                                   :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--accent) 5%, transparent);'">
-                                    <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-bold truncate" style="color: var(--text-primary);" x-text="item.title"></p>
-                                        <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-secondary);" x-text="item.body"></p>
-                                        <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.6;" x-text="item.created_at"></p>
+                                <template x-if="item.link">
+                                    <a :href="item.link"
+                                       class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
+                                       :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--accent) 5%, transparent);'">
+                                        <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-bold truncate" style="color: var(--text-primary);" x-text="item.title"></p>
+                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-secondary);" x-text="item.body"></p>
+                                            <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.6;" x-text="item.created_at"></p>
+                                        </div>
+                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--accent);"></span>
+                                    </a>
+                                </template>
+                                <template x-if="!item.link">
+                                    <div class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
+                                         :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--accent) 5%, transparent);'">
+                                        <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-bold truncate" style="color: var(--text-primary);" x-text="item.title"></p>
+                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-secondary);" x-text="item.body"></p>
+                                            <p class="text-[10px] mt-1" style="color: var(--text-secondary); opacity: 0.6;" x-text="item.created_at"></p>
+                                        </div>
+                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--accent);"></span>
                                     </div>
-                                    <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--accent);"></span>
-                                </div>
+                                </template>
                             </template>
                         </div>
                         <a href="{{ route('dashboard.notifications') }}"
@@ -324,6 +338,7 @@ function notificationBell() {
         },
 
         async markRead(id) {
+            if (! id) return;
             try {
                 await fetch('{{ url("/api/notifications") }}/' + id + '/read', {
                     method: 'POST',

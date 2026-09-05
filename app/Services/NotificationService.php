@@ -31,6 +31,8 @@ class NotificationService
 
     /**
      * ایجاد اعلان برای یک کاربر
+     * به‌جای переда کردن رشته‌های ثابت، از کلیدهای ترجمه‌ای استفاده می‌شود
+     * تا در ۴ زبان (fa/en/tr/ar) کاملاً محلی‌سازی شود.
      */
     public function notifyUser(
         User $user,
@@ -40,7 +42,11 @@ class NotificationService
         ?string $link = null,
         ?array $data = null
     ): Notification {
-        $meta = self::TYPES[$type] ?? ['icon' => '🔔', 'color' => 'accent'];
+        $locale = $user->locale ?? app()->getLocale();
+        $currentLocale = app()->getLocale();
+        $title = __("notifications.{$type}.title", [], $locale);
+        $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
+        $meta  = self::TYPES[$type] ?? ['icon' => '🔔', 'color' => 'accent'];
 
         return Notification::create([
             'notifiable_type' => User::class,
@@ -70,6 +76,10 @@ class NotificationService
         $created = 0;
 
         foreach ($admins as $admin) {
+            $locale = $admin->locale ?? app()->getLocale();
+            $title = __("notifications.{$type}.title", [], $locale);
+            $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
+
             Notification::create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $admin->id,

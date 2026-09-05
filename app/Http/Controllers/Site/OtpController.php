@@ -161,4 +161,58 @@ class OtpController extends Controller
 
         return back()->with('success', __('messages.otp_resent'));
     }
+
+    /**
+     * ارسال کد تایید به‌صورت AJAX (برای باکس ثبت‌نام سمت خانه).
+     * differentials: استقلال از redirect و ارورهای JSON برای نمایش در바인Box.
+     */
+    public function sendAjax(Request $request): JsonResponse
+    {
+        $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
+        $name = trim($request->input('name', ''));
+
+        // اعتبارسنجی اولیه: شماره معتبر باشد
+        if (! $this->otpService->isValidMobile($mobile)) {
+            return response()->json([
+                'success' => false,
+                'error'   => __('messages.otp_mobile_invalid'),
+            ]);
+        }
+
+        // کاربر با این شماره قبلاً ثبت‌نام کرده است
+        if ($this->otpService->userExists($mobile)) {
+            return response()->json([
+                'success' => false,
+                'error'   => __('messages.otp_mobile_registered'),
+            ]);
+        }
+
+        // مهمان جدید بدون نام
+        if ($name === '') {
+            return response()->json([
+                'success' => false,
+                'error'   => __('messages.otp_name_required'),
+            ]);
+        }
+
+        // ارسال OTP
+        $result = $this->otpService->send($mobile, $name);
+
+        if (! $result['success']) {
+            return response()->json([
+                'success' => false,
+                'error'   => $result['message'],
+            ]);
+        }
+
+        // ذخیره در세션 برای مرحله verify
+        $request->session()->put('otp_mobile', $this->otpService->normalizeMobile($mobile));
+        $request->session()->forget('otp_new_user');
+
+        return response()->json([
+            'success' => true,
+            'message' => $result['message'],
+            'verifyUrl' => localizedRoute('login.verify'),
+        ]);
+    }
 }

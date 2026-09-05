@@ -22,17 +22,20 @@ class NotificationController extends Controller
 
         if ($request->get('format') === 'json' || $request->wantsJson()) {
             return response()->json([
-                'data' => collect($notifications->items())->map(fn ($n) => [
-                    'id' => $n->id,
-                    'type' => $n->type,
-                    'title' => $n->title,
-                    'body' => $n->body,
-                    'icon' => $n->icon,
-                    // ارجاع به صفحه جزئیات اعلان در سایت
-                    'link' => route('dashboard.notification-detail', $n->id),
-                    'is_read' => (bool) $n->is_read,
-                    'created_at' => $n->created_at?->diffForHumans(),
-                ])->values(),
+                'data' => collect($notifications->items())->map(function ($n) {
+                    $id = $n->id ?? null;
+                    return [
+                        'id' => $id,
+                        'type' => $n->type,
+                        'title' => $n->title,
+                        'body' => $n->body,
+                        'icon' => $n->icon,
+                        // فقط اگر id واقعی وجود داشته باشد لینک سازیم
+                        'link' => $id !== null ? route('dashboard.notification-detail', $id) : null,
+                        'is_read' => (bool) $n->is_read,
+                        'created_at' => $n->created_at?->diffForHumans(),
+                    ];
+                })->values(),
                 'count' => $this->notificationService->getUnreadCount(Auth::user()),
             ]);
         }

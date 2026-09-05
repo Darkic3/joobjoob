@@ -22,17 +22,19 @@ class NotificationController extends Controller
 
         if ($request->get('format') === 'json' || $request->wantsJson()) {
             return response()->json([
-                'data' => $notifications->getCollection()->map(fn ($n) => [
-                    'id' => $n->id,
-                    'type' => $n->type,
-                    'title' => $n->title,
-                    'body' => $n->body,
-                    'icon' => $n->icon,
-                    // ارجاع به صفحه جزئیات اعلان در پنل
-                    'link' => route('admin.notifications.show', $n->id),
-                    'is_read' => (bool) $n->is_read,
-                    'created_at' => $n->created_at?->diffForHumans(),
-                ])->values(),
+                'data' => $notifications->getCollection()->map(function ($n) {
+                    $id = $n->id ?? null;
+                    return [
+                        'id' => $id,
+                        'type' => $n->type,
+                        'title' => $n->title,
+                        'body' => $n->body,
+                        'icon' => $n->icon,
+                        'link' => $id !== null ? route('admin.notifications.show', $id) : null,
+                        'is_read' => (bool) $n->is_read,
+                        'created_at' => $n->created_at?->diffForHumans(),
+                    ];
+                })->values(),
                 'count' => $this->notificationService->getAdminUnreadCount(),
             ]);
         }

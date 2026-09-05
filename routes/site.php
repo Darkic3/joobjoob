@@ -132,6 +132,9 @@ $siteRoutes = function () {
     Route::post('/login/send', [OtpController::class, 'send'])
         ->middleware('throttle:5,1')
         ->name('login.otp.send');
+    Route::post('/login/send-ajax', [OtpController::class, 'sendAjax'])
+        ->middleware('throttle:5,1')
+        ->name('login.otp.send-ajax');
     Route::get('/login/verify', [OtpController::class, 'showVerify'])->name('login.verify');
     Route::post('/login/otp/resend', [OtpController::class, 'resend'])
         ->middleware('throttle:3,1')
