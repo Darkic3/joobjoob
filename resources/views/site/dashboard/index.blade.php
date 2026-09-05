@@ -79,7 +79,8 @@
                             <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-black tracking-wider"
                                   style="background: color-mix(in srgb, var(--success) 10%, transparent); color: var(--success);"
                                   dir="ltr">{{ $welcomeDiscount->code }}</span>
-                            <button onclick="navigator.clipboard.writeText('{{ $welcomeDiscount->code }}').then(() => this.textContent = '✓ کپی شد')"
+                            <button type="button"
+                                    onclick="copyToClipboard('{{ $welcomeDiscount->code }}', this)"
                                     class="text-[11px] font-bold px-2 py-1 rounded-lg transition-all hover:opacity-80"
                                     style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">
                                 کپی
@@ -149,3 +150,34 @@
     </div>
 </div>
 @endsection
+
+<script>
+function copyToClipboard(text, btn) {
+    var originalText = btn.textContent;
+    function showCopied() {
+        btn.textContent = '✓ کپی شد';
+        btn.style.color = 'var(--success)';
+        setTimeout(function() {
+            btn.textContent = originalText;
+            btn.style.color = '';
+        }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showCopied).catch(function() {
+            fallbackCopy(text, showCopied);
+        });
+    } else {
+        fallbackCopy(text, showCopied);
+    }
+    function fallbackCopy(text, cb) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        cb();
+    }
+}
+</script>
