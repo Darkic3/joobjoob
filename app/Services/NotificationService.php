@@ -42,8 +42,7 @@ class NotificationService
         ?string $link = null,
         ?array $data = null
     ): Notification {
-        $locale = $user->locale ?? app()->getLocale();
-        $currentLocale = app()->getLocale();
+        $locale = app()->getLocale();
         $title = __("notifications.{$type}.title", [], $locale);
         $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
         $meta  = self::TYPES[$type] ?? ['icon' => '🔔', 'color' => 'accent'];
@@ -76,7 +75,7 @@ class NotificationService
         $created = 0;
 
         foreach ($admins as $admin) {
-            $locale = $admin->locale ?? app()->getLocale();
+            $locale = app()->getLocale();
             $title = __("notifications.{$type}.title", [], $locale);
             $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
 
