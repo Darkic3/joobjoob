@@ -31,6 +31,32 @@ class DiscountController extends Controller
             $query->where('is_active', $request->status === 'active');
         }
 
+        if ($request->filled('type')) {
+            $query->when($request->type, function ($q) use ($request) {
+                match ($request->type) {
+                    'general' => $q->whereNull('pay_type')
+                        ->whereNull('user_id')
+                        ->where('first_purchase', 0)
+                        ->whereNull('expires_at')
+                        ->orWhere(function ($q) {
+                            $q->whereNull('pay_type')
+                                ->whereNull('user_id')
+                                ->where('first_purchase', 0)
+                                ->whereNotNull('expires_at');
+                        }),
+                    'welcome' => $q->where('title', 'like', '%خوش آمد گویی%')
+                        ->orWhere('title', 'like', '%웰컴%')
+                        ->orWhere('title', 'like', '%welcome%'),
+                    'first_purchase' => $q->where('first_purchase', 1),
+                    'category' => $q->where('pay_type', 'category'),
+                    'brand' => $q->where('pay_type', 'brand'),
+                    'product' => $q->where('pay_type', 'product'),
+                    'user' => $q->whereNotNull('user_id'),
+                    default => null,
+                };
+            });
+        }
+
         $discounts = $query->latest()->paginate(15)->withQueryString();
 
         return view('admin.discounts.index', compact('discounts'));

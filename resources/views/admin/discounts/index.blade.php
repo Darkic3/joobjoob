@@ -28,6 +28,16 @@
                 <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>فعال</option>
                 <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>غیرفعال</option>
             </select>
+            <select name="type" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm">
+                <option value="">همه انواع</option>
+                <option value="general" {{ request('type') === 'general' ? 'selected' : '' }}>کد عمومی</option>
+                <option value="welcome" {{ request('type') === 'welcome' ? 'selected' : '' }}>خوش آمد گویی</option>
+                <option value="first_purchase" {{ request('type') === 'first_purchase' ? 'selected' : '' }}>خرید اول</option>
+                <option value="category" {{ request('type') === 'category' ? 'selected' : '' }}>مرتبط دسته‌بندی</option>
+                <option value="brand" {{ request('type') === 'brand' ? 'selected' : '' }}>مرتبط برند</option>
+                <option value="product" {{ request('type') === 'product' ? 'selected' : '' }}>مرتبط محصول</option>
+                <option value="user" {{ request('type') === 'user' ? 'selected' : '' }}>مرتبط کاربر</option>
+            </select>
             <button type="submit" class="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl text-sm font-semibold transition-colors">اعمال فیلتر</button>
         </form>
 
