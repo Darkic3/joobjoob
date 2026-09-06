@@ -149,7 +149,7 @@
         <div class="inv-parties">
             <div class="inv-party">
                 <div class="inv-party-title">فروشنده</div>
-                <div class="inv-party-name">{{ config('app.name', 'Shopora') }}</div>
+                <div class="inv-party-name">{{setting('site_name', config('app.name', 'Shopora')) }}</div>
                 <div class="inv-party-detail">
                     @if(config('app.company_phone'))
                         تلفن: {{ config('app.company_phone') }}

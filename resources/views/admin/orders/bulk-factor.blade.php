@@ -122,7 +122,7 @@
     <div class="invoice">
         <div class="inv-header">
             <div>
-                <div class="inv-brand">{{ config('app.name', 'Shopora') }}</div>
+                <div class="inv-brand">{{ setting('site_name', config('app.name', 'Shopora')) }}</div>
                 <div class="inv-brand-sub">فاکتور خرید</div>
             </div>
             <div class="inv-title">
@@ -149,7 +149,7 @@
         <div class="inv-parties">
             <div class="inv-party">
                 <div class="inv-party-title">فروشنده</div>
-                <div class="inv-party-name">{{ config('app.name', 'Shopora') }}</div>
+                <div class="inv-party-name">{{ setting('site_name', config('app.name', 'Shopora')) }}</div>
             </div>
             <div class="inv-party">
                 <div class="inv-party-title">تحویل‌گیرنده</div>
@@ -241,7 +241,7 @@
         <div class="inv-footer-note">از خرید شما متشکریم 🙏</div>
 
         <div class="inv-footer">
-            <span>{{ config('app.name') }}</span>
+            <span>{{ setting('site_name', config('app.name', 'Shopora')) }}</span>
             <span>چاپ: {{ now()->format('d/m/Y H:i') }}</span>
         </div>
     </div>
