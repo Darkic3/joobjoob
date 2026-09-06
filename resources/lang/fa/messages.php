@@ -169,6 +169,8 @@ return [
     'otp_change_number' => 'تغییر شماره',
     'otp_code_sent' => 'کد تایید با موفقیت ارسال شد',
     'otp_resent' => 'کد جدید ارسال شد',
+    'otp_resend_in' => 'ارسال مجدد کد تا :seconds ثانیه دیگر',
+    'otp_resend_cooldown' => 'لطفاً :seconds ثانیه دیگر دوباره تلاش کنید',
     'otp_login_success' => 'خوش آمدید!',
     'otp_mobile_invalid' => 'شماره موبایل معتبر نیست',
     'otp_mobile_registered' => 'این شماره موبایل قبلاً ثبت‌نام کرده است',

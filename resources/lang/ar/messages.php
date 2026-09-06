@@ -226,6 +226,8 @@ return [
     'otp_change_number' => 'تغيير الرقم',
     'otp_code_sent' => 'تم إرسال رمز التحقق بنجاح',
     'otp_resent' => 'تم إرسال رمز جديد',
+    'otp_resend_in' => 'إعادة إرسال الرمز بعد :seconds ثانية',
+    'otp_resend_cooldown' => 'يرجى المحاولة بعد :seconds ثانية',
     'otp_login_success' => 'مرحبًا بعودتك!',
     'otp_mobile_invalid' => 'رقم الهاتف غير صالح',
     'otp_mobile_blocked' => 'الوصول إلى هذا الرقم غير مسموح',

@@ -168,6 +168,8 @@ return [
     'otp_change_number' => 'Change number',
     'otp_code_sent' => 'Verification code sent successfully',
     'otp_resent' => 'A new code has been sent',
+    'otp_resend_in' => 'Resend code in :seconds seconds',
+    'otp_resend_cooldown' => 'Please try again in :seconds seconds',
     'otp_login_success' => 'Welcome back!',
     'otp_mobile_invalid' => 'Invalid mobile number',
     'otp_mobile_blocked' => 'Access to this number is not allowed',

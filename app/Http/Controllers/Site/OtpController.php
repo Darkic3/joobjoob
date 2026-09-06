@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 
 class OtpController extends Controller
 {
+    /** مهلت ارسال مجدد کد (ثانیه) — با تایمر فرانت‌اند صفحه verify هماهنگ است */
+    public const RESEND_COOLDOWN_SECONDS = 30;
+
     public function __construct(private readonly OtpService $otpService) {}
 
     /**
@@ -83,6 +86,8 @@ class OtpController extends Controller
             return redirect()->route('login.verify')->with('error', $result['message']);
         }
 
+        $request->session()->put('otp_last_sent_at', now()->timestamp);
+
         return redirect()->route('login.verify')->with('success', $result['message']);
     }
 
@@ -153,11 +158,22 @@ class OtpController extends Controller
             return redirect()->route('login');
         }
 
+        // مهلت ۳۰ ثانیه‌ای ارسال مجدد (جلوگیری از اسپم پیامک)
+        $lastSentAt = (int) $request->session()->get('otp_last_sent_at', 0);
+        $elapsed = now()->timestamp - $lastSentAt;
+        if ($lastSentAt > 0 && $elapsed < self::RESEND_COOLDOWN_SECONDS) {
+            return back()->withErrors(['code' => __('messages.otp_resend_cooldown', [
+                'seconds' => self::RESEND_COOLDOWN_SECONDS - $elapsed,
+            ])]);
+        }
+
         $result = $this->otpService->send($mobile);
 
         if (! $result['success']) {
             return back()->withErrors(['code' => $result['message']]);
         }
+
+        $request->session()->put('otp_last_sent_at', now()->timestamp);
 
         return back()->with('success', __('messages.otp_resent'));
     }

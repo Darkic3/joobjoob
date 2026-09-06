@@ -226,6 +226,8 @@ return [
     'otp_change_number' => 'Numarayı değiştir',
     'otp_code_sent' => 'Doğrulama kodu başarıyla gönderildi',
     'otp_resent' => 'Yeni kod gönderildi',
+    'otp_resend_in' => 'Kodu :seconds saniye sonra tekrar gönder',
+    'otp_resend_cooldown' => 'Lütfen :seconds saniye sonra tekrar deneyin',
     'otp_login_success' => 'Tekrar hoş geldiniz!',
     'otp_mobile_invalid' => 'Geçersiz telefon numarası',
     'otp_mobile_blocked' => 'Bu numaraya erişime izin verilmiyor',

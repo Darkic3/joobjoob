@@ -76,16 +76,35 @@
                 </button>
             </form>
 
-            <div class="mt-6 flex items-center justify-between text-xs">
-                <form action="{{ localizedRoute('login.otp.resend') }}" method="POST">
+            <div class="mt-6 flex items-center justify-between gap-3 text-xs">
+                <form action="{{ localizedRoute('login.otp.resend') }}" method="POST" id="resendForm">
                     @csrf
-                    <button type="submit" class="font-semibold hover:opacity-70 transition-opacity"
-                            style="color: var(--accent);">
-                        {{ __('messages.otp_resend') }}
+                    <button type="submit" id="resendBtn" disabled
+                            class="resend-btn font-bold transition-all"
+                            data-ready="{{ __('messages.otp_resend') }}"
+                            aria-label="{{ __('messages.otp_resend') }}">
+                        <span class="resend-ring-wrap" id="resendRingWrap" aria-hidden="true">
+                            <svg class="resend-ring" width="40" height="40" viewBox="0 0 40 40">
+                                <defs>
+                                    <linearGradient id="resendRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color: var(--accent);" />
+                                        <stop offset="100%" style="stop-color: var(--gold);" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="20" cy="20" r="15.5" fill="none" stroke-width="3.5" class="resend-ring-track" />
+                                <circle cx="20" cy="20" r="15.5" fill="none" stroke-width="3.5" stroke-linecap="round"
+                                        class="resend-ring-fg" id="resendRingFg" />
+                            </svg>
+                            <span class="resend-ring-num mono" id="resendSecs"></span>
+                        </span>
+                        <span id="resendBtnIcon" class="hidden">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+                        </span>
+                        <span id="resendHint" data-tpl="{{ __('messages.otp_resend_in', ['seconds' => '__S__']) }}"></span>
                     </button>
                 </form>
                 <a href="{{ localizedRoute('login', ['change' => 1]) }}"
-                   class="font-semibold hover:opacity-70 transition-opacity"
+                   class="font-semibold hover:opacity-70 transition-opacity shrink-0"
                    style="color: var(--text-secondary);">
                     {{ __('messages.otp_change_number') }}
                 </a>
@@ -95,3 +114,137 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    /* ─── تایمر ارسال مجدد کد: حلقه پیشرفت + درخشش ─── */
+    .resend-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding-inline-start: 6px;
+        padding-inline-end: 14px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        border-radius: 16px;
+        background: color-mix(in srgb, var(--accent) 7%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+        color: var(--text-secondary);
+        cursor: not-allowed;
+    }
+    .resend-btn.ready {
+        cursor: pointer;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 13%, transparent);
+        border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+        animation: resendGlow 1.8s ease-in-out infinite;
+    }
+    .resend-btn.ready:hover {
+        transform: translateY(-1px) scale(1.02);
+    }
+    .resend-btn.ready:active {
+        transform: scale(0.97);
+    }
+    @keyframes resendGlow {
+        0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent); }
+        50% { box-shadow: 0 0 16px 4px color-mix(in srgb, var(--accent) 28%, transparent); }
+    }
+    .resend-ring-wrap {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+    }
+    .resend-ring {
+        transform: rotate(-90deg);
+    }
+    .resend-ring-track {
+        stroke: color-mix(in srgb, var(--text-primary) 10%, transparent);
+    }
+    .resend-ring-fg {
+        stroke: url(#resendRingGrad);
+        stroke-dasharray: 97.4;
+        stroke-dashoffset: 97.4;
+    }
+    .resend-ring-num {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--accent);
+    }
+    #resendHint b {
+        color: var(--accent);
+        font-weight: 800;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .resend-btn.ready { animation: none; }
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    (function () {
+        var TOTAL = 30;
+        var CIRC = 2 * Math.PI * 15.5;
+        var form = document.getElementById('resendForm');
+        var btn = document.getElementById('resendBtn');
+        if (!form || !btn) return;
+        var ringFg = document.getElementById('resendRingFg');
+        var ringWrap = document.getElementById('resendRingWrap');
+        var secsEl = document.getElementById('resendSecs');
+        var hintEl = document.getElementById('resendHint');
+        var iconEl = document.getElementById('resendBtnIcon');
+        var readyLabel = btn.getAttribute('data-ready') || '';
+        var tpl = hintEl.getAttribute('data-tpl') || '__S__';
+
+        var FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩';
+        function loc(n) {
+            var s = String(n);
+            var a = document.documentElement.getAttribute('data-digits');
+            var fam = (a === 'persian' || a === 'arabic' || a === 'latin') ? a : null;
+            if (!fam) {
+                var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase();
+                fam = l === 'fa' ? 'persian' : (l === 'ar' ? 'arabic' : 'latin');
+            }
+            if (fam === 'persian') return s.replace(/[0-9]/g, function (d) { return FA[+d]; });
+            if (fam === 'arabic') return s.replace(/[0-9]/g, function (d) { return AR[+d]; });
+            return s;
+        }
+
+        function render(remaining) {
+            var t = loc(remaining);
+            secsEl.textContent = t;
+            hintEl.innerHTML = tpl.split('__S__').join('<b>' + t + '</b>');
+            if (ringFg) ringFg.style.strokeDashoffset = (CIRC * remaining / TOTAL).toFixed(1);
+        }
+
+        var endAt = Date.now() + TOTAL * 1000;
+        render(TOTAL);
+        var timer = setInterval(function () {
+            var remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+            render(remaining);
+            if (remaining <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.classList.add('ready');
+                if (ringWrap) ringWrap.classList.add('hidden');
+                if (iconEl) iconEl.classList.remove('hidden');
+                hintEl.textContent = readyLabel;
+            }
+        }, 200);
+
+        // جلوگیری از دابل‌سابمیت بعد از فعال شدن
+        form.addEventListener('submit', function () {
+            if (btn.disabled) return false;
+            btn.disabled = true;
+            btn.classList.remove('ready');
+        });
+    })();
+</script>
+@endpush
