@@ -71,6 +71,7 @@ class AuditLog extends Model
     {
         return match ($this->event) {
             'order.created' => 'ایجاد سفارش',
+            'order.receipt_updated' => 'ویرایش اطلاعات فیش واریزی',
             'order.status_changed' => 'تغییر وضعیت سفارش',
             'order.shipping_status_changed' => 'تغییر وضعیت ارسال',
             'order.cancelled' => 'لغو سفارش',

@@ -8,6 +8,7 @@ use App\Http\Requests\Site\UpdateReceiptRequest;
 use App\Models\Address;
 use App\Models\Order;
 use App\Services\AddressService;
+use App\Services\AuditService;
 use App\Services\CityService;
 use App\Services\NotificationService;
 use App\Services\StateService;
@@ -55,10 +56,30 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'امکان ویرایش اطلاعات پرداخت برای این سفارش وجود ندارد.');
         }
 
+        $oldTrackingCode = $order->receipt_tracking_code;
+        $oldPayerCard = $order->receipt_payer_card;
+
         $order->update([
             'receipt_tracking_code' => $request->validated('receipt_tracking_code'),
             'receipt_payer_card' => $request->validated('receipt_payer_card') ?? null,
         ]);
+
+        $order->refresh();
+
+        // ── Audit: receipt info change history ──
+        try {
+            $newTrackingCode = $order->receipt_tracking_code;
+            $newPayerCard = $order->receipt_payer_card;
+            if ($oldTrackingCode !== $newTrackingCode || $oldPayerCard !== $newPayerCard) {
+                AuditService::orderReceiptUpdated(
+                    $order,
+                    $oldTrackingCode,
+                    $newTrackingCode,
+                    $oldPayerCard,
+                    $newPayerCard
+                );
+            }
+        } catch (\Throwable $e) { Log::error('Card-to-card audit failed for order #' . $order->id, ['message' => $e->getMessage()]); }
 
         // ── Notification: card-to-card receipt submitted ──
         try {

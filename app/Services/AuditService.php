@@ -89,6 +89,35 @@ class AuditService
         );
     }
 
+    public static function orderReceiptUpdated(
+        Order $order,
+        ?string $oldTrackingCode,
+        ?string $newTrackingCode,
+        ?string $oldPayerCard,
+        ?string $newPayerCard,
+        ?string $changedBy = null
+    ): AuditLog {
+        $actor = $changedBy ?? (Auth::check() ? Auth::user()->name : 'سیستم');
+
+        $parts = [];
+        if ($oldTrackingCode !== $newTrackingCode) {
+            $parts[] = 'کد پیگیری: ' . ($oldTrackingCode ?: 'خالی') . ' ← ' . ($newTrackingCode ?: 'خالی');
+        }
+        if ($oldPayerCard !== $newPayerCard) {
+            $parts[] = 'شماره کارت: ' . ($oldPayerCard ?: 'خالی') . ' ← ' . ($newPayerCard ?: 'خالی');
+        }
+
+        return self::log(
+            'order.receipt_updated',
+            $order,
+            ['receipt_tracking_code' => $oldTrackingCode, 'receipt_payer_card' => $oldPayerCard],
+            ['receipt_tracking_code' => $newTrackingCode, 'receipt_payer_card' => $newPayerCard],
+            ['changed_by' => $actor, 'payment_price' => $order->payment_price],
+            'اطلاعات فیش واریزی سفارش #' . $order->id . ' توسط ' . $actor . ' ویرایش شد'
+                . ($parts ? ' — ' . implode(' | ', $parts) : '')
+        );
+    }
+
     public static function orderStockReserved(Order $order, array $items): AuditLog
     {
         return self::log('order.stock_reserved', $order, null, null,
