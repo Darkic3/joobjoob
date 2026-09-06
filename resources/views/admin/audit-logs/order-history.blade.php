@@ -44,7 +44,7 @@
                     <td class="px-4 py-3 text-sm max-w-xs truncate">{{ $log->description }}</td>
                     <td class="px-4 py-3 text-sm">{{ $log->user?->name ?? "-" }}</td>
                     <td class="px-4 py-3">
-                        <a href="{{ route("admin.audit-logs.show", $log->id) }}" class="text-indigo-600 text-xs font-semibold">جزئیات</a>
+                        <a href="{{ route("admin.audit-logs.show", ["id" => $log->id, "from" => "order", "order_id" => $order->id]) }}" class="text-indigo-600 text-xs font-semibold">جزئیات</a>
                     </td>
                 </tr>
             @empty

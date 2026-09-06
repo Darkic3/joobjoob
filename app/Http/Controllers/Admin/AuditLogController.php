@@ -41,12 +41,21 @@ class AuditLogController extends Controller
 
     /**
      * جزئیات یک لاگ
+     * اگر با ?from=order&order_id=X آمده باشد (از تاریخچه سفارش)، دکمه بازگشت به همان تاریخچه هم نمایش داده می‌شود.
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $log = AuditLog::with('user')->findOrFail($id);
 
-        return view('admin.audit-logs.show', compact('log'));
+        $backOrderId = null;
+        if ($request->query('from') === 'order' && ctype_digit((string) $request->query('order_id'))) {
+            $orderId = (int) $request->query('order_id');
+            if (Order::whereKey($orderId)->exists()) {
+                $backOrderId = $orderId;
+            }
+        }
+
+        return view('admin.audit-logs.show', compact('log', 'backOrderId'));
     }
 
     /**
