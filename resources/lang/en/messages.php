@@ -363,6 +363,7 @@ return [
     'back' => 'Back',
 
     'notifications' => 'Notifications',
+    'notification_detail' => 'Notification Detail',
 
     'mark_all_read' => 'Mark all read',
 
@@ -375,6 +376,12 @@ return [
     'notifications_manage_desc' => 'Manage received notifications',
 
     'unread' => 'Unread',
+
+    'read' => 'Read',
+
+    'notification_type' => 'Type',
+
+    'back_to_notifications' => 'Back to notifications',
 
     'orders' => 'Orders',
 

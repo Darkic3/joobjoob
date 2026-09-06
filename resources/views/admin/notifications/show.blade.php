@@ -45,12 +45,12 @@
                 <div class="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">نوع اعلان</p>
-                        <p class="font-semibold text-gray-800 dark:text-gray-200">{{ $notification->type }}</p>
+                        <p class="font-semibold text-gray-800 dark:text-gray-200">{{ $notification->type_label }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">وضعیت</p>
                         <p class="font-semibold {{ $notification->is_read ? 'text-gray-500' : 'text-indigo-600' }} dark:text-{{ $notification->is_read ? 'gray-400' : 'indigo-400' }}">
-                            {{ $notification->is_read ? 'خوانده‌شده' : 'برخی‌نشده' }}
+                            {{ $notification->is_read ? __('messages.read') : __('messages.unread') }}
                         </p>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
-                            مشاهده جزئیات
+                            {{ __('messages.view_details') }}
                         </a>
                     </div>
                 @endif

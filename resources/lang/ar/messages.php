@@ -363,6 +363,7 @@ return [
     'back' => 'رجوع',
 
     'notifications' => 'الإشعارات',
+    'notification_detail' => 'تفاصيل الإشعار',
 
     'mark_all_read' => 'تحديد الكل كمقروء',
 
@@ -375,6 +376,12 @@ return [
     'notifications_manage_desc' => 'إدارة الإشعارات المستلمة',
 
     'unread' => 'غير مقروء',
+
+    'read' => 'مقروء',
+
+    'notification_type' => 'النوع',
+
+    'back_to_notifications' => 'العودة إلى الإشعارات',
 
     'orders' => 'الطلبات',
 

@@ -363,6 +363,7 @@ return [
     'back' => 'Geri',
 
     'notifications' => 'Bildirimler',
+    'notification_detail' => 'Bildirim Detayı',
 
     'mark_all_read' => 'Tümünü okundu işaretle',
 
@@ -375,6 +376,12 @@ return [
     'notifications_manage_desc' => 'Alınan bildirimleri yönetin',
 
     'unread' => 'Okunmamış',
+
+    'read' => 'Okundu',
+
+    'notification_type' => 'Tür',
+
+    'back_to_notifications' => 'Bildirimlere dön',
 
     'orders' => 'Siparişler',
 

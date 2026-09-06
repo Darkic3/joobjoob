@@ -365,6 +365,7 @@ return [
     'back' => 'بازگشت',
 
     'notifications' => 'اعلانات',
+    'notification_detail' => 'جزئیات اعلان',
 
     'mark_all_read' => 'خوانده‌شده همه',
 
@@ -377,6 +378,12 @@ return [
     'notifications_manage_desc' => 'مدیریت اعلان‌های دریافتی',
 
     'unread' => 'خوانده‌نشده',
+
+    'read' => 'خوانده‌شده',
+
+    'notification_type' => 'نوع',
+
+    'back_to_notifications' => 'بازگشت به اعلان‌ها',
 
     'orders' => 'سفارش‌ها',
 

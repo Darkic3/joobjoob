@@ -66,6 +66,18 @@ class Notification extends Model
 
     // ==================== Methods ====================
 
+    /**
+     * برچسب ترجمه‌شده نوع اعلان (مثلاً order.created => «ثبت سفارش»)
+     * اگر کلید ترجمه وجود نداشت، خود type خام برمی‌گردد تا چیزی گم نشود.
+     */
+    public function getTypeLabelAttribute(): string
+    {
+        $key = 'notifications.'.$this->type.'.label';
+        $label = __($key);
+
+        return $label === $key ? (string) $this->type : $label;
+    }
+
     public function markAsRead(): bool
     {
         return $this->update(['is_read' => true]);

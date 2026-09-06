@@ -17,7 +17,7 @@
                 <a href="{{ route('dashboard.notifications') }}"
                    class="text-sm font-bold transition-opacity hover:opacity-70"
                    style="color: var(--text-secondary);">
-                    ← بازگشت به اعلانات
+                    ← {{ __('messages.back_to_notifications') }}
                 </a>
             </div>
 
@@ -52,8 +52,8 @@
                         <div class="mt-4 pt-4 border-t border-gray-200"
                              style="border-color: color-mix(in srgb, var(--text-primary) 10%, transparent);">
                             <div class="flex items-center justify-between text-xs" style="color: var(--text-secondary);">
-                                <span>نوع: {{ e($notification->type) }}</span>
-                                <span>{{ $notification->is_read ? 'خوانده‌شده' : 'برخی‌نشده' }}</span>
+                                <span>{{ __('messages.notification_type') }}: {{ e($notification->type_label) }}</span>
+                                <span>{{ $notification->is_read ? __('messages.read') : __('messages.unread') }}</span>
                             </div>
 
                             @if($notification->link)
@@ -65,7 +65,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                         </svg>
-                                        مشاهده جزئیات
+                                        {{ __('messages.view_details') }}
                                     </a>
                                 </div>
                             @endif
