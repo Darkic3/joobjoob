@@ -48,6 +48,8 @@ return [
     'product_carousel_nav' => 'Product carousel navigation',
     'price' => 'Price',
     'quantity' => 'Quantity',
+    'increase_quantity' => 'Increase quantity',
+    'decrease_quantity' => 'Decrease quantity',
     'total' => 'Total',
     'subtotal' => 'Subtotal',
     'discount' => 'Discount',

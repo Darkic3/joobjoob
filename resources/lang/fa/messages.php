@@ -42,6 +42,8 @@ return [
     'product_carousel_nav' => 'ناوبری کاروسل محصولات',
     'price' => 'قیمت',
     'quantity' => 'تعداد',
+    'increase_quantity' => 'افزایش تعداد',
+    'decrease_quantity' => 'کاهش تعداد',
     'total' => 'مجموع',
     'subtotal' => 'جمع جزء',
     'discount' => 'تخفیف',

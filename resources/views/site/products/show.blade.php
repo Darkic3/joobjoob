@@ -223,17 +223,22 @@
 
                 {{-- تعداد و دکمه خرید --}}
                 <div class="flex items-center gap-4 pt-4 border-t border-[var(--shadow-light)]">
-                    <div class="neu-flat-sm flex items-center rounded-lg overflow-hidden">
+                    <div class="flex items-stretch rounded-2xl overflow-hidden shrink-0"
+                         style="background: var(--bg-elevated); box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);"
+                         role="group" aria-label="{{ __('messages.quantity') }}">
                         <button type="button" onclick="decrementQty()"
-                                class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">
-                            -
+                                class="w-11 h-12 grid place-items-center transition-all hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] hover:text-[var(--accent)] active:scale-90"
+                                style="color: var(--text-primary);" aria-label="{{ __('messages.decrease_quantity') }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
                         </button>
-                        <input type="number" id="qty-input" name="qty" value="1" min="1" max="{{ $product->stock }}"
-                               class="w-16 h-10 text-center bg-transparent border-none focus:ring-0 text-sm font-bold"
-                               readonly>
+                        <input type="text" inputmode="numeric" id="qty-input" name="qty" value="1" min="1" max="{{ $product->stock }}"
+                               class="mono w-[52px] h-12 text-center bg-transparent outline-none select-none text-[15px] font-extrabold"
+                               style="color: var(--text-primary); border-inline: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent); font-variant-numeric: tabular-nums;"
+                               readonly tabindex="-1" aria-live="polite" aria-label="{{ __('messages.quantity') }}">
                         <button type="button" onclick="incrementQty({{ max(1, $product->stock) }})"
-                                class="w-10 h-10 flex items-center justify-center text-lg font-bold hover:bg-[var(--shadow-light)] transition-colors">
-                            +
+                                class="w-11 h-12 grid place-items-center transition-all hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] hover:text-[var(--accent)] active:scale-90"
+                                style="color: var(--text-primary);" aria-label="{{ __('messages.increase_quantity') }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                         </button>
                     </div>
 

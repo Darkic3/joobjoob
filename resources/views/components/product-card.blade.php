@@ -88,7 +88,7 @@
         @endif
 
         {{-- بخش قیمت و دکمه خرید --}}
-        <div class="mt-auto pt-2 border-t border-[var(--shadow-light)]/50">
+        <div class="mt-auto pt-2">
             <div class="mb-3">
                 {{-- قیمت قبلی + برچسب تخفیف — خط کوچک بالای قیمت نهایی --}}
                 @if($hasDiscount)
@@ -97,6 +97,11 @@
                             {{ format_price($originalPrice) }}
                         </span>
                         <span class="price-off">{{ $discountPercent }}٪-</span>
+                    </div>
+                @else
+                    {{-- نگهدارنده نامرئی هم‌ارتفاع ردیف تخفیف تا قیمت نهایی همه کارت‌ها تراز بماند --}}
+                    <div class="flex items-center gap-1.5 mb-1 invisible" aria-hidden="true">
+                        <span class="mono text-[11px] font-semibold" dir="ltr">&nbsp;</span>
                     </div>
                 @endif
 

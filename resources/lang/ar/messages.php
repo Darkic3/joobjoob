@@ -48,6 +48,8 @@ return [
     'product_carousel_nav' => 'تنقل دوّار المنتجات',
     'price' => 'السعر',
     'quantity' => 'الكمية',
+    'increase_quantity' => 'زيادة الكمية',
+    'decrease_quantity' => 'إنقاص الكمية',
     'total' => 'المجموع',
     'subtotal' => 'المجموع الفرعي',
     'discount' => 'الخصم',

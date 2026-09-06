@@ -48,6 +48,8 @@ return [
     'product_carousel_nav' => 'Ürün karusel navigasyonu',
     'price' => 'Fiyat',
     'quantity' => 'Adet',
+    'increase_quantity' => 'Adedi artır',
+    'decrease_quantity' => 'Adedi azalt',
     'total' => 'Toplam',
     'subtotal' => 'Ara Toplam',
     'discount' => 'İndirim',
