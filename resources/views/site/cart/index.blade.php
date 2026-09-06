@@ -750,12 +750,13 @@
                     <p class="text-xs mt-1" style="color: var(--text-secondary);">لطفاً اطلاعات زیر را بررسی کرده و فیش واریزی را آپلود کنید</p>
                 </div>
                 <div class="px-6 py-5 space-y-4">
-                    <div class="p-4 rounded-2xl" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);">
+                    <div class="p-4 rounded-2xl relative" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-xs font-bold" style="color: var(--text-secondary);">شماره کارت مقصد</span>
                             <button type="button" onclick="copyCardNumber()" id="copyCardBtn" class="text-xs px-3 py-1.5 rounded-xl font-bold transition-all" style="background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent);">کپی شماره کارت</button>
                         </div>
                         <p id="modalCardNumber" class="mono text-xl font-black tracking-wider text-center py-1" style="color: var(--accent);" dir="ltr"></p>
+                        <span id="copyFloatMsg" class="copy-float-msg" aria-hidden="true">کپی شد ✓</span>
                     </div>
                     <div id="modalHolderRow" class="flex items-center justify-between px-1" style="display:none;">
                         <span class="text-xs" style="color: var(--text-secondary);">صاحب کارت</span>
@@ -963,6 +964,55 @@
             pointer-events: none !important;
             user-select: none !important;
             transition: filter 0.3s ease;
+        }
+
+        /* ─── کپی شماره کارت: انیمیشن موفقیت ─── */
+        #modalCardNumber.copy-success-flash {
+            animation: copyPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), copyGlow 0.7s ease;
+        }
+        @keyframes copyPop {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        @keyframes copyGlow {
+            0% { text-shadow: 0 0 0 rgba(34, 197, 94, 0); }
+            35% { text-shadow: 0 0 18px rgba(34, 197, 94, 0.55); }
+            100% { text-shadow: 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .copy-float-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: #16a34a;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 999px;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.45);
+            z-index: 5;
+        }
+        .copy-float-msg.show {
+            animation: copyFloat 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes copyFloat {
+            0% { opacity: 0; transform: translate(-50%, -20%) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            70% { opacity: 1; transform: translate(-50%, -62%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -95%) scale(0.95); }
+        }
+        #copyCardBtn.copy-btn-success {
+            background: color-mix(in srgb, #22c55e 18%, transparent) !important;
+            color: #16a34a !important;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #modalCardNumber.copy-success-flash,
+            .copy-float-msg.show { animation-duration: 0.01ms; }
         }
 
         /* ─── ریسپانسیو ─── */
@@ -1304,6 +1354,15 @@
                     displayNum = window.localizeDigits ? window.localizeDigits.convert(displayNum) : displayNum;
 
                     document.getElementById('modalCardNumber').textContent = displayNum;
+                    window._cardToCardRawNumber = cardNum;
+                    // ریست حالت دکمه کپی از بازدید قبلی
+                    (function() {
+                        var cb = document.getElementById('copyCardBtn');
+                        if (cb && cb.dataset.origHtml) {
+                            cb.innerHTML = cb.dataset.origHtml;
+                            cb.classList.remove('copy-btn-success');
+                        }
+                    })();
                     var holderRow = document.getElementById('modalHolderRow');
                     var descRow = document.getElementById('modalDescRow');
                     if (cardHolder) { holderRow.style.display = ''; document.getElementById('modalCardHolder').textContent = cardHolder; } else { holderRow.style.display = 'none'; }
@@ -1400,47 +1459,89 @@
         };
 
         window.copyCardNumber = function() {
-            var displayText = document.getElementById('modalCardNumber').textContent;
-            var num = displayText.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/-/g, '');
+            var numEl = document.getElementById('modalCardNumber');
             var btn = document.getElementById('copyCardBtn');
-            var orig = btn.textContent;
+
+            // منبع حقیقی شماره: مقدار خام ذخیره‌شده هنگام باز شدن مودال (ارقام لاتین)
+            var num = String(window._cardToCardRawNumber || '').replace(/\D/g, '');
+            if (!num && numEl) {
+                // fallback: پارس متن نمایشی (ارقام فارسی + خط تیره)
+                var displayText = numEl.textContent || '';
+                num = displayText.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/\D/g, '');
+            }
+            if (!num) {
+                copyShowError('شماره کارت یافت نشد');
+                return;
+            }
+
+            if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+
+            function copyShowError(msg) {
+                btn.innerHTML = msg;
+                setTimeout(function() { btn.innerHTML = btn.dataset.origHtml; }, 2000);
+                if (window.showToast) showToast(msg, 'error');
+            }
 
             function onSuccess() {
-                btn.textContent = 'کپی شد! ✓';
-                btn.style.background = 'color-mix(in srgb, #22c55e 15%, transparent)';
-                btn.style.color = '#22c55e';
+                // ۱) انیمیشن پاپ روی خود شماره کارت
+                if (numEl) {
+                    numEl.classList.remove('copy-success-flash');
+                    void numEl.offsetWidth;
+                    numEl.classList.add('copy-success-flash');
+                }
+                // ۲) پیام شناور «کپی شد» روی شماره
+                var pill = document.getElementById('copyFloatMsg');
+                if (pill) {
+                    pill.classList.remove('show');
+                    void pill.offsetWidth;
+                    pill.classList.add('show');
+                }
+                // ۳) حالت موفقیت دکمه (آیکون تیک + سبز)
+                btn.classList.add('copy-btn-success');
+                btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;">'
+                    + '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
+                    + 'کپی شد!</span>';
+                // ۴) toast سراسری با خود شماره
+                if (window.showToast) {
+                    var pretty = num.replace(/(\d{4})(?=\d)/g, '$1-');
+                    showToast('شماره کارت کپی شد', 'success', pretty);
+                }
                 setTimeout(function() {
-                    btn.textContent = orig;
-                    btn.style.background = '';
-                    btn.style.color = '';
-                }, 1500);
+                    btn.classList.remove('copy-btn-success');
+                    btn.innerHTML = btn.dataset.origHtml;
+                    if (numEl) numEl.classList.remove('copy-success-flash');
+                }, 1800);
             }
 
-            // Try modern clipboard API first
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(num).then(onSuccess).catch(function() {
-                    fallbackCopy(num, onSuccess);
-                });
-            } else {
-                fallbackCopy(num, onSuccess);
-            }
-
-            function fallbackCopy(text, callback) {
+            // fallback سازگار با iOS و صفحات غیر امن (http)
+            function fallbackCopy(text) {
+                if (!document.queryCommandSupported || !document.queryCommandSupported('copy')) {
+                    copyShowError('خطا در کپی');
+                    return;
+                }
                 var ta = document.createElement('textarea');
                 ta.value = text;
-                ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0;';
                 document.body.appendChild(ta);
                 ta.focus();
                 ta.select();
-                try {
-                    document.execCommand('copy');
-                    callback();
-                } catch(e) {
-                    // Last resort: show the number for manual copy
-                    btn.textContent = 'خطا در کپی';
-                    setTimeout(function() { btn.textContent = orig; }, 2000);
-                }
+                try { ta.setSelectionRange(0, ta.value.length); } catch (e) {}
+                var ok = false;
+                try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
                 document.body.removeChild(ta);
+                // فقط وقتی واقعاً کپی شد پیام موفقیت بده
+                if (ok) { onSuccess(); }
+                else { copyShowError('خطا در کپی'); }
+            }
+
+            // Try modern clipboard API first (فقط در صورت موفقیت واقعیِ promise)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(num).then(onSuccess).catch(function() {
+                    fallbackCopy(num);
+                });
+            } else {
+                fallbackCopy(num);
             }
         };
 
