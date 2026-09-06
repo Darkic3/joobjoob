@@ -69,39 +69,53 @@
                         </span>
                     </div>
 
-                    {{-- فرم ثبت‌نام — فیلدها زیرِ هم، تمام‌عرض؛ موبایل فقط عددی (فیلتر سراسری only-digits.js) --}}
-                    <form x-data="registerForm()" x-on:submit.prevent data-register-form class="space-y-3">
+                    {{-- فرم ثبت‌نام — فیلدها زیرِ هم، تمام‌عرض؛ ارورِ هر فیلد زیر خودش؛ عددی فقط (only-digits.js سراسری) --}}
+                    <form x-data="registerForm()" x-on:submit.prevent data-register-form class="space-y-3" novalidate>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                        {{-- فیلد موبایل — فقط ارقام 0-9 (ارقام فارسی/عربی خودکار لاتین می‌شوند) --}}
+                        {{-- فیلد موبایل — فقط ارقام 0-9 (فارسی/عربی خودکار لاتین می‌شوند) --}}
                         <div class="form-field">
                             <label for="register-mobile" class="form-label">{{ __('messages.otp_mobile') }}</label>
                             <input id="register-mobile" type="tel" name="mobile" x-model="mobile"
-                                   x-on:input.debounce.300ms="clearError()"
+                                   x-on:input="resetServerErrors()"
                                    x-on:blur="mobileBlurred = true"
                                    placeholder="{{ __('messages.register_mobile_ph') }}"
                                    class="neu-input py-3 text-sm"
-                                   :style="mobileError ? errorStyle : ''"
+                                   :style="isMobileInvalid() ? errorStyle : ''"
                                    required dir="ltr" inputmode="tel" autocomplete="tel" maxlength="13">
+                            <span class="form-error block mt-1" x-show="isMobileInvalid()" x-text="mobileMessage()"></span>
+
+                            {{-- اگر شماره قبلاً ثبت شده، به‌جای ثبت‌نام تکراری مسیر ورود را پیشنهاد بده --}}
+                            <template x-if="mobileRegistered">
+                                <span class="block mt-2 text-[11px] font-bold">
+                                    <a href="{{ localizedRoute('login') }}"
+                                       class="inline-flex items-center gap-1 transition-opacity hover:opacity-70"
+                                       style="color: var(--accent);">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H7m0 0 4-4m-4 4 4 4"/><path d="M11 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg>
+                                        {{ __('messages.login') }}
+                                    </a>
+                                </span>
+                            </template>
                         </div>
 
                         {{-- فیلد نام --}}
                         <div class="form-field">
                             <label for="register-name" class="form-label">{{ __('messages.otp_name') }}</label>
                             <input id="register-name" type="text" name="name" x-model="name"
-                                   x-on:input.debounce.300ms="clearError()"
+                                   x-on:input="resetServerErrors()"
                                    x-on:blur="nameBlurred = true"
                                    placeholder="{{ __('messages.register_name_ph') }}"
                                    class="neu-input py-3 text-sm"
-                                   :style="nameError ? errorStyle : ''"
-                                   required autocomplete="name">
+                                   :style="isNameInvalid() ? errorStyle : ''"
+                                   required autocomplete="name" maxlength="120">
+                            <span class="form-error block mt-1" x-show="isNameInvalid()" x-text="nameMessage()"></span>
                         </div>
 
-                        {{-- پیام خطا --}}
-                        <template x-if="error">
+                        {{-- خطای عمومی (پیامک / شبکه / محدودیت تلاش) --}}
+                        <template x-if="serverError">
                             <div class="flex items-center gap-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-4 py-2.5 text-sm text-rose-700 dark:text-rose-300">
                                 <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-                                <span x-text="error"></span>
+                                <span x-text="serverError"></span>
                             </div>
                         </template>
 
@@ -115,7 +129,7 @@
                             <template x-if="!loading">
                                 <svg class="inline-block me-1.5 -mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                             </template>
-                            <span x-text="loading ? 'در حال ارسال...' : '{{ __('messages.register_btn') }}'"></span>
+                            <span x-text="loading ? '{{ __('messages.sending') }}' : '{{ __('messages.register_btn') }}'"></span>
                         </button>
                     </form>
 
@@ -140,42 +154,66 @@ function registerForm() {
     return {
         mobile: '',
         name: '',
-        error: '',
         loading: false,
-        // هشدار بصری فقط بعد از خروج از فیلد (یا تلاش برای ارسال) — نه وسط تایپ
+        // هشدار بصری فقط بعد از خروج از فیلد یا تلاش برای ارسال — نه وسط تایپ
         mobileBlurred: false,
         nameBlurred: false,
+        submitted: false,
+        // خطای عمومی (پیامک/شبکه/محدودیت تلاش)
+        serverError: '',
+        // خطای برگشتی از سرور، چسبیده به یک فیلد خاص: { field: 'mobile'|'name', message }
+        serverFieldError: null,
+        // شماره قبلاً ثبت‌شده → پیشنهاد ورود به‌جای ثبت‌نام تکراری
+        mobileRegistered: false,
+
         // حلقهٔ قرمز خطا — هم‌خانواده با صفحات ورود (inset + ring از var(--danger))
         errorStyle: 'box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--danger) 45%, transparent);',
 
-        // اعتبارسنجی شماره موبایل ایرانی: 09xxxxxxxxx (ارقام پس از only-digits لاتین هستند)
-        get mobileError() {
-            if (! this.mobileBlurred || ! this.mobile) return false;
-            return ! /^09\d{9}$/.test(this.mobile.trim());
+        // پیام خطای فیلد موبایل (اولویت: خطای سرور ← خالی ← نامعتبر)
+        mobileMessage() {
+            if (this.serverFieldError && this.serverFieldError.field === 'mobile') {
+                return this.serverFieldError.message;
+            }
+            if (! (this.submitted || this.mobileBlurred)) return '';
+            const m = this.mobile.trim();
+            if (! m) return '{{ __('messages.otp_mobile_required') }}';
+            // ارقام پس از only-digits لاتین هستند: 09xxxxxxxxx
+            return /^09\d{9}$/.test(m) ? '' : '{{ __('messages.otp_mobile_invalid') }}';
         },
 
-        get nameError() {
-            return this.nameBlurred && this.name.trim() === '';
+        // پیام خطای فیلد نام
+        nameMessage() {
+            if (this.serverFieldError && this.serverFieldError.field === 'name') {
+                return this.serverFieldError.message;
+            }
+            if (! (this.submitted || this.nameBlurred)) return '';
+            return this.name.trim() === '' ? '{{ __('messages.otp_name_required') }}' : '';
         },
 
-        clearError() {
-            this.error = '';
+        isMobileInvalid() {
+            return !! this.mobileMessage();
+        },
+
+        isNameInvalid() {
+            return !! this.nameMessage();
+        },
+
+        // با تغییر مقدار توسط کاربر، خطاهای برگشتی از سرور پاک می‌شوند
+        resetServerErrors() {
+            this.serverError = '';
+            this.serverFieldError = null;
+            this.mobileRegistered = false;
         },
 
         async submit() {
-            this.error = '';
-            // با تلاش برای ارسال هم هشدارهای بصری فیلدها (مانند خروج از فیلد) ظاهر شوند
-            this.mobileBlurred = true;
-            this.nameBlurred = true;
+            this.submitted = true;
+            this.resetServerErrors();
 
-            // client-side validation
             const mobile = this.mobile.trim();
-            if (! /^09\d{9}$/.test(mobile)) {
-                this.error = '{{ __('messages.otp_mobile_invalid') }}';
-                return;
-            }
-            if (! this.name || this.name.trim() === '') {
-                this.error = '{{ __('messages.otp_name_required') }}';
+            const name = this.name.trim();
+
+            // اعتبارسنجی سمت کاربر — پیام‌ها زیر هر فیلد ظاهر می‌شوند
+            if (! mobile || ! name || ! /^09\d{9}$/.test(mobile)) {
                 return;
             }
 
@@ -189,22 +227,32 @@ function registerForm() {
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: new URLSearchParams({
-                        mobile: mobile,
-                        name: this.name.trim(),
-                    }),
+                    body: new URLSearchParams({ mobile: mobile, name: name }),
                 });
 
-                const data = await res.json();
+                // هیچ خطای سروری نباید به‌صورت صفحهٔ خام Laravel دیده شود
+                const data = await res.json().catch(() => null);
 
-                if (data.success) {
+                if (data && data.success) {
                     // ارسال موفق — کاربر را به صفحه کد تایید معطوف کن
                     window.location.href = data.verifyUrl;
-                } else {
-                    this.error = data.error || '{{ __('messages.otp_sms_failed') }}';
+                    return;
                 }
+
+                if (data && data.field) {
+                    // خطای فیلدی (مثلاً شماره از قبل ثبت‌شده) — زیر همان فیلد نمایش بده
+                    if (data.field === 'mobile') {
+                        this.mobileRegistered = data.registered === true;
+                    }
+                    this.serverFieldError = { field: data.field, message: data.error || '{{ __('messages.otp_sms_failed') }}' };
+                    return;
+                }
+
+                // خطای عمومی (پیامک، محدودیت تلاش ۴۲۹، …)
+                this.serverError = (data && (data.error || data.message)) || '{{ __('messages.otp_sms_failed') }}';
             } catch (e) {
-                this.error = '{{ __('messages.otp_sms_failed') }}';
+                // خطای شبکه — همیشه پیام دوستانه، نه صفحهٔ خطا
+                this.serverError = '{{ __('messages.otp_sms_failed') }}';
             } finally {
                 this.loading = false;
             }

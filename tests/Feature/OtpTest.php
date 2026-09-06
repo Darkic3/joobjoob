@@ -182,7 +182,7 @@ class OtpTest extends TestCase
             ]);
 
         $this->assertSame(1, User::where('mobile', '09123456789')->count());
-        $this->assertSessionMissing('otp_mobile');
+        $this->assertFalse(session()->has('otp_mobile'));
     }
 
     public function test_register_box_requires_name_for_new_user_with_field_error(): void

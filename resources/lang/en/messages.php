@@ -160,6 +160,7 @@ return [
     'otp_name_ph' => 'Your full name',
     'otp_register_btn' => 'Register & Get Verification Code',
     'otp_name_required' => 'Please enter your name to register',
+    'otp_mobile_required' => 'Please enter your mobile number',
     'otp_send_code' => 'Send verification code',
     'otp_code' => 'Verification code',
     'otp_code_ph' => '4-digit code',
@@ -172,6 +173,7 @@ return [
     'otp_resend_cooldown' => 'Please try again in :seconds seconds',
     'otp_login_success' => 'Welcome back!',
     'otp_mobile_invalid' => 'Invalid mobile number',
+    'otp_mobile_registered' => 'This mobile number is already registered. Please log in',
     'otp_mobile_blocked' => 'Access to this number is not allowed',
     'otp_code_invalid' => 'The code you entered is incorrect',
     'otp_code_expired' => 'The code has expired. Please request a new one',
@@ -199,6 +201,7 @@ return [
     'register_mobile_ph' => 'Your mobile number',
     'register_btn' => 'Register & Get Discount Code',
     'register_agree' => 'By registering, you accept the terms and privacy policy.',
+    'sending' => 'Sending…',
     'already_member_title' => 'You are already a member',
     'already_member_desc' => 'Your discount codes will soon be available in your user panel.',
 
