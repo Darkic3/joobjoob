@@ -47,10 +47,11 @@
                  style="position: absolute; inset-inline-start: -40px; bottom: -40px; width: 140px; height: 140px; border-radius: 999px;
                         background: radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%); pointer-events: none;"></div>
 
-            <div class="relative p-8 md:p-9">
+            {{-- محتوای کارت ثبت‌نام — در حالت تمام‌عرض هم فرم کشیده نمی‌شود (max-w-xl) --}}
+            <div class="relative w-full max-w-xl mx-auto p-8 md:p-9">
                 @guest
-                    {{-- هدر با آیکون و بج تخفیف --}}
-                    <div class="flex items-start justify-between mb-5">
+                    {{-- هدر با آیکون و بج گرادیانی تخفیف --}}
+                    <div class="flex items-start justify-between gap-3 mb-6">
                         <div class="flex items-center gap-3">
                             <div class="w-11 h-11 rounded-2xl grid place-items-center shrink-0"
                                  style="background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)); color: var(--accent);">
@@ -58,41 +59,42 @@
                             </div>
                             <div>
                                 <h3 class="font-extrabold text-lg leading-snug">{{ __('messages.register_title') }}</h3>
-                                <p class="text-xs mt-1" style="color: var(--text-secondary);">{{ __('messages.register_desc') }}</p>
+                                <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--text-secondary);">{{ __('messages.register_desc') }}</p>
                             </div>
                         </div>
-                        <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-                              style="background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                        <span class="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black text-white"
+                              style="background: linear-gradient(135deg, var(--accent), var(--gold)); box-shadow: 0 4px 14px color-mix(in srgb, var(--gold) 45%, transparent);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                             ۱۰٪
                         </span>
                     </div>
 
-                    {{-- فرم ثبت‌نام --}}
-                    <form x-data="registerForm()" x-on:submit.prevent class="space-y-3">
+                    {{-- فرم ثبت‌نام — فیلدها زیرِ هم، تمام‌عرض؛ موبایل فقط عددی (فیلتر سراسری only-digits.js) --}}
+                    <form x-data="registerForm()" x-on:submit.prevent data-register-form class="space-y-3">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            {{-- فیلد موبایل --}}
-                            <div class="flex-1 relative">
-                                <span class="absolute inset-y-0 left-0 w-10 grid place-items-center pointer-events-none" style="color: var(--text-secondary);">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                </span>
-                                <input type="tel" x-model="mobile" x-on:input.debounce.300ms="clearError()"
-                                       placeholder="{{ __('messages.register_mobile_ph') }}"
-                                       class="neu-input py-3 text-sm" :class="mobileError ? 'border-rose-400 dark:border-rose-500' : ''"
-                                       style="padding-left:2.5rem; padding-right:0.75rem;" required dir="ltr"
-                                       inputmode="tel" autocomplete="tel" maxlength="13">
-                            </div>
-                            {{-- فیلد نام --}}
-                            <div class="flex-1 relative" x-data>
-                                <span class="absolute inset-y-0 right-0 w-10 grid place-items-center pointer-events-none" style="color: var(--text-secondary);">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                </span>
-                                <input type="text" x-model="name" x-on:input.debounce.300ms="clearError()"
-                                       placeholder="{{ __('messages.register_name_ph') }}"
-                                       class="neu-input py-3 text-sm" :class="nameError ? 'border-rose-400 dark:border-rose-500' : ''"
-                                       style="padding-right:2.5rem; padding-left:1rem;" required>
-                            </div>
+
+                        {{-- فیلد موبایل — فقط ارقام 0-9 (ارقام فارسی/عربی خودکار لاتین می‌شوند) --}}
+                        <div class="form-field">
+                            <label for="register-mobile" class="form-label">{{ __('messages.otp_mobile') }}</label>
+                            <input id="register-mobile" type="tel" name="mobile" x-model="mobile"
+                                   x-on:input.debounce.300ms="clearError()"
+                                   x-on:blur="mobileBlurred = true"
+                                   placeholder="{{ __('messages.register_mobile_ph') }}"
+                                   class="neu-input py-3 text-sm"
+                                   :style="mobileError ? errorStyle : ''"
+                                   required dir="ltr" inputmode="tel" autocomplete="tel" maxlength="13">
+                        </div>
+
+                        {{-- فیلد نام --}}
+                        <div class="form-field">
+                            <label for="register-name" class="form-label">{{ __('messages.otp_name') }}</label>
+                            <input id="register-name" type="text" name="name" x-model="name"
+                                   x-on:input.debounce.300ms="clearError()"
+                                   x-on:blur="nameBlurred = true"
+                                   placeholder="{{ __('messages.register_name_ph') }}"
+                                   class="neu-input py-3 text-sm"
+                                   :style="nameError ? errorStyle : ''"
+                                   required autocomplete="name">
                         </div>
 
                         {{-- پیام خطا --}}
@@ -140,15 +142,20 @@ function registerForm() {
         name: '',
         error: '',
         loading: false,
+        // هشدار بصری فقط بعد از خروج از فیلد (یا تلاش برای ارسال) — نه وسط تایپ
+        mobileBlurred: false,
+        nameBlurred: false,
+        // حلقهٔ قرمز خطا — هم‌خانواده با صفحات ورود (inset + ring از var(--danger))
+        errorStyle: 'box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--danger) 45%, transparent);',
 
-        /**_validates mobile number against Iranian pattern: 09xxxxxxxxx */
+        // اعتبارسنجی شماره موبایل ایرانی: 09xxxxxxxxx (ارقام پس از only-digits لاتین هستند)
         get mobileError() {
-            if (! this.mobile) return false;
-            return ! /^09\d{9}$/.test(this.mobile);
+            if (! this.mobileBlurred || ! this.mobile) return false;
+            return ! /^09\d{9}$/.test(this.mobile.trim());
         },
 
         get nameError() {
-            return ! this.name || this.name.trim() === '';
+            return this.nameBlurred && this.name.trim() === '';
         },
 
         clearError() {
@@ -157,6 +164,9 @@ function registerForm() {
 
         async submit() {
             this.error = '';
+            // با تلاش برای ارسال هم هشدارهای بصری فیلدها (مانند خروج از فیلد) ظاهر شوند
+            this.mobileBlurred = true;
+            this.nameBlurred = true;
 
             // client-side validation
             const mobile = this.mobile.trim();

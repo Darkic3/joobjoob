@@ -767,7 +767,7 @@
                     </div>
                     <div>
                         <label class="text-xs font-bold mb-2 block" style="color: var(--text-secondary);">کد پیگیری واریزی <span class="text-rose-500">*</span></label>
-                        <input type="text" id="receiptTrackingCode" inputmode="numeric" pattern="\d{6,16}" maxlength="16" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        <input type="text" id="receiptTrackingCode" inputmode="numeric" pattern="\d{6,16}" maxlength="16" placeholder="مثلاً: ۱۲۳۴۵۶۷۸۹۰"
                                class="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none"
                                style="background: color-mix(in srgb, var(--text-primary) 4%, transparent); color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);"
                                dir="ltr">

@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/app-admin.js',
                 'resources/js/card-format.js',
+                'resources/js/only-digits.js',
             ],
             refresh: true,
         }),
