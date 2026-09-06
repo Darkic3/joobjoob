@@ -7,6 +7,7 @@ use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
 {
@@ -180,55 +181,87 @@ class OtpController extends Controller
 
     /**
      * ارسال کد تایید به‌صورت AJAX (برای باکس ثبت‌نام سمت خانه).
-     * differentials: استقلال از redirect و ارورهای JSON برای نمایش در바인Box.
+     *
+     * پاسخ همیشه JSON است و خطاها «فیلدی» برمی‌گردند (field: mobile | name)
+     * تا باکس ثبت‌نام بتواند ارور را دقیقاً زیر همان فیلد نشان دهد:
+     *   - mobile خالی → otp_mobile_required
+     *   - شماره نامعتبر → otp_mobile_invalid
+     *   - شماره از قبل ثبت‌شده → otp_mobile_registered + registered: true
+     *   - نام خالی → otp_name_required
+     * هر استثنای غیرمنتظره هم به‌جای صفحهٔ خطای Laravel، پیام JSON عمومی می‌گیرد.
      */
     public function sendAjax(Request $request): JsonResponse
     {
-        $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
-        $name = trim($request->input('name', ''));
+        try {
+            $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
+            $name = trim((string) $request->input('name', ''));
 
-        // اعتبارسنجی اولیه: شماره معتبر باشد
-        if (! $this->otpService->isValidMobile($mobile)) {
+            // شماره وارد نشده
+            if ($mobile === '') {
+                return response()->json([
+                    'success' => false,
+                    'field'   => 'mobile',
+                    'error'   => __('messages.otp_mobile_required'),
+                ]);
+            }
+
+            // شماره نامعتبر
+            if (! $this->otpService->isValidMobile($mobile)) {
+                return response()->json([
+                    'success' => false,
+                    'field'   => 'mobile',
+                    'error'   => __('messages.otp_mobile_invalid'),
+                ]);
+            }
+
+            // کاربر با این شماره قبلاً ثبت‌نام کرده است
+            if ($this->otpService->userExists($mobile)) {
+                return response()->json([
+                    'success'    => false,
+                    'field'      => 'mobile',
+                    'registered' => true,
+                    'error'      => __('messages.otp_mobile_registered'),
+                ]);
+            }
+
+            // مهمان جدید بدون نام
+            if ($name === '') {
+                return response()->json([
+                    'success' => false,
+                    'field'   => 'name',
+                    'error'   => __('messages.otp_name_required'),
+                ]);
+            }
+
+            // ارسال OTP
+            $result = $this->otpService->send($mobile, $name);
+
+            if (! $result['success']) {
+                return response()->json([
+                    'success' => false,
+                    'error'   => $result['message'],
+                ]);
+            }
+
+            // ذخیره در سشن برای مرحله verify
+            $request->session()->put('otp_mobile', $this->otpService->normalizeMobile($mobile));
+            $request->session()->forget('otp_new_user');
+
+            return response()->json([
+                'success'   => true,
+                'message'   => $result['message'],
+                'verifyUrl' => localizedRoute('login.verify'),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Register-box OTP send failed: '.$e->getMessage(), [
+                'mobile'    => $request->input('mobile'),
+                'exception' => $e,
+            ]);
+
             return response()->json([
                 'success' => false,
-                'error'   => __('messages.otp_mobile_invalid'),
+                'error'   => __('messages.otp_sms_failed'),
             ]);
         }
-
-        // کاربر با این شماره قبلاً ثبت‌نام کرده است
-        if ($this->otpService->userExists($mobile)) {
-            return response()->json([
-                'success' => false,
-                'error'   => __('messages.otp_mobile_registered'),
-            ]);
-        }
-
-        // مهمان جدید بدون نام
-        if ($name === '') {
-            return response()->json([
-                'success' => false,
-                'error'   => __('messages.otp_name_required'),
-            ]);
-        }
-
-        // ارسال OTP
-        $result = $this->otpService->send($mobile, $name);
-
-        if (! $result['success']) {
-            return response()->json([
-                'success' => false,
-                'error'   => $result['message'],
-            ]);
-        }
-
-        // ذخیره در세션 برای مرحله verify
-        $request->session()->put('otp_mobile', $this->otpService->normalizeMobile($mobile));
-        $request->session()->forget('otp_new_user');
-
-        return response()->json([
-            'success' => true,
-            'message' => $result['message'],
-            'verifyUrl' => localizedRoute('login.verify'),
-        ]);
     }
 }
