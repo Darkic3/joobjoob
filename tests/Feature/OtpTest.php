@@ -137,6 +137,86 @@ class OtpTest extends TestCase
         $this->assertDatabaseMissing('users', ['mobile' => '12345']);
     }
 
+    // ───────────────────── باکس ثبت‌نام صفحهٔ اصلی (sendAjax) ─────────────────────
+
+    public function test_register_box_requires_mobile_with_field_error(): void
+    {
+        $this->postJson('/login/send-ajax', ['mobile' => '', 'name' => 'علی رضایی'])
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'field'   => 'mobile',
+                'error'   => __('messages.otp_mobile_required'),
+            ]);
+
+        $this->assertDatabaseMissing('users', ['mobile' => '']);
+    }
+
+    public function test_register_box_rejects_invalid_mobile_with_field_error(): void
+    {
+        $this->fakeSms();
+
+        $this->postJson('/login/send-ajax', ['mobile' => '12345', 'name' => 'علی رضایی'])
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'field'   => 'mobile',
+                'error'   => __('messages.otp_mobile_invalid'),
+            ]);
+
+        $this->assertDatabaseMissing('users', ['mobile' => '12345']);
+    }
+
+    public function test_register_box_rejects_already_registered_mobile_and_flags_login(): void
+    {
+        $this->fakeSms();
+        User::factory()->create(['mobile' => '09123456789']);
+
+        $this->postJson('/login/send-ajax', ['mobile' => '۰۹۱۲۳۴۵۶۷۸۹', 'name' => 'علی رضایی'])
+            ->assertOk()
+            ->assertJson([
+                'success'    => false,
+                'field'      => 'mobile',
+                'registered' => true,
+                'error'      => __('messages.otp_mobile_registered'),
+            ]);
+
+        $this->assertSame(1, User::where('mobile', '09123456789')->count());
+        $this->assertSessionMissing('otp_mobile');
+    }
+
+    public function test_register_box_requires_name_for_new_user_with_field_error(): void
+    {
+        $this->fakeSms();
+
+        $this->postJson('/login/send-ajax', ['mobile' => '09123456789', 'name' => '  '])
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'field'   => 'name',
+                'error'   => __('messages.otp_name_required'),
+            ]);
+
+        $this->assertDatabaseMissing('users', ['mobile' => '09123456789']);
+    }
+
+    public function test_register_box_new_user_with_name_sends_code_and_returns_verify_url(): void
+    {
+        $fake = $this->fakeSms();
+
+        $this->postJson('/login/send-ajax', ['mobile' => '09123456789', 'name' => 'علی رضایی'])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('verifyUrl', route('login.verify'))
+            ->assertSessionHas('otp_mobile', '09123456789');
+
+        $user = User::where('mobile', '09123456789')->first();
+        $this->assertNotNull($user);
+        $this->assertSame('علی رضایی', $user->name);
+        $this->assertTrue($fake->lookupCalled);
+        $this->assertSame('09123456789', $fake->lastMobile);
+    }
+
     public function test_send_otp_without_configured_key_redirects_to_verify_with_error(): void
     {
         // بدون جایگزینی Sms — کلید API در settings خالی است → خطای پیکربندی
