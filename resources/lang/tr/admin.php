@@ -288,7 +288,7 @@ return [
     'promo_banners' => [
         'tab' => 'Tanıtım Afişlerini Yönet',
         'title' => 'Tanıtım Afişlerini Yönet',
-        'subtitle' => 'Ana sayfa tanıtım afişleri — istediğiniz stil ve renkte 1 ila 4 afiş',
+        'subtitle' => 'Ana sayfa tanıtım afişleri — istediğiniz stil ve renkte 1 ila 6 afiş (kaydırıcı)',
         'add_new' => 'Yeni Afiş',
         'search_ph' => 'Başlıkta ara...',
         'title_subtitle' => 'Başlık ve Alt Metin',

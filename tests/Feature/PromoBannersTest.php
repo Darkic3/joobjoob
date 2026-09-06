@@ -9,7 +9,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * بنرهای میانی صفحهٔ اصلی — مدل مستقل PromoBanner (۱ تا ۴ بنر با سبک/رنگ دلخواه).
+ * بنرهای میانی صفحهٔ اصلی — مدل مستقل PromoBanner (۱ تا ۶ بنر با سبک/رنگ دلخواه،
+ * در سایت به‌صورت اسلایدر نمایش داده می‌شود و تک‌بنر تمام‌عرض می‌ماند).
  */
 class PromoBannersTest extends TestCase
 {
@@ -71,6 +72,20 @@ class PromoBannersTest extends TestCase
         $this->assertStringContainsString('promo-banner--coupon promo-banner--gold', $html);
     }
 
+    public function test_multiple_banners_render_inside_the_swiper_slider(): void
+    {
+        $this->makeBanner(['title' => ['fa' => 'بنر اسلایدر ۱']]);
+        $this->makeBanner(['title' => ['fa' => 'بنر اسلایدر ۲']]);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-promo-swiper', $html);
+        // فقط داخل بخش بنرها بشمار (صفحه اسلایدهای سوییپرهای دیگر هم دارد)
+        $promoSlice = substr($html, strpos($html, 'data-promo-swiper'));
+        $this->assertSame(2, substr_count($promoSlice, 'class="swiper-slide"'));
+        $this->assertStringContainsString('promo-swiper__pagination', $html);
+    }
+
     public function test_banner_without_url_is_not_clickable(): void
     {
         $this->makeBanner();
@@ -80,6 +95,8 @@ class PromoBannersTest extends TestCase
         // بدون لینک: به جای <a> یک <div> رندر می‌شود (کلاس promo-banner--static) و لینک پیش‌فرض به محصولات ندارد
         $this->assertStringContainsString('promo-banner--static', $html);
         $this->assertStringNotContainsString('<a href="'.localizedRoute('products.index').'" class="promo-banner', $html);
+        // تک‌بنر: اسلایدر ساخته نمی‌شود (تمام‌عرض بدون کروم)
+        $this->assertStringNotContainsString('data-promo-swiper', $html);
     }
 
     public function test_banner_uses_custom_url(): void
@@ -114,15 +131,15 @@ class PromoBannersTest extends TestCase
         $this->assertStringContainsString('rect x="3" y="8" width="18"', $html);
     }
 
-    public function test_site_shows_max_four_banners(): void
+    public function test_site_shows_max_six_banners(): void
     {
-        foreach (range(1, 5) as $i) {
+        foreach (range(1, 7) as $i) {
             $this->makeBanner(['title' => ['fa' => "بنر $i"], 'sort_order' => $i]);
         }
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertSame(4, substr_count($html, 'promo-banner promo-banner--'));
+        $this->assertSame(6, substr_count($html, 'promo-banner promo-banner--'));
     }
 
     // ── CRUD ادمین ─────────────────────────────────────────────

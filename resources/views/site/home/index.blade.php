@@ -191,14 +191,73 @@
         </section>
     @endif
 
-    {{-- ۶.۵. بنرهای میانی تبلیغاتی — مدل PromoBanner (۱ تا ۴ بنر)؛ پرکنندهٔ فضای بین بخش‌ها --}}
+    {{-- ۶.۵. بنرهای میانی تبلیغاتی — مدل PromoBanner؛ تک‌بنر تمام‌عرض یا اسلایدرِ بنرها (Swiper) --}}
     @if($promoBanners->isNotEmpty())
         <section class="reveal-on-scroll py-6">
-            <div class="promo-banners">
-                @foreach($promoBanners as $banner)
-                    <x-promo-banner-card :banner="$banner"/>
-                @endforeach
-            </div>
+            @if($promoBanners->count() === 1)
+                {{-- فقط یک بنر: تمام‌عرض، بدون کروم اسلایدر --}}
+                <div class="promo-banners promo-banners--single">
+                    <x-promo-banner-card :banner="$promoBanners->first()"/>
+                </div>
+            @else
+                {{-- دو یا چند بنر: اسلایدر کشویی — در موبایل یکی‌یکی، در دسکتاپ چندتایی --}}
+                <div class="promo-swiper" data-promo-swiper>
+                    <div class="swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($promoBanners as $banner)
+                                <div class="swiper-slide">
+                                    <x-promo-banner-card :banner="$banner"/>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <button type="button" class="promo-swiper__nav promo-swiper__nav--prev" data-promo-prev
+                            aria-label="{{ __('messages.prev_slide') }}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>
+                    </button>
+                    <button type="button" class="promo-swiper__nav promo-swiper__nav--next" data-promo-next
+                            aria-label="{{ __('messages.next_slide') }}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m0 0-6-6m6 6-6 6"/></svg>
+                    </button>
+
+                    <div class="promo-swiper__pagination swiper-pagination" aria-hidden="true"></div>
+                </div>
+
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const wrap = document.querySelector('[data-promo-swiper]');
+                            if (!wrap || typeof Swiper === 'undefined') return;
+
+                            const slider = new Swiper(wrap.querySelector('.swiper'), {
+                                // جهت از سند خوانده می‌شود تا در LTR (انگلیسی و…) هم درست بچرخد
+                                rtl: document.documentElement.dir === 'rtl',
+                                slidesPerView: 1,
+                                spaceBetween: 20,
+                                speed: 550,
+                                loop: false,
+                                breakpoints: {
+                                    640: { slidesPerView: 2 },
+                                    1024: { slidesPerView: 3 },
+                                    1280: { slidesPerView: 4 },
+                                },
+                                pagination: {
+                                    el: wrap.querySelector('.promo-swiper__pagination'),
+                                    clickable: true,
+                                },
+                            });
+
+                            const prev = wrap.querySelector('[data-promo-prev]');
+                            const next = wrap.querySelector('[data-promo-next]');
+                            if (prev) prev.addEventListener('click', () => slider.slidePrev());
+                            if (next) next.addEventListener('click', () => slider.slideNext());
+                        });
+                    </script>
+                @endpush
+            @endif
         </section>
     @endif
 

@@ -289,7 +289,7 @@ return [
     'promo_banners' => [
         'tab' => 'Manage Promo Banners',
         'title' => 'Manage Promo Banners',
-        'subtitle' => 'Home page promo banners — from 1 to 4 banners with custom style and color',
+        'subtitle' => 'Home page promo banners — from 1 to 6 banners with custom style and color (slider)',
         'add_new' => 'New Banner',
         'search_ph' => 'Search in title...',
         'title_subtitle' => 'Title & Subtitle',

@@ -2333,6 +2333,82 @@ html, body {
     gap: 1.25rem;
 }
 
+/* ---------- اسلایدر بنرهای میانی (۲ بنر یا بیشتر) ---------- */
+.promo-swiper {
+    position: relative;
+    /* فضای کافی برای فلش‌های کناری (دسکتاپ) */
+    padding-inline: 2.25rem;
+}
+.promo-swiper .swiper {
+    /* سایهٔ هاور بنرها لبه نبرد */
+    padding-block: 4px 8px;
+}
+.promo-swiper .swiper-wrapper {
+    align-items: stretch;
+}
+.promo-swiper .swiper-slide {
+    height: auto;
+}
+.promo-swiper .promo-banner {
+    height: 100%;
+}
+.promo-swiper__pagination.swiper-pagination {
+    position: static;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .45rem;
+    margin-top: 1rem;
+}
+.promo-swiper__pagination .swiper-pagination-bullet {
+    margin: 0 !important;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    opacity: .45;
+    background: var(--text-secondary);
+    transition: width var(--dur-med) var(--ease-out), opacity var(--dur-med) var(--ease-out), background-color var(--dur-med) var(--ease-out);
+}
+.promo-swiper__pagination .swiper-pagination-bullet-active {
+    width: 22px;
+    opacity: 1;
+    background: var(--accent);
+}
+.promo-swiper__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    border-radius: 999px;
+    box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+    transition: color var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+}
+.promo-swiper__nav:hover {
+    color: var(--accent);
+    box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+}
+.promo-swiper__nav--prev { inset-inline-start: 0; }
+.promo-swiper__nav--next { inset-inline-end: 0; }
+@media (min-width: 640px) {
+    .promo-swiper__nav { display: inline-flex; }
+}
+@media (max-width: 639.98px) {
+    /* موبایل: بدون فلش و بدون فضای کناری — سوایپ طبیعی */
+    .promo-swiper { padding-inline: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .promo-swiper .swiper-wrapper { transition: none; }
+}
+
 .promo-banner {
     position: relative;
     display: flex;

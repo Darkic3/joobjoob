@@ -16,8 +16,9 @@ class PromoBannerService
 
     /**
      * حداکثر تعداد بنرهایی که در صفحهٔ اصلی نمایش داده می‌شود
+     * (به اندازه‌ای باز شده تا هر ۵ سبک بنر + یک نمونهٔ اضافه در اسلایدر قابل نمایش باشد)
      */
-    public const SITE_MAX_BANNERS = 4;
+    public const SITE_MAX_BANNERS = 6;
 
     public function store(PromoBannerDTO $dto): PromoBanner
     {
