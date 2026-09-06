@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminPermission;
+use App\Http\Middleware\LocalizeHtmlDigits;
 use App\Http\Middleware\LogAdminRequests;
 use App\Http\Middleware\RefreshRememberMeCookie;
 use App\Http\Middleware\SetLocale;
@@ -23,9 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'refreshRememberMe' => RefreshRememberMeCookie::class,
         ]);
 
+        // SetTheme آخرین لایه‌ی درخواست است؛ LocalizeHtmlDigits باید بعد از آن اجرا شود
+        // چون خانوادهٔ ارقام را از زبانی که SetLocale اعمال کرده می‌خواند.
         $middleware->web([
             SetLocale::class,
             SetTheme::class,
+            LocalizeHtmlDigits::class,
         ]);
 
         // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین (ادمین یا سایت)

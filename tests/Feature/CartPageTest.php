@@ -75,7 +75,8 @@ class CartPageTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('id="cart-count-mobile"', false)
-            ->assertSee('>1<', false);
+            // خروجی HTML سمت سرور بومی است: تعداد ۱ → ۱ فارسی
+            ->assertSee('>۱<', false);
     }
 
     // ==========================================
@@ -102,7 +103,7 @@ class CartPageTest extends TestCase
         $this->get('/cart')
             ->assertOk()
             ->assertSee('محصول تست')
-            ->assertSee(format_price(300000), false);
+            ->assertSee(\App\Helpers\NumberHelper::localizeText(format_price(300000)), false);
     }
 
     public function test_cart_item_can_be_removed(): void

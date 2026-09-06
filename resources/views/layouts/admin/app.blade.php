@@ -117,8 +117,11 @@ function adminNotificationBell() {
                     const loc = (window.localizeDigits && window.localizeDigits.convert)
                         ? window.localizeDigits.convert
                         : (s) => s;
+                    // عنوان/متن/تاریخ همان موقعِ نگاشت بومی می‌شوند (id و link دست نمی‌خورند)
                     this.items = (data.data || []).slice(0, 8).map((item) => ({
                         ...item,
+                        title: item.title ? loc(item.title) : item.title,
+                        body: item.body ? loc(item.body) : item.body,
                         created_at: item.created_at ? loc(item.created_at) : item.created_at,
                     }));
                     if (typeof data.count === 'number') this.count = data.count;

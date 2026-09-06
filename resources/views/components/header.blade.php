@@ -298,7 +298,7 @@ function notificationBell() {
         },
 
         // نمایش هماهنگ با زبان از همان اول (بدون چشمک انگلیسی→فارسی)؛
-        // localize-digits با debounce روی MutationObserver کار می‌کند.
+        // localize-digits گره‌های تازه‌اضافه‌شده را پیش از paint همان فریم تبدیل می‌کند.
         displayCount() {
             const raw = this.count > 99 ? '99+' : String(this.count);
             return (window.localizeDigits && window.localizeDigits.convert)
@@ -327,8 +327,11 @@ function notificationBell() {
                     const loc = (window.localizeDigits && window.localizeDigits.convert)
                         ? window.localizeDigits.convert
                         : (s) => s;
+                    // عنوان/متن/تاریخ همان موقعِ نگاشت بومی می‌شوند (id و link دست نمی‌خورند)
                     this.items = (data.data || []).slice(0, 8).map((item) => ({
                         ...item,
+                        title: item.title ? loc(item.title) : item.title,
+                        body: item.body ? loc(item.body) : item.body,
                         created_at: item.created_at ? loc(item.created_at) : item.created_at,
                     }));
                     if (typeof data.count === 'number') this.count = data.count;

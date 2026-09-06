@@ -12,8 +12,14 @@
  *   موجودی، تاریخ، درصد، امتیاز، تایمر، بج سبد خرید، صفحه‌بندی و…
  * - به مقادیر فرم‌ها (input / select / textarea) و کدها
  *   (script / style / pre / code) دست نمی‌زند تا داده‌های ارسالی سالم بمانند.
+ * - از نسخهٔ ۲ معماری دو لایه است:
+ *     ۱) سمت سرور: میدل‌ور LocalizeHtmlDigits کلِ HTML را قبل از اولین paint
+ *        بومی می‌کند (هیچ چشمکی برای محتوای استاتیک باقی نمی‌ماند).
+ *     ۲) این فایل فقط برای محتوای داینامیکِ ساخته‌شده توسط JS است و گره‌های
+ *        تازه‌اضافه‌شده را در همان میکروتسکِ درج (پیش از paintِ همان فریم)
+ *        تبدیل می‌کند — بدون debounce و بدون مرور کل صفحه.
  * - MutationObserver برای محتوای داینامیک (تایمر شمارش معکوس، تغییر قیمت
- *   واریانت، بج سبد خرید، toast و…) در هر دو جهت زبان کار می‌کند.
+ *   واریانت، بج سبد خرید، toast، اعلان‌ها و…) در هر دو جهت زبان کار می‌کند.
  */
 (function () {
     'use strict';
@@ -100,30 +106,37 @@
         }
     }
 
+    function convertTextNode(node) {
+        if (skipTextNode(node)) return;
+        var v = node.nodeValue;
+        if (!/[0-9۰-۹٠-٩٪]/.test(v)) return;
+        var c = convertText(v);
+        // فقط اگر واقعاً تغییر کرده بنویس تا حلقه‌ی بی‌نهایت نشود
+        if (c !== v) node.nodeValue = c;
+    }
+
     function start() {
         walk(document.body);
 
-        var timer = null;
         new MutationObserver(function (mutations) {
             for (var i = 0; i < mutations.length; i++) {
                 var m = mutations[i];
                 if (m.type === 'characterData') {
                     // به‌روزرسانی متنِ یک گره موجود (تایمر، بج سبد، قیمت واریانت…)
-                    if (skipTextNode(m.target)) continue;
-                    var v = m.target.nodeValue;
-                    if (!/[0-9۰-۹٠-٩٪]/.test(v)) continue;
-                    var c = convertText(v);
-                    // فقط اگر واقعاً تغییر کرده بنویس تا حلقه‌ی بی‌نهایت نشود
-                    if (c !== v) m.target.nodeValue = c;
-                } else if (m.type === 'childList' && m.addedNodes.length) {
-                    // محتوای جدید اضافه شده — با debounce کل صفحه یک‌بار مرور شود
-                    if (!timer) {
-                        timer = setTimeout(function () {
-                            timer = null;
-                            walk(document.body);
-                        }, 300);
+                    convertTextNode(m.target);
+                } else if (m.type === 'childList') {
+                    // محتوای جدید اضافه‌شده — همین‌حالا تبدیلش کن: کال‌بکِ MutationObserver
+                    // در میکروتسکِ همان‌تسکِ درج اجرا می‌شود، یعنی پیش از render/paintِ
+                    // همان فریم؛ پس رقمِ لاتین حتی یک فریم دیده نمی‌شود. دیگر debounceِ
+                    // ۳۰۰ms و مرورِ کلِ صفحه لازم نیست.
+                    for (var j = 0; j < m.addedNodes.length; j++) {
+                        var node = m.addedNodes[j];
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            convertTextNode(node);
+                        } else if (node.nodeType === Node.ELEMENT_NODE) {
+                            walk(node);
+                        }
                     }
-                    break;
                 }
             }
         }).observe(document.body, { childList: true, subtree: true, characterData: true });

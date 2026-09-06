@@ -63,7 +63,8 @@
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $discount->id }}</td>
                                 <td class="px-6 py-4 text-sm font-semibold text-gray-800 dark:text-white">{{ $discount->title }}</td>
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">{{ $discount->code }}</span>
+                                    {{-- data-digit-raw: کد تخفیف «داده» است و ارقامش باید همیشه لاتین بماند --}}
+                                    <span data-digit-raw class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">{{ $discount->code }}</span>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     @if($discount->type === 'percent')

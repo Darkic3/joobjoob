@@ -42,7 +42,8 @@ class StaticPagesTest extends TestCase
         $response = $this->get('/page/about')->assertOk();
 
         $response->assertSee(__('messages.pages.about.story_title'));
-        $response->assertSee(__('messages.pages.about.stats.0.value'), false);
+        // خروجی HTML سمت سرور بومی است (ارقام آمار صفحه درباره ما فارسی می‌شود)
+        $response->assertSee(\App\Helpers\NumberHelper::localizeText(__('messages.pages.about.stats.0.value')), false);
         $response->assertSee(__('messages.pages.about.values.0.title'));
         $response->assertSee(__('messages.pages.about.values.0.text'));
     }

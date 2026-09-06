@@ -43,7 +43,8 @@ class QuickViewTest extends TestCase
         $this->get(route('products.quick-view', ['product' => $product->slug]))
             ->assertOk()
             ->assertSee('محصول پیش‌نمایش')
-            ->assertSee(format_price(150000), false)
+            // خروجی HTML سمت سرور بومی است
+            ->assertSee(\App\Helpers\NumberHelper::localizeText(format_price(150000)), false)
             ->assertSee('data-quick-view-add', false)
             ->assertSee(__('messages.view_details'));
     }

@@ -93,7 +93,8 @@ class WishlistTest extends TestCase
             ->assertOk()
             ->assertSee('id="wishlist-count"', false)
             ->assertSee('id="wishlist-count-mobile"', false)
-            ->assertSee('>1<', false);
+            // خروجی HTML سمت سرور بومی است: تعداد ۱ → ۱ فارسی
+            ->assertSee('>۱<', false);
     }
 
     public function test_product_card_heart_starts_active_when_in_wishlist(): void

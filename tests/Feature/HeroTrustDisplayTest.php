@@ -41,8 +41,9 @@ class HeroTrustDisplayTest extends TestCase
 
         // فقط به اندازهٔ سقف نمایش، چیپ در هیرو رندر می‌شود
         $this->assertSame($shown, substr_count($html, 'class="hero-trust-chip"'));
-        $this->assertStringContainsString('متن اعتماد 1', $html);
-        $this->assertStringNotContainsString('متن اعتماد ' . ($shown + 1), $html);
+        // خروجی HTML سمت سرور بومی است
+        $this->assertStringContainsString('متن اعتماد ۱', $html);
+        $this->assertStringNotContainsString('متن اعتماد ۴', $html);
     }
 
     public function test_hero_hides_trust_band_when_no_trust_items(): void

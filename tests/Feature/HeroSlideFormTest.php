@@ -43,7 +43,10 @@ class HeroSlideFormTest extends TestCase
         $this->assertStringContainsString(__('admin.hero_slides.shown_in_hero'), $html);
         $this->assertStringContainsString(__('admin.hero_slides.hidden_in_hero'), $html);
         $this->assertStringContainsString(
-            __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN]),
+            // خروجی HTML سمت سرور بومی است (عدد داخل پیام هم فارسی می‌شود)
+            \App\Helpers\NumberHelper::localizeText(
+                __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN])
+            ),
             $html
         );
 

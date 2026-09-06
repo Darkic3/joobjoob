@@ -188,7 +188,8 @@ class NotificationTest extends TestCase
 
         $this->assertInstanceOf(Notification::class, $notification);
         $this->assertEquals('order.created', $notification->type);
-        $this->assertEquals('Order Created', $notification->title);
+        // notifyUser به‌عمد رشتهٔ title را نادیده می‌گیرد و عنوان را از کلید ترجمه می‌سازد
+        $this->assertEquals(__('notifications.order.created.title'), $notification->title);
         $this->assertEquals('/orders/1', $notification->link);
         $this->assertFalse($notification->is_read);
     }

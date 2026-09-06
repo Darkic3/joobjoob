@@ -111,8 +111,9 @@ class HomeBlogSectionTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('12,345', false)
-            ->assertSee(__('messages.reading_time', ['minutes' => 3]));
+            // با میدل‌ور LocalizeHtmlDigits خروجیِ HTML از همان ابتدا فارسی است
+            ->assertSee(\App\Helpers\NumberHelper::localizeText('12,345'), false)
+            ->assertSee(\App\Helpers\NumberHelper::localizeText(__('messages.reading_time', ['minutes' => 3])));
     }
 
     public function test_blog_date_is_localized_per_active_language(): void

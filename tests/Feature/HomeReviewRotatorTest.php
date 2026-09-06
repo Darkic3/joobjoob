@@ -58,8 +58,9 @@ class HomeReviewRotatorTest extends TestCase
             ->assertSee('data-reviews-rotator', false)
             ->assertSee('data-reviews-batch="0"', false)
             ->assertSee('data-reviews-batch="1"', false)
-            ->assertSee('نظر نمونه 0')
-            ->assertSee('نظر نمونه 5')
+            // خروجی HTML سمت سرور بومی است (attribute ها دست نمی‌خورند ولی متنِ نظر بومی است)
+            ->assertSee('نظر نمونه ۰')
+            ->assertSee('نظر نمونه ۵')
             ->assertSee('reviews-dot', false);
     }
 
