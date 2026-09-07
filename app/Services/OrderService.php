@@ -161,6 +161,24 @@ class OrderService
     private function handleFreeOrder(Order $order): RedirectResponse
     {
         $order->update(['order_status' => 'paid']);
+
+        // ثبت استفاده از کد تخفیف برای سفارش رایگان (P1-07)
+        $couponSession = session('coupon');
+        if ($order->discount_id && $couponSession) {
+            try {
+                $couponService = app(\App\Services\CouponService::class);
+                $couponService->recordUsage(
+                    $order->discount_id,
+                    $order->user_id,
+                    $order->id,
+                    $couponSession['discount_amount'] ?? $order->discount_price
+                );
+            } catch (\Throwable $e) {
+                Log::error('Coupon recordUsage failed for free order #' . $order->id, ['message' => $e->getMessage()]);
+            }
+        }
+        session()->forget('coupon');
+
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
         return redirect(route('checkout.success', $order->id));
     }
@@ -202,6 +220,23 @@ class OrderService
             'order_status' => intval($order->deposit_price) != 0 ? 'deposit_paid' : 'paid',
         ]);
         try { AuditService::orderStatusChanged($order, $oldStatus, $order->order_status, 'سیستم - پرداخت موفق'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
+
+        // ── ثبت استفاده از کد تخفیف (فقط پس از تایید پرداخت — P1-07) ──
+        $couponSession = session('coupon');
+        if ($order->discount_id && $couponSession) {
+            try {
+                $couponService = app(\App\Services\CouponService::class);
+                $couponService->recordUsage(
+                    $order->discount_id,
+                    $order->user_id,
+                    $order->id,
+                    $couponSession['discount_amount'] ?? $order->discount_price
+                );
+            } catch (\Throwable $e) {
+                Log::error('Coupon recordUsage failed for order #' . $order->id, ['message' => $e->getMessage()]);
+            }
+        }
+        session()->forget('coupon');
 
         // ── Notification: payment success ──
         try {

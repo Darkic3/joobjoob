@@ -210,21 +210,10 @@ class CheckoutController extends Controller
 
             $result = $orderService->checkout($order);
 
-            // ثبت استفاده از کد تخفیف
-            $couponSession = session('coupon');
-            if ($order->discount_id && $couponSession) {
-                $couponService = app(\App\Services\CouponService::class);
-                $couponService->recordUsage(
-                    $order->discount_id,
-                    auth()->id(),
-                    $order->id,
-                    $couponSession['discount_amount'] ?? $order->discount_price
-                );
-            }
 
             // پاکسازی سبد
             $this->cart->clear();
-            session()->forget('coupon');
+            // coupon session حفظ می‌شود تا پس از پرداخت موفق پاک شود (P1-07)
             session()->forget('checkout_address_id');
             session()->forget('checkout_shipping_method_id');
             session()->forget('checkout_shipping_price');
