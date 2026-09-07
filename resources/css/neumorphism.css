@@ -127,6 +127,8 @@ body {
     }
     .neu-input:focus { box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
     .neu-input::placeholder { color: var(--text-secondary); }
+    /* در حالت RTL، پلیس‌هولدر اینپوت‌های dir=ltr (مثل موبایل) هم راست‌چین شود */
+    [dir="rtl"] input[dir="ltr"]::placeholder { direction: rtl; text-align: right; }
 
     /* ---------- دایره‌های آیکون: اندازه و مرکزچینی فقط یک‌بار، همه‌جا یکسان ----------
        نکته‌ی مهم: line-height:1 روی خود دایره باعث می‌شود ایموجی/حروف همیشه
