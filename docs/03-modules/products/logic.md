@@ -196,6 +196,8 @@ Agar `related` manual khali bashad, 7 mahsul-e ham-daste az `product_category_id
 
 **TrustBadges (`:185`):** `$this->trustBadgeService->getActiveForSite(4)`.
 
+**Wishlist check (VERIFIED ADDITION):** `$inWishlist = app(\App\Services\WishlistService::class)->has($product)` — computed and passed to the view (shows heart state on PDP).
+
 **Deal timer (`:188-193`):** `timer_active && end_timer->isFuture() ? dealEndsAt = end_timer : dealEndsAt = deal_ends_at->isFuture()`.
 
 Return `view('site.products.show', array_merge(compact('product','related','complement','reviewTree','trustBadges','dealEndsAt'), $viewData, ['userVotes'=>...]))` (`:195-199`).
@@ -221,8 +223,8 @@ Return `view('site.products.show', array_merge(compact('product','related','comp
 
 #### 2.2.8 `storeReview / storeReply / voteReview` — `Site/ProductController.php:312-479`
 
-- **storeReview (`:312-374`):** validation `rating 1-5 + comment 3-1000 + guest_name/phone agar guest`, create ba `is_approved=false`, notification be admin via `NotificationService::notifyAdmins('review.new', ...)` dar try/catch (`:358-368`), redirect ba fragment `tab-reviews`.
-- **storeReply (`:379-425`):** `parent_id=review->id`, `rating=review->rating` (pasokh emtiaz nadarad), `is_approved=STATUS_PENDING`.
+- **storeReview (`:312-374`):** validation via **`StoreReviewRequest` FormRequest** (NOT inline — corrected): `rating 1-5 + comment 3-1000 + guest_name/phone agar guest`, create ba `is_approved=false`, notification be admin via `NotificationService::notifyAdmins('review.new', ...)` dar try/catch (`:358-368`), redirect ba fragment `tab-reviews`.
+- **storeReply (`:379-425`):** validation via **`StoreReviewReplyRequest` FormRequest** (corrected); `parent_id=review->id`, `rating=review->rating` (pasokh emtiaz nadarad), `is_approved=STATUS_PENDING`.
 - **voteReview (`:430-479`):** `type in:like,dislike` validation, toggle logic: agar `existingVote.type === validated type → delete (removed)`, agar motefavet → `update`, vagarna → `create`. Agar `expectsJson()` → JSON ba `likes/dislikes/user_vote` (`:462-472`).
 
 ---
@@ -406,7 +408,7 @@ if($minVariant) {
 }
 ```
 
-Qaede: `stock` product = jam-e stock hameye variant-ha. `price/final_price` = arzan-tarin variant-e mojood (`stock>0 && final_price>0`). Agar hich variant-e mojoodi nabashad faghat `stock` update mishavad ta ghimat-e ghabli az bein naravad.
+Qaede (VERIFIED): `stock` product = jam-e stock hameye variant-ha — **stock dar HAR DO shakhe update mishavad** (ba minVariant hamrah-e price, bedoone minVariant tanha). `price/final_price` = arzan-tarin variant-e mojood (`stock>0 && final_price>0`) — faghat ba vojood-e `minVariant` update mishavad; vagarna ghimat-e ghabli hefz mishavad.
 
 #### 3.1.9 `syncProperties` / `syncAssociations` — `ProductService.php:335-368`
 
@@ -646,7 +648,7 @@ Fillable `:13` `title, type, parent_id, active, is_filter, is_color, color_code`
 |---|------|---------------|-------|
 | 1 | `price/stock nullable agar variant darad` | `ProductRequest.php:49,51` `price/stock nullable` + `ProductDTO.php:48` `price<=0 && stock<=0 skip` + `ProductService.php:305` `if !variants()->exists() return` dar aggregate | Agar mahsul variant darad, ghimat/mojoodi-e asli az variant-ha jam mishavad va field-haye product mitavanand khali bashand. DTO radif-haye variant-e khali ra hazf mikonad. |
 | 2 | `final_price computed` | `ProductService.php:167-169` `discount>0 ? discount : price` + `:277-279` variant + `Product.php:195-204` accessor | `final_price` hamishe dar `prepareData` mohasebe mishavad — dar DB zakhire + dar accessor fallback. Site/Admin filter bar asas-e `final_price` ast na `price`. |
-| 3 | `Variant aggregation` | `ProductService.php:303-329` | `stock = sum(variant stock)`, `price/final_price = min variant where stock>0 && final_price>0 orderBy final_price asc`. Agar hich variant-e mojoodi nabashad faghat stock update. |
+| 3 | `Variant aggregation` | `ProductService.php:303-329` | `stock = sum(variant stock)` — **hamishe** update mishavad (har do shakhe); `price/final_price = min variant where stock>0 && final_price>0 orderBy final_price asc` — faghat agar `minVariant` vojood dashte bashad. |
 | 4 | `WebP images` | `ImageUploader.php:32-48` `webpName + convertToWebP imagewebp 90` + `ImageResizer.php:38-60` `imagecreatefromwebp + cover-crop` | Hameye tasavir be WebP tabdil mishavand (be joz webp/svg/gif). 3 resize `thumb/medium/large` ba cover-crop-e markazi. |
 | 5 | `main_image dual source` | `Product.php:130-161` + `ProductService.php:424-456` | `main_image` column + `images.is_primary`. Service har do ra sync mikonad. Accessor fallback az relation agar column khali. |
 | 6 | `JSON multilingual` | `Product.php:24-26` casts array + `:253-261` trans() + `Site/ProductController.php:51-52` `name->fa like` | `name/short_description/description/title` JSON fa/en — query ba `->` operator, namayesh ba `trans()`. |
@@ -662,7 +664,9 @@ Fillable `:13` `title, type, parent_id, active, is_filter, is_color, color_code`
 ## 8. Transactions & Concurrency (Transaction-ha va Hamzaman-i)
 
 - **ProductService store/update/destroy** har 3 dar `DB::transaction(Closure)` hastand (`:30, :56, :87`). Hameye neveshtan-ha (product + images + specs + variants + properties + associations) atomic hastand — agar har kodam fail, rollback-e kamel.
-- **StockService** niz `DB::transaction` + `lockForUpdate` baraye `decrement/increment` estefade mikonad (`app/Services/StockService.php:49,71,95,120` `lockForUpdate()->first()`). Baraye order reserve/restore — na baraye ProductService (ProductService lock nadarad — potential race agar 2 admin hamzaman mahsul ra update konand, akharin neveshte barande).
+- **StockService** niz `DB::transaction` + `lockForUpdate` baraye `decrement/increment` estefade mikonad (`app/Services/StockService.php` `lockForUpdate()->first()`). Baraye order reserve/restore — na baraye ProductService (ProductService lock nadarad — potential race agar 2 admin hamzaman mahsul ra update konand, akharin neveshte barande).
+- **Audit correction:** `StockService::enrichCartItemsWithStockStatus` DEAD nist — az `CartService::dbContent` seda zade mishavad (Cart module docs).
+- **Product accessor:** `getDefaultVariantAttribute` (in-stock variant sortByDesc stock ?? first — `Product.php:236-244`) dar list-e accessor-ha ezafe shavad; CartService variant-repair hamamin semantics ra darad.
 - **No nested transactions:** ProductService transaction dakheli-e StockService nist — joda hastand. Order lifecycle (Cart/Checkout) StockService ra seda mizanad.
 
 ---
