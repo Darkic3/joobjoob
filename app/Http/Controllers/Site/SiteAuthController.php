@@ -33,11 +33,6 @@ class SiteAuthController extends Controller
             'showNameField' => $request->session()->get('otp_new_user', false),
         ]);
 
-        if (Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
-            return redirect()->intended(localizedRoute('dashboard'));
-        }
-
-        return back()->withErrors(['email' => __('messages.login_failed')])->onlyInput('email');
     }
 
     /**

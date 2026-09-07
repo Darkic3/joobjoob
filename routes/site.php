@@ -127,7 +127,6 @@ $siteRoutes = function () {
 
     // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
     Route::get('/login', [SiteAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [SiteAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [SiteAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
     // ورود با کد یکبارمصرف (OTP) — پیامک کاوه‌نگار
