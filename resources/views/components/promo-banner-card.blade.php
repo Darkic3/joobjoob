@@ -4,6 +4,10 @@
 @if($banner->url)
     <a href="{{ $banner->url }}"
        class="promo-banner promo-banner--{{ $banner->style }} promo-banner--{{ $banner->tone }} group">
+        @if($banner->style === 'coupon')
+            <span class="promo-banner-coupon-hole--top" aria-hidden="true"></span>
+            <span class="promo-banner-coupon-hole--bottom" aria-hidden="true"></span>
+        @endif
         <span class="promo-banner-icon" aria-hidden="true">
             <x-promo-banner-icon :icon="$banner->icon"/>
         </span>
@@ -17,6 +21,10 @@
     </a>
 @else
     <div class="promo-banner promo-banner--static promo-banner--{{ $banner->style }} promo-banner--{{ $banner->tone }}">
+        @if($banner->style === 'coupon')
+            <span class="promo-banner-coupon-hole--top" aria-hidden="true"></span>
+            <span class="promo-banner-coupon-hole--bottom" aria-hidden="true"></span>
+        @endif
         <span class="promo-banner-icon" aria-hidden="true">
             <x-promo-banner-icon :icon="$banner->icon"/>
         </span>
