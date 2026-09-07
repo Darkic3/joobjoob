@@ -13,6 +13,11 @@ CartController (index/add/update/remove/applyCoupon)
   ├─► AddressService / StateService / Bank::active (for cart.index view when auth)
   └─► CouponService (applyCoupon)
 
+OtpController::verify (P1-05 ✅)
+  └─→ CartService::mergeGuestCart (session 'cart' captured pre-login → regenerate → merge → sessionClear)
+        ├─→ Cart (existing-row match on product/variant/color/size, qty=min(existing+qty, stock))
+        └─→ dbAdd for new rows + sessionClear
+
 CheckoutController (shipments/setShipment/addressPrice/orderPrice/create)
   ├─► AddressService::find / findOne -> Address+City
   ├─► ShippingCalculator::getAvailableMethods / calculate (see shipping module)
@@ -28,6 +33,7 @@ CheckoutController (shipments/setShipment/addressPrice/orderPrice/create)
 |---------|--------|-------|
 | CartService dbAdd/dbUpdate/dbRemove | writes `carts` (create/update/delete where user_id) | reads `products, product_variants, specifications` (for price/stock/label), reads `Discount` via CouponService |
 | CartService session* | writes `session cart` array | reads `products/variants` per item (N+1) |
+| CartService::getSessionItems | — | DEAD CODE (zero callers) |
 | CouponService | writes `session coupon` + `discount_usage` via recordUsage | reads `discounts, discountable, product_categories/brands/products` for eligibility |
 
 ## Controller → Service
@@ -49,7 +55,9 @@ CheckoutController (shipments/setShipment/addressPrice/orderPrice/create)
 - No external for Cart; DB `carts` + `products/variants/images` + `discounts`. Session `cart` for guest.
 
 ## Evidence
-- `app/Services/CartService.php:12,16,26,80,180,260`
-- `app/Http/Controllers/Site/CartController.php:14,46,112,147,167`
-- `app/Models/Cart.php:8`
-- `routes/site.php: $siteRoutes cart.* + checkout.*`
+- `app/Services/CartService.php` (full audit — dbContent/refreshDbPrices/mergeGuestCart:348/getSessionItems:386 dead)
+- `app/Http/Controllers/Site/CartController.php` (index/add/update/remove/applyCoupon)
+- `app/Models/Cart.php` (fillable, NO CartItem model, no SoftDeletes)
+- `app/Http/Controllers/Site/OtpController.php:135-147` (P1-05 merge caller)
+- `database/migrations/2026_08_31_163905_create_carts_table.php` (user_id FK nullOnDelete + index, product_id FK cascade, no unique composite)
+- `routes/site.php:81,84-90,91` ($siteRoutes cart.* + checkout.*)
