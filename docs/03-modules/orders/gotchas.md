@@ -1,7 +1,8 @@
 # Orders — Gotchas & Known Bugs
 
 > **Source:** `app/Models/Order.php:114`, `database/migrations/2026_08_26_000008_create_orders_table.php:18`, `app/Observers/OrderObserver.php:14`, `app/Services/OrderService.php:83,122`, `app/Services/BankPaymentService.php:35`, `app/Services/StockService.php`, `app/Payments/ZarinPal.php:20`, `app/Services/CartService.php:290`, `routes/console.php`
-> **Desc:** 7 status dar code vali 6 ta dar migration؛ double restoreStock؛ Observer created isDirty bug؛ hard/soft delete inconsistency؛ toman string price؛ rial x10؛ mergeGuestCart UNKNOWN؛ va ...
+> **Desc:** 7 status dar code vali 6 ta dar migration؛ toman string price؛ rial x10؛ va ...
+> **UPDATE (verified audit):** P0-01 (Observer isDirty), P0-02 (double restoreStock), P0-03 (delete on token fail), P0-09 (forceDelete) — HAME FIx SHODEAND. Partials belahar.
 
 ## CRITICAL — Bayad Avval Khund
 
@@ -12,41 +13,50 @@
 - **Risk:** AI ya DBA agar comment ra source truth begirad, `pending_confirmation` ra invalid mifahmad. هچ check constraint ham nadarad (string nullable) pas DB har string ra mipasirad, vali doc gumrah mikonad.
 - **Evidence:** `Order.php:114 match pending_confirmation`, `migration:18 comment missing`, `OrderSeeder: pending_confirmation estefade shode`.
 
-### 2) Double `restoreStock` — Observer + cancelOrder (+ cron)
+### 2) Double `restoreStock` — FIXED ✅ (P0-02)
 
-- **Flow A:** `Admin/OrderController::changeOrderStatus` -> agar `cancelled` => `OrderService::cancelOrder` => `order.update(cancelled)` + `restoreStock` (in_array previous paid/deposit_paid/pending_confirmation/wait_for_verification).
-- **Observer:** `OrderObserver::updated` => `wasChanged(order_status) && cancelled && getOriginal in [paid,...]` => dobare `restoreStock`.
-- **Natije:** `cancelOrder` update mikonad => Observer fire mishavad => stock **2 bar** `increment` + `InventoryTransaction type=add` 2 bar. Mojudi 2x barmigardad.
-- **Flow B (cron):** `CancelExpiredOrders::handle` => `order.update(cancelled)` + `restoreStock` => baz ham Observer fire => 2x.
-- **Fix (faqat doc, no code):** Ya `cancelOrder` bayad `withoutEvents` update konad, ya Observer bayad idempotency check (InventoryTransaction already exists) dashte bashad, ya cron bayad `cancelOrder` seda bezanad na direct update.
-- **Evidence:** `OrderService:230 cancelOrder restoreStock`, `OrderObserver:30-40 wasChanged restoreStock`, `CancelExpiredOrders:40-50 update+restoreStock`.
+**Previously:** Observer + cancelOrder (+ cron) both ran `restoreStock` → stock 2x increment.
 
-### 3) `OrderObserver::created` hichvaght history nemisazad — `isDirty` bug
+**Now (verified in code):** `OrderObserver::updated` only writes `OrderHistory` when
+`wasChanged('order_status') || wasChanged('shipping_status_id')` — **NO restoreStock anywhere
+in the observer**. Code comment states it explicitly: stock restoration is handled exclusively
+by `OrderService::cancelOrder` and `CancelExpiredOrders`.
+- `cancelOrder`: update cancelled → audit → notify → restoreStock (conditional on previous status).
+- `handleFailedPayment`: guard `unpaid` early-return → restoreStock (no double).
+- Cron: filter `paying` upfront → restoreStock once.
+⚠️ Residual (Inventory module gotcha #1): the cron re-checks nothing at PROCESSING time —
+a concurrent admin cancel between fetch and loop still double-restores. Conditional update needed.
 
+### 3) `OrderObserver::created` — FIXED ✅ (P0-01)
+
+**Previously:** `isDirty()` in `created` was always false (model synced after INSERT) → no
+initial history for new orders.
+
+**Now (verified in code):** `created()` creates `OrderHistory` **unconditionally**:
 ```php
 public function created(Order $order): void {
-  if($order->isDirty('order_status') || $order->isDirty('shipping_status_id')) // always false!
-    OrderHistory::create(...)
+  OrderHistory::create([
+    'order_id' => $order->id,
+    'order_status' => $order->order_status,
+    'shipping_status_id' => $order->shipping_status_id,
+  ]);
 }
 ```
+`updated()` uses `wasChanged()` (correct post-save check) — explanatory comment in code.
 
-- `created` **bad az INSERT** seda zade mishavad — model dg dirty nist (`syncOriginal` shode). Shart hamishe `false` => hich history baraye sefaresh jadid sakhte nemishavad.
-- `updated` dorost ast (qabl az sync dirty true ast).
-- **Natije:** `histories` baraye `paying` aval khali ast؛ admin timeline napadid.
-- **Evidence:** `OrderObserver:14-22`.
+### 4) Hard delete vs Soft delete inconsistency — FIXED ✅ (P0-09 + P0-03)
 
-### 4) Hard delete vs Soft delete inconsistency
+**Previously:** reserve-fail path used `forceDelete()`; token-fail used `delete()`.
 
-| Path | Code | Type |
-|------|------|------|
-| Stock insufficient | `OrderService::create catch RuntimeException => $order->forceDelete()` | **hard** (bypass softDeletes, InventoryTransaction ham nist) |
-| Bank token failed | `BankPaymentService::handlePayment if failed => $order->delete()` | **soft** (trash) |
-| - | `Order` model `use SoftDeletes` | soft expected |
+**Now (verified in code):**
+| Path | Old | New |
+|------|-----|-----|
+| Stock insufficient (`OrderService::create`) | `forceDelete()` | order marked `cancelled` + rethrown (audit trail preserved, P0-09) |
+| Bank token failed (`BankPaymentService::handlePayment`) | `delete()` | `unpaid` + restoreStock + audit (P0-03) |
 
-- `forceDelete` dar reserve fail: order az DB pak mishavad — audit/log ham mimanad vali order ghabel bazgasht nist. Agar `forceDelete` nakard, `paying` order ba stock nakafi baghi mimanad.
-- `delete` dar token fail: soft — admin mitavanad trash ra bebinad.
-- **AI trap:** Agar `Order::withTrashed` nazani, force-deleted order ra hichvaght peida nakhahi kard.
-- **Evidence:** `OrderService:83 forceDelete`, `BankPaymentService:35 delete`.
+**No delete of any kind remains in order failure paths.** Order + items creation is wrapped in
+`DB::transaction` (P0-09); reservation runs in its own transaction afterwards.
+⚠️ Reminder: `Order::withTrashed` still needed to see any historically soft-deleted orders.
 
 ## DATA GOTCHAS
 
@@ -69,10 +79,11 @@ public function created(Order $order): void {
 - **Risk:** Report radifi `price - discounted_price` hamishe 0. Agar AI bekhahad radifi discount hesab konad, bayad `original_price` az Cart begirad (vali zakhire nemishavad).
 - **Evidence:** `OrderService:74-75`, `CartService dbAdd final_price`.
 
-### 8) `payment_receipt` dead write
+### 8) `payment_receipt` dead write — FIXED ✅
 
-- `OrderService:64 'payment_receipt' => $orderData['payment_receipt']??null` — vali `2026_08_31_000001_replace_payment_receipt_with_tracking_fields` in column ra drop karde va `receipt_tracking_code/receipt_payer_card` gozashte. Assignment silent ignore (fillable nist ya column nist).
-- **Evidence:** `OrderService:64`, `migration 2026_08_31`.
+**Previously:** `OrderService:64` wrote `payment_receipt` against a dropped column.
+**Now (verified):** `OrderService::create` writes `receipt_tracking_code` / `receipt_payer_card`
+(matching the `2026_08_31` migration). No dead assignment remains.
 
 ### 9) `address` JSON snapshot + FK hamzaman
 
@@ -87,12 +98,14 @@ public function created(Order $order): void {
 - Bayad AI guard nasazad, vali dar test bayad invalid transition ra expect konad ke alan pass mishavad.
 - **Evidence:** `Admin OrderController:78 changeOrderStatus no rules`.
 
-### 11) `mergeGuestCart` — UNKNOWN / conditional
+### 11) `mergeGuestCart` — VERIFIED (P1-05 ✅) — OTP is the ONLY login flow
 
-- `CartService::mergeGuestCart(array $guestItems)` vojood darad va `OtpController:139` seda mizanad (`app(CartService::class)->mergeGuestCart($guestCart)` bad az OTP verify).
-- **UNKNOWN:** `SiteAuthController::login` (normal password login) `mergeGuestCart` seda **nemizanad** — faghat OTP flow merge mikonad. Agar user ba password login konad, cart session mehman gom mishavad (`sessionClear` dar merge nist vali guest items merge nemishavand).
-- **Risk:** AI agar fekr konad hame login ha merge mikonand, eshtebah ast.
-- **Evidence:** `CartService:290 mergeGuestCart`, `OtpController:139 call`, `SiteAuthController no merge`.
+- `CartService::mergeGuestCart` IS called from `OtpController::verify:146` — flow verified
+  end-to-end (capture pre-login → verify → regenerate → merge → sessionClear).
+- **Correction:** the old doc claimed a "normal password login" that skips merge — **password
+  login DOES NOT EXIST in this codebase**. OTP via Kavenegar is the only authentication path,
+  so ALL logins merge the guest cart.
+- Full merge internals: see Cart module docs (incl. qty=0 edge-case gotcha).
 
 ### 12) `CartService` session vs DB dual — `weight` az DB copy
 
@@ -132,12 +145,12 @@ public function created(Order $order): void {
 ## AI Checklist — Qabl az dast zadan be Orders
 
 - [ ] `Order.php:getStatusAttribute` 7 status ra check kardam — `pending_confirmation` ra az migration comment nakhandam
-- [ ] `OrderObserver::created` bug ra fix nakardam (doc only) — history jadid ra expected nist
-- [ ] `restoreStock` ra 2 bar seda nazadam — test double restore ra assert kardam
+- [x] `OrderObserver::created` FIXED (P0-01) — unconditional history; `updated` uses wasChanged
+- [x] Double restoreStock FIXED (P0-02) — observer stock-free; cron re-check race documented in Inventory gotcha #1
 - [ ] `forceDelete` vs `delete` tafaavot ra daram — soft-deleted order ra ba `withTrashed` peyda mikonam
 - [ ] Toman string price ra `intval(str_replace(',','', ...))` parse kardam, na direct int cast
 - [ ] Rial x10 `.'0'` ra faramush nakardam
-- [ ] `mergeGuestCart` faghat OTP flow ast — normal login merge nadarad
+- [x] `mergeGuestCart` VERIFIED (P1-05) — OTP is the only login; no password login exists
 - [ ] `discount_id && price<=0` free order branch ra test kardam
 - [ ] Cron path `routes/console.php` ast na `Kernel.php`
 - [ ] Callback 4 gateway field mapping ra az jadval api-contract khandam
@@ -145,9 +158,9 @@ public function created(Order $order): void {
 ## Evidence
 
 - `app/Models/Order.php:114 getStatusAttribute 7`, `OrderHistory.php match`, `migration:18 missing pending_confirmation`
-- `app/Observers/OrderObserver.php:14 isDirty bug, 30 wasChanged double restore`
-- `app/Services/OrderService.php:83 forceDelete, 124 toman parse, 146 cancelOrder restore, 168 callback lookup`
-- `app/Services/BankPaymentService.php:35 delete soft, 20-60 handlePayment`
+- `app/Observers/OrderObserver.php` — FIXED (P0-01/P0-02): unconditional created-history, wasChanged history-only updated
+- `app/Services/OrderService.php` — 124 toman parse, cancelOrder restore, callback lookup, create DB::transaction (P0-09)
+- `app/Services/BankPaymentService.php` — handlePayment failure branch FIXED (P0-03: restoreStock→unpaid→audit, no delete)
 - `app/Services/StockService.php:24 DB::transaction lockForUpdate, RuntimeException`
 - `app/Payments/ZarinPal.php:20 rial x10, 38 code 100, 75 code 100||101`
 - `app/Services/CartService.php:290 mergeGuestCart`, `app/Http/Controllers/Site/OtpController.php:139`, `SiteAuthController no merge`

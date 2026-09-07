@@ -20,9 +20,9 @@ Order hassas-tarin flow hast: `cart (session/DB) -> OrderService::create (paying
 - `findById(int):?Order` with `items.product, shippingStatus, bank, shippingMethod, user` (22), `findByField(field,value):?Order orderBy id DESC where field` (27).
 
 ### 3.2 create(array cartItems, array orderData, ?userDescription):Order
-- evidence 32-110: `defaultStatus = OrderShippingStatus::default()->first()` (default is_default true). `weightSum = sum item weight*qty`. `Order::create([user_id Auth::id(), state_id/city_id/address_id from orderData, address json snapshot (state/city/address/receiptor_mobile/postal_code), receiptor_full_name, shipping_method_id, bank_id, order_status=paying (hardcode), shipping_price, total_price, discount_price, discount_id, payment_price, freight_balance, total_weight=weightSum, user_description, shipping_status_id=defaultStatus?id, payment_receipt])` — evidence 38-62.
+- evidence 32-110: `defaultStatus = OrderShippingStatus::default()->first()` (default is_default true). `weightSum = sum item weight*qty`. `Order::create([user_id Auth::id(), state_id/city_id/address_id from orderData, address json snapshot (state/city/address/receiptor_mobile/postal_code), receiptor_full_name, shipping_method_id, bank_id, order_status=paying (hardcode), shipping_price, total_price, discount_price, discount_id, payment_price, freight_balance, total_weight=weightSum, user_description, shipping_status_id=defaultStatus?id, receipt_tracking_code, receipt_payer_card])` — evidence 38-62. **P0-09 ✅:** Order + OrderItem loop wrapped in `DB::transaction` (atomic).
 - Loop cartItems `OrderItem::create([order_id, product_id, product_variant_id from variant_id, quantity from qty, weight, price=item price, discounted_price=item price])` — **price == discounted_price copy** (evidence 64-74) — bug/doc.
-- `try stockService->reserveStock(order)` catch `RuntimeException -> Log warning, order->forceDelete (hard), throw` — evidence 76-82. reserveStock khod `DB::transaction` + `lockForUpdate` per item, decrement stock, create `inventory_transactions`.
+- **P0-09 ✅ FIXED:** `try stockService->reserveStock(order)` catch `RuntimeException -> Log warning, order->update(['order_status'=>'cancelled']) + RETHROW` — **NO forceDelete anywhere**; cancelled order + items remain as audit trail. reserveStock khod `DB::transaction` + `lockForUpdate` per item, decrement stock, create `inventory_transactions` (separate atomic unit from order creation — see Inventory module).
 - `try AuditService::orderCreated(order)` catch log — evidence 84.
 - `try NotificationService notifyUser order.created + notifyAdmins order.new` with `number_format payment_price`, `route dashboard.order-detail + admin.orders.show` — evidence 87-102. Catch log.
 - `return order->fresh([items.product, shippingStatus, bank])`.
@@ -38,12 +38,13 @@ Order hassas-tarin flow hast: `cart (session/DB) -> OrderService::create (paying
 - `handleFreeOrder` -> `order->update order_status paid` + notify? + redirect success. Evidence check file tail ~180-210 (verify via cat tail needed — but logic as is).
 
 ### 3.5 cancelOrder(Order)
-- (see file ~260-290) `order->update order_status cancelled` -> Observer restoreStock via `wasChanged` else direct `stockService->restoreStock`.
+- (verified) `$previousStatus = order->order_status` → `order->update cancelled` → `AuditService::orderStatusChanged` (try/catch) → `NotificationService order.cancelled` to user (try/catch) → **restoreStock ONLY IF** previous status ∈ `[paid, deposit_paid, pending_confirmation, wait_for_verification]` (try/catch logged).
+- ⚠️ Observer does NOT restore stock (P0-02 fixed) — no double restore here.
 
-## 4. Observer — OrderObserver (`app/Observers/OrderObserver.php:1-70`)
-- `__construct(StockService)` — evidence 11.
-- `created(Order)` — evidence 14-22: `if isDirty(order_status) || isDirty(shipping_status_id) -> OrderHistory::create([order_id, order_status, shipping_status_id])` — **BUG**: dar `created` event `isDirty` hamishe false chon just created, pas history hichvaght dar created sakhte nemishe (bayad `wasChanged` ya unconditional). Doc as bug.
-- `updated(Order)` — evidence 24-52: ham history agar `isDirty` status/shipping, **duplicate logic** but dar updated dorost kar mikonad. Ba'd `if wasChanged(order_status) && order_status===cancelled` => `previousStatus = getOriginal(order_status)` if `in_array previous [paid,deposit_paid,pending_confirmation,wait_for_verification]` then `try stockService->restoreStock(order)` catch log `Stock restoration failed`. — **double restore risk** agar admin `changeOrderStatus cancelled` ham `cancelOrder()->restoreStock` + observer ham restore — bayad guard kard.
+## 4. Observer — OrderObserver (`app/Observers/OrderObserver.php`) — P0-01/P0-02 FIXED ✅
+- No constructor dependencies (old `__construct(StockService)` removed).
+- **`created(Order)` — FIXED (P0-01):** `OrderHistory::create([...])` **UNCONDITIONALLY** (old isDirty-always-false bug gone; explanatory comment in code).
+- **`updated(Order)` — FIXED (P0-02):** ONLY creates history when `wasChanged('order_status') || wasChanged('shipping_status_id')`. **NO restoreStock anywhere in the observer** — code comment: "Stock restoration is handled exclusively by OrderService::cancelOrder and CancelExpiredOrders — NOT here, to avoid double restore."
 
 ## 5. Controllers
 
@@ -78,28 +79,28 @@ Order hassas-tarin flow hast: `cart (session/DB) -> OrderService::create (paying
 - `getAvailableStock(productId, variantId):int` via `withTrashed`.
 
 ## 7. Transactions / Session / Notifications
-- `OrderService::create` no outer DB::transaction except reserveStock internal + forceDelete on fail — order create + items + reserve atomic partly, but notification/audit outside.
+- **P0-09 ✅:** `OrderService::create` wraps Order + OrderItems in `DB::transaction`; reserveStock runs AFTER in its own internal transaction (separate atomic unit); on reservation failure order → `cancelled` + rethrow. Audit/notification remain outside transactions (intentional, try/catch logged).
 - Session keys for checkout: `checkout_address_id, checkout_shipping_method_id, checkout_shipping_price, coupon (code/discount_id/value/discount_amount)`.
 - Notifications: `order.created` to user + `order.new` to admins on create, `order.shipped` on shipping_status change, `order.cancelled` maybe.
 
-## 8. Failure Paths
-- Stock insufficient -> RuntimeException + forceDelete order + rethrow -> controller catch redirect failed.
+## 8. Failure Paths (UPDATED post P0-02/P0-03/P0-09)
+- Stock insufficient -> RuntimeException + order `cancelled` (NO forceDelete) + rethrow -> controller catch redirect failed.
 - Bank not found -> redirect failed.
-- Bank token failed (ZarinPal) inside BankPaymentService -> `order->delete() hard` + redirect failed.
-- Verify failed -> `order_status unpaid` not cancelled, stock remains reserved (no restore) — asset.
-- Double restore if both cancelOrder + observer on cancelled.
+- Bank token failed (ZarinPal) inside BankPaymentService -> **restoreStock + `unpaid` + audit** (P0-03, NO delete) + redirect failed.
+- Verify failed -> `order_status unpaid` + `handleFailedPayment` DOES restore stock (guard: early-return if already `unpaid`) — old "stock remains reserved" claim is outdated.
+- Double restore: FIXED (P0-02). Residual: cron re-check race — see Inventory gotchas #1.
 
-## 9. Known Issues
-- Observer created isDirty bug (no history on create).
-- Double restore on cancelled (observer + service).
-- `price == discounted_price` copy in OrderItem (no discount snapshot per item).
-- `deposit_price` vs `payment_price` string toman with comma -> intval replace.
-- Missing composite index `orders(order_status,created_at)` (Phase 1 High).
-- Hard delete on token fail loses order.
+## 9. Known Issues (UPDATED)
+- ~~Observer created isDirty bug~~ — FIXED (P0-01).
+- ~~Double restore on cancelled (observer + service)~~ — FIXED (P0-02). Cron re-check race → Inventory gotchas #1.
+- `price == discounted_price` copy in OrderItem (no discount snapshot per item) — STILL VALID.
+- `deposit_price` vs `payment_price` string toman with comma -> intval replace — STILL VALID.
+- Missing composite index `orders(order_status,created_at)` (Phase 1 High) — STILL VALID.
+- ~~Hard delete on token fail loses order~~ — FIXED (P0-03: unpaid + restoreStock + audit).
 
 ## 10. Evidence
-- `app/Services/OrderService.php:32 create, 76 reserveStock forceDelete, 108 checkout price str_replace, 120 card_to_card, 125 handlePayment`
-- `app/Observers/OrderObserver.php:14 created isDirty, 24 updated wasChanged cancelled restore`
+- `app/Services/OrderService.php` — create (DB::transaction + cancelled-on-reserve-fail, P0-09), checkout price str_replace, card_to_card, handlePayment, handleSuccessOrderPayment (P1-07 coupon recordUsage), handleFailedPayment (unpaid guard + restoreStock)
+- `app/Observers/OrderObserver.php` — FIXED P0-01/P0-02 (unconditional created-history; history-only updated, no stock logic)
 - `app/Models/Order.php:11 fillable SoftDeletes, 20 casts address array, 75 getStatus 7, 108 getBankTrackingCode`
 - `app/Http/Controllers/Site/CheckoutController.php:124 create guard !addressId, 176 orderData, 190 create + checkout + recordUsage + clear, 230 success ownership, 260 finishZarinPal`
 - `app/Http/Controllers/Admin/OrderController.php:18 index jalali_to_gregorian, 60 show, 72 changeShippingStatus notify, 110 changeOrderStatus cancelled->cancelOrder`
