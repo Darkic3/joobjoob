@@ -32,6 +32,21 @@ POST /checkout/create (CardToCardCheckoutRequest) -> CheckoutController@create:
 ## Session keys
 cart, checkout_address_id, checkout_shipping_method_id, checkout_shipping_price, coupon
 
+## Guest Cart Merge — Correction (2026-09-07)
+
+**Doc-e ghabli (khat 10 ghabl):** `mergeGuestCart exists but no caller found — UNKNOWN` — **GHALAT**.
+
+**Vagheyat-e code:**
+- `OtpController::verify:132-146` → `guestCart = session('cart',[])` ghabl az `regenerate()` → ba'd az `verify success` → `app(CartService::class)->mergeGuestCart(guestCart)` — **caller mojood, FIXED**.
+- `SiteAuthController.php:19-62` → **hich** `mergeGuestCart` nadare — password login merge **nadarad** (P1-05). Dalil: `grep mergeGuestCart app/` → 2 hit: `CartService:348` def + `OtpController:146` call.
+
+**Doc bayad shavad:**
+```
+OTP login: mergeGuestCart OK (OtpController::verify)
+Password login: NO merge (SiteAuthController gap) — P1-05
+```
+
 ## AI gotcha
 - Always check session keys before create.
 - Amount toman, shipping added after discount.
+- P1-05: Password login merge missing — fix in SiteAuthController::login.

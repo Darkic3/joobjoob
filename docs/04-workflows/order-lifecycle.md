@@ -37,3 +37,20 @@ Evidence: `Order.php getStatusAttribute match` + `OrderService 68,146,156,195,23
 - Observer created bug: isDirty always false -> no history for new order.
 - Double restore possible.
 - Hard delete on token failure (not cancelled).
+
+## P0 Fixes Applied — 2026-09-07 (Sync ba Code-e Jadid)
+
+> Code alan FIXED ast, doc-e ghabli STALE bood.
+
+- **P0-01 FIXED:** `OrderObserver::created` dige `isDirty` nadare — `OrderHistory::create` unconditional. Dalil: `app/Observers/OrderObserver.php:16-23`.
+- **P0-02 FIXED:** Double restore hazf shod — `OrderObserver::updated` faghat `wasChanged` + `OrderHistory` misazad, hich `restoreStock` dar Observer nist. Owner-e restore faghat `OrderService::cancelOrder` va `CancelExpiredOrders`. Dalil: `OrderObserver.php:34-43` comment `Stock restoration is handled exclusively...`.
+- **P0-03 FIXED:** `BankPaymentService::handlePayment` dige `order->delete()` nemikone — `restoreStock` + `update unpaid` + `AuditService::orderStatusChanged`. Dalil: `BankPaymentService.php:27-51`.
+- **P0-09 FIXED:** `OrderService::create` kollan `DB::transaction` + dar reserve fail `update cancelled` na `forceDelete`. Dalil: `OrderService.php:53-107`.
+
+## Verification vs Code (2026-09-07)
+| Doc Claim ghabli | Code-e feli | Status |
+|---|---|---|
+| `created isDirty false -> no history` | `created unconditional` | FIXED — doc bayad update shavad |
+| `updated isDirty` | `wasChanged` | FIXED |
+| `double restore risk` | Observer restore hazf | FIXED |
+| `hard delete on token fail` | `unpaid + restore` | FIXED |

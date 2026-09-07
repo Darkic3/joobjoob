@@ -65,9 +65,11 @@ class XxxRequest extends FormRequest
 
 ---
 
-## 3. Inventory — 16 FormRequests
+## 3. Inventory — 22 FormRequests (Audit 2026-09-07)
 
-### 3.1 Admin — 14
+> Doc-e ghabli 16 mored minevesht (14 Admin + 2 Site) — **STALE**. Code-e feli 15 Admin + 7 Site = 22.
+
+### 3.1 Admin — 15
 
 | Request | File | Traits/Rules | Slug? | Notable |
 |---------|------|--------------|-------|---------|
@@ -87,12 +89,19 @@ class XxxRequest extends FormRequest
 | `UpdateSettingsRequest` | `Admin/UpdateSettingsRequest.php` | `config('settings.fields')` | — | **dynamic** rules: iterates `config('settings.fields')` filtered by `tab === route('group')`; strips file rules when no file uploaded |
 | `UserRequest` | `Admin/UserRequest.php` | `Rule::unique` | — | `password required` on create, `nullable` on update; `roles.* exists:roles,id` |
 
-### 3.2 Site — 2
+### 3.2 Site — 7 (doc-e ghabli 2 minevesht — STALE)
 
 | Request | File | Notable |
 |---------|------|---------|
-| `CardToCardCheckoutRequest` | `Site/CardToCardCheckoutRequest.php` | Conditional rules: if `bank_id` resolves to `bank_type==='card_to_card'` then `receipt_tracking_code required\|numeric\|min:6\|max:16`, `receipt_payer_card regex` |
+| `CardToCardCheckoutRequest` | `Site/CardToCardCheckoutRequest.php` | Conditional: if `bank_type==='card_to_card'` then `receipt_tracking_code required\|numeric\|min:6\|max:16`, `receipt_payer_card regex` |
 | `UpdateReceiptRequest` | `Site/UpdateReceiptRequest.php` | Always `receipt_tracking_code required`, `receipt_payer_card regex` |
+| `StoreReviewRequest` | `Site/StoreReviewRequest.php` | `rating 1-5`, `comment 3-1000`; guest: `guest_name 2-100`, `guest_phone regex /^0[0-9]{9,}$/` |
+| `StoreReviewReplyRequest` | `Site/StoreReviewReplyRequest.php` | `comment 3-500`; guest fields same |
+| `SendContactRequest` | `Site/SendContactRequest.php` | `name 2-120`, `email`, `phone digits_between:10,15`, `department in:trans(...)`, `message 10-2000` |
+| `SendOtpAjaxRequest` | `Site/SendOtpAjaxRequest.php` | Inline closure `isValidMobile` + `userExists`; `failedValidation` custom JSON `{success:false, field, error}` |
+| `NewsletterSubscribeRequest` | `Site/NewsletterSubscribeRequest.php` | `email required\|email\|max:190` |
+
+> **Gap-e mostanad-nashode:** `CartController::add/update/applyCoupon` hich `FormRequest` nadarad — inline `$request->validate(['qty'=>...])` dar `app/Http/Controllers/Site/CartController.php:89,156,216`. Doc migoft "Every write goes through FormRequest" — in mored esterna ast.
 
 ### 3.3 Custom Rules — 2
 
