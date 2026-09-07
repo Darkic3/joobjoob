@@ -3,7 +3,7 @@
 > **Models:** `Bank`, `Order` (transaction_info), `PaymentGateway`, `ZarinPal`, `PaymentGatewayFactory`, `PaymentPostDTO`, `PaymentVerifyDTO`
 > **Services:** `BankPaymentService`, `OrderService`, `StockService`, `NotificationService`, `AuditService`
 > **Controllers:** `Admin\BankController`, `Site\CheckoutController`
-> **Source:** `app/Models/Bank.php` (39 lines) | `app/Payments/ZarinPal.php` (115 lines) | `app/Payments/PaymentGatewayFactory.php` (22 lines) | `app/Payments/PaymentGateway.php` (23 lines) | `app/Services/BankPaymentService.php` (70 lines) | `app/Services/OrderService.php` (270 lines) | `app/Http/Controllers/Admin/BankController.php` (95 lines) | `app/Http/Controllers/Site/CheckoutController.php` (333 lines) | `app/Http/Requests/Admin/BankRequest.php` (53 lines) | `routes/admin.php:95-96` | `routes/site.php:116-121`
+> **Source:** `app/Models/Bank.php` (39 lines) | `app/Payments/ZarinPal.php` (115 lines) | `app/Payments/PaymentGatewayFactory.php` (22 lines) | `app/Payments/PaymentGateway.php` (23 lines) | `app/Services/BankPaymentService.php` (110 lines, P0-03 fixed) | `app/Services/OrderService.php` (270 lines) | `app/Http/Controllers/Admin/BankController.php` (95 lines) | `app/Http/Controllers/Site/CheckoutController.php` (333 lines) | `app/Http/Requests/Admin/BankRequest.php` (53 lines) | `routes/admin.php:95-96` | `routes/site.php:116-121`
 > **Workflows:** `docs/04-workflows/payment-zarinpal.md` + `docs/04-workflows/card-to-card.md` + `docs/04-workflows/cart-checkout.md`
 
 ---
@@ -12,7 +12,7 @@
 
 Payments module provides **دو حالت پرداخت**: آنلاین via ZarinPal و دستی via `card_to_card` (کارت به کارت). Bank model acts as gateway registry — admin defines which method is active, its credentials (`config.MerchantId` for ZarinPal, `card_number`/`card_holder_name` for card_to_card), icon, and `status`. Checkout never calls Factory for card_to_card directly; `OrderService::checkout()` short-circuits before Factory. ZarinPal flow is **toman → rial با الحاق رشته‌ای `'0'` (x10)** in both token and verify phases. Transaction lifecycle is persisted in `orders.transaction_info` JSON (`{post:{Authority}, verify:{RefID}}`) and reconciled via callback `checkout.finish.zarin-pal` (` ANY /checkout/finish`). Duplicate callback when already `paid` is treated as idempotent success — no second verify.
 
-Finglish evidence: `Bank.php:12 fillable`, `Bank.php:15 config json cast`, `ZarinPal.php:29 intval($amount.'0')`, `ZarinPal.php:58 intval($price.'0')`, `BankPaymentService.php:26 order->delete()`, `OrderService.php:145 bank_type === 'card_to_card'`, `CheckoutController.php:275 transaction_info->post->Authority`, `OrderService.php:169 in_array paid/deposit_paid`.
+Finglish evidence: `Bank.php:12 fillable`, `Bank.php:15 config json cast`, `ZarinPal.php:29 intval($amount.'0')`, `ZarinPal.php:58 intval($price.'0')`, `BankPaymentService.php` handlePayment failure branch — FIXED (P0-03): restoreStock → unpaid → audit (was: order->delete()), `OrderService.php:145 bank_type === 'card_to_card'`, `CheckoutController.php:275 transaction_info->post->Authority`, `OrderService.php:169 in_array paid/deposit_paid`.
 
 ---
 
@@ -401,28 +401,42 @@ Evidence: `ZarinPal.php:95-114`.
 
 ### 9.1 `handlePayment(Bank $bank, Order $order, int $price): RedirectResponse`
 
+> **REWRITTEN after P0-03 fix — the old `$order->delete()` behavior is gone.**
+
 ```php
 public function handlePayment(Bank $bank, Order $order, int $price): RedirectResponse {
   $gateway = PaymentGatewayFactory::create($bank, config('app.name','Shop'));
   $response = $gateway->getBankToken($price, $order);
   Auth::loginUsingId($order->user_id);
   if ($response->getStatus() === 'failed') {
-    $order->delete(); // hard delete! data loss
-    return redirect(route('checkout.failed'))->with('error','خطا در پرداخت، مجدد تلاش نمایید.');
+    // P0-03 Fix: never delete the order — mark unpaid, restore stock, log it.
+    $previousStatus = $order->order_status;
+    try { $this->stockService()->restoreStock($order); }
+    catch (\Throwable $e) { Log::error('restoreStock failed on token failure for order #'.$order->id, [...]); }
+    $order->update(['order_status' => 'unpaid']);
+    try { AuditService::orderStatusChanged($order, $previousStatus, 'unpaid', 'Gateway token failed'); }
+    catch (\Throwable $e) { Log::error('AuditLog failed on token failure for order #'.$order->id, [...]); }
+    return redirect(route('checkout.failed'))
+        ->with('error', 'خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.');
   }
   $order->update(['transaction_info'=>['post'=>$response->getPostData(),'verify'=>[]]]);
   ob_start(); $gateway->redirect($response,$order); $content=ob_get_clean(); return response($content);
 }
 ```
 
-- Factory + `getBankToken` already did `intval(price.'0')` inside gateway; `price` here is toman int from `OrderService::checkout` (already `intval(str_replace(',','',payment_price))`).
-- `Auth::loginUsingId($order->user_id)` — logs in the order owner before redirect; needed because callback is unauthenticated but success page checks `auth()->id() === order->user_id`. Without this, guest checkout? Actually checkout requires `auth` middleware, but callback logs in again.
-- **Hard delete on failed token**: `$order->delete()` then `redirect checkout.failed`. Since `Order` uses `SoftDeletes`, `delete()` is soft? Wait `Order` model uses `SoftDeletes` (`use SoftDeletes;`), so `delete()` sets `deleted_at`, not hard delete from DB. However spec says "hard delete" — but code shows `OrderService::create` on stock reservation fail uses `forceDelete()` (hard), while here uses plain `delete()` (soft). Check `BankPaymentService.php:26 $order->delete()` — with SoftDeletes this is soft delete, recoverable. But Order has FK items, histories not deleted — orphaned? OrderItems remain. Some docs label this "hard delete" loosely as data loss (order disappears from UI). Could be considered data loss because soft-deleted orders not visible in `admin/orders` nor user dashboard, but still in DB with deleted_at.
+- Failure branch order (P0-03): capture previousStatus → restoreStock (try/catch + log) →
+  update `unpaid` → audit (try/catch) → redirect `checkout.failed`. No delete; order preserved
+  for debugging and admin visibility.
+- `stockService()` is a private helper resolving `app(StockService::class)` — BankPaymentService
+  now has a direct dependency edge on StockService.
+- `Auth::loginUsingId($order->user_id)` — logs in the order owner before redirect; callback is
+  unauthenticated but success page checks `auth()->id() === order->user_id`.
 - Transaction info shape set to `['post'=>['Authority'=>...],'verify'=>[]]` — verify empty until callback.
-- `ob_start` + `redirect` with `exit` → unreachable return, but method signature promises `RedirectResponse` yet actually never returns on success (script exits). On failed path returns `RedirectResponse` to `checkout.failed`.
-- Gotcha: `order->update(['transaction_info'=>...])` overwrites entire JSON; if order already had other keys in transaction_info, lost. But creation sets it fresh.
+- `ob_start` + `redirect` with `exit` → unreachable return on success (script exits); on failed
+  path returns `RedirectResponse` to `checkout.failed`.
+- `order->update(['transaction_info'=>...])` overwrites entire JSON (fresh at creation — OK).
 
-Evidence: `BankPaymentService.php:17-43`.
+Evidence: `BankPaymentService.php:17-60` (failure branch ~23-45).
 
 ### 9.2 `handleVerify(Order $order, array $callbackData, int $price): bool`
 
@@ -505,6 +519,24 @@ Evidence: `OrderService.php:162-239`, `OrderService.php:37 findByField`, `OrderS
 `Order::getStatusAttribute` maps `order_status` values: `paying` (در حال پرداخت), `paid`, `deposit_paid` (بیعانه), `wait_for_verification`, `pending_confirmation` (کارت به کارت), `unpaid`, `cancelled`. Also `getBankTrackingCodeAttribute` extracts RefID vs card code per bank type; `getIsCardToCardAttribute` helper.
 
 Evidence: `Order.php:112-170`.
+
+### 10.4 Coupon usage recording — after payment confirmation (P1-07)
+
+- `handleSuccessOrderPayment`: after updating status to `paid`/`deposit_paid` →
+  `CouponService::recordUsage($order->discount_id, $order->user_id, $order->id, session discount_amount ?? $order->discount_price)`
+  then `session()->forget('coupon')`.
+- `handleFreeOrder` (100%-discount free orders): same recordUsage + forget.
+- Failed paths (`handleFailedPayment`, token-failure) deliberately KEEP the coupon session so
+  the user can retry (comment at `CheckoutController:216`).
+- ⚠️ recordUsage is gated on `session('coupon')` existing — see gotchas #18 (session-coupling).
+- ⚠️ `CouponService::apply` first_purchase counts only `paid` (gotchas #19); limits have a
+  TOCTOU window (gotchas #20).
+- `WelcomeDiscountService::createForUser` called from `OtpService:100` on registration:
+  `WELCOME-XXXXXX`, 10%, count=1, per-user=1, first-purchase, with_discount=false, 30-day
+  expiry, user-specific (`user_id` set AND `discount_users` pivot attached).
+- Two apply entry points, no duplication: `POST /checkout/apply-discount`
+  (`CheckoutController::applyDiscount`) and `POST /cart/coupon` (`CartController::applyCoupon`
+  → `CartService::applyCoupon:430` → same `CouponService::apply`).
 
 ---
 
@@ -620,7 +652,7 @@ Happy ZarinPal: cart -> CheckoutController::create -> OrderService::create (payi
   -> ZarinPal::verifyTransaction (amount.'0' -> verify.json code100 RefID) -> Order.update verify.RefID
   -> handleSuccessOrderPayment -> order_status paid, Audit, Notification, session flash, view checkout.success
 
-Failed token: getBankToken failed -> Order.delete (soft), redirect checkout.failed
+Failed token: getBankToken failed -> restoreStock + order unpaid + audit (P0-03), redirect checkout.failed
 
 Cancelled at gateway: Status!=OK -> handleVerify returns failed -> order_status unpaid -> restoreStock -> redirect failed
 Already paid replay: callback finds order_status paid -> immediate redirect success (no verify)
@@ -720,7 +752,7 @@ Evidence: `BankRequest.php:18-27 rules`, `CheckoutController.php:157 CardToCardC
 ## 19. Invariants & Gotchas Summary
 
 - Amount must always be toman int via `str_replace(',','',price)` → `intval` → `intval(val.'0')` on gateway; never pass formatted string directly.
-- Hard(?) delete on token failure — order soft-deleted, items orphaned, customer loses cart, no audit log — see `gotchas.md`.
+- Failed token → `unpaid` + restoreStock + audit (P0-03 ✅). No delete anywhere in payment failure paths — see `gotchas.md`.
 - MerchantId missing → gateway sends `merchant_id:''` → always fails → order soft-deleted → data loss loop.
 - `card_to_card` no gateway — Factory mapping misleading.
 - Authority lookup via JSON path `transaction_info->post->Authority` — requires MySQL 5.7+ JSON support; SQLite in tests may need different syntax.
@@ -729,4 +761,4 @@ Evidence: `BankRequest.php:18-27 rules`, `CheckoutController.php:157 CardToCardC
 
 ---
 
-> **AI Checklist for payments:** [x] Bank model dual-type, [x] config MerchantId case, [x] ImageHandler bank WebP, [x] amount.'0' both flows, [x] request vs verify vs StartPay, [x] callback ANY route, [x] Factory dead code, [x] delete on failed token, [x] transaction_info {post,verify}, [x] duplicate paid guard, [x] dependencies Http Ssl ok.
+> **AI Checklist for payments:** [x] Bank model dual-type, [x] config MerchantId case, [x] ImageHandler bank WebP, [x] amount.'0' both flows, [x] request vs verify vs StartPay, [x] callback ANY route, [x] Factory dead code, [x] unpaid+restoreStock on failed token (P0-03, no delete), [x] transaction_info {post,verify}, [x] duplicate paid guard, [x] dependencies Http Ssl ok.

@@ -16,7 +16,8 @@ BankPaymentService
   ├─→ ZarinPal::verifyTransaction(array $data, int $price, ?Order) → Http::post(verify.json)
   ├─→ ZarinPal::redirect(PostDTO, Order) → header Location StartPay
   ├─→ Auth::loginUsingId(int $user_id)    (IlluminateAuth)
-  ├─→ Order::update(['transaction_info'=>[]]) + Order::delete()
+  ├─→ Order::update(['transaction_info'=>[]])
+  ├─→ StockService::restoreStock + AuditService::orderStatusChanged (token-failure path, P0-03 — via app(StockService::class) helper)
   └─→ route('checkout.failed') / response()
 
 OrderService::checkout(Order)
@@ -68,7 +69,9 @@ Config/FileSystem
 | `OrderService::callback` | `BankPaymentService::handleVerify` | `handleVerify(Order, array data, int price): bool` | After Authority lookup |
 | `OrderService::handleSuccessOrderPayment` | `AuditService::orderStatusChanged` | `orderStatusChanged(Order, old, new, reason)` | Try/catch log |
 | `OrderService::handleFailedPayment` | `AuditService` + `StockService::restoreStock` | — | On unpaid |
-| `OrderService::create` | `StockService::reserveStock` | — | Before checkout; forceDelete on fail |
+| `OrderService::create` | `StockService::reserveStock` | — | Own DB::transaction; fail → order `cancelled` + rethrow (P0-09 — no forceDelete) |
+| `OrderService::handleSuccessOrderPayment` / `handleFreeOrder` | `CouponService::recordUsage` + `session()->forget('coupon')` | — | P1-07: usage recorded only after payment confirmation; session-gated (see Payments gotcha #18) |
+| `OtpService` (registration) | `WelcomeDiscountService::createForUser` | — | Creates WELCOME-XXXXXX 10% discount per new user |
 | `OrderService::callback success` | `NotificationService::notifyUser/notifyAdmins` | — | `order.paid` / `order.paid_admin` |
 | `CheckoutController::create` | `OrderService::create` + `checkout` + `CouponService::recordUsage` + `CartService::clear` | — | Orchestrates full create→pay |
 | `BankController::store/update` | `ImageHandler::handle/delete` | `handle('bank', file)` | Folder `bank` |
@@ -126,3 +129,5 @@ Config/FileSystem
 - `app/Models/Bank.php:28 config('paths.upload')` — bank aks dar uploads/bank.
 - `app/Http/Controllers/Admin/BankController.php:5 ImageHandler` — admin CRUD be ImageHandler vabaste ast.
 - `app/Services/OrderService.php:22 BankPaymentService inject` — OrderService be BankPaymentService vabaste.
+- `app/Services/BankPaymentService.php` handlePayment failure branch — StockService + AuditService edges added by P0-03 (old Order::delete edge removed).
+- `app/Services/OtpService.php:100 WelcomeDiscountService::createForUser` — Auth-OTP → Discounts edge (P1-07 anchor).

@@ -162,10 +162,10 @@ discount_id = session('coupon.discount_id'), address snapshot JSON
 **Response:** `OrderService::create` + `OrderService::checkout` result:
 - If `card_to_card` → `302 redirect route('checkout.success', order.id)` flash `سفارش شما ثبت شد و پس از تأیید...` (`pending_confirmation`)
 - If `zarinPal` and token success → script exits via `header Location https://payment.zarinpal.com/pg/StartPay/{Authority}` (no JSON)
-- If token failed → `302 redirect route('checkout.failed')` flash `خطا در پرداخت، مجدد تلاش نمایید.` + order soft-deleted
+- If token failed → `302 redirect route('checkout.failed')` flash `خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.` + order marked `unpaid` + stock restored + audit log (P0-03 — no delete)
 - On exception → `302 redirect checkout.failed` log `Order creation failed`
 
-**Evidence:** `CheckoutController.php:157-238`, `OrderService.php:130-152`.
+**Evidence:** `CheckoutController.php` (~157-238), `OrderService.php` (checkout ~130-152; handleSuccessOrderPayment records coupon usage + forgets session — P1-07; handleFailedPayment guard `unpaid` + restoreStock).
 
 ---
 

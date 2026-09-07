@@ -15,24 +15,27 @@
 
 ---
 
-## 2. Hard (soft) delete on failed token — data loss
+## 2. Failed token → delete — FIXED ✅ (P0-03)
 
-```php
-// BankPaymentService.php:26
-if ($response->getStatus()==='failed'){ $order->delete(); return redirect(checkout.failed); }
-```
+**Previously:** `$order->delete()` on token failure → order vanished from UI, reserved stock never restored, no audit.
 
-- Order and items remain soft-deleted but vanish from UI (`admin/orders.index` excludes trashed, dashboard hides). Customer loses cart history, no audit `AuditService` log, `OrderObserver` not triggered for history? Stock already reserved (reserveStock) — if order deleted, reserved stock not restored (only `handleFailedPayment` restores, but this path deletes without restore). Stock over-reserved.
-- `delete()` with `SoftDeletes` is soft, but spec calls "hard delete" — semantically data loss because soft-deleted orders not surfaced; `forceDelete` in `OrderService::create` stock fail path is truly hard.
-- Better: `update(['order_status'=>'unpaid'])` + `restoreStock` + audit + notify, not delete.
+**Now (verified in code):** the failure branch in `BankPaymentService::handlePayment`:
+1. `$previousStatus = $order->order_status` (captured)
+2. `StockService::restoreStock($order)` inside try/catch + `Log::error`
+3. `$order->update(['order_status' => 'unpaid'])`
+4. `AuditService::orderStatusChanged($order, $previousStatus, 'unpaid', 'Gateway token failed')` (try/catch)
+5. redirect `checkout.failed` with «خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.»
+
+No delete anywhere in payment failure paths. Order preserved for debugging and admin visibility.
 
 ---
 
-## 3. MerchantId missing → silent loop to delete
+## 3. MerchantId missing → every payment insta-fails (root cause STILL VALID)
 
 - `ZarinPal::__construct` does `$this->merchant = $config['MerchantId'] ?? ''` — empty string valid.
-- `getBankToken` sends `merchant_id: ''` → ZarinPal returns `code !=100` → DTO failed → order deleted → user sees `خطا در پرداخت`. No validation in `BankController::store` or `BankRequest` for `MerchantId` presence; `config` is nullable string, not validated json.
-- Admin can create `zarinPal` bank with `config = {}` or `{"merchantId":"..."}` typo (lowercase) → every payment insta-fails+deletes.
+- `getBankToken` sends `merchant_id: ''` → ZarinPal returns `code !=100` → DTO failed → order marked `unpaid` + stock restored (P0-03) → user sees «خطا در ارتباط با درگاه پرداخت».
+- Consequence updated post-P0-03: no more delete/data-loss loop — but the ROOT CAUSE is unfixed: no validation in `BankController::store` or `BankRequest` for `MerchantId` presence; `config` is nullable string, not validated json.
+- Admin can create `zarinPal` bank with `config = {}` or `{"merchantId":"..."}` typo (lowercase) → every payment insta-fails.
 
 **Mitigate:** `BankRequest` rule `config` should have custom `json` + `RequiredIf bank_type zarinPal` + check `MerchantId` exists.
 
@@ -112,6 +115,28 @@ if ($response->getStatus()==='failed'){ $order->delete(); return redirect(checko
 
 ---
 
+## 18. recordUsage (P1-07) gated on session — usage can be lost
+
+- `OrderService::handleSuccessOrderPayment` and `handleFreeOrder`: coupon usage is recorded ONLY
+  when `session('coupon')` still exists (`if ($order->discount_id && $couponSession)`).
+- If the session expired/lost before the callback (long payment, short session lifetime, other
+  device) → `DiscountUsage` is never created → `count` / `max_usage_per_user` limits bypassed.
+- Fix: gate on `$order->discount_id` only; amount from `$order->discount_price` (the existing
+  `??` fallback), not session presence.
+
+## 19. first_purchase counts only `paid`
+
+- `CouponService::apply` step 4: `$user->orders()->where('order_status','paid')->exists()`.
+- A `deposit_paid` order does not count → user with a deposit-paid order is still "first purchase".
+- Should be `whereIn(['paid','deposit_paid'])`. Same gap in `DiscountController::filterUsers` `no_paid_orders`.
+
+## 20. TOCTOU on coupon limits — in-flight orders uncounted
+
+- `Discount::hasReachedLimit` counts only `usageRecords` (written after payment success).
+- Between order create (unpaid) and payment, no usage row exists → N concurrent orders can pass
+  a capacity-1 check; post-payment the limit goes negative. Same family as the stock race
+  (Orders module). Fix: record usage at order creation with compensation on failure, or lock.
+
 ## 16. AI Checklist — before coding payments
 
 - [ ] Checked `Bank` fillable/casts — MerchantId case sensitive.
@@ -119,7 +144,7 @@ if ($response->getStatus()==='failed'){ $order->delete(); return redirect(checko
 - [ ] Handled `card_to_card` **before** Factory — not via gateway.
 - [ ] Updated `transaction_info` JSON shape `{post:{Authority}, verify:{RefID}}` without overwriting post on verify.
 - [ ] Guarded duplicate callback if `already paid` → redirect success.
-- [ ] Avoided `order->delete()` on failed token — use `unpaid` + restoreStock.
+- [x] Avoided `order->delete()` on failed token — `unpaid` + restoreStock + audit (P0-03 ✅ verified).
 - [ ] Validated `config` JSON and MerchantId presence for zarinPal.
 - [ ] Used `Http` with timeout 30 and no `withoutVerifying`.
 
@@ -128,7 +153,7 @@ if ($response->getStatus()==='failed'){ $order->delete(); return redirect(checko
 ## 17. Evidence
 
 - `app/Payments/ZarinPal.php:29,58 intval(amount.'0')` — amount concat bug surface.
-- `app/Services/BankPaymentService.php:26 $order->delete()` — data loss bug.
+- `app/Services/BankPaymentService.php` handlePayment failure branch — FIXED (P0-03): restoreStock → unpaid → audit. Old `:26 $order->delete()` reference is stale (file grew 70 → ~110 lines).
 - `app/Payments/ZarinPal.php:22 $config['MerchantId']` — MerchantId missing risk.
 - `app/Payments/ZarinPal.php:98 Http::withHeaders()->timeout(30)` — Ssl ok via Http.
 - `app/Payments/PaymentGatewayFactory.php:18 card_to_card=>ZarinPal` — dead code.
