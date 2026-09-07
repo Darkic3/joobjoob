@@ -74,8 +74,8 @@ class Sms
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
         ]);
 
         $response = curl_exec($curl);
@@ -249,8 +249,8 @@ class Sms
         $options = [
             CURLOPT_URL => "$this->baseUrl/$this->token/$url",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_CONNECTTIMEOUT => 15,
         ];
