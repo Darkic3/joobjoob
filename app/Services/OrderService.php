@@ -50,54 +50,59 @@ class OrderService
             $weightSum += $weight * ($item['qty'] ?? 1);
         }
 
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'state_id' => $orderData['state_id'] ?? null,
-            'city_id' => $orderData['city_id'] ?? null,
-            'address_id' => $orderData['address_id'] ?? null,
-            'address' => [
-                'state' => $orderData['state_name'] ?? '',
-                'city' => $orderData['city_name'] ?? '',
-                'address' => $orderData['full_address'] ?? '',
-                'receiptor_mobile' => $orderData['receiptor_mobile'] ?? '',
-                'postal_code' => $orderData['postal_code'] ?? '',
-            ],
-            'receiptor_full_name' => $orderData['receiptor_full_name'] ?? null,
-            'shipping_method_id' => $orderData['shipping_method_id'] ?? null,
-            'bank_id' => $orderData['bank_id'] ?? null,
-            'order_status' => 'paying',
-            'shipping_price' => $orderData['shipping_price'] ?? 0,
-            'total_price' => $orderData['total_price'] ?? 0,
-            'discount_price' => $orderData['discount_price'] ?? 0,
-            'discount_id' => $orderData['discount_id'] ?? null,
-            'payment_price' => $orderData['payment_price'] ?? 0,
-            'freight_balance' => $orderData['freight_balance'] ?? 0,
-            'total_weight' => $weightSum,
-            'user_description' => $userDescription,
-            'shipping_status_id' => $defaultStatus?->id,
-            'payment_receipt' => $orderData['payment_receipt'] ?? null,
-            'receipt_tracking_code' => $orderData['receipt_tracking_code'] ?? null,
-            'receipt_payer_card' => $orderData['receipt_payer_card'] ?? null,
-        ]);
-
-        foreach ($cartItems as $item) {
-            $weight = $item['weight'] ?? 0;
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'] ?? null,
-                'product_variant_id' => $item['variant_id'] ?? null,
-                'quantity' => $item['qty'] ?? 1,
-                'weight' => $weight,
-                'price' => $item['price'] ?? 0,
-                'discounted_price' => $item['price'] ?? 0,
+        // P0-09: Wrap order + items in a DB transaction for atomicity
+        $order = DB::transaction(function () use ($cartItems, $orderData, $userDescription, $defaultStatus, $weightSum) {
+            $o = Order::create([
+                'user_id' => Auth::id(),
+                'state_id' => $orderData['state_id'] ?? null,
+                'city_id' => $orderData['city_id'] ?? null,
+                'address_id' => $orderData['address_id'] ?? null,
+                'address' => [
+                    'state' => $orderData['state_name'] ?? '',
+                    'city' => $orderData['city_name'] ?? '',
+                    'address' => $orderData['full_address'] ?? '',
+                    'receiptor_mobile' => $orderData['receiptor_mobile'] ?? '',
+                    'postal_code' => $orderData['postal_code'] ?? '',
+                ],
+                'receiptor_full_name' => $orderData['receiptor_full_name'] ?? null,
+                'shipping_method_id' => $orderData['shipping_method_id'] ?? null,
+                'bank_id' => $orderData['bank_id'] ?? null,
+                'order_status' => 'paying',
+                'shipping_price' => $orderData['shipping_price'] ?? 0,
+                'total_price' => $orderData['total_price'] ?? 0,
+                'discount_price' => $orderData['discount_price'] ?? 0,
+                'discount_id' => $orderData['discount_id'] ?? null,
+                'payment_price' => $orderData['payment_price'] ?? 0,
+                'freight_balance' => $orderData['freight_balance'] ?? 0,
+                'total_weight' => $weightSum,
+                'user_description' => $userDescription,
+                'shipping_status_id' => $defaultStatus?->id,
+                'receipt_tracking_code' => $orderData['receipt_tracking_code'] ?? null,
+                'receipt_payer_card' => $orderData['receipt_payer_card'] ?? null,
             ]);
-        }
 
+            foreach ($cartItems as $item) {
+                $weight = $item['weight'] ?? 0;
+                OrderItem::create([
+                    'order_id' => $o->id,
+                    'product_id' => $item['product_id'] ?? null,
+                    'product_variant_id' => $item['variant_id'] ?? null,
+                    'quantity' => $item['qty'] ?? 1,
+                    'weight' => $weight,
+                    'price' => $item['price'] ?? 0,
+                    'discounted_price' => $item['price'] ?? 0,
+                ]);
+            }
+
+            return $o;
+        });
+
+        // P0-09: Never forceDelete — mark as cancelled instead to preserve audit trail
         try {
             $this->stockService->reserveStock($order);
         } catch (\RuntimeException $e) {
             Log::warning('Stock reservation failed for order #' . $order->id, ['message' => $e->getMessage()]);
-            $order->forceDelete();
+            $order->update(['order_status' => 'cancelled']);
             throw $e;
         }
 
