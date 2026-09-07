@@ -41,7 +41,6 @@ class ShippingMethod extends Model
     public function getTypeNameAttribute(): array
     {
         return match ($this->attributes['type'] ?? null) {
-            'chapar' => ['title' => 'چاپار', 'badge' => 'success'],
             'cod24' => ['title' => 'Cod24', 'badge' => 'primary'],
             'with_weight' => ['title' => 'بر اساس وزن', 'badge' => 'info'],
             default => ['title' => 'قیمت ثابت', 'badge' => 'info'],

@@ -27,8 +27,6 @@ class ShippingCalculator
 
             'with_weight' => $price = ($weightSum / 100) * ($shippingMethod->price ?? 0),
 
-            'chapar' => $price = self::chaparQuote($shippingMethod, $weightSum, $finalPriceSum, $address),
-
             default => $price = $shippingMethod->price ?? 0,
         };
 
@@ -56,7 +54,6 @@ class ShippingCalculator
         match ($shippingMethod->type) {
             'fixed_price' => $price = $shippingMethod->price ?? 0,
             'with_weight' => $price = ($weightSum / 100) * ($shippingMethod->price ?? 0),
-            'chapar' => $price = self::chaparQuote($shippingMethod, $weightSum, $finalPriceSum, $address),
             default => $price = $shippingMethod->price ?? 0,
         };
 
@@ -71,29 +68,7 @@ class ShippingCalculator
     /**
      * استعلام قیمت چاپار
      */
-    protected static function chaparQuote(ShippingMethod $shippingMethod, float $weightSum, float $finalPriceSum, ?Address $address): string
-    {
-        try {
-            $response = \App\Services\ChaparShipment::quote([
-                'origin' => $shippingMethod->senderCity?->chapar_id,
-                'destination' => $address?->city?->chapar_id,
-                'weight' => $weightSum / 1000, // وزن به کیلوگرم
-                'value' => $finalPriceSum . '0', // قیمت به ریال
-                'method' => $shippingMethod->chapar_type,
-            ]);
-
-            if (isset($response['result']) && $response['result'] === true) {
-                $totalCost = $response['objects']['order']['price']['fld_Total_Cost'] ?? 0;
-                return ($totalCost / 10); // ریال به تومان
-            }
-
-            return 0;
-        } catch (\Exception $e) {
-            \Log::error('Chapar quote failed', ['message' => $e->getMessage()]);
-            return 0;
-        }
-    }
-
+    
     /**
      * دریافت روش‌های ارسال موجود بر اساس آدرس
      *
@@ -115,13 +90,10 @@ class ShippingCalculator
             if (in_array($shipment->type, ['with_weight', 'fixed_price'])) {
                 $result = self::calculate($shipment, $shipmentWeightSum, $finalPriceSum, $address);
                 $price = $result['price'];
-            } else {
-                // برای chapar، قیمت لحظه‌ای محاسبه می‌شود
-                $price = 'dynamic';
             }
 
             // محاسبه قیمت اصلی ارسال (قبل از اعمال سقف رایگان) برای نمایش مبلغ سود
-            $originalPrice = is_numeric($price) ? $price : 0;
+            $originalPrice = $price;
             if ($shipment->price_ceiling > 0 && $shipment->freight_balance != 1) {
                 // اگر ارسال به خاطر سقف رایگان رایگان شده، قیمت اصلی را محاسبه کن
                 if (is_numeric($price) && $price == 0 && $finalPriceSum >= $shipment->price_ceiling) {

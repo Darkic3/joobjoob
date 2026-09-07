@@ -25,7 +25,7 @@ class ShippingMethodController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:fixed_price,with_weight,chapar,cod24',
+            'type' => 'required|in:fixed_price,with_weight,cod24',
             'price' => 'nullable|numeric|min:0',
             'price_ceiling' => 'nullable|numeric|min:0',
             'estimated_days_min' => 'required|integer|min:1|max:30',
@@ -33,7 +33,6 @@ class ShippingMethodController extends Controller
             'status' => 'required|boolean',
             'description' => 'nullable|string',
             'freight_balance' => 'nullable|boolean',
-            'chapar_type' => 'nullable|string',
             'sender_name' => 'nullable|string|max:255',
             'sender_company' => 'nullable|string|max:255',
             'sender_city_id' => 'nullable|exists:cities,id',
@@ -71,7 +70,7 @@ class ShippingMethodController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:fixed_price,with_weight,chapar,cod24',
+            'type' => 'required|in:fixed_price,with_weight,cod24',
             'price' => 'nullable|numeric|min:0',
             'price_ceiling' => 'nullable|numeric|min:0',
             'estimated_days_min' => 'required|integer|min:1|max:30',
@@ -79,7 +78,6 @@ class ShippingMethodController extends Controller
             'status' => 'required|boolean',
             'description' => 'nullable|string',
             'freight_balance' => 'nullable|boolean',
-            'chapar_type' => 'nullable|string',
             'sender_name' => 'nullable|string|max:255',
             'sender_company' => 'nullable|string|max:255',
             'sender_city_id' => 'nullable|exists:cities,id',

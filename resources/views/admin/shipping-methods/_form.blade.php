@@ -28,16 +28,11 @@
                     <select name="type" class="input-custom !py-1.5 !text-sm" required>
                         <option value="fixed_price" {{ old('type', $method->type ?? '') === 'fixed_price' ? 'selected' : '' }}>{{ __('admin.shipping_methods.type_fixed_price') }}</option>
                         <option value="with_weight" {{ old('type', $method->type ?? '') === 'with_weight' ? 'selected' : '' }}>{{ __('admin.shipping_methods.type_with_weight') }}</option>
-                        <option value="chapar" {{ old('type', $method->type ?? '') === 'chapar' ? 'selected' : '' }}>{{ __('admin.shipping_methods.type_chapar') }}</option>
                         <option value="cod24" {{ old('type', $method->type ?? '') === 'cod24' ? 'selected' : '' }}>{{ __('admin.shipping_methods.type_cod24') }}</option>
                     </select>
                     @error('type') <p class="text-rose-500 text-xs mt-0.5">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.shipping_methods.field_chapar_type') }}</label>
-                    <input type="text" name="chapar_type" value="{{ old('chapar_type', $method->chapar_type ?? '') }}" class="input-custom !py-1.5 !text-sm" placeholder="{{ __('admin.shipping_methods.chapar_type_placeholder') }}">
-                </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.shipping_methods.field_price') }}</label>

@@ -46,7 +46,6 @@
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
                                     @if($method->type === 'fixed_price') bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400
                                     @elseif($method->type === 'with_weight') bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400
-                                    @elseif($method->type === 'chapar') bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400
                                     @else bg-gray-100 text-gray-600 dark:bg-gray-600/50 dark:text-gray-300 @endif">
                                     {{ $method->typeName['title'] }}
                                 </span>
