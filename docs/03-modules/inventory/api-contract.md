@@ -1,17 +1,27 @@
-# Inventory — API Contract
+# Inventory — API Contract (Verified Audit)
 
-> Source: `routes/site.php`, `routes/admin.php`, `web.php` (localized duplicates)
+> ⚠️ The old doc listed a phantom `/admin/inventory` CRUD resource — **no such controller or routes exist**. Inventory has no admin HTTP surface; it is a Service+Model module.
 
-| Method | URI | Name | Middleware | Controller@Method | Auth |
-|--------|-----|------|------------|-------------------|------|
-| GET | /{locale}/inventory | inventory.index | web, SetLocale | Site/Admin Controller@index | guest/auth |
-| GET | /admin/inventory | admin.inventory.index | auth,adminPermission,log.admin | Admin Controller@index | admin |
-| POST | /admin/inventory | admin.inventory.store | auth,adminPermission | Admin Controller@store | admin |
-| PUT | /admin/inventory/{id} | admin.inventory.update | auth,adminPermission | Admin Controller@update | admin |
-| DELETE | /admin/inventory/{id} | admin.inventory.destroy | auth,adminPermission | Admin Controller@destroy | admin |
+## HTTP surface (verified: none for admin)
 
-Notes:
-- Actual routes per `Route::resource except show` + custom (e.g., checkout/finish, otp/send). Check `routes/*.php`.
-- Site routes duplicated under `{locale}` prefix (locale.* names). $siteRoutes closure registered twice.
-- Throttle on OTP (5,1), resend (3,1), contact (5,1).
-- Validation: Admin via FormRequest, Site via inline or CardToCardCheckoutRequest.
+Stock visibility rides on other modules' endpoints:
+
+| Method | URI | Name | Consumes | Notes |
+|--------|-----|------|----------|-------|
+| POST | `/checkout/validate-stock` | `checkout.validate-stock` | `StockService::validateCartItems` (auth) | JSON `{success, unavailable[], insufficient[]}` |
+| GET | `/cart` | `cart.index` | `CartService::dbContent` → `enrichCartItemsWithStockStatus` | per-row `is_in_stock` / `current_stock` |
+| — | product listings | — | `Product::stock`, `ProductVariant::scopeInStock` | `stock > 0` filter |
+
+## Ops surface
+
+```
+php artisan orders:cancel-expired {--minutes=15 : انتظار} {--dry-run : بدون اجرا}
+```
+Cancels `paying` orders older than the cutoff and restores stock (P0-06: dry-run + per-order
+try/catch). ⚠️ See gotchas #1 (double-restore race) and Notifications (cron never notifies the user).
+
+## No CRUD exists for
+
+- `inventory_transactions` ledger — write-only, no reader UI (see gotchas #6).
+- Manual stock adjustments — done indirectly via `ProductService` (admin product edit) and
+  `aggregateVariantPrices` (variant-sum re-sync), which share the drift risk in gotchas #3.
