@@ -46,4 +46,21 @@ If order already paid -> redirect success immediately, no second verify.
 ## AI gotcha
 - Always use `'0'` concat for unit conversion.
 - Don't forget transaction_info JSON structure {post, verify}.
-- Hard delete on token failure is risky.
+- Hard delete on token failure is risky (FIXED 2026-09-07 — see below).
+
+## P0-03 Fix — Token Failure (2026-09-07)
+
+**Ghabli (STALE):** `if failed -> order->delete() (hard delete!)` — `BankPaymentService.php:26`.
+
+**Feli (FIXED):** `BankPaymentService.php:27-51`
+```
+if failed ->
+  try StockService::restoreStock(order) catch Log
+  update order_status=unpaid
+  AuditService::orderStatusChanged(paying -> unpaid, 'Gateway token failed')
+  redirect checkout.failed
+```
+> Natije: Order baraye debug/retry mimanad, stock barmigardad, audit trail hefz.
+
+## Doc Drift Warning
+In workflow ghablan `hard delete` ra mostanad karde bood — alan bayad `unpaid` flow ra jaygozin koni.

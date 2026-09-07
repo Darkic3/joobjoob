@@ -19,7 +19,27 @@ Stock is reserved at order creation (paying) and restored on cancel/fail.
 `increaseProductStock`: lockForUpdate -> increment -> type=add
 `increaseVariantStock`: increment variant + recalc parent sum
 
-Callers of restore: `OrderService::handleFailedPayment`, `OrderService::cancelOrder`, `OrderObserver::updated wasChanged cancelled`, `CancelExpiredOrders` — **double restore risk** if both Observer and Service called.
+Callers of restore: `OrderService::handleFailedPayment`, `OrderService::cancelOrder`, `CancelExpiredOrders` — **double restore risk FIXED 2026-09-07** (Observer dige restore nemikone, owner faghat Service/Command).
+
+## Reserve — FIXED (P0-09) — 2026-09-07
+
+**Ghabli:** `OrderService::create -> try reserve catch -> forceDelete + throw` (doc khat 9 ghabl).
+
+**Feli:** `OrderService.php:53-107`
+```
+DB::transaction { Order::create + foreach OrderItem::create }
+try reserveStock catch RuntimeException -> update cancelled + throw (NO forceDelete)
+```
+> Dalil: Transaction atomicity + audit trail hefz.
+
+## Restore — FIXED (P0-02) — 2026-09-07
+
+**Ghabli:** Callers 4 ta + double risk.
+
+**Feli:** Owner faghat 2 ta:
+- `OrderService::cancelOrder` (admin)
+- `CancelExpiredOrders` (cron)
+`OrderObserver::updated` dige restore **nemikone** — `app/Observers/OrderObserver.php:31-32`.
 
 ## N+1 / Race
 - `getAvailableStock` uses `withTrashed()->find` per item — N+1 but inside transaction with lock.
