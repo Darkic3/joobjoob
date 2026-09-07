@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Bank;
 use App\Models\Order;
 use App\Payments\PaymentGatewayFactory;
+use App\Services\StockService;
+use App\Services\AuditService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
@@ -23,9 +25,30 @@ class BankPaymentService
         Auth::loginUsingId($order->user_id);
 
         if ($response->getStatus() === 'failed') {
-            $order->delete();
+            // P0-03 Fix: Never delete the order — mark as unpaid, restore stock, log it.
+            // This preserves the order for debugging, retry, and admin visibility.
+            $previousStatus = $order->order_status;
+
+            try {
+                $this->stockService()->restoreStock($order);
+            } catch (\Throwable $e) {
+                Log::error('restoreStock failed on token failure for order #' . $order->id, [
+                    'message' => $e->getMessage(),
+                ]);
+            }
+
+            $order->update(['order_status' => 'unpaid']);
+
+            try {
+                AuditService::orderStatusChanged($order, $previousStatus, 'unpaid', 'Gateway token failed');
+            } catch (\Throwable $e) {
+                Log::error('AuditLog failed on token failure for order #' . $order->id, [
+                    'message' => $e->getMessage(),
+                ]);
+            }
+
             return redirect(route('checkout.failed'))
-                ->with('error', 'خطا در پرداخت، مجدد تلاش نمایید.');
+                ->with('error', 'خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.');
         }
 
         $order->update([
@@ -66,5 +89,13 @@ class BankPaymentService
         }
 
         return true;
+    }
+
+    /**
+     * Resolve StockService from the container.
+     */
+    private function stockService(): StockService
+    {
+        return app(StockService::class);
     }
 }
