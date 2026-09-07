@@ -1,6 +1,7 @@
 # Cart — Logic (Enriched Phase 2.1)
 
-> **Source of Truth:** `app/Services/CartService.php:1-560`, `app/Http/Controllers/Site/CartController.php:1-160`, `app/Models/Cart.php:1-35`, `app/Services/CouponService.php:calculateForCart`, `app/Services/StockService.php:enrichCartItemsWithStockStatus`
+> **Source of Truth:** `app/Services/CartService.php:1-445`, `app/Http/Controllers/Site/CartController.php:1-221`, `app/Models/Cart.php:1-24`, `app/Services/CouponService.php:calculateForCart`, `app/Services/StockService.php:enrichCartItemsWithStockStatus`
+> **Note:** `app/Models/CartItem.php` does NOT exist — each `carts` row IS a cart item.
 
 ## 1. Purpose & Responsibilities
 Cart yek service-e do-gane hast: **Guest = session** `cart` (array keyed by md5) + **Auth = DB** `carts` table. Hameye mohasebat (subtotal, discount, total, count, weight) dar CartService jam shode va Checkout ham session keys `checkout_*` + `coupon` ra estefade mikonad.
@@ -28,9 +29,17 @@ Cart yek service-e do-gane hast: **Guest = session** `cart` (array keyed by md5)
 - `content()` — if isAuth `dbContent()` else `sessionContent()`.
 
 ### 3.3 dbContent() (Auth DB)
-- `Cart::where(user_id, auth()->id())->get()` — line ~26.
-- **Backfill original_price**: agar `empty(original_price)` → `Product::find(product_id)` -> `variant = product->variants()->find(variantId)` -> `original_price = variant?price:product->price`, `needsUpdate` save if `getOriginal` null.
-- **Enrich stock**: `$stockService->enrichCartItemsWithStockStatus(items)` — har item `getAvailableStock` ba `Product::withTrashed()->find` (N+1) -> `is_in_stock/current_stock`.
+- `Cart::where(user_id, auth()->id())->get()`.
+- **`refreshDbPrices($items)`** (replaces the old "original_price backfill" logic):
+  `Product::with('variants')->findMany(productIds)` (batched) → per item:
+  variant repair (row without `variant_id` on `has_variants` product → default = in-stock
+  variant ?? first, saved via `isDirty` check) + price/stock re-sync with today's prices
+  (`price = variant?final_price:product->final_price`, `original_price = variant?price:product->price`,
+  `stock = variant?stock:product->stock`) → `$item->save()` when drifted.
+  ⚠️ **WRITE-ON-READ** — every authenticated cart read (incl. header `count()`) may issue UPDATEs.
+- **Enrich stock**: `$stockService->enrichCartItemsWithStockStatus(items)` — per item
+  `getAvailableStock` (`withTrashed()->find`, N+1) → in-memory `is_in_stock/current_stock`
+  attributes on the Eloquent models (safe only because refreshDbPrices already saved).
 - **Map**: `mapWithKeys id => [rowId=>id, product_id, variant_id, variant_label, name, slug, price, original_price, qty, stock, weight, color, size, image, is_in_stock, current_stock]`.
 
 ### 3.4 dbAdd(Product,qty,variantId,color,size):string
@@ -56,8 +65,15 @@ Cart yek service-e do-gane hast: **Guest = session** `cart` (array keyed by md5)
 - `count():int` — sum qty, `weight():int` — sum weight*qty, `roundedWeight():float` — ceil(weight/100)*100? Actually in ShippingCalculator `ceil(weightSum/100)*100` for with_weight.
 - `toArray():array` — content values array for OrderService create.
 - `clear():void` — if isAuth dbClear else sessionClear.
-- `mergeGuestCart(array guestItems)` — mojood vali **hichi seda nemizane** — UNKNOWN (grep -rn mergeGuestCart faghate tarif). Guest cart bad az login momkene gom she.
-- `applyCoupon(code):bool` — deleg be CouponService apply (upper trim, checks), `removeCoupon`.
+- **`mergeGuestCart(array $guestItems)` — ACTIVE, called from OTP login (P1-05 ✅)**:
+  `OtpController::verify:135-147` — (1) `$guestCart = session('cart', [])` captured BEFORE login,
+  (2) `otpService->verify` (login), (3) `session()->regenerate()`, (4) `mergeGuestCart($guestCart)`,
+  (5) redirect intended dashboard. Internals: guard `!isAuth() || empty` → per item `Product::find`
+  (skip missing) → existing row matched on (product_id, variant_id, color, size) →
+  `qty = min(existing+qty, stock)`; else `dbAdd` → final `sessionClear()`.
+  Guest md5 rowIds are translated to DB-id rowIds during merge — frontend must treat rowId as opaque.
+- `getSessionItems()` — **DEAD CODE** (zero callers).
+- `applyCoupon(code):bool` — deleg be CouponService apply (upper trim, checks). (Coupon removal is `CouponService::remove()`, not a CartService method.)
 
 ### 3.8 Stock interaction
 - `enrichCartItemsWithStockStatus` per item `getAvailableStock(productId, variantId)` -> `ProductVariant::withTrashed()->find` or `Product::withTrashed()->find` -> `max(0, stock)` cast int.
@@ -74,7 +90,7 @@ Cart yek service-e do-gane hast: **Guest = session** `cart` (array keyed by md5)
 - Guest can view/update/remove cart bedoone auth; checkout steps require auth (group `auth` prefix checkout).
 
 ## 6. Business Rules
-- Guest vs Auth dual — hich sync automatic nist (UNKNOWN merge).
+- Guest vs Auth dual — automatic sync exists ONLY via `mergeGuestCart` on OTP login (P1-05 ✅, see §3.7).
 - `rowId` md5 deterministic — debug sade vali collision risk nist (4 field).
 - Price snapshot dar cart (price/original_price) az product/variant dar zaman add — agar product price taghir kone cart price dige update nemishe (snapshot).
 - `is_in_stock/current_stock` enrich faghat baraye namayesh — reserve dar `OrderService::create -> StockService::reserveStock` ba `lockForUpdate` anjam mishe, na dar cart.
@@ -86,14 +102,14 @@ Cart yek service-e do-gane hast: **Guest = session** `cart` (array keyed by md5)
 
 ## 8. Failure Paths
 - Product not found `firstOrFail 404`.
-- Qty > stock -> clamp + warning `stock_limit_reached`, not error.
-- Guest cart lost after login if merge not called — UNKNOWN.
+- Qty > stock on ADD → partial add up to stock + warning `stock_limit_reached` (422 JSON when nothing addable).
+- Qty > stock on UPDATE → current qty KEPT (no clamp) + `stock_warning` in JSON.
+- Guest cart merge on login: VERIFIED (P1-05) — no loss path.
 
 ## 9. Known Bugs / Legacy
-- **N+1 Product::find per item** in dbContent/sessionContent + enrich — `withTrashed()->find` per item. Mitune `whereIn`.
-- **mergeGuestCart no caller** — evidence `grep -rn mergeGuestCart app --include=*.php` faghate method tarif.
-- **Snapshot price** — stale if catalog price changes.
-- **SoftDeletes not used** for carts — guest session even has no id.
+- **N+1 in enrich** — `enrichCartItemsWithStockStatus`/`getAvailableStock` = one `withTrashed()->find` per item (products themselves ARE batched now). Mitune `whereIn`.
+- **mergeGuestCart qty=0 edge** — `min(existing+qty, stock)` with stock=0 persists a 0-qty row (bypasses the `max(1,qty)` clamp of dbUpdate) → garbage OrderItem quantity 0. See gotchas.
+- **Write-on-read** — refreshDbPrices may UPDATE on every auth cart read (design: «قیمت روز»).
 
 ## 10. Evidence
 - `app/Services/CartService.php:12 sessionKey, 16 isAuth, 26 dbContent, 80 dbAdd, 140 dbUpdate, 180 sessionContent, 200 sessionAdd, 260 subtotal/discount, 340 mergeGuestCart`
