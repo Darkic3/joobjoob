@@ -23,7 +23,6 @@ yarn-error.log
 /.vscode
 /.freebuff
 /.agents
-/docs
 /documents/others
 .DS_Store
 Thumbs.db
