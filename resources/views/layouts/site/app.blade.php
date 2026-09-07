@@ -87,7 +87,9 @@
 
 <x-quick-view-modal/>
 
+@if(setting('allow_open_requests', false))
 <x-social-proof-toast/>
+@endif
 
 <x-toast/>
 
