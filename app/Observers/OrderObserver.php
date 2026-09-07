@@ -4,51 +4,41 @@ namespace App\Observers;
 
 use App\Models\Order;
 use App\Models\OrderHistory;
-use App\Services\StockService;
-use Illuminate\Support\Facades\Log;
 
 class OrderObserver
 {
-    protected StockService $stockService;
-
-    public function __construct(StockService $stockService)
-    {
-        $this->stockService = $stockService;
-    }
-
+    /**
+     * Handle the Order "created" event.
+     *
+     * In Laravel, `created` fires AFTER the model is saved, so isDirty()
+     * always returns false. We unconditionally create the initial history.
+     */
     public function created(Order $order): void
     {
-        if ($order->isDirty('order_status') || $order->isDirty('shipping_status_id')) {
-            OrderHistory::create([
-                'order_id' => $order->id,
-                'order_status' => $order->order_status,
-                'shipping_status_id' => $order->shipping_status_id,
-            ]);
-        }
+        OrderHistory::create([
+            'order_id' => $order->id,
+            'order_status' => $order->order_status,
+            'shipping_status_id' => $order->shipping_status_id,
+        ]);
     }
 
+    /**
+     * Handle the Order "updated" event.
+     *
+     * Use wasChanged() (not isDirty) — isDirty is true mid-save but
+     * wasChanged correctly reflects the persisted state change.
+     *
+     * Stock restoration is handled exclusively by OrderService::cancelOrder
+     * and CancelExpiredOrders command — NOT here, to avoid double restore.
+     */
     public function updated(Order $order): void
     {
-        if ($order->isDirty('order_status') || $order->isDirty('shipping_status_id')) {
+        if ($order->wasChanged('order_status') || $order->wasChanged('shipping_status_id')) {
             OrderHistory::create([
                 'order_id' => $order->id,
                 'order_status' => $order->order_status,
                 'shipping_status_id' => $order->shipping_status_id,
             ]);
-        }
-
-        // بازگردانی موجودی هنگام لغو سفارش
-        if ($order->wasChanged('order_status') && $order->order_status === 'cancelled') {
-            $previousStatus = $order->getOriginal('order_status');
-            if (in_array($previousStatus, ['paid', 'deposit_paid', 'pending_confirmation', 'wait_for_verification'])) {
-                try {
-                    $this->stockService->restoreStock($order);
-                } catch (\Exception $e) {
-                    Log::error('OrderObserver: Stock restoration failed for cancelled order #' . $order->id, [
-                        'message' => $e->getMessage(),
-                    ]);
-                }
-            }
         }
     }
 }
