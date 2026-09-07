@@ -186,6 +186,8 @@ return [
     'newsletter_subtitle' => 'از تخفیف‌های ویژه و محصولات جدید زودتر از همه باخبر شوید.',
     'newsletter' => 'خبرنامه',
     'newsletter_email_placeholder' => 'ایمیل شما',
+    'newsletter_subscribed' => 'عضویت شما در خبرنامه با موفقیت ثبت شد.',
+    'newsletter_error' => 'خطایی رخ داده است؛ لطفاً دوباره تلاش کنید.',
 
     'socials' => [
         'instagram' => 'اینستاگرام',

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\StoreReviewReplyRequest;
+use App\Http\Requests\Site\StoreReviewRequest;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -312,36 +314,12 @@ class ProductController extends Controller
     /**
      * ثبت نظر جدید برای محصول.
      */
-    public function storeReview(Request $request)
+    public function storeReview(StoreReviewRequest $request)
     {
         $product = Product::where('slug', $request->route('product'))->firstOrFail();
 
-        $isGuest = !auth()->check();
-
-        $rules = [
-            'rating'  => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:3|max:1000',
-        ];
-
-        $messages = [
-            'rating.required'  => 'لطفاً امتیاز را انتخاب کنید.',
-            'rating.min'       => 'امتیاز باید حداقل ۱ باشد.',
-            'rating.max'       => 'امتیاز حداکثر ۵ است.',
-            'comment.required' => 'لطفاً متن نظر را بنویسید.',
-            'comment.min'      => 'نظر باید حداقل ۳ حرف باشد.',
-            'comment.max'      => 'نظر نمی‌تواند بیش از ۱۰۰۰ حرف باشد.',
-        ];
-
-        if ($isGuest) {
-            $rules['guest_name']  = 'required|string|min:2|max:100';
-            $rules['guest_phone'] = 'required|string|min:10|max:20|regex:/^0[0-9]{9,}$/';
-            $messages['guest_name.required']  = 'لطفاً نام خود را وارد کنید.';
-            $messages['guest_name.min']       = 'نام باید حداقل ۲ حرف باشد.';
-            $messages['guest_phone.required'] = 'لطفاً شماره تلفن خود را وارد کنید.';
-            $messages['guest_phone.regex']    = 'شماره تلفن معتبر نیست (مثال: 09123456789).';
-        }
-
-        $validated = $request->validate($rules, $messages);
+        $validated = $request->validated();
+        $isGuest = ! auth()->check();
 
         $data = [
             'user_id'     => auth()->id(),
@@ -379,37 +357,18 @@ class ProductController extends Controller
     /**
      * ثبت پاسخ به یک نظر.
      */
-    public function storeReply(Request $request)
+    public function storeReply(StoreReviewReplyRequest $request)
     {
         $product = Product::where('slug', $request->route('product'))->firstOrFail();
         $review = Review::findOrFail($request->route('review'));
 
+        $validated = $request->validated();
         $isGuest = ! auth()->check();
-
-        $rules = [
-            'comment' => 'required|string|min:3|max:500',
-        ];
-        $messages = [
-            'comment.required' => 'لطفاً متن پاسخ را بنویسید.',
-            'comment.min'      => 'پاسخ باید حداقل ۳ حرف باشد.',
-            'comment.max'      => 'پاسخ نمی‌تواند بیش از ۵۰۰ حرف باشد.',
-        ];
-
-        if ($isGuest) {
-            $rules['guest_name']  = 'required|string|min:2|max:100';
-            $rules['guest_phone'] = 'required|string|min:10|max:20|regex:/^0[0-9]{9,}$/';
-            $messages['guest_name.required']  = 'لطفاً نام خود را وارد کنید.';
-            $messages['guest_name.min']       = 'نام باید حداقل ۲ حرف باشد.';
-            $messages['guest_phone.required'] = 'لطفاً شماره تلفن خود را وارد کنید.';
-            $messages['guest_phone.regex']    = 'شماره تلفن معتبر نیست.';
-        }
-
-        $validated = $request->validate($rules, $messages);
 
         $data = [
             'user_id'     => auth()->id(),
             'parent_id'   => $review->id,
-            'rating'      => $review->rating, // پاسخ امتیاز نداره
+            'rating'      => $review->rating,
             'comment'     => $validated['comment'],
             'is_approved' => Review::STATUS_PENDING,
         ];

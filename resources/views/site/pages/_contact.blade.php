@@ -59,8 +59,9 @@
                 <div class="grid sm:grid-cols-2 gap-5">
                     <div class="form-field">
                         <label for="contact-phone" class="form-label">{{ $data['phone'] }}</label>
-                        <input id="contact-phone" type="tel" name="phone" value="{{ old('phone') }}" maxlength="40"
-                               placeholder="{{ $data['phone_ph'] }}" class="neu-input" autocomplete="tel" dir="ltr">
+                        <input id="contact-phone" type="tel" name="phone" value="{{ old('phone') }}" maxlength="15"
+                               placeholder="{{ $data['phone_ph'] }}" class="neu-input" autocomplete="tel" dir="ltr"
+                               inputmode="tel">
                         @error('phone')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
 

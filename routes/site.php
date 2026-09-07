@@ -72,6 +72,11 @@ $siteRoutes = function () {
         ->middleware('throttle:5,1')
         ->name('site.contact.send');
 
+    // خبرنامه — throttle: حداکثر ۳ ارسال در دقیقه
+    Route::post('/newsletter/subscribe', [PageController::class, 'subscribeNewsletter'])
+        ->middleware('throttle:3,1')
+        ->name('newsletter.subscribe');
+
     // افزودن به سبد — مهمان هم مجاز است (سبد session-based است)
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 

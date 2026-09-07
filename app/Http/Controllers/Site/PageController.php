@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\NewsletterSubscribeRequest;
+use App\Http\Requests\Site\SendContactRequest;
 use App\Models\ContactRequest;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -33,15 +35,9 @@ class PageController extends Controller
     /**
      * دریافت پیام از فرم تماس — با throttle (۵ ارسال در دقیقه) در روت محافظت می‌شود.
      */
-    public function sendContact(Request $request): RedirectResponse
+    public function sendContact(SendContactRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:190'],
-            'phone' => ['nullable', 'string', 'max:40'],
-            'department' => ['nullable', 'string', 'max:40'],
-            'message' => ['required', 'string', 'min:10', 'max:2000'],
-        ]);
+        $validated = $request->validated();
 
         ContactRequest::create($validated);
 
@@ -57,6 +53,23 @@ class PageController extends Controller
         } catch (\Throwable $e) { Log::error('Contact notification failed', ['message' => $e->getMessage()]); }
 
         return back()->with('success', __('messages.pages.contact.success'));
+    }
+
+    /**
+     * عضویت در خبرنامه — AJAX.
+     */
+    public function subscribeNewsletter(NewsletterSubscribeRequest $request): JsonResponse
+    {
+        $email = $request->validated('email');
+
+        // ذخیره ایمیل (جدول newsletter_subscribers یا هر مکان دیگر)
+        // فعلاً فقط لاگ می‌کنیم — جدول واقعی بعداً اضافه می‌شود
+        Log::info('Newsletter subscription', ['email' => $email]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.newsletter_subscribed'),
+        ]);
     }
 
     /**

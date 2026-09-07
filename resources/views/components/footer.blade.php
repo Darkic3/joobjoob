@@ -123,13 +123,26 @@
                     <div class="site-footer-acc-body" id="footer-acc-newsletter">
                         <div class="site-footer-acc-inner">
                             <p class="site-footer-newsletter-sub">{{ __('messages.newsletter_subtitle') }}</p>
-                            <form class="site-footer-newsletter" action="#" method="post" onsubmit="return false;">
+                            <form class="site-footer-newsletter" x-data="newsletterForm()" x-on:submit.prevent>
                                 <input type="email" name="email" required
+                                       x-model="email"
                                        placeholder="{{ settingOverride('newsletter_placeholder', __('messages.newsletter_email_placeholder')) }}"
-                                       class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}">
-                                <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                       class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}"
+                                       dir="ltr">
+                                <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}"
+                                        x-on:click="submit()" :disabled="loading">
+                                    <template x-if="loading">
+                                        <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" opacity="0.25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" opacity="0.75"/></svg>
+                                    </template>
+                                    <template x-if="!loading">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                    </template>
                                 </button>
+                                <template x-if="message">
+                                    <span class="text-xs font-bold mt-1 block"
+                                          :class="success ? 'text-emerald-500' : 'text-rose-500'"
+                                          x-text="message"></span>
+                                </template>
                             </form>
                         </div>
                     </div>
@@ -153,3 +166,53 @@
         </div>
     </div>
 </footer>
+
+<script>
+function newsletterForm() {
+    return {
+        email: '',
+        loading: false,
+        message: '',
+        success: false,
+
+        async submit() {
+            this.message = '';
+            this.success = false;
+
+            const email = this.email.trim();
+            if (! email || ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                this.message = '{{ __('validation.requests.newsletter.email_invalid') }}';
+                return;
+            }
+
+            this.loading = true;
+            try {
+                const res = await fetch('{{ route("newsletter.subscribe") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ email: email }),
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (res.ok && data && data.success) {
+                    this.message = data.message || '{{ __('messages.newsletter_subscribed') }}';
+                    this.success = true;
+                    this.email = '';
+                } else {
+                    this.message = (data && data.error) || '{{ __('messages.newsletter_error') }}';
+                }
+            } catch (e) {
+                this.message = '{{ __('messages.newsletter_error') }}';
+            } finally {
+                this.loading = false;
+            }
+        },
+    };
+}
+</script>

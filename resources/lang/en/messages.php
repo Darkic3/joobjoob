@@ -185,6 +185,8 @@ return [
     'newsletter_subtitle' => 'Be the first to hear about special offers and new arrivals.',
     'newsletter' => 'Newsletter',
     'newsletter_email_placeholder' => 'Your email',
+    'newsletter_subscribed' => 'You have been successfully subscribed to our newsletter.',
+    'newsletter_error' => 'An error occurred. Please try again.',
 
     'socials' => [
         'instagram' => 'Instagram',
