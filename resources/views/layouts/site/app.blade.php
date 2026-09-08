@@ -35,11 +35,6 @@
 
 <body class="min-h-screen{{ auth()->check() ? " auth" : "" }}" style="background: var(--bg);">
 
-{{-- Skip-to-content link for keyboard accessibility (hidden until focused) --}}
-<a href="#main-content" class="skip-to-content" aria-label="{{ __('messages.skip_to_content') }}">
-    {{ __('messages.skip_to_content') }}
-</a>
-
 {{-- داده‌های نوار اعلان توسط SiteLayoutComposer آماده می‌شود --}}
 <div class="announce-bar text-center text-xs md:text-sm font-semibold py-2 px-4">
         <span id="announce-text" data-messages='{{ json_encode($announceMessages) }}'>

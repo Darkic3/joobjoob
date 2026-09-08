@@ -13,29 +13,6 @@
 * { font-family: 'Vazirmatn', sans-serif; }
 .mono { font-family: 'JetBrains Mono', 'Vazirmatn', monospace; }
 
-/* Skip-to-content: hidden until keyboard focus */
-.skip-to-content {
-    position: absolute;
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    padding: 0.75rem 1.5rem;
-    background: var(--accent);
-    color: var(--accent-contrast, #fff);
-    font-weight: 700;
-    font-size: 0.875rem;
-    border-radius: 0 0 0.75rem 0.75rem;
-    text-decoration: none;
-    transition: top 0.2s ease;
-}
-.skip-to-content:focus {
-    top: 0;
-    outline: 3px solid var(--accent);
-    outline-offset: 2px;
-}
-
-
 /*========================= FOR SCROLL PAGE  =========================*/
 /* ورود سنگین و سینمایی: fade-up + blur که با cubic-bezier اکسپو نرم می‌شود.
    فقط transform/opacity/filter انیمیت می‌شوند (GPU-safe) و prefers-reduced-motion

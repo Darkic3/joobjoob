@@ -399,5 +399,4 @@ return [
 
     'notifications' => 'اعلانات',
 
-    'skip_to_content' => 'رفتن به محتوای اصلی',
 ];
