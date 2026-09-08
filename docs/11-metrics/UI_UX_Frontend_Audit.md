@@ -3,271 +3,183 @@
 > **Date:** 2026-09-08
 > **Auditor:** Buffy (Module Code Inspector)
 > **Scope:** Full frontend stack — Blade templates, CSS, JS, RTL, Accessibility, Performance, Mobile
+> **Files Scanned:** 15+ Blade templates, 3 CSS files, 4 JS files, vite.config.js, package.json
 
 ---
 
-## 1. Blade Template Structure
+## A. ✅ قوت‌ها (What's Done Well)
 
-### Architecture
-- **Layout inheritance:** `layouts/site/app.blade.php` → `@extends` + `@yield('content')`
-- **Component system:** 17 reusable Blade components in `resources/views/components/`
-- **Partial system:** `_partials/` directories for layout fragments
-
-### Components Inventory
-
-| Component | Purpose | Quality |
-|-----------|---------|---------|
-| `header.blade.php` | Fluid Island header (neumorphism) | ✅ Excellent — RTL-aware, ARIA labels |
-| `mobile-bar.blade.php` | Bottom mobile nav (4 items) | ✅ Excellent — search sheet, ARIA |
-| `footer.blade.php` | Site footer | ✅ Good |
-| `product-card.blade.php` | Product grid card | ✅ Good — lazy loading |
-| `category-card.blade.php` | Category card | ✅ Good |
-| `countdown-timer.blade.php` | Deal timer | ✅ Good |
-| `quick-view-modal.blade.php` | Quick view modal | ✅ Good |
-| `trust-badges.blade.php` | Trust badges section | ✅ Good |
-| `toast.blade.php` | Toast notifications | ✅ Good — Alpine.js |
-| `social-proof-toast.blade.php` | Social proof popup | ✅ Good |
-| `share-buttons.blade.php` | Social sharing | ✅ Good |
-| `back-to-top.blade.php` | Scroll to top | ✅ Good |
-
-### Template Organization
-```
-resources/views/
-├── layouts/site/app.blade.php      # Main site layout
-├── layouts/site/guest.blade.php    # Guest layout
-├── layouts/admin/                   # Admin layout
-├── components/                      # 17 reusable components
-├── site/
-│   ├── home/                        # Homepage (hero, sections)
-│   ├── products/                    # Product listing/show
-│   ├── cart/                        # Cart pages
-│   ├── checkout/                    # Checkout flow
-│   ├── auth/                        # Login/verify
-│   ├── dashboard/                   # User dashboard
-│   ├── wishlist/                    # Wishlist page
-│   ├── blogs/                       # Blog pages
-│   └── pages/                       # Static pages
-└── admin/                           # Admin panel
-```
-
----
-
-## 2. CSS Framework & Styling
-
-### Stack
-- **Tailwind CSS 3.4** — utility-first framework
-- **Custom CSS:** `neumorphism.css` + `neumorphism-pro.css` — neumorphism design system
-- **RTL support:** Full — `dir="{{ $direction }}"` on `<html>`, Tailwind RTL utilities
-
-### Design System (Neumorphism)
-- Custom `neu-*` classes: `neu-card`, `neu-btn`, `neu-btn-icon`, `neu-toggle`, `neu-input`
-- CSS custom properties: `var(--bg)`, `var(--accent)`, `var(--text-primary)`, `var(--danger)`, etc.
-- Dark mode: `data-theme` attribute on `<html>`, theme toggle button
-- Glass morphism: `backdrop-blur-md`, `color-mix(in srgb, ...)`
+### Design System
+1. **Neumorphism design system** — consistent `neu-*` classes (`neu-card`, `neu-btn`, `neu-input`, `neu-toggle`, `neu-flat-*`)
+2. **CSS custom properties** — `var(--bg)`, `var(--accent)`, `var(--text-primary)`, `var(--danger)`, `var(--success)` etc.
+3. **Dark mode** — `data-theme` attribute on `<html>`, theme toggle with persistence
+4. **Glass morphism** — `backdrop-blur-md`, `color-mix(in srgb, ...)` for modern UI
 
 ### RTL/LTR Support
-- ✅ `<html dir="{{ $direction }}">` — dynamic from locale
-- ✅ Tailwind RTL utilities: `rtl:rotate-180`, `ms-*` (margin-inline-start)
-- ✅ Font: Vazirmatn (Persian) + JetBrains Mono (numbers)
-- ✅ `data-digits="{{ $digitFamily }}"` — locale-aware digit rendering
+5. **Full RTL** — `<html dir="{{ $direction }}">`, Tailwind RTL utilities (`ms-*`, `end-*`, `rtl:rotate-180`)
+6. **Font strategy** — Vazirmatn (Persian) + JetBrains Mono (numbers/code)
+7. **Locale-aware digits** — `NumberHelper::localizeDigits()`, `window.localizeDigits.convert`
+8. **Language switching** — dropdown in header, links in mobile menu, `localizedRoute()` everywhere
 
-### Potential Issues
-- ⚠️ Google Fonts loaded twice: once in `app.css` via `@import url(...)` AND once in `app.blade.php` via `<link>` — **double download**
-- ⚠️ `neumorphism.css` loaded via `@import` in CSS — **render-blocking** (should be inlined or bundled)
+### Mobile Experience
+9. **Bottom mobile bar** — 4-item nav (Home, Search, Wishlist, Cart) with search sheet
+10. **Hamburger menu** — full-screen slide-in with ARIA attributes
+11. **Touch-friendly** — minimum 44px touch targets on buttons
+12. **Sticky cart bar** — on product show page (mobile)
 
----
+### Components
+13. **17 reusable Blade components** — header, footer, product-card, category-card, etc.
+14. **Product card** — wishlist toggle, quick view, discount badge, stock bar, lazy loading
+15. **Review system** — star rating, nested replies, social proof toast
 
-## 3. JavaScript & Interactivity
+### Performance
+16. **Vite bundling** — tree-shaking, CSS/JS optimization
+17. **Lazy loading** — `loading="lazy"` on images
+18. **Scroll animations** — `reveal-on-scroll` with IntersectionObserver
+19. **`prefers-reduced-motion`** — all animations disabled for accessibility
 
-### Stack
-- **Alpine.js 3.14** — reactive UI components
-- **GSAP 3.15** — scroll animations, parallax
-- **Swiper 14** — carousels (hero, promo banners)
-- **Vanilla JS** — ui-effects.js (scroll reveal, hscroll, mobile menu)
-
-### AJAX Patterns
-- ✅ All AJAX uses `fetch()` with proper headers (`X-Requested-With`, `Accept: application/json`)
-- ✅ CSRF token via `document.querySelector('meta[name="csrf-token"]').content`
-- ✅ Error handling with `try/catch` (silent fallback)
-
-### Form Validation
-- ✅ Server-side: FormRequest classes with custom messages
-- ✅ Client-side: `digits:4` for OTP, `required` attributes
-- ⚠️ No client-side validation for review forms (relies on server)
-
-### Animation System
-- ✅ `reveal-on-scroll` — fade-up + blur on scroll (IntersectionObserver)
-- ✅ `[data-stagger]` — staggered grid entrance animations
-- ✅ `prefers-reduced-motion` respected — all animations disabled
+### SEO
+20. **JSON-LD** — Product schema on show page
+21. **Canonical + hreflang** — proper i18n SEO tags
+22. **Open Graph** — locale-aware meta tags
 
 ---
 
-## 4. RTL/LTR & Localization in UI
+## B. ⚠️ مشکلات بحرانی (Critical Issues)
 
-### Font Strategy
+| # | مشکل | شدت | فایل | توضیح |
+|---|------|------|------|-------|
+| 1 | **Double font download** | HIGH | `app.css` + `app.blade.php` | Vazirmatn loaded via `@import url(...)` in CSS AND `<link>` in HTML — ~200KB extra download |
+| 2 | **No skip-to-content link** | HIGH | `layouts/site/app.blade.php` | Keyboard users must tab through entire header to reach content |
+| 3 | **Product thumbnail alt missing** | HIGH | `show.blade.php:108` | `<img src="..." alt="thumbnail">` — should be `alt="{{ $product->trans('name') }} - {{ $loop->iteration }}"` |
+| 4 | **No 404 page** | HIGH | `resources/views/errors/` | No custom 404/500 pages — Laravel default shown |
+| 5 | **Inline script in header** | MEDIUM | `header.blade.php` | `notificationBell()` function is inline — should be bundled |
+
+---
+
+## C. 🟡 مشکلات متوسط (Medium Issues)
+
+### RTL Issues
+1. **Product show: "تومان" text** — `<span>تومان</span>` after price is not `dir="rtl"` explicitly (may inherit wrong direction in some contexts)
+2. **Breadcrumb separator** — hardcoded `/` not RTL-aware (should use `rtl:rotate-180` arrow)
+3. **Star rating `★★★★★`** — rendered as text, not semantic `<span>` with `aria-label`
+
+### Accessibility Issues
+4. **Form labels** — some forms use `<label>` but not `for="id"` association (e.g., review form)
+5. **Color contrast** — `var(--text-secondary)` on `var(--bg)` may fail WCAG AA (need to verify)
+6. **Focus indicators** — `neu-btn` has no visible focus ring for keyboard navigation
+7. **Modal focus trap** — `quick-view-modal` and `reply-modal` don't trap focus
+
+### Performance Issues
+8. **Render-blocking CSS** — `neumorphism.css` loaded via `@import` in CSS (should be bundled)
+9. **No `preconnect` for Google Fonts** — adds ~100ms to font loading
+10. **No skeleton loading states** — pages show blank while loading
+11. **Large inline scripts** — variant selector (~200 lines) is inline in `show.blade.php`
+
+### Mobile Issues
+12. **Hero slider height** — may be too tall on 320px screens
+13. **Cart step indicator** — 4-step process may be confusing on small screens
+14. **Address form** — inline panel toggle may be hard to discover
+
+---
+
+## D. 🔵 پیشنهادات بهبود (Enhancement Suggestions)
+
+### High Priority
+1. **Add skeleton loading** — for product cards, cart items, checkout steps
+2. **Add `srcset` to product images** — serve smaller images on mobile
+3. **Add `<link rel="preload">` for Vazirmatn** — prevent FOIT
+4. **Create custom 404/500 pages** — branded error pages with navigation
+5. **Add focus-visible styles** — visible focus ring for keyboard users
+
+### Medium Priority
+6. **Move inline JS to bundles** — variant selector, lightbox, review form
+7. **Add `aria-live` region for toasts** — screen reader announcements
+8. **Add loading spinner for AJAX** — coupon apply, shipping methods
+9. **Add confirmation dialog for delete** — cart remove, review delete
+10. **Add breadcrumbs to all pages** — not just product show
+
+### Low Priority
+11. **Add print styles** — for order confirmation page
+12. **Add `font-display: swap`** — prevent invisible text
+13. **Consider PWA manifest** — installability
+14. **Add service worker** — offline support for static pages
+15. **Add micro-interactions** — button hover states, card hover effects
+
+---
+
+## E. 📐 Design System Recommendation
+
+### Current State
+- ✅ Neumorphism classes exist (`neu-*`)
+- ✅ CSS custom properties for colors
+- ❌ No documented design tokens
+- ❌ No spacing scale documentation
+- ❌ No typography scale documentation
+
+### Recommended Design Tokens
+
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
-* { font-family: 'Vazirmatn', sans-serif; }
-.mono { font-family: 'JetBrains Mono', 'Vazirmatn', monospace; }
+:root {
+  /* Colors */
+  --color-accent: #6366f1;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-gold: #eab308;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+
+  /* Typography */
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1rem;    /* 16px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-2xl: 1.5rem;   /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+
+  /* Border Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
 ```
 
-### RTL Implementation
-- ✅ `<html dir="{{ $direction }}">` — dynamic
-- ✅ `ms-*` utilities for RTL-aware margins
-- ✅ `rtl:rotate-180` for arrow icons
-- ✅ `end-*` for absolute positioning (RTL-aware)
-- ✅ Swiper `rtl: document.documentElement.dir === 'rtl'`
+### Recommended Component Documentation
 
-### Locale Switching
-- ✅ Language dropdown in header (desktop)
-- ✅ Language links in mobile menu
-- ✅ `localizedRoute()` helper for all routes
-- ✅ `localizedUrl()` for canonical/hreflang
-
-### Potential Issues
-- ⚠️ `only-digits.js` handles digit conversion (Arabic→Latin) but may not cover all edge cases
-- ⚠️ `number_format()` in Blade uses default locale — may show wrong separator for non-Farsi locales
+| Component | Class | Props | Usage |
+|-----------|-------|-------|-------|
+| Button | `neu-btn` | `primary`, `icon`, `sm`, `lg` | Actions, navigation |
+| Card | `neu-card` | — | Content containers |
+| Input | `neu-input` | `error`, `disabled` | Forms |
+| Badge | `neu-badge` | `accent`, `success`, `danger` | Status indicators |
+| Toggle | `neu-toggle` | `checked` | Settings switches |
 
 ---
 
-## 5. Accessibility Issues
+## F. 💬 پیام کامیت پیشنهادی
 
-### ✅ What's Done Well
-- ✅ `aria-label` on all interactive elements (buttons, links, nav)
-- ✅ `aria-hidden="true"` on decorative SVGs
-- ✅ `aria-expanded` on hamburger menu
-- ✅ `aria-modal="true"` on dialogs (mobile menu, search sheet)
-- ✅ `role="search"` on search form
-- ✅ `role="tablist"` / `role="tab"` on review dots
-- ✅ `alt` attributes on blog images
-- ✅ Keyboard navigation: `tabindex` on review dots
-- ✅ `prefers-reduced-motion` support
-
-### ⚠️ Issues Found
-
-| Issue | Location | Severity |
-|-------|----------|----------|
-| **Product images missing `alt`** | `product-card.blade.php` | HIGH |
-| **Blog images use `$blog->title` as alt** | Home page blog section | Low — acceptable |
-| **No `aria-label` on search input** | `header.blade.php` | Low |
-| **No skip-to-content link** | `app.blade.php` | Medium |
-| **Focus trap missing in modals** | `quick-view-modal.blade.php` | Medium |
-| **No `aria-live` for toast notifications** | `toast.blade.php` | Low |
+```
+docs: update UI/UX audit report — add critical issues, medium issues, enhancement suggestions, design system recommendation
+```
 
 ---
 
-## 6. Performance Concerns
+**Overall Score:** 8.5/10 — Professional, modern, well-implemented frontend with excellent RTL support and neumorphism design.
 
-### ✅ What's Done Well
-- ✅ Vite bundling (tree-shaking)
-- ✅ `loading="lazy"` on blog images
-- ✅ `will-change: transform` on animated elements
-- ✅ CSS animations only on `transform`/`opacity` (GPU-safe)
-- ✅ `prefers-reduced-motion` support
-
-### ⚠️ Issues Found
-
-| Issue | Location | Impact | Fix |
-|-------|----------|--------|-----|
-| **Double font download** | `app.css` @import + `app.blade.php` `<link>` | HIGH | Remove one |
-| **Render-blocking CSS import** | `neumorphism.css` via `@import` in CSS | Medium | Bundle with Tailwind |
-| **Inline `<script>` in header** | `notificationBell()` function | Low | Move to bundled JS |
-| **No `preload` for critical fonts** | `app.blade.php` | Medium | Add `<link rel="preload">` |
-| **Large Swiper bundle** | `app.js` imports full Swiper | Medium | Use dynamic import |
-| **GSAP loaded but minimal use** | `app.js` | Low | Check if needed |
-
-### Image Optimization
-- ✅ WebP conversion via `ImageHandler`
-- ✅ 3 sizes: thumb (300), medium (800), large (1200)
-- ✅ `loading="lazy"` on blog images
-- ⚠️ No `srcset` / responsive images on product cards
-- ⚠️ No `<img>` `width`/`height` on product images (CLS risk)
-
----
-
-## 7. Mobile Responsiveness
-
-### Breakpoints (Tailwind defaults)
-- `sm:` 640px — tablet landscape
-- `md:` 768px — tablet
-- `lg:` 1024px — desktop
-- `xl:` 1280px — large desktop
-
-### Mobile Navigation
-- ✅ **Bottom bar** (`mobile-bar.blade.php`) — 4 items: Home, Search, Wishlist, Cart
-- ✅ **Hamburger menu** — full-screen slide-in with nav links
-- ✅ **Search sheet** — slide-up search on mobile
-- ✅ Cart/Wishlist counts on mobile bar badges
-
-### Touch Targets
-- ✅ Minimum 44px touch targets (buttons, links)
-- ✅ `mobile-bar-item` sized appropriately
-- ✅ Hamburger menu area large enough
-
-### Responsive Patterns
-- ✅ `grid-cols-2 md:grid-cols-4` — product grids
-- ✅ `hidden lg:flex` — desktop nav hidden on mobile
-- ✅ `lg:hidden` — mobile bar hidden on desktop
-- ✅ Horizontal scroll (`hscroll-*`) for product carousels
-- ✅ `max-w-7xl mx-auto px-4 md:px-6` — content width
-
-### Potential Issues
-- ⚠️ Hero slider may be too tall on small screens
-- ⚠️ Product cards may be too narrow on 320px screens
-- ⚠️ Checkout form may need better mobile layout
-
----
-
-## 8. UI/UX Best Practices & Suggestions
-
-### ✅ Excellent Patterns
-1. **Neumorphism design system** — consistent, modern, distinctive
-2. **Fluid Island header** — sticky, glass morphism, RTL-aware
-3. **Stagger animations** — professional grid entrance effects
-4. **Social proof toast** — psychological persuasion (toggled via settings)
-5. **Countdown timer** — urgency for deals
-6. **Quick view modal** — product preview without page load
-7. **Theme toggle** — dark/light mode with persistence
-
-### 🔧 Suggestions for Improvement
-
-#### High Priority
-1. **Add `srcset` to product images** — serve smaller images on mobile
-2. **Add `<link rel="preload">` for Vazirmatn font** — prevent FOIT
-3. **Remove duplicate font import** — `app.css` @import AND `app.blade.php` link
-4. **Add skip-to-content link** — keyboard accessibility
-5. **Fix product image `alt` attributes** — screen reader support
-
-#### Medium Priority
-6. **Move inline `notificationBell()` to bundled JS** — cleaner architecture
-7. **Add `aria-live` region for toasts** — screen reader announcements
-8. **Add focus trap in modals** — keyboard navigation
-9. **Lazy load below-fold sections** — IntersectionObserver for reviews, blogs
-10. **Add skeleton loading states** — better perceived performance
-
-#### Low Priority
-11. **Add `preconnect` for Google Fonts** — faster font loading
-12. **Consider `font-display: swap`** — prevent invisible text
-13. **Add `width`/`height` to product images** — prevent CLS
-14. **Consider PWA manifest** — installability
-15. **Add service worker** — offline support for static pages
-
----
-
-## 9. Summary
-
-| Category | Score | Notes |
-|----------|-------|-------|
-| **Template Architecture** | 9/10 | Clean inheritance, 17 components, well-organized |
-| **CSS/Styling** | 9/10 | Excellent neumorphism, Tailwind + RTL, dark mode |
-| **JavaScript** | 8/10 | Alpine + GSAP + Swiper, some inline scripts |
-| **RTL/LTR** | 9/10 | Full support, locale-aware, digit conversion |
-| **Accessibility** | 7/10 | Good ARIA, missing alt on products, no skip link |
-| **Performance** | 7/10 | Vite bundling, double font, render-blocking CSS |
-| **Mobile** | 9/10 | Bottom bar, hamburger, responsive grids |
-| **Overall** | **8.5/10** | Professional, modern, well-implemented |
-
-### Top 3 Quick Wins
+### Top 5 Quick Wins
 1. Remove duplicate Vazirmatn font import (saves ~200KB)
-2. Add `alt` to product card images (accessibility)
-3. Add `<link rel="preload">` for critical font (performance)
+2. Add skip-to-content link (accessibility)
+3. Add `alt` to product thumbnails (accessibility)
+4. Create custom 404 page (UX)
+5. Add `<link rel="preload">` for critical font (performance)
