@@ -30,7 +30,7 @@ Step 5  loop har $order:
           agar $dryRun → line("[DRY-RUN] لغو نشد.") → continue
           try:
             $previousStatus = $order->order_status
-            $order->update(['order_status'=>'cancelled'])   // Observer ham fire mishavad → OrderHistory + restoreStock duplicate
+            $order->update(['order_status'=>'cancelled'])   // Observer fires → OrderHistory only (P0-02 fixed: no restoreStock in observer)
             $stockService->restoreStock($order)              // DB::transaction + InventoryTransaction type=add
             Log::info("Auto-cancelled expired order #{$id}", [previous_status, created_at, payment_price])
             $cancelled++
@@ -44,7 +44,7 @@ Step 6  info("نتیجه: {$cancelled} سفارش لغو شد" + failed? ", {$fa
 
 **Tables touched:** `orders` (update), `inventory_transactions` (via StockService), `order_histories` (via Observer), `audit_logs` (via StockService→AuditService)
 
-**Idempotency:** `where order_status='paying'` → agar order ghablan `cancelled` shode, dobare select nemishavad. `restoreStock` duplicate (Service + Observer) mojoud — mesle ghabl.
+**Idempotency:** `where order_status='paying'` → agar order ghablan `cancelled` shode, dobare select nemishavad. `restoreStock` SINGULAR (Service only — P0-02 fixed: observer has no stock logic).
 
 ### 1.2 `LangNew` — Logic
 
