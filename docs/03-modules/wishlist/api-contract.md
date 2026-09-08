@@ -20,6 +20,16 @@
 
 ---
 
+## Dual-Mode Behavior
+
+| User State | Storage | API Behavior |
+|------------|---------|--------------|
+| Guest (not logged in) | Session `wishlist` array | Toggle reads/writes session |
+| Authenticated | `wishlists` DB table | Toggle reads/writes DB |
+| Just logged in (OTP) | Merged: session → DB | `mergeGuestWishlist` called automatically |
+
+---
+
 ## Request/Response Patterns
 
 ### GET `/wishlist`
@@ -50,6 +60,6 @@
 
 ## Notes
 
-- Wishlist is session-based — no DB persistence
-- No merge on login (unlike Cart's `mergeGuestCart`)
-- RecentlyViewed is consumed internally by `ProductController::show()` — no dedicated routes
+- Wishlist now persists for authenticated users (DB table)
+- Guest wishlist is merged into DB on OTP login via `mergeGuestWishlist`
+- RecentlyViewed remains session-only (no persistence)

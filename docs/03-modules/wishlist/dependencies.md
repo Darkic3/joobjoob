@@ -5,28 +5,31 @@
 ## Direct Dependencies
 
 ### Models
+- `Wishlist` — NEW: DB persistence for authenticated users
 - `Product` — the only model involved (read-only via `whereIn`)
+- `User` — FK in wishlists table
 
 ### Services
-- `WishlistService` — session-based wishlist (85 lines)
-- `RecentlyViewedService` — session-based recently viewed (100 lines)
+- `WishlistService` — dual-mode (session + DB), 165 lines
+- `RecentlyViewedService` — session-only, 100 lines
 
 ### Controllers
 - `Site\WishlistController` — index + toggle (35 lines)
 - `Site\ProductController` — calls `WishlistService::has()` for heart icon state
+- `Site\OtpController` — calls `WishlistService::mergeGuestWishlist()` after login
 
 ### External
-- None — pure session, no DB, no external APIs
+- None — pure session + DB, no external APIs
 
 ---
 
-## Inbound Dependencies (who uses Wishlist/RecentlyViewed)
+## Inbound Dependencies (who uses Wishlist)
 
 | Consumer Module | Interaction | Notes |
 |-----------------|-------------|-------|
 | **Products** | `ProductController::show()` calls `$this->wishlistService->has($product)` | Passes `$inWishlist` to view for heart icon |
 | **Products** | `ProductController::show()` calls `$this->recentlyViewed->add($product)` | Adds to recently viewed list |
-| **Auth-OTP** | `OtpController::verify()` regenerates session | **Wishlist lost** (no merge — unlike Cart) |
+| **Auth-OTP** | `OtpController::verify()` calls `mergeGuestWishlist($guestIds)` | Transfers session wishlist to DB (FIXED) |
 
 ---
 
@@ -35,36 +38,31 @@
 | Dependency | Usage | Notes |
 |------------|-------|-------|
 | `Product::with(['images','category'])->whereIn('id', $ids)` | Batch load products | In `content()` — not N+1 |
-| `session($key)` | Read/write session array | No DB interaction |
-| `Product::where('slug', ...)->firstOrFail()` | Product lookup in toggle | Route model binding |
-
----
-
-## Cross-Module Gotchas
-
-### Auth-OTP → Wishlist
-- `OtpController::verify()` calls `session()->regenerate()` after login
-- Wishlist session array is NOT preserved — **guest wishlist lost on login**
-- Cart has `mergeGuestCart`; Wishlist has NO equivalent
-
-### Products → Wishlist
-- `ProductController::show()` reads `$inWishlist` for heart icon
-- No write interaction — toggle is separate AJAX endpoint
+| `Wishlist::where(user_id, product_id)` | DB queries for auth mode | Unique constraint |
+| `DB::table('wishlists')->insertOrIgnore()` | Merge guest wishlist | Safe upsert |
+| `session($key)` | Guest mode storage | No DB interaction |
 
 ---
 
 ## Schema
 
-### No database tables
-Both services use Laravel session storage:
-- `session('wishlist')` → `array<int>` of product IDs
-- `session('recently_viewed')` → `array<int>` of product IDs (max 20, newest first)
+### `wishlists` table (NEW)
+```
+id         BIGINT PK AUTO INCREMENT
+user_id    BIGINT FK → users.id (cascadeOnDelete)
+product_id BIGINT FK → products.id (cascadeOnDelete)
+created_at TIMESTAMP
+updated_at TIMESTAMP
+```
+
+### Indexes
+- `(user_id, product_id)` — UNIQUE constraint
 
 ### Session keys
 | Key | Service | Storage | Max Items |
 |-----|---------|---------|-----------|
-| `wishlist` | WishlistService | `array<int>` | Unlimited |
-| `recently_viewed` | RecentlyViewedService | `array<int>` | 20 |
+| `wishlist` | WishlistService | Session (guest) / DB (auth) | Unlimited |
+| `recently_viewed` | RecentlyViewedService | Session only | 20 |
 
 ---
 
@@ -72,17 +70,19 @@ Both services use Laravel session storage:
 
 **Loose coupling:** Wishlist/RecentlyViewed are leaf nodes — they read Products but trigger nothing.
 
-**Tight coupling:** None — no inverse dependencies.
+**Tight coupling:** `OtpController::verify` now depends on `WishlistService::mergeGuestWishlist`.
 
-**Risk:** Session-only storage means data is lost on session destroy (login, timeout, driver change). No persistence means no recovery.
+**Risk:** Dual-mode adds complexity — session vs DB behavior must be transparent to callers.
 
 ---
 
 ## Evidence
 
-- `app/Services/WishlistService.php` — 85 lines, session-based
-- `app/Services/RecentlyViewedService.php` — 100 lines, max 20
+- `app/Services/WishlistService.php` — 165 lines, dual-mode, mergeGuestWishlist
+- `app/Models/Wishlist.php` — new model, user/product relations
+- `app/Services/RecentlyViewedService.php` — 100 lines, session-only
 - `app/Http/Controllers/Site/WishlistController.php` — 35 lines, no auth
+- `app/Http/Controllers/Site/OtpController.php:139-141` — mergeGuestWishlist
 - `app/Http/Controllers/Site/ProductController.php:185` — `$inWishlist`
-- `app/Http/Controllers/Site/ProductController.php:161` — `recentlyViewed->add()`
+- `database/migrations/2026_09_08_000001_create_wishlists_table.php` — schema
 - `routes/site.php:60-61` — 2 routes

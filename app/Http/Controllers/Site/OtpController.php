@@ -129,8 +129,9 @@ class OtpController extends Controller
                 ->withErrors(['mobile' => __('messages.otp_session_expired')]);
         }
 
-        // ذخیره سبد مهمان قبل از لاگین
+        // ذخیره سبد مهمان و علاقه‌مندی مهمان قبل از لاگین
         $guestCart = session('cart', []);
+        $guestWishlist = session('wishlist', []);
 
         $result = $this->otpService->verify($mobile, $data['code']);
 
@@ -144,6 +145,11 @@ class OtpController extends Controller
         // ادغام سبد مهمان با سبد کاربر
         if (! empty($guestCart)) {
             app(\App\Services\CartService::class)->mergeGuestCart($guestCart);
+        }
+
+        // ادغام علاقه‌مندی مهمان با علاقه‌مندی کاربر
+        if (! empty($guestWishlist)) {
+            app(\App\Services\WishlistService::class)->mergeGuestWishlist($guestWishlist);
         }
 
         return redirect()->intended(localizedRoute('dashboard'));

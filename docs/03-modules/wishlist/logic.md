@@ -1,72 +1,103 @@
 # Wishlist / RecentlyViewed — Logic (Verified Audit)
 
-> **Services:** `WishlistService` (85 lines), `RecentlyViewedService` (100 lines)
+> **Services:** `WishlistService` (165 lines), `RecentlyViewedService` (100 lines)
+> **Model:** `Wishlist` (new — DB persistence for authenticated users)
 > **Controller:** `Site\WishlistController` (35 lines)
-> **No DB tables** — both services are 100% session-based
-> **No DB models** — Product is the only model involved
+> **Migration:** `2026_09_08_000001_create_wishlists_table` (unique constraint)
+> **Dual-mode:** Session for guests, DB for authenticated users + auto-merge on login
 
 ---
 
 ## 1. Purpose & Architecture
 
-Two session-based "soft" services with no persistence:
-- **WishlistService:** Product wishlist (heart icon toggle) — stored as `[product_id, ...]` in session
-- **RecentlyViewedService:** Recently viewed products (slider) — stored as `[product_id, ...]` in session (max 20, newest first)
-
-Both are **guest-compatible** — no login required. No merge on login (unlike Cart).
+Two services with different storage strategies:
+- **WishlistService:** Dual-mode — Session for guests, DB for authenticated users. Merges on OTP login.
+- **RecentlyViewedService:** Session-only (max 20, newest first). No DB persistence.
 
 ---
 
-## 2. WishlistService
+## 2. WishlistService — Dual-Mode Architecture
 
-### Session Key: `wishlist`
-### Storage: `array<int>` of product IDs (ordered by insertion)
+### Storage Strategy
+
+| State | Storage | Table/Key | Max Items |
+|-------|---------|-----------|-----------|
+| Guest (not logged in) | Session | `session('wishlist')` = `[product_id, ...]` | Unlimited |
+| Authenticated | DB | `wishlists` table (user_id, product_id) | Unlimited |
 
 ### Methods
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `ids()` | `(): array` | Returns filtered int array of product IDs |
-| `content()` | `(): Collection` | `Product::with(['images','category'])->whereIn('id', $ids)` — preserves insertion order |
-| `has()` | `(Product\|int): bool` | `in_array($id, $this->ids(), true)` |
-| `toggle()` | `(Product): bool` | Add if missing, remove if present. Returns new state (`true` = in wishlist) |
-| `remove()` | `(Product\|int): void` | Remove by ID |
-| `count()` | `(): int` | `count($this->ids())` |
+| Method | Signature | Guest | Auth |
+|--------|-----------|-------|------|
+| `ids()` | `(): array` | Session array | `Wishlist::where(user_id)->pluck(product_id)` |
+| `content()` | `(): Collection` | Batch `whereIn` + sort | Same |
+| `has()` | `(Product\|int): bool` | `in_array` | `Wishlist::where()->exists()` |
+| `toggle()` | `(Product): bool` | Session toggle | DB insert/delete toggle |
+| `remove()` | `(Product\|int): void` | Session filter | DB delete |
+| `count()` | `(): int` | `count(array)` | `Wishlist::where()->count()` |
+| `mergeGuestWishlist()` | `(array $guestIds): void` | — | `insertOrIgnore` + session clear |
 
 ### Key Design Decisions
-- **No DB table** — purely session storage
-- **No merge on login** — wishlist is lost on session destroy (unlike Cart's `mergeGuestCart`)
-- **No cap on items** — can grow indefinitely (unlike RecentlyViewed's max 20)
-- **No product validation** — if product is deleted, ID remains in session until content() filters it out
+- **Transparent to callers** — `has()` and `toggle()` auto-detect guest vs auth
+- **No data loss on login** — `mergeGuestWishlist` transfers session IDs to DB
+- **Unique constraint** — `(user_id, product_id)` prevents duplicates
+- **insertOrIgnore** — safe upsert without race conditions
 
 ---
 
-## 3. RecentlyViewedService
+## 3. mergeGuestWishlist — Integration with OTP Login
+
+### Flow (OtpController::verify)
+
+```
+1. $guestCart = session('cart', [])        // capture before login
+2. $guestWishlist = session('wishlist', []) // capture before login
+3. otpService->verify()                    // login (Auth::login)
+4. session()->regenerate()                 // new session ID
+5. CartService::mergeGuestCart($guestCart) // merge cart
+6. WishlistService::mergeGuestWishlist($guestWishlist) // merge wishlist
+7. redirect dashboard
+```
+
+### mergeGuestWishlist internals
+```php
+public function mergeGuestWishlist(array $guestIds): void
+{
+    if (! $this->isAuth() || empty($guestIds)) return;
+
+    $rows = array_map(fn(int $productId) => [
+        'user_id'    => Auth::id(),
+        'product_id' => $productId,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ], array_filter(array_map('intval', $guestIds), fn(int $id) => $id > 0));
+
+    if (! empty($rows)) {
+        DB::table('wishlists')->insertOrIgnore($rows);
+    }
+
+    session()->forget('wishlist'); // clear guest session
+}
+```
+
+---
+
+## 4. RecentlyViewedService — Session-Only (unchanged)
 
 ### Session Key: `recently_viewed`
 ### Storage: `array<int>` of product IDs (newest first, max 20)
 
-### Methods
+Same as before — no DB persistence, no merge on login.
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `ids()` | `(): array` | Filtered int array |
-| `content()` | `(int $limit): Collection` | `Product::with(['images','category','brand'])->whereIn('id', $ids)->where('is_active', true)` — preserves order |
-| `add()` | `(Product\|int): void` | Remove existing + `array_unshift` + `array_slice(0, 20)` |
-| `remove()` | `(Product\|int): void` | Remove by ID |
-| `clear()` | `(): void` | `session()->forget($key)` |
-| `count()` | `(): int` | `count($this->ids())` |
-| `has()` | `(Product\|int): bool` | `in_array` check |
-
-### Key Design Decisions
-- **Max 20 items** — oldest auto-pruned on add
-- **Only active products** — `where('is_active', true)` filters deleted/inactive
-- **Newest first** — `array_unshift` on add, `sortBy` on content for display
-- **No merge on login** — session-based only
+| Method | Description |
+|--------|-------------|
+| `add()` | Remove existing + `array_unshift` + `array_slice(0, 20)` |
+| `content()` | `Product::with(['images','category','brand'])->whereIn('id', $ids)->where('is_active', true)` |
+| `remove()` / `clear()` / `count()` / `has()` | Standard array operations |
 
 ---
 
-## 4. Controller — `Site\WishlistController`
+## 5. Controller — `Site\WishlistController`
 
 ### `index()`
 - Returns `site.wishlist.index` view with `$items = $this->wishlist->content()`
@@ -76,55 +107,53 @@ Both are **guest-compatible** — no login required. No merge on login (unlike C
 - Find product by slug: `Product::where('slug', $request->route('product'))->firstOrFail()`
 - Call `$this->wishlist->toggle($product)`
 - Return JSON: `{success: true, in_wishlist: bool, count: int}`
-- **No auth required** — guest can toggle
+- No auth required — guest can toggle
 
 ---
 
-## 5. Routes
+## 6. Routes
 
 ```
-GET  /wishlist                    → WishlistController@index    (guest/auth)
-POST /wishlist/toggle/{product:slug} → WishlistController@toggle (guest/auth, JSON)
+GET  /wishlist                         → WishlistController@index    (guest/auth)
+POST /wishlist/toggle/{product:slug}   → WishlistController@toggle   (guest/auth, JSON)
 ```
-
-**No admin routes** — wishlist is user-facing only.
 
 ---
 
-## 6. Business Rules
+## 7. Business Rules
 
 | Rule | Evidence |
 |------|----------|
-| Session-only storage | `session($this->sessionKey, [])` — no DB |
-| No login required | No `auth` middleware on routes |
-| No merge on login | No `mergeGuestWishlist` exists (unlike Cart) |
-| No cap on wishlist items | `toggle()` adds without limit |
-| Max 20 recently viewed | `array_slice($ids, 0, $this->maxItems)` |
-| Only active products in recently viewed | `where('is_active', true)` |
-| Insertion order preserved | `sortBy(fn($p) => array_search($p->id, $ids))` |
-| Product lookup N+1 in content() | Per-item eager load with `whereIn` (batched, not N+1) |
+| Dual-mode: session for guest, DB for auth | `WishlistService::isAuth()` check |
+| Merge on login via `mergeGuestWishlist` | `OtpController::verify:139-141` |
+| Unique constraint `(user_id, product_id)` | Migration + `insertOrIgnore` |
+| No cap on wishlist items | No limit in toggle |
+| Product soft-delete handled | `whereIn` filters non-existent IDs |
+| Session cleared after merge | `session()->forget('wishlist')` |
 
 ---
 
-## 7. Cross-Module Integration
+## 8. Schema — `wishlists` table
 
-### Products → Wishlist
-- `ProductController::show()` calls `$this->wishlistService->has($product)` to pass `$inWishlist` to view
-- Heart icon state rendered via `$inWishlist`
+```
+id         BIGINT PK AUTO INCREMENT
+user_id    BIGINT FK → users.id (cascadeOnDelete)
+product_id BIGINT FK → products.id (cascadeOnDelete)
+created_at TIMESTAMP
+updated_at TIMESTAMP
+```
 
-### Cart → Wishlist
-- No integration — wishlist and cart are independent session stores
-
-### Auth → Wishlist
-- No merge on login — wishlist is session-only
-- **Missing feature:** `mergeGuestWishlist` (like Cart's `mergeGuestCart`) — discussed but not implemented
+### Indexes
+- `(user_id, product_id)` — UNIQUE constraint
 
 ---
 
-## 8. Evidence
+## 9. Evidence
 
-- `app/Services/WishlistService.php` — 85 lines, session-based, toggle/remove/count
-- `app/Services/RecentlyViewedService.php` — 100 lines, session-based, max 20, add/remove/clear
+- `app/Services/WishlistService.php` — 165 lines, dual-mode, mergeGuestWishlist
+- `app/Models/Wishlist.php` — new model, user/product relations
+- `app/Services/RecentlyViewedService.php` — 100 lines, session-only
 - `app/Http/Controllers/Site/WishlistController.php` — 35 lines, index + toggle
+- `app/Http/Controllers/Site/OtpController.php:139-141` — mergeGuestWishlist call
+- `database/migrations/2026_09_08_000001_create_wishlists_table.php` — schema
 - `routes/site.php:60-61` — 2 routes (no auth)
-- `app/Http/Controllers/Site/ProductController.php:185` — `$inWishlist` passed to view

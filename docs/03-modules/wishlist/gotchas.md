@@ -2,88 +2,68 @@
 
 ---
 
-## 1. No `mergeGuestWishlist` on login — wishlist LOST (MISSING FEATURE)
+## 1. ~~No `mergeGuestWishlist` on login~~ — FIXED ✅ (Backlog 3.2)
 
-**Bug:** Unlike Cart (which has `mergeGuestCart` called from `OtpController::verify:146`), Wishlist has **no merge mechanism**. When a guest adds items to wishlist, then logs in (OTP), the session is regenerated (`session()->regenerate()`) and the wishlist array is lost.
+**Previously:** Guest wishlist lost on OTP login (session regenerate). Cart had `mergeGuestCart`; Wishlist didn't.
 
-**Impact:** HIGH — guest users lose their wishlist on login. Cart has this feature; Wishlist doesn't.
-
-**Fix:** Implement `WishlistService::mergeGuestWishlist(array $guestIds)` called from `OtpController::verify` after session regenerate, similar to Cart's merge pattern.
+**Now (2026-09-08):** `WishlistService::mergeGuestWishlist(array $guestIds)` implemented and called from `OtpController::verify` after session regenerate. Uses `DB::table('wishlists')->insertOrIgnore()` for safe upsert. Session cleared after merge.
 
 ---
 
-## 2. No cap on wishlist items — unbounded session growth
+## 2. No cap on wishlist items — unbounded session/DB growth
 
-**Bug:** `WishlistService::toggle()` adds product IDs without any limit. A user (or bot) can add thousands of IDs to the session array.
+**Status:** OPEN — `toggle()` adds without limit. Session mode can grow indefinitely; DB mode grows per-row.
 
-**Impact:** Low — session storage is cheap, but `content()` loads ALL products via `whereIn` which could be slow with 1000+ IDs.
+**Impact:** Low — `content()` loads all via `whereIn` which could be slow with 1000+ items.
 
-**Fix:** Add `maxItems = 100` cap (or similar) in `toggle()`.
+**Fix:** Add `maxItems = 100` cap in `toggle()`.
 
 ---
 
 ## 3. No product validation in `ids()` — stale IDs accumulate
 
-**Bug:** `ids()` returns whatever is in session without checking if products still exist or are active. If a product is soft-deleted or deactivated, its ID remains in the session until `content()` is called (which filters via `whereIn`).
+**Status:** OPEN — Session IDs are not validated against product existence. DB IDs are filtered by FK cascadeOnDelete (auto-cleanup on product delete).
 
-**Impact:** Low — `content()` handles it, but `count()` includes stale IDs.
-
-**Fix:** Either validate on `ids()` (expensive) or accept that `count()` may be slightly inflated.
+**Impact:** Low — `content()` handles it via `whereIn`. `count()` may include stale session IDs.
 
 ---
 
-## 4. `RecentlyViewedService::add()` — N+1 if called per product
+## 4. `content()` N+1 risk in views
 
-**Bug:** `add()` only writes to session (no DB query), so it's fast. But if called in a loop (e.g., from a product listing), the `array_search` + `array_unshift` + `array_slice` runs per call.
-
-**Impact:** Negligible — pure PHP array operations.
+**Status:** OPEN — `content()` does `Product::with(['images','category'])->whereIn('id', $ids)` — batched, not N+1. But if view accesses `$product->brand` or other non-eager-loaded relations, N+1 triggers.
 
 ---
 
-## 5. No auth middleware on toggle — CSRF protection only
+## 5. RecentlyViewed — no merge on login
 
-**Bug:** `POST /wishlist/toggle/{product:slug}` has no `auth` middleware. Guest users can toggle. CSRF is handled by Laravel's web middleware.
-
-**Impact:** None — this is intentional design (guest wishlist).
+**Status:** OPEN (by design) — RecentlyViewed is session-only, no DB persistence. Guest recently viewed is lost on login. This is acceptable — recently viewed is ephemeral.
 
 ---
 
-## 6. `content()` N+1 risk in views
+## 6. Session driver dependency — `array` driver loses everything
 
-**Bug:** `WishlistService::content()` does `Product::with(['images', 'category'])->whereIn('id', $ids)` — batched query, not N+1. But if the view accesses `$product->brand` or other relations not eager-loaded, it triggers N+1.
-
-**Impact:** Low — depends on view implementation.
+**Status:** OPEN — Both services use `session()`. If `SESSION_DRIVER=array` (tests), all data lost between requests. Tests must use `database` or `file` driver.
 
 ---
 
-## 7. RecentlyViewed — `is_active` filter but no `SoftDeletes` check
+## 7. Dual-mode consistency — session vs DB after toggle
 
-**Bug:** `RecentlyViewedService::content()` filters `where('is_active', true)` but doesn't use `withTrashed()`. Soft-deleted products are excluded by default (global scope). This is correct behavior but undocumented.
-
----
-
-## 8. Session driver dependency — `array` driver loses everything
-
-**Bug:** Both services use `session()`. If `SESSION_DRIVER=array` (used in tests), all data is lost between requests. Tests must use `database` or `file` driver.
-
-**Impact:** Test-only issue.
+**Status:** OPEN — After login, `toggle()` switches from session to DB mode. If a guest adds items to session, then logs in, the session items are merged. But if a guest toggles AFTER the merge (race), items could be in session but not DB. The merge runs once at login; subsequent toggles use DB.
 
 ---
 
 ## AI Checklist before coding Wishlist
 
-- [ ] Checked if `mergeGuestWishlist` exists (it doesn't — add if implementing login merge)
-- [ ] Verified session key is unique (`wishlist` / `recently_viewed`)
-- [ ] Checked product eager loading in `content()` — add relations as needed
-- [ ] Remembered: no DB tables — all session-based
-- [ ] Remembered: no auth required — guest can toggle
-- [ ] Checked max items cap (wishlist: none, recently viewed: 20)
+- [x] `mergeGuestWishlist` exists and is called from OtpController (FIXED)
+- [ ] Checked session vs DB mode via `isAuth()`
+- [ ] Verified `insertOrIgnore` for merge safety
+- [ ] Checked product eager loading in `content()`
+- [ ] Remembered: no cap on wishlist items
+- [ ] Remembered: no auth required on toggle route
 
 ## Evidence
 
-- `app/Services/WishlistService.php` — 85 lines, session-based toggle/remove/count
-- `app/Services/RecentlyViewedService.php` — 100 lines, max 20, add/remove/clear
-- `app/Http/Controllers/Site/WishlistController.php` — 35 lines, index + toggle (no auth)
-- `routes/site.php:60-61` — 2 routes (no auth middleware)
-- `app/Http/Controllers/Site/ProductController.php:185` — `$inWishlist` passed to view
-- `app/Http/Controllers/Site/OtpController.php:135-147` — session regenerate (wishlist lost here)
+- `app/Services/WishlistService.php` — 165 lines, dual-mode, mergeGuestWishlist
+- `app/Models/Wishlist.php` — new model, user/product relations
+- `app/Http/Controllers/Site/OtpController.php:139-141` — mergeGuestWishlist call
+- `database/migrations/2026_09_08_000001_create_wishlists_table.php` — schema
