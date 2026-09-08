@@ -35,10 +35,18 @@ for public campaigns.
 `apply()` step 5 and `filterUsers` `no_paid_orders` both count only `order_status = 'paid'`.
 A user with a deposit_paid order still counts as "first purchase".
 
-## 6) TOCTOU on usage limits (cross-ref Payments gotcha #20)
-`hasReachedLimit` counts only `usageRecords` (written after payment success). Between order
-create (unpaid) and payment, nothing is recorded → N concurrent orders can pass a capacity-1
-coupon check; post-payment the limit goes negative.
+## 6) TOCTOU on usage limits — PARTIALLY FIXED ✅ (apply race) / OPEN (cross-request)
+
+**Fixed (2026-09-08):** `CouponService::apply()` now wraps the entire validation pipeline in
+`DB::transaction` + `lockForUpdate()` on the Discount row. Two concurrent `apply()` calls for
+the same code are serialized — the second blocks until the first's transaction commits.
+This prevents the "two users apply same code simultaneously" race.
+
+**Still OPEN:** The cross-request TOCTOU between `apply()` (session write) and `recordUsage()`
+(called from `OrderService::handleSuccessOrderPayment` after payment) remains. Between order
+creation and payment success, other requests can still apply the same code. A unique constraint
+on `discount_usage(discount_id, order_id)` would prevent duplicate recording, and recording
+usage at order creation time (with compensation on failure) would close the gap entirely.
 
 ## 7) Stale session coupon after soft-delete bypasses eligibility (EDGE)
 `destroy()` soft-deletes; an existing session `coupon` survives. `calculateForCart()` gets
