@@ -4,6 +4,7 @@ use App\Http\Middleware\AdminPermission;
 use App\Http\Middleware\LocalizeHtmlDigits;
 use App\Http\Middleware\LogAdminRequests;
 use App\Http\Middleware\RefreshRememberMeCookie;
+use App\Http\Middleware\SecureHeadersMiddleware;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTheme;
 use Illuminate\Foundation\Application;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // SetTheme آخرین لایه‌ی درخواست است؛ LocalizeHtmlDigits باید بعد از آن اجرا شود
         // چون خانوادهٔ ارقام را از زبانی که SetLocale اعمال کرده می‌خواند.
         $middleware->web([
+            SecureHeadersMiddleware::class, // Security headers (OWASP)
             SetLocale::class,
             SetTheme::class,
             LocalizeHtmlDigits::class,

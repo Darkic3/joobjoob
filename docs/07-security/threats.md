@@ -37,6 +37,21 @@ Named rate limiters added to `AppServiceProvider::boot()` and applied to sensiti
 **Previously:** Reviews, wishlist toggle, cart add, discount apply, and checkout create had NO throttle — vulnerable to spam/DoS.
 **Now:** All sensitive endpoints rate-limited. Combined with existing OTP throttle (5/min) and contact (5/min).
 
+## Security Headers — FIXED ✅ (2026-09-08)
+
+`SecureHeadersMiddleware` added to web middleware stack. Headers applied to ALL responses:
+
+| Header | Value | Protection |
+|--------|-------|------------|
+| `X-Frame-Options` | `SAMEORIGIN` | Clickjacking — prevents embedding in iframes from other origins |
+| `X-Content-Type-Options` | `nosniff` | MIME Sniffing — browser must respect declared Content-Type |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Referrer leakage — send origin only on cross-origin requests |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` | Feature restriction — disable sensitive browser APIs by default |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | HSTS — force HTTPS for 1 year (secure/production only) |
+
+**Previously:** No security headers — vulnerable to Clickjacking, MIME Sniffing, referrer leakage.
+**Now:** All OWASP recommended headers applied via middleware.
+
 ## Known Threats — Detail (P0-08 Payload Leak & MITM)
 
 ### T11 — Chapar HTTP MITM
