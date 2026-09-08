@@ -17,6 +17,7 @@ use App\Services\StockService;
 use App\Http\Requests\Site\CardToCardCheckoutRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -67,13 +68,34 @@ class CheckoutController extends Controller
 
     /**
      * انتخاب روش ارسال (AJAX)
+     *
+     * P0-05 FIX: فقط shipping_method_id ذخیره می‌شود، نه shipping_price.
+     * قیمت ارسال در مرحله create() به صورت سروری محاسبه می‌شود.
      */
     public function setShipment(Request $request): JsonResponse
     {
-        session([
-            'checkout_shipping_method_id' => $request->get('shipping_method_id'),
-            'checkout_shipping_price' => $request->get('shipping_price', 0),
-        ]);
+        $shippingMethodId = $request->get('shipping_method_id');
+
+        // اعتبارسنجی: آیا روش ارسال وجود دارد و فعال است؟
+        $method = ShippingMethod::where('id', $shippingMethodId)
+            ->where('status', 1)
+            ->first();
+
+        if (! $method) {
+            return response()->json(['success' => false, 'message' => 'روش ارسال نامعتبر یا غیرفعال است.'], 422);
+        }
+
+        // اعتبارسنجی: آیا این روش برای شهر آدرس کاربر فعال است؟
+        $addressId = session('checkout_address_id');
+        if ($addressId) {
+            $address = Address::find($addressId);
+            if ($address && ! $method->cities()->where('cities.id', $address->city_id)->exists()) {
+                return response()->json(['success' => false, 'message' => 'روش ارسال برای این شهر فعال نیست.'], 422);
+            }
+        }
+
+        // P0-05 FIX: فقط method_id ذخیره می‌شود، قیمت در create() محاسبه می‌شود
+        session(['checkout_shipping_method_id' => $method->id]);
 
         return response()->json(['success' => true]);
     }
@@ -169,14 +191,30 @@ class CheckoutController extends Controller
 
         $addressId = session('checkout_address_id');
         $shippingMethodId = session('checkout_shipping_method_id');
-        $shippingPrice = session('checkout_shipping_price', 0);
 
         if (! $addressId || ! $shippingMethodId) {
             return redirect()->back()->with('error', 'اطلاعات تکمیل نیست.');
         }
 
         $address = Address::with(['state', 'city'])->find($addressId);
-        $shippingMethod = ShippingMethod::find($shippingMethodId);
+        $shippingMethod = ShippingMethod::where('id', $shippingMethodId)
+            ->where('status', 1)
+            ->first();
+
+        if (! $shippingMethod) {
+            return redirect()->back()->with('error', 'روش ارسال نامعتبر یا غیرفعال است.');
+        }
+
+        // P0-05 FIX: محاسبه سروری قیمت ارسال (نادیده گرفتن مقدار کلاینت)
+        $shippingPrice = ShippingCalculator::calculate(
+            $shippingMethod,
+            $this->cart->roundedWeight(),
+            $this->cart->total(),
+            $address
+        )['price'];
+
+        // ذخیره قیمت محاسبه‌شده در سشن (برای نمایش در addressPrice)
+        session(['checkout_shipping_price' => $shippingPrice]);
 
         $orderData = [
             'address_id' => $address->id,

@@ -2,24 +2,16 @@
 
 ---
 
-## 1. P0-05 — CLIENT-CONTROLLED `shipping_price` — STILL UNFIXED ⚠️
+## 1. P0-05 — CLIENT-CONTROLLED `shipping_price` — FIXED ✅ (2026-09-08)
 
-**Bug:** `CheckoutController::setShipment` (line 73-76) stores BOTH values verbatim from client:
-```php
-session([
-    'checkout_shipping_method_id' => $request->get('shipping_method_id'),
-    'checkout_shipping_price'     => $request->get('shipping_price', 0),
-]);
-```
-No validation whatsoever. `checkout/create` (line 172) reads `session('checkout_shipping_price')` and passes it to `OrderService::create` as `shipping_price`. A tampered `shipping_price=0` means free shipping — no server-side recalculation.
+**Previously:** `CheckoutController::setShipment` stored BOTH `shipping_method_id` AND `shipping_price` verbatim from client. `checkout/create` used the client-supplied price — user could set `shipping_price=0` for free shipping.
 
-**Impact:** HIGH — user can set any shipping price, including 0, for any method.
+**Now (verified in code):**
+1. `setShipment` only stores `shipping_method_id` — validates method exists, is active, and is available for the address's city.
+2. `create` recalculates shipping price server-side via `ShippingCalculator::calculate($method, $cart->roundedWeight(), $cart->total(), $address)['price']`.
+3. Session value is overwritten with server-calculated price.
 
-**Fix:** Server-side recalculation at `checkout/create`:
-```php
-$shippingPrice = ShippingCalculator::calculate($shippingMethod, $cart->roundedWeight(), $cart->total())['price'];
-```
-Ignore session value entirely.
+**Evidence:** `CheckoutController::setShipment` validates + stores only method_id; `create` calls `ShippingCalculator::calculate` and stores result in session.
 
 ---
 
