@@ -29,7 +29,7 @@ class CancelExpiredOrders extends Command
 
         $this->info("{$expiredOrders->count()} سفارش منقضی شده یافت شد:");
 
-        $stockService = app(StockService::class);
+        $orderService = app(\App\Services\OrderService::class);
         $cancelled = 0;
         $failed = 0;
 
@@ -43,10 +43,7 @@ class CancelExpiredOrders extends Command
 
             try {
                 $previousStatus = $order->order_status;
-                $order->update(['order_status' => 'cancelled']);
-
-                // بازگردانی موجودی
-                $stockService->restoreStock($order);
+                $orderService->updateOrderStatus($order, 'cancelled', 'سیستم - سفارش منقضی');
 
                 Log::info("Auto-cancelled expired order #{$order->id}", [
                     'previous_status' => $previousStatus,

@@ -25,26 +25,19 @@ class BankPaymentService
         Auth::loginUsingId($order->user_id);
 
         if ($response->getStatus() === 'failed') {
-            // P0-03 Fix: Never delete the order — mark as unpaid, restore stock, log it.
-            // This preserves the order for debugging, retry, and admin visibility.
-            $previousStatus = $order->order_status;
-
+            // P0-03 Fix + rework: use centralized status transition so stock logic is consistent
             try {
-                $this->stockService()->restoreStock($order);
+                $orderService = app(\App\Services\OrderService::class);
+                $orderService->updateOrderStatus($order, 'unpaid', 'Gateway token failed');
             } catch (\Throwable $e) {
-                Log::error('restoreStock failed on token failure for order #' . $order->id, [
+                Log::error('updateOrderStatus unpaid failed on token failure for order #' . $order->id, [
                     'message' => $e->getMessage(),
                 ]);
-            }
-
-            $order->update(['order_status' => 'unpaid']);
-
-            try {
-                AuditService::orderStatusChanged($order, $previousStatus, 'unpaid', 'Gateway token failed');
-            } catch (\Throwable $e) {
-                Log::error('AuditLog failed on token failure for order #' . $order->id, [
-                    'message' => $e->getMessage(),
-                ]);
+                // fallback: ensure status is unpaid even if stock logic threw
+                if ($order->order_status !== 'unpaid') {
+                    $order->update(['order_status' => 'unpaid']);
+                    try { AuditService::orderStatusChanged($order, $order->order_status, 'unpaid', 'Gateway token failed'); } catch (\Throwable $ex) { Log::error('AuditLog failed', ['message' => $ex->getMessage()]); }
+                }
             }
 
             return redirect(route('checkout.failed'))
@@ -84,7 +77,8 @@ class BankPaymentService
         ]);
 
         if ($response->getStatus() === 'failed') {
-            $order->update(['order_status' => 'unpaid']);
+            // وضعیت را اینجا تغییر نمی‌دهیم — caller (OrderService::callback -> handleFailedPayment) مسئول تغییر وضعیت و بازگردانی موجودی است
+            // تا از double-restore و لاگ ناقص جلوگیری شود. فقط verify data را ذخیره می‌کنیم (بالا).
             return false;
         }
 

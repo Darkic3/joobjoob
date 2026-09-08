@@ -177,6 +177,38 @@ class Order extends Model
         return in_array($this->bank?->bank_type ?? '', ['card_to_card', 'card-to-card']);
     }
 
+    // ==================== Stock Logic Constants ====================
+
+    /** وضعیت‌هایی که موجودی برای آن‌ها رزرو/نگه‌داری می‌شود ( کم شده باقی می‌ماند ) */
+    public const STOCK_RESERVED_STATUSES = [
+        'paying',
+        'paid',
+        'deposit_paid',
+        'pending_confirmation',
+        'wait_for_verification',
+    ];
+
+    /** وضعیت‌هایی که موجودی آزاد است (برگردانده شده یا هرگز رزرو نشده) */
+    public const STOCK_RELEASED_STATUSES = [
+        'cancelled',
+        'unpaid',
+    ];
+
+    public static function isStockReservedStatus(?string $status): bool
+    {
+        return in_array($status, self::STOCK_RESERVED_STATUSES, true);
+    }
+
+    public static function isStockReleasedStatus(?string $status): bool
+    {
+        return in_array($status, self::STOCK_RELEASED_STATUSES, true);
+    }
+
+    public function holdsStock(): bool
+    {
+        return self::isStockReservedStatus($this->order_status);
+    }
+
     // ==================== Methods ====================
 
     public function hasReturnItem(): ?string

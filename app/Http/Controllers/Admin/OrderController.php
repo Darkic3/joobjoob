@@ -131,11 +131,31 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $newStatus = $request->get('order_status');
 
-        if ($newStatus === 'cancelled') {
-            // استفاده از cancelOrder برای بازگردانی موجودی
-            $this->orderService->cancelOrder($order);
-        } else {
-            $order->update(['order_status' => $newStatus]);
+        $allowed = ['paying','paid','deposit_paid','pending_confirmation','wait_for_verification','unpaid','cancelled'];
+        if (! in_array($newStatus, $allowed, true)) {
+            return redirect()->back()->with('error', 'وضعیت نامعتبر است.');
+        }
+
+        if ($order->order_status === $newStatus) {
+            return redirect()->back()->with('success', 'وضعیت سفارش بدون تغییر باقی ماند.');
+        }
+
+        try {
+            $this->orderService->updateOrderStatus($order, $newStatus, auth()->user()->name ?? 'ادمین');
+        } catch (\RuntimeException $e) {
+            Log::warning('Admin changeOrderStatus re-reserve failed', [
+                'order_id' => $order->id,
+                'from' => $order->order_status,
+                'to' => $newStatus,
+                'message' => $e->getMessage(),
+            ]);
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Admin changeOrderStatus failed', [
+                'order_id' => $order->id,
+                'message' => $e->getMessage(),
+            ]);
+            return redirect()->back()->with('error', 'خطا در تغییر وضعیت: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'وضعیت سفارش بروزرسانی شد.');

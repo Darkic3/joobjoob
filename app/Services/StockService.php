@@ -14,30 +14,81 @@ class StockService
 {
     public function reserveStock(Order $order): bool
     {
-        $items = $order->items()->get();
+        $items = $order->allItems()->where('quantity', '>', 0)->get();
+        if ($items->isEmpty()) {
+            $items = $order->items()->get();
+            if ($items->isEmpty()) {
+                return true;
+            }
+        }
+        $items = $items->filter(fn ($i) => (int) $i->quantity > 0);
         if ($items->isEmpty()) {
             return true;
         }
-        return DB::transaction(function () use ($order, $items) {
+        $result = DB::transaction(function () use ($order, $items) {
             foreach ($items as $item) {
                 $this->decreaseItemStock($item->product_id, $item->product_variant_id, $item->quantity, $order->id);
             }
             return true;
         });
+
+        // لاگ سطح سفارش برای رزرو (برای گزارش‌گیری و دیباگ)
+        try {
+            $auditItems = $items->map(fn ($i) => [
+                'product_id' => $i->product_id,
+                'variant_id' => $i->product_variant_id,
+                'quantity' => $i->quantity,
+            ])->toArray();
+            AuditService::orderStockReserved($order, $auditItems);
+            Log::info("StockService: stock reserved for order #{$order->id}", [
+                'order_id' => $order->id,
+                'order_status' => $order->order_status,
+                'items' => $auditItems,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('AuditLog order.stock_reserved failed for order #' . $order->id, ['message' => $e->getMessage()]);
+        }
+
+        return $result;
     }
 
     public function restoreStock(Order $order): bool
     {
-        $items = $order->items()->get();
+        $items = $order->allItems()->where('quantity', '>', 0)->get();
+        if ($items->isEmpty()) {
+            $items = $order->items()->get();
+            if ($items->isEmpty()) {
+                return true;
+            }
+        }
+        $items = $items->filter(fn ($i) => (int) $i->quantity > 0);
         if ($items->isEmpty()) {
             return true;
         }
-        return DB::transaction(function () use ($order, $items) {
+        $result = DB::transaction(function () use ($order, $items) {
             foreach ($items as $item) {
                 $this->increaseItemStock($item->product_id, $item->product_variant_id, $item->quantity, $order->id);
             }
             return true;
         });
+
+        try {
+            $auditItems = $items->map(fn ($i) => [
+                'product_id' => $i->product_id,
+                'variant_id' => $i->product_variant_id,
+                'quantity' => $i->quantity,
+            ])->toArray();
+            AuditService::orderStockRestored($order, $auditItems);
+            Log::info("StockService: stock restored for order #{$order->id}", [
+                'order_id' => $order->id,
+                'order_status' => $order->order_status,
+                'items' => $auditItems,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('AuditLog order.stock_restored failed for order #' . $order->id, ['message' => $e->getMessage()]);
+        }
+
+        return $result;
     }
 
     public function validateCartItems(array $cartItems): array
