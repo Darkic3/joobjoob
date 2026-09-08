@@ -752,8 +752,7 @@
                 <div class="px-6 py-5 space-y-4">
                     <div class="p-4 rounded-2xl relative" style="background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold" style="color: var(--text-secondary);">شماره کارت مقصد</span>
-                            <button type="button" onclick="copyCardNumber()" id="copyCardBtn" class="text-xs px-3 py-1.5 rounded-xl font-bold transition-all" style="background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent);">کپی شماره کارت</button>
+                            <span class="text-xs font-bold" style="color: var(--text-secondary);">شماره کارت مقصد</span>                                <button type="button" onclick="copyCardNumber()" id="copyCardBtn" class="copy-card-btn text-xs px-3 py-1.5 rounded-xl font-bold transition-all" style="background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent);">کپی شماره کارت</button>
                         </div>
                         <p id="modalCardNumber" class="mono text-xl font-black tracking-wider text-center py-1" style="color: var(--accent);" dir="ltr"></p>
                         <span id="copyFloatMsg" class="copy-float-msg" aria-hidden="true">کپی شد ✓</span>
