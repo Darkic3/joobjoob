@@ -395,4 +395,10 @@ return [
     'loading' => 'جارٍ التحميل...',
 
     'notifications' => 'الإشعارات',
+
+    // إزالة من المفضلة
+    'confirm_remove_wishlist' => 'هل أنت متأكد أنك تريد إزالة هذا المنتج من المفضلة؟',
+    'confirm_remove_wishlist_title' => 'إزالة من المفضلة',
+    'confirm_remove_wishlist_confirm' => 'نعم، أزِل',
+    'confirm_remove_wishlist_cancel' => 'إلغاء',
 ];

@@ -60,6 +60,11 @@
                     data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
                     data-add-label="{{ __('messages.add_to_wishlist') }}"
                     data-remove-label="{{ __('messages.remove_from_wishlist') }}"
+                    data-wishlist-title-confirm="{{ __('messages.confirm_remove_wishlist_title') }}"
+                    data-wishlist-text-confirm="{{ __('messages.confirm_remove_wishlist') }}"
+                    data-wishlist-confirm-label="{{ __('messages.confirm_remove_wishlist_confirm') }}"
+                    data-wishlist-cancel-label="{{ __('messages.confirm_remove_wishlist_cancel') }}"
+                    data-wishlist-removed-label="{{ __('messages.removed_from_wishlist') }}"
                     aria-label="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}"
                     title="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ $inWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

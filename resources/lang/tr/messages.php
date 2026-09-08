@@ -395,4 +395,10 @@ return [
     'loading' => 'Yükleniyor...',
 
     'notifications' => 'Bildirimler',
+
+    // İstek listesinden çıkarma
+    'confirm_remove_wishlist' => 'Bu ürünü istek listesinden çıkarmak istediğinizden emin misiniz?',
+    'confirm_remove_wishlist_title' => 'İstek Listesinden Çıkar',
+    'confirm_remove_wishlist_confirm' => 'Evet, Çıkar',
+    'confirm_remove_wishlist_cancel' => 'İptal',
 ];

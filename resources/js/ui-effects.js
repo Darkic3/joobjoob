@@ -757,6 +757,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // ---------- علاقه‌مندی‌ها: toggle قلب روی کارت‌ها ----------
+// (فقط برای اضافه کردن — بدون تایید)
+// برای حذف از علاقه‌مندی‌ها یک `swal` تأیید نمایش داده می‌شود
 document.addEventListener('DOMContentLoaded', function () {
     const csrfToken = () => { const m = document.querySelector('meta[name="csrf-token"]'); return m ? m.content : ''; };
 
@@ -764,6 +766,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const btn = e.target.closest('[data-wishlist-toggle]');
         if (!btn) return;
         e.preventDefault();
+
+        // فقط درخواست‌های حذف (دکمه قرمز فعال) نیاز به تایید دارند
+        const isRemoving = btn.getAttribute('data-wishlist-active') === '1';
+        if (isRemoving) {
+            showRemoveWishlistConfirm(btn);
+            return;
+        }
+
+        // اضافه کردن بدون تأیید
+        toggleWishlist(btn);
+    });
+
+    // تابع اصلی toggle
+    function toggleWishlist(btn) {
         btn.disabled = true;
 
         fetch(btn.getAttribute('data-wishlist-url'), {
@@ -788,11 +804,200 @@ document.addEventListener('DOMContentLoaded', function () {
                         void badge.offsetWidth;
                         badge.classList.add('count-pop');
                     });
+
+                    // انیمیشن добавления: fly-to-cart-android (برای علائم بالای صفحه)
+                    if (active) flyToWishlistBadge(btn);
                 }
             })
             .finally(function () { btn.disabled = false; });
-    });
+    }
+
+    // تایید حذف با swal
+    function showRemoveWishlistConfirm(btn) {
+        // ساخت أوپن إیجة محلی (از swal یا fall-back به confirm ساده)
+        var title = btn.getAttribute('data-wishlist-title-confirm') || '';
+        var text = btn.getAttribute('data-wishlist-text-confirm') || '';
+
+        if (typeof swal === 'function') {
+            swal({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: btn.getAttribute('data-wishlist-confirm-label') || 'はい，削除',
+                cancelButtonText: btn.getAttribute('data-wishlist-cancel-label') || 'キャンセル',
+            }).then(function (result) {
+                if (result.value !== false && result.dismiss !== 'cancel') {
+                    confirmRemoveWishlist(btn);
+                }
+            });
+        } else {
+            // فیل‌بک ساده: confirm نativa
+            if (confirm(title + '\n\n' + text)) {
+                confirmRemoveWishlist(btn);
+            }
+        }
+    }
+
+    // حذف واقعی + انیمیشن faint-out
+    function confirmRemoveWishlist(btn) {
+        btn.disabled = true;
+
+        // شروع انیمیشن محو شدن molestie
+        var card = btn.closest('[data-card-link], .product-card');
+        if (card) startWishlistRemoveAnimation(card);
+
+        fetch(btn.getAttribute('data-wishlist-url'), {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' },
+        })
+            .then(r => r.json())
+            .then(function (data) {
+                const active = !!data.in_wishlist;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('data-wishlist-active', active ? '1' : '0');
+                btn.setAttribute('aria-label', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+                btn.setAttribute('title', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+
+                if (data.count !== undefined) {
+                    ['wishlist-count', 'wishlist-count-mobile'].forEach(function (id) {
+                        const badge = document.getElementById(id);
+                        if (!badge) return;
+                        badge.textContent = data.count;
+                        badge.classList.remove('count-pop');
+                        void badge.offsetWidth;
+                        badge.classList.add('count-pop');
+                    });
+
+                    // انیمیشن حذف کامل: کارت از صفحه disappearing
+                    if (!active && card) finishWishlistRemoveAnimation(card);
+
+                    // اگر کارت کامل محو شد، به‌روز کردن badgeها و لحظه‌ای toast
+                    if (!active && card) {
+                        setTimeout(function () {
+                            card.style.display = 'none';
+                            updateEmptyState();
+                            showToastMessage(btn.getAttribute('data-wishlist-removed-label') || 'حذف شد', 'info');
+                        }, 400);
+                    }
+                }
+            })
+            .finally(function () { btn.disabled = false; });
+    }
+
+    // انیمیشن محو: تخفیف نرم opacity + translateY + scale → disappear
+    function startWishlistRemoveAnimation(card) {
+        card.classList.add('wishlist-removing');
+    }
+
+    // پایان انیمیشن (بعد از fade-out)
+    function finishWishlistRemoveAnimation(card) {
+        // کارت از دیدアラين؛煞нд甜َدر
+        card.classList.add('wishlist-removed');
+    }
+
+    // به‌روزرسانی grid وقتی کارت حذف شد (برخلاف الگوریتم nợ)
+    function updateEmptyState() {
+        // اگر gridnow has zero children visible → نمایش حالت خالی
+        var grid = document.querySelector('#wishlist-grid');
+        if (!grid) return;
+        var visibleCards = grid.querySelectorAll(':scope > *:not(.wishlist-removed)');
+        var emptyState = grid.parentElement.querySelector('.wishlist-empty-state');
+        if (!visibleCards.length && emptyState) {
+            emptyState.classList.remove('hidden');
+        }
+    }
+
+    // انیمیشن fly-to-wishlist-badge: کپی کوچک از تصویر محصول → بج بالا صفحه
+    function flyToWishlistBadge(sourceEl) {
+        var card = sourceEl.closest('[data-card-link], .product-card');
+        var img = card ? card.querySelector('img') : null;
+        if (!img) return;
+
+        var badge = document.getElementById('wishlist-count') || document.getElementById('wishlist-count-mobile');
+        if (!badge) return;
+        var target = badge.closest('a, button');
+        if (!target) return;
+
+        var src = img.getBoundingClientRect();
+        var dst = target.getBoundingClientRect();
+
+        var size = Math.min(src.width * 0.3, src.height * 0.3, 48);
+        var ghost = document.createElement('div');
+        ghost.setAttribute('aria-hidden', 'true');
+        ghost.style.cssText =
+            'position:fixed;z-index:99999;pointer-events:none;'
+            + 'width:' + size + 'px;height:' + size + 'px;'
+            + 'border-radius:50%;'
+            + 'background-image:url(' + img.src + ');background-size:cover;background-position:center;'
+            + 'box-shadow:0 4px 12px rgba(0,0,0,.25);'
+            + 'will-change:transform,opacity;'
+            + 'left:' + (src.left + src.width / 2 - size / 2) + 'px;'
+            + 'top:' + (src.top + src.height / 2 - size / 2) + 'px;'
+            + 'transform:scale(1);opacity:1;';
+        document.body.appendChild(ghost);
+
+        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+        var duration = 800;
+        var t0 = performance.now();
+
+        function step(now) {
+            var t = Math.min((now - t0) / duration, 1);
+            var e = easeOutCubic(t);
+            var cx = src.left + src.width / 2 + (dst.left + dst.width / 2 - src.left - src.width / 2) * e;
+            var cy = src.top + src.height / 2 + (dst.top + dst.height / 2 - src.top - src.height / 2) * e;
+            var s = size + (14 - size) * e;
+            var op = t < 0.7 ? 1 : 1 - ((t - 0.7) / 0.3) * 0.9;
+
+            ghost.style.left = (cx - s / 2) + 'px';
+            ghost.style.top = (cy - s / 2) + 'px';
+            ghost.style.width = s + 'px';
+            ghost.style.height = s + 'px';
+            ghost.style.opacity = op;
+
+            if (t < 1) requestAnimationFrame(step); else ghost.remove();
+        }
+        requestAnimationFrame(step);
+    }
+
+    // توastr محلی:显示 برای حذف انجام شد
+    function showToastMessage(msg, type) {
+        if (typeof showToast === 'function') {
+            showToast(msg || 'حذف شد', type || 'info');
+        } else {
+            var toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText =
+                'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);'
+                + 'background:#374151;color:#fff;padding:10px 18px;border-radius:8px;'
+                + 'font-size:14px;z-index:99998;box-shadow:0 4px 12px rgba(0,0,0,.2);'
+                + 'opacity:0;transition:opacity .2s ease;';
+            document.body.appendChild(toast);
+            requestAnimationFrame(function () { toast.style.opacity = '1'; });
+            setTimeout(function () {
+                toast.style.opacity = '0';
+                setTimeout(function () { toast.remove(); }, 200);
+            }, 1800);
+        }
+    }
 });
+
+// inline style for wishlist removal animation (injected to head when first used)
+(function () {
+    if (document.getElementById('wishlist-remove-anim-style')) return;
+    var style = document.createElement('style');
+    style.id = 'wishlist-remove-anim-style';
+    style.textContent =
+        '.wishlist-removing { animation: wishlistFadeOut .35s ease forwards; } '
+        + '@keyframes wishlistFadeOut { '
+        + '0% { opacity:1; transform:scale(1); filter:grayscale(0); } '
+        + '100% { opacity:0; transform:scale(0.85); filter:grayscale(1); } '
+        + '}';
+    document.head.appendChild(style);
+})();
+
 
 
 // ---------- چرخش نظرات مشتریان (rotator) ----------

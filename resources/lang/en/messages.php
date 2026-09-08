@@ -397,4 +397,10 @@ return [
     'loading' => 'Loading...',
 
     'notifications' => 'Notifications',
+
+    // Remove from wishlist
+    'confirm_remove_wishlist' => 'Are you sure you want to remove this product from your wishlist?',
+    'confirm_remove_wishlist_title' => 'Remove from Wishlist',
+    'confirm_remove_wishlist_confirm' => 'Yes, Remove',
+    'confirm_remove_wishlist_cancel' => 'Cancel',
 ];

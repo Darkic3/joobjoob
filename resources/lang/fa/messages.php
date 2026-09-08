@@ -399,4 +399,10 @@ return [
 
     'notifications' => 'اعلانات',
 
+    // حذف از علاقه‌مندی‌ها
+    'confirm_remove_wishlist' => 'آیا مطمئن هستید که می‌خواهید این محصول را از علاقه‌مندی‌های خود حذف کنید؟',
+    'confirm_remove_wishlist_title' => 'حذف از علاقه‌مندی‌ها',
+    'confirm_remove_wishlist_confirm' => 'بله، حذف کن',
+    'confirm_remove_wishlist_cancel' => 'انصراف',
 ];
+
