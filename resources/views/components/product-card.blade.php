@@ -1,157 +1,169 @@
 {{--
-    کارت محصول — سازگار با مدل Product و پشتیبانی چندزبانه.
-    Props (از کلاس ProductCard): product | rank | soldPercent
-    همهٔ محاسبات نمایشی در کلاس کامپوننت انجام می‌شود؛ این ویو فقط رندر است.
+    کارت محصول — بازطراحی مدرن با Tailwind CSS
+    Props: product | rank | soldPercent
+    حفظ کامل منطق Backend + بهبود UI/UX
 --}}
 
-<a href="{{ $url }}" class="neu-card product-card neu-interactive group relative flex flex-col h-full p-4 block" style="text-decoration: none; color: inherit;" data-card-link>
+<a href="{{ $url }}" class="group block bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden" style="text-decoration: none; color: inherit;" data-card-link>
 
-    {{-- نشان رتبه (فقط برای بخش پرفروش‌ترین‌ها) — بزرگ و برجسته، همیشه بالای فید لبه‌ها --}}
-    @if($rank)
-        <span class="neu-rank-badge"
-              style="--rank-color: {{ $rankStyle['color'] }}; --rank-text: {{ $rankStyle['text'] }};">
-            {{ $rank }}
-        </span>
-    @endif
-
-    {{-- دکمه‌های عملیات سریع — آیکون‌های خطی ظریف (z-20 بالاتر از لایهٔ محو لبه‌ها) --}}
-    <div class="product-actions absolute top-3 end-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button type="button"
-                class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)] wishlist-heart {{ $inWishlist ? 'active' : '' }}"
-                data-wishlist-toggle
-                data-wishlist-url="{{ localizedRoute('wishlist.toggle', ['product' => $product->slug]) }}"
-                data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
-                data-add-label="{{ __('messages.add_to_wishlist') }}"
-                data-remove-label="{{ __('messages.remove_from_wishlist') }}"
-                aria-label="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}"
-                title="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-            </svg>
-        </button>
-        <button type="button"
-                class="neu-btn neu-btn-icon w-8 h-8 flex items-center justify-center text-sm bg-[var(--bg-elevated)]"
-                data-quick-view-url="{{ localizedRoute('products.quick-view', ['product' => $product->slug]) }}"
-                aria-label="{{ __('messages.quick_view') }}" title="{{ __('messages.quick_view') }}">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-        </button>
-    </div>
-
-    <div class="flex flex-col flex-1">
+    {{-- ═══ بخش تصویر ═══ --}}
+    <div class="relative aspect-square overflow-hidden bg-gray-100">
         {{-- تصویر محصول --}}
-        <div class="product-image-wrap relative mb-3 overflow-hidden rounded-xl bg-[var(--bg-elevated)]/60" style="aspect-ratio: 1/1;">
-            <img src="{{ $imageUrl }}"
-                 alt="{{ $name }}"
-                 width="400" height="400"
-                 loading="lazy"
-                 onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
-                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform">
+        <img src="{{ $imageUrl }}"
+             alt="{{ $name }}"
+             width="400" height="400"
+             loading="lazy"
+             onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
 
-            {{-- نشان‌ها (فقط اگر رتبه‌بندی نباشد) --}}
-            @if(!$rank)
-                @if($lowStock)
-                    <span class="badge-urgency absolute top-2 start-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse">
-                        {{ __('messages.only_left', ['count' => $product->stock]) }}
-                    </span>
-                @elseif($hasDiscount)
-                    <span class="badge-sale absolute top-2 start-2 z-10">
-                        {{ $discountPercent }}٪-
-                    </span>
-                @elseif($isNew)
-                    <span class="badge-new absolute top-2 start-2 z-10 bg-[var(--success)] text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                        {{ __('messages.new_badge') }}
-                    </span>
-                @endif
+        {{-- ═══ بج‌ها ═══ --}}
+        <div class="absolute top-3 start-3 flex flex-col gap-2 z-10">
+            {{-- بج تخفیف --}}
+            @if($hasDiscount)
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white bg-red-500 shadow-lg">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/>
+                    </svg>
+                    {{ $discountPercent }}٪-
+                </span>
+            @endif
+
+            {{-- بج موجودی کم --}}
+            @if($lowStock && !$hasDiscount)
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white bg-orange-500 shadow-lg animate-pulse">
+                    {{ __('messages.only_left', ['count' => $product->stock]) }}
+                </span>
+            @endif
+
+            {{-- بج جدید --}}
+            @if($isNew && !$hasDiscount && !$lowStock)
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white bg-emerald-500 shadow-lg">
+                    {{ __('messages.new_badge') }}
+                </span>
             @endif
         </div>
 
-        {{-- نام محصول --}}
-        <h4 class="text-[13px] font-bold line-clamp-2 leading-relaxed" style="color: var(--text-primary);">
+        {{-- بج رتبه --}}
+        @if($rank)
+            <span class="absolute top-3 end-3 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-lg z-10"
+                  style="background: {{ $rankStyle['color'] }};">
+                {{ $rank }}
+            </span>
+        @endif
+
+        {{-- دکمه‌های عملیات سریع --}}
+        <div class="absolute top-3 end-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 @if($rank) mt-14 @endif">
+            <button type="button"
+                    class="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 {{ $inWishlist ? 'text-red-500' : 'text-gray-600 hover:text-red-500' }}"
+                    data-wishlist-toggle
+                    data-wishlist-url="{{ localizedRoute('wishlist.toggle', ['product' => $product->slug]) }}"
+                    data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
+                    data-add-label="{{ __('messages.add_to_wishlist') }}"
+                    data-remove-label="{{ __('messages.remove_from_wishlist') }}"
+                    aria-label="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}"
+                    title="{{ $inWishlist ? __('messages.remove_from_wishlist') : __('messages.add_to_wishlist') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ $inWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+                </svg>
+            </button>
+            <button type="button"
+                    class="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-gray-600 hover:bg-white hover:scale-110 hover:text-blue-500 transition-all duration-200"
+                    data-quick-view-url="{{ localizedRoute('products.quick-view', ['product' => $product->slug]) }}"
+                    aria-label="{{ __('messages.quick_view') }}" title="{{ __('messages.quick_view') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- لایه ناموجود --}}
+        @if($outOfStock)
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-20">
+                <span class="px-4 py-2 rounded-xl bg-white/90 text-sm font-bold text-gray-700 shadow-lg">
+                    {{ __('messages.out_of_stock') }}
+                </span>
+            </div>
+        @endif
+    </div>
+
+    {{-- ═══ بخش محتوا ═══ --}}
+    <div class="p-4">
+        {{-- عنوان محصول --}}
+        <h4 class="text-sm font-bold text-gray-900 line-clamp-2 leading-relaxed mb-2 min-h-[2.5rem]">
             {{ $name }}
         </h4>
 
-        {{-- امتیاز و تعداد نظرات --}}
+        {{-- امتیاز --}}
         @if($rating > 0)
-            <div class="flex items-center gap-1.5 mt-1.5">
-                <div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"
-                     style="background: color-mix(in srgb, var(--gold) 10%, transparent);">
-                    <svg class="w-3 h-3" style="color: var(--gold);" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <span class="text-[11px] font-bold" style="color: var(--gold);">{{ format_price($rating, 1) }}</span>
+            <div class="flex items-center gap-1.5 mb-3">
+                <div class="flex items-center gap-0.5">
+                    @for($i = 1; $i <= 5; $i++)
+                        <svg class="w-3.5 h-3.5 {{ $i <= round($rating) ? 'text-amber-400' : 'text-gray-200' }}" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    @endfor
                 </div>
-                <span class="text-[10px]" style="color: var(--text-secondary);">({{ $reviewCount }})</span>
+                <span class="text-[11px] text-gray-500">({{ $reviewCount }})</span>
             </div>
         @endif
 
-        {{-- بخش قیمت و دکمه خرید --}}
-        <div class="mt-auto pt-2">
+        {{-- نوار پیشرفت فروش --}}
+        @if($soldPercent !== null)
             <div class="mb-3">
-                {{-- قیمت قبلی + برچسب تخفیف — خط کوچک بالای قیمت نهایی --}}
-                @if($hasDiscount)
-                    <div class="flex items-center gap-1.5 mb-1">
-                        <span class="mono text-[11px] font-semibold line-through" style="color: var(--text-secondary); opacity: .8;" dir="ltr">
-                            {{ format_price($originalPrice) }}
-                        </span>
-                        <span class="price-off">{{ $discountPercent }}٪-</span>
-                    </div>
-                @else
-                    {{-- نگهدارنده نامرئی هم‌ارتفاع ردیف تخفیف تا قیمت نهایی همه کارت‌ها تراز بماند --}}
-                    <div class="flex items-center gap-1.5 mb-1 invisible" aria-hidden="true">
-                        <span class="mono text-[11px] font-semibold" dir="ltr">&nbsp;</span>
-                    </div>
-                @endif
-
-                {{-- قیمت نهایی — بزرگ، بولد و با هاله برای جلب توجه --}}
-                <div class="flex items-baseline gap-1.5">
-                    <span class="mono font-black text-xl leading-none price-glow" style="color: var(--accent);" dir="ltr">
-                        {{ format_price($finalPrice) }}
-                    </span>
-                    <span class="text-[11px] font-bold" style="color: var(--text-secondary);">{{ __('messages.toman') }}</span>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $soldPercent >= 80 ? 'bg-red-500' : 'bg-emerald-500' }}"
+                         style="width: {{ $soldPercent }}%;"></div>
                 </div>
-            </div>
-
-            {{-- نوار پیشرفت فروش (فقط در صورت ارسال soldPercent) — پر شدن با scaleX، هماهنگ با ورود پله‌ای گرید --}}
-            @if($soldPercent !== null)
-                <div class="stock-bar w-full h-1.5 rounded-full bg-[var(--shadow-dark)] mb-1 overflow-hidden">
-                    <div class="stock-bar-fill h-full rounded-full bg-[var(--urgency)]"
-                         style="--sold: {{ $soldPercent / 100 }};"></div>
-                </div>
-                <p class="text-[10px] font-semibold mb-3" style="color: {{ $soldPercent >= 80 ? 'var(--urgency)' : 'var(--text-secondary)' }};">
+                <p class="text-[10px] font-semibold mt-1 {{ $soldPercent >= 80 ? 'text-red-500' : 'text-gray-500' }}">
                     {{ $soldPercent }}٪ {{ __('messages.sold_percent') }}
                 </p>
+            </div>
+        @endif
+
+        {{-- ═══ قیمت ═══ --}}
+        <div class="mb-3">
+            @if($hasDiscount)
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs text-gray-400 line-through mono" dir="ltr">
+                        {{ format_price($originalPrice) }}
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600">
+                        {{ $discountPercent }}٪-
+                    </span>
+                </div>
             @endif
-
-            {{-- دکمه افزودن به سبد خرید — Button-in-Button: آیکون داخل چیپ دایره‌ای، با تنش جنبشی روی هاور --}}
-            <button type="button"
-                    class="add-to-cart"
-                    @disabled($outOfStock)
-                    data-success="{{ __('messages.added_short') }}"
-                    data-cart-url="{{ route('cart.add', ['product' => $product->id]) }}"
-                    data-csrf="{{ csrf_token() }}"
-                    onclick="event.stopPropagation()">
-
-                @if($outOfStock)
-                    <span class="add-to-cart-chip" aria-hidden="true">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                             stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                    </span>
-                    <span>{{ __('messages.out_of_stock') }}</span>
-                @else
-                    <span class="add-to-cart-chip" aria-hidden="true">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                            <path d="M3 6h18"/>
-                            <path d="M16 10a4 4 0 0 1-8 0"/>
-                        </svg>
-                    </span>
-                    <span>{{ __('messages.add_to_cart') }}</span>
-                @endif
-            </button>
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-xl font-black text-indigo-600 mono" dir="ltr">
+                    {{ format_price($finalPrice) }}
+                </span>
+                <span class="text-[11px] text-gray-500 font-medium">{{ __('messages.toman') }}</span>
+            </div>
         </div>
+
+        {{-- ═══ دکمه افزودن به سبد ═══ --}}
+        <button type="button"
+                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
+                       {{ $outOfStock
+                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                           : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]' }}"
+                @disabled($outOfStock)
+                data-success="{{ __('messages.added_short') }}"
+                data-cart-url="{{ route('cart.add', ['product' => $product->id]) }}"
+                data-csrf="{{ csrf_token() }}"
+                onclick="event.stopPropagation()">
+
+            @if($outOfStock)
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+                <span>{{ __('messages.out_of_stock') }}</span>
+            @else
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.746 2.437-7.28a1.125 1.125 0 0 0-1.11-1.35H5.106M7.5 14.25 5.106 5.106M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                </svg>
+                <span>{{ __('messages.add_to_cart') }}</span>
+            @endif
+        </button>
     </div>
 </a>
