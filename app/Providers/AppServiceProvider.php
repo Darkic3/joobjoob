@@ -2,9 +2,15 @@
 
 namespace App\Providers;
 
+use App\Events\OrderCreated;
+use App\Events\OrderPaid;
+use App\Listeners\RecordAuditListener;
+use App\Listeners\RecordCouponUsageListener;
+use App\Listeners\SendOrderNotificationListener;
 use App\Models\Order;
 use App\Observers\OrderObserver;
 use App\Services\CartService;
+use Illuminate\Support\Facades\Event;
 use App\Services\RecentlyViewedService;
 use App\Services\WishlistService;
 use App\View\Composers\AdminLayoutComposer;
@@ -37,6 +43,16 @@ class AppServiceProvider extends ServiceProvider
     {
         // Observerها
         Order::observe(OrderObserver::class);
+
+        // ── V1.1 Event-Driven wiring (Ready-to-Merge — order create listeners) ──
+        // In 3 listener dar V1 faqhat sabt mishavand, amma OrderService hanuz mostaghim
+        // Audit/Notification/Coupon ra sedaa mizand (dual-write). Dar migration-e V1.1
+        // bakhsh-e synchronous-e OrderService hazf va `event(new OrderCreated($order))`
+        // jaygozin mishavad — guide: docs/11-metrics/V2_Event_Driven_Migration_Guide.md
+        Event::listen(OrderCreated::class, SendOrderNotificationListener::class);
+        Event::listen(OrderCreated::class, RecordAuditListener::class);
+        Event::listen(OrderCreated::class, RecordCouponUsageListener::class);
+        Event::listen(OrderPaid::class, RecordAuditListener::class);
 
         Gate::define('admin', fn ($user) => $user->isAdmin());
 
