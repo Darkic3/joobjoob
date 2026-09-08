@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
 /* دیزاین‌سیستم پایه، سپس لایه‌ی PRO (Hero و روان‌شناسی فروش) */
+/* Font loaded via <link> in app.blade.php — removed @import to avoid render-blocking + duplicate download */
 @import './neumorphism.css';
 @import './neumorphism-pro.css';
 
@@ -12,6 +12,28 @@
 
 * { font-family: 'Vazirmatn', sans-serif; }
 .mono { font-family: 'JetBrains Mono', 'Vazirmatn', monospace; }
+
+/* Skip-to-content: hidden until keyboard focus */
+.skip-to-content {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: var(--accent-contrast, #fff);
+    font-weight: 700;
+    font-size: 0.875rem;
+    border-radius: 0 0 0.75rem 0.75rem;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+.skip-to-content:focus {
+    top: 0;
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
 
 
 /*========================= FOR SCROLL PAGE  =========================*/

@@ -39,7 +39,7 @@
                     @foreach($product->images as $img)
                         <button onclick="document.getElementById('main-image').src='{{ $img->url }}'"
                                 class="neu-flat-sm p-1 w-20 h-20 flex-shrink-0 overflow-hidden hover:neu-pressed transition-all">
-                            <img src="{{ $img->url }}" class="w-full h-full object-cover rounded-lg" alt="thumbnail">
+                            <img src="{{ $img->url }}" class="w-full h-full object-cover rounded-lg" alt="{{ $product->trans('name') }} - {{ __('messages.image') }} {{ $loop->iteration }}">
                         </button>
                     @endforeach
                 </div>

@@ -22,7 +22,9 @@
 
     @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
     @endif
     @vite(['resources/css/app.css', 'resources/js/ui-effects.js', 'resources/js/app.js', 'resources/js/card-format.js', 'resources/js/only-digits.js'])
     @stack('styles')
@@ -33,6 +35,11 @@
 
 <body class="min-h-screen{{ auth()->check() ? " auth" : "" }}" style="background: var(--bg);">
 
+{{-- Skip-to-content link for keyboard accessibility (hidden until focused) --}}
+<a href="#main-content" class="skip-to-content" aria-label="{{ __('messages.skip_to_content') }}">
+    {{ __('messages.skip_to_content') }}
+</a>
+
 {{-- داده‌های نوار اعلان توسط SiteLayoutComposer آماده می‌شود --}}
 <div class="announce-bar text-center text-xs md:text-sm font-semibold py-2 px-4">
         <span id="announce-text" data-messages='{{ json_encode($announceMessages) }}'>
@@ -42,7 +49,7 @@
 
 <x-header :cart-count="$cartCount" :wishlist-count="$wishlistCount" :unread-notification-count="$unreadNotificationCount"/>
 
-<main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+<main id="main-content" class="max-w-7xl mx-auto px-4 md:px-6 py-6" tabindex="-1">
     @yield('content')
 </main>
 
