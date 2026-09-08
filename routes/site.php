@@ -47,18 +47,22 @@ $siteRoutes = function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::post('/products/{product:slug}/reviews', [ProductController::class, 'storeReview'])
+        ->middleware('throttle:reviews')
         ->name('products.reviews.store');
     Route::post('/products/{product:slug}/reviews/{review}/reply', [ProductController::class, 'storeReply'])
+        ->middleware('throttle:reviews')
         ->name('products.reviews.reply');
     Route::post('/products/{product:slug}/reviews/{review}/vote', [ProductController::class, 'voteReview'])
-        ->middleware('auth')
+        ->middleware(['auth', 'throttle:reviews'])
         ->name('products.reviews.vote');
     Route::get('/products/{product:slug}/quick-view', [ProductController::class, 'quickView'])->name('products.quick-view');
     Route::get('/product-categories/{category:slug}', [ProductController::class, 'category'])->name('products.category');
 
     // علاقه‌مندی‌ها (سشن — بدون نیاز به لاگین)
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/toggle/{product:slug}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/wishlist/toggle/{product:slug}', [WishlistController::class, 'toggle'])
+        ->middleware('throttle:wishlist')
+        ->name('wishlist.toggle');
 
     // وبلاگ
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
@@ -78,7 +82,9 @@ $siteRoutes = function () {
         ->name('newsletter.subscribe');
 
     // افزودن به سبد — مهمان هم مجاز است (سبد session-based است)
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])
+        ->middleware('throttle:cart_actions')
+        ->name('cart.add');
 
     // نمایش، ویرایش و حذف اقلام سبد — بدون نیاز به لاگین
     Route::prefix('cart')->name('cart.')->group(function () {
@@ -88,7 +94,7 @@ $siteRoutes = function () {
     });
 
     // کد تخفیف — نیازمند ورود
-    Route::middleware('auth')->post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
+    Route::middleware(['auth', 'throttle:discount'])->post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
 
     // ==================== تسویه حساب (نیازمند ورود) ====================
     Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
@@ -104,13 +110,17 @@ $siteRoutes = function () {
 
         // مرحله ۳: پرداخت
         Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
-        Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('apply-discount');
+        Route::post('/apply-discount', [CheckoutController::class, 'applyDiscount'])
+            ->middleware('throttle:discount')
+            ->name('apply-discount');
         Route::post('/remove-discount', [CheckoutController::class, 'removeDiscount'])->name('remove-discount');
         Route::post('/validate-stock', [CheckoutController::class, 'validateStock'])->name('validate-stock');
         Route::get('/order-price', [CheckoutController::class, 'orderPrice'])->name('order-price');
 
         // مرحله ۴: ایجاد سفارش
-        Route::post('/create', [CheckoutController::class, 'create'])->name('create');
+        Route::post('/create', [CheckoutController::class, 'create'])
+            ->middleware('throttle:checkout')
+            ->name('create');
 
         // صفحات نتیجه
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');

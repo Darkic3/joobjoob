@@ -22,6 +22,21 @@
 
 No Critical RCE/SQLi found with evidence. Xsrf via web middleware, throttle on otp/contact.
 
+## Rate Limiters — FIXED ✅ (2026-09-08)
+
+Named rate limiters added to `AppServiceProvider::boot()` and applied to sensitive routes:
+
+| Limiter | Limit | Key | Applied To |
+|---------|-------|-----|------------|
+| `reviews` | 5/min | IP | `products.reviews.store`, `products.reviews.reply`, `products.reviews.vote` |
+| `wishlist` | 30/min | user_id or IP | `wishlist.toggle` |
+| `cart_actions` | 30/min | user_id or IP | `cart.add` |
+| `checkout` | 10/min | user_id | `checkout.create` |
+| `discount` | 10/min | user_id or IP | `cart.coupon`, `checkout.apply-discount` |
+
+**Previously:** Reviews, wishlist toggle, cart add, discount apply, and checkout create had NO throttle — vulnerable to spam/DoS.
+**Now:** All sensitive endpoints rate-limited. Combined with existing OTP throttle (5/min) and contact (5/min).
+
 ## Known Threats — Detail (P0-08 Payload Leak & MITM)
 
 ### T11 — Chapar HTTP MITM
