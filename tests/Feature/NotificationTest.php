@@ -410,4 +410,70 @@ class NotificationTest extends TestCase
 
         $response->assertOk();
     }
+
+    // ==================== Audience Split Regression Tests ====================
+
+    public function test_admin_panel_excludes_personal_user_types()
+    {
+        // ادمین به‌عنوان خریدار در سایت اعلان شخصی می‌گیرد
+        $this->service->notifyUser($this->admin, 'order.created', 'Test', null, '/account/orders/1', ['order_id' => 1, 'amount' => 1000]);
+        $this->service->notifyAdmins('order.new', 'Admin', null, '/admin/orders/1', ['order_id' => 1]);
+
+        $list = $this->service->getAdminNotifications($this->admin);
+
+        $this->assertCount(1, $list);
+        $this->assertEquals('order.new', $list->first()->type);
+        $this->assertEquals(1, $this->service->getAdminUnreadCount($this->admin));
+    }
+
+    public function test_site_count_excludes_admin_types_for_admin_user()
+    {
+        $this->service->notifyUser($this->admin, 'order.created', 'Test', null, '/account/orders/1', ['order_id' => 1, 'amount' => 1000]);
+        $this->service->notifyAdmins('order.new', 'Admin', null, '/admin/orders/1', ['order_id' => 1]);
+
+        // بج سایت فقط user را می‌شمارد (۱ نه ۲)
+        $this->assertEquals(1, $this->service->getUnreadCount($this->admin));
+
+        $response = $this->actingAs($this->admin)->getJson('/account/notifications?format=json');
+        $response->assertOk();
+        $this->assertCount(1, $response->json('data'));
+        $this->assertEquals('order.created', $response->json('data.0.type'));
+    }
+
+    public function test_admin_dropdown_link_points_to_go_and_redirects_to_target()
+    {
+        $this->service->notifyAdmins('order.new', 'Admin', null, '/admin/orders/99', ['order_id' => 99]);
+        $notification = Notification::forUser($this->admin->id)->adminNotifications()->firstOrFail();
+
+        $json = $this->actingAs($this->admin)->getJson('/admin/notifications?format=json');
+        $json->assertOk();
+        $this->assertStringContainsString("/admin/notifications/{$notification->id}/go", $json->json('data.0.link'));
+
+        $go = $this->actingAs($this->admin)->get("/admin/notifications/{$notification->id}/go");
+        $go->assertRedirect('/admin/orders/99');
+        $this->assertTrue($notification->fresh()->is_read);
+    }
+
+    public function test_site_go_redirects_to_target()
+    {
+        $n = $this->service->notifyUser($this->user, 'order.created', 'Test', null, '/account/orders/5', ['order_id' => 5, 'amount' => 1000]);
+
+        $go = $this->actingAs($this->user)->get("/account/notifications/{$n->id}/go");
+        $go->assertRedirect('/account/orders/5');
+        $this->assertTrue($n->fresh()->is_read);
+    }
+
+    public function test_mark_all_read_is_audience_scoped()
+    {
+        $this->service->notifyUser($this->admin, 'order.created', 'Test', null, '/x', ['order_id' => 1, 'amount' => 1]);
+        $this->service->notifyAdmins('order.new', 'Admin', null, '/admin/orders/1', ['order_id' => 1]);
+
+        // خواندن همه در سایت نباید اعلان ادمینی را بخواند و بالعکس
+        $this->service->markAllUserAsRead($this->admin);
+        $this->assertEquals(0, $this->service->getUnreadCount($this->admin));
+        $this->assertEquals(1, $this->service->getAdminUnreadCount($this->admin));
+
+        $this->service->markAllAdminAsRead($this->admin);
+        $this->assertEquals(0, $this->service->getAdminUnreadCount($this->admin));
+    }
 }

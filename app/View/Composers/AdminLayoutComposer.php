@@ -16,7 +16,7 @@ class AdminLayoutComposer
     {
         $view->with([
             'unreadNotificationCount' => Auth::check()
-                ? $this->notificationService->getAdminUnreadCount()
+                ? $this->notificationService->getAdminUnreadCount(Auth::user())
                 : 0,
         ]);
     }

@@ -108,8 +108,7 @@
                         <template x-for="item in items" :key="item.id">
                             <a :href="item.link"
                                class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                               :style="item.is_read ? '' : 'background: rgba(59,130,246,0.05);'"
-                               @click.prevent="!item.is_read && markRead(item.id)">
+                               :style="item.is_read ? '' : 'background: rgba(59,130,246,0.05);'">
                                 <span x-html="notifIcon(item.type)" class="shrink-0"></span>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate" x-text="item.title"></p>

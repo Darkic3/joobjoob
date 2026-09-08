@@ -173,6 +173,7 @@ $siteRoutes = function () {
         // اعلانات
         Route::get('/account/notifications', [NotificationController::class, 'index'])->name('dashboard.notifications');
         Route::get('/api/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
+        Route::get('/account/notifications/{id}/go', [NotificationController::class, 'go'])->name('dashboard.notification-go');
         Route::get('/account/notifications/{id}', [NotificationController::class, 'show'])->name('dashboard.notification-detail');
         Route::post('/api/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('api.notifications.mark-read');
         Route::post('/api/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('api.notifications.mark-all-read');

@@ -27,6 +27,10 @@ class NotificationService
         'contact.new' => ['icon' => '✉️', 'color' => 'accent'],
     ];
 
+    // تک‌منبع حقیقت تفکیک مخاطب — آینه ثابت‌های مدل (برای سازگاری کالرهای قدیمی)
+    public const USER_TYPES = Notification::USER_TYPES;
+    public const ADMIN_TYPES = Notification::ADMIN_TYPES;
+
     // ==================== Create Notifications ====================
 
     /**
@@ -44,13 +48,17 @@ class NotificationService
     ): Notification {
         $locale = app()->getLocale();
         $title = __("notifications.{$type}.title", [], $locale);
-        $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
+        $body  = trans("notifications.{$type}.body", $data ?? [], $locale);
+        if ($body === "notifications.{$type}.body") {
+            $body = null;
+        }
         $meta  = self::TYPES[$type] ?? ['icon' => '🔔', 'color' => 'accent'];
 
         return Notification::create([
             'notifiable_type' => User::class,
             'notifiable_id' => $user->id,
             'type' => $type,
+            'audience' => 'user',
             'title' => $title,
             'body' => $body,
             'icon' => $meta['icon'],
@@ -77,12 +85,16 @@ class NotificationService
         foreach ($admins as $admin) {
             $locale = app()->getLocale();
             $title = __("notifications.{$type}.title", [], $locale);
-            $body  = $body ? trans("notifications.{$type}.body", $data ?? [], $locale) : null;
+            $body  = trans("notifications.{$type}.body", $data ?? [], $locale);
+            if ($body === "notifications.{$type}.body") {
+                $body = null;
+            }
 
             Notification::create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $admin->id,
                 'type' => $type,
+                'audience' => 'admin',
                 'title' => $title,
                 'body' => $body,
                 'icon' => $meta['icon'],
@@ -99,19 +111,24 @@ class NotificationService
     // ==================== Read/Unread ====================
 
     /**
-     * تعداد اعلان‌های خوانده‌نشده کاربر
+     * تعداد اعلان‌های خوانده‌نشده کاربر (فقط audience=user — بج سایت)
      */
     public function getUnreadCount(User $user): int
     {
-        return Notification::getUnreadCount($user->id);
+        return Notification::getUnreadCount($user->id, 'user');
     }
 
     /**
-     * تعداد اعلان‌های خوانده‌نشده ادمین‌ها
+     * تعداد اعلان‌های خوانده‌نشده ادمین (شخصی + فقط audience=admin — بج پنل)
+     * اگر ادمین پاس داده نشود، برای سازگاری شمارش گلوبال فیلترشده برمی‌گردد.
      */
-    public function getAdminUnreadCount(): int
+    public function getAdminUnreadCount(?User $admin = null): int
     {
-        return Notification::getAdminUnreadCount();
+        if ($admin === null) {
+            return Notification::getAdminUnreadCount();
+        }
+
+        return Notification::getAdminUnreadCount($admin->id);
     }
 
     /**
@@ -128,11 +145,21 @@ class NotificationService
     }
 
     /**
-     * خوانده‌شده همه اعلان‌های کاربر
+     * خوانده‌شده همه اعلان‌های کاربر (با تفکیک audience تا پنل/سایت همدیگر را نخوانند)
      */
-    public function markAllAsRead(User $user): int
+    public function markAllAsRead(User $user, ?string $audience = null): int
     {
-        return Notification::markAllAsRead($user->id);
+        return Notification::markAllAsRead($user->id, $audience);
+    }
+
+    public function markAllUserAsRead(User $user): int
+    {
+        return Notification::markAllAsRead($user->id, 'user');
+    }
+
+    public function markAllAdminAsRead(User $admin): int
+    {
+        return Notification::markAllAsRead($admin->id, 'admin');
     }
 
     // ==================== Get Notifications ====================
@@ -150,19 +177,37 @@ class NotificationService
     }
 
     /**
-     * لیست اعلانات ادمین
+     * لیست اعلانات ادمین — شخصی (فقط کپی همین ادمین) + فقط audience=admin
+     * امضای قدیمی getAdminNotifications($perPage, $filter) همچنان پشتیبانی می‌شود.
      */
-    public function getAdminNotifications(int $perPage = 20, ?string $filter = null): LengthAwarePaginator
+    public function getAdminNotifications(User|int $adminOrPerPage = 20, int|string|null $perPageOrFilter = 20, ?string $filter = null): LengthAwarePaginator
     {
-        $query = Notification::forAdmins()->latest();
+        if ($adminOrPerPage instanceof User) {
+            $admin = $adminOrPerPage;
+            $perPage = is_int($perPageOrFilter) ? $perPageOrFilter : 20;
+            $activeFilter = is_string($perPageOrFilter) ? $perPageOrFilter : $filter;
+            $query = Notification::forUser($admin->id)->adminNotifications()->latest();
+            $this->applyAdminFilter($query, $activeFilter);
 
-        if ($filter === 'unread') {
-            $query->unread();
-        } elseif ($filter && $filter !== 'all') {
-            $query->ofType($filter);
+            return $query->paginate($perPage);
         }
 
+        // سازگاری عقب‌رو: getAdminNotifications(20, $filter) → شمارش گلوبال فیلترشده
+        $perPage = (int) $adminOrPerPage;
+        $activeFilter = is_string($perPageOrFilter) ? $perPageOrFilter : $filter;
+        $query = Notification::forAdmins()->adminNotifications()->latest();
+        $this->applyAdminFilter($query, $activeFilter);
+
         return $query->paginate($perPage);
+    }
+
+    private function applyAdminFilter($query, ?string $activeFilter): void
+    {
+        if ($activeFilter === 'unread') {
+            $query->unread();
+        } elseif ($activeFilter && $activeFilter !== 'all') {
+            $query->ofType($activeFilter);
+        }
     }
 
     /**

@@ -18,7 +18,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter');
-        $notifications = $this->notificationService->getAdminNotifications(20, $filter);
+        $notifications = $this->notificationService->getAdminNotifications($request->user(), 20, $filter);
 
         if ($request->get('format') === 'json' || $request->wantsJson()) {
             return response()->json([
@@ -30,12 +30,13 @@ class NotificationController extends Controller
                         'title' => $n->title,
                         'body' => $n->body,
                         'icon' => $n->icon,
-                        'link' => $id !== null ? route('admin.notifications.show', $id) : null,
+                        'link' => $id !== null ? route('admin.notifications.go', $id) : null,
+                        'target' => $n->link,
                         'is_read' => (bool) $n->is_read,
                         'created_at' => $n->created_at?->diffForHumans(),
                     ];
                 })->values(),
-                'count' => $this->notificationService->getAdminUnreadCount(),
+                'count' => $this->notificationService->getAdminUnreadCount($request->user()),
             ]);
         }
 
@@ -47,7 +48,7 @@ class NotificationController extends Controller
      */
     public function show(Request $request, int $id)
     {
-        $notification = Notification::forUser($request->user()->id)->find($id);
+        $notification = Notification::forUser($request->user()->id)->adminNotifications()->find($id);
 
         if (! $notification) {
             return redirect()->route('admin.notifications.index')
@@ -65,7 +66,8 @@ class NotificationController extends Controller
      */
     public function unreadCount(): JsonResponse
     {
-        $count = $this->notificationService->getAdminUnreadCount();
+        $user = auth()->user();
+        $count = $user ? $this->notificationService->getAdminUnreadCount($user) : 0;
 
         return response()->json(['count' => $count]);
     }
@@ -103,7 +105,7 @@ class NotificationController extends Controller
      */
     public function markAllRead(): JsonResponse
     {
-        $count = $this->notificationService->markAllAsRead(auth()->user());
+        $count = $this->notificationService->markAllAdminAsRead(auth()->user());
 
         return response()->json(['success' => true, 'count' => $count]);
     }

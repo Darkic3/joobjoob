@@ -30,8 +30,9 @@ class NotificationController extends Controller
                         'title' => $n->title,
                         'body' => $n->body,
                         'icon' => $n->icon,
-                        // فقط اگر id واقعی وجود داشته باشد لینک سازیم
-                        'link' => $id !== null ? route('dashboard.notification-detail', $id) : null,
+                        // کلیک مستقیم به مقصد (go) — مثل پنل ادمین
+                        'link' => $id !== null ? route('dashboard.notification-go', $id) : null,
+                        'target' => $n->link,
                         'is_read' => (bool) $n->is_read,
                         'created_at' => $n->created_at?->diffForHumans(),
                     ];
@@ -64,6 +65,28 @@ class NotificationController extends Controller
     }
 
     /**
+     * رفتن به مقصد اعلان + علامت‌گذاری خوانده‌شده (سمت سرور — قرینه go پنل ادمین)
+     */
+    public function go(int $id)
+    {
+        $user = Auth::user();
+        $this->notificationService->markAsRead($id, $user);
+
+        $notification = $this->notificationService->getUserNotifications($user)
+            ->getCollection()
+            ->firstWhere('id', $id);
+
+        $target = $notification?->link ?: route('dashboard.notifications');
+
+        // فقط مسیرهای داخلی — جلوگیری از open-redirect
+        if (! str_starts_with($target, '/') && ! str_starts_with($target, url('/'))) {
+            $target = route('dashboard.notifications');
+        }
+
+        return redirect()->to($target);
+    }
+
+    /**
      * تعداد اعلان‌های خوانده‌نشده (AJAX)
      */
     public function unreadCount(): JsonResponse
@@ -88,7 +111,7 @@ class NotificationController extends Controller
      */
     public function markAllRead(): JsonResponse
     {
-        $count = $this->notificationService->markAllAsRead(Auth::user());
+        $count = $this->notificationService->markAllUserAsRead(Auth::user());
 
         return response()->json(['success' => true, 'count' => $count]);
     }

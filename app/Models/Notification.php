@@ -8,8 +8,25 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Notification extends Model
 {
+    public const USER_TYPES = [
+        'order.created',
+        'order.paid',
+        'order.shipped',
+        'order.cancelled',
+        'discount.welcome',
+        'discount.expiring',
+    ];
+
+    public const ADMIN_TYPES = [
+        'order.new',
+        'order.paid_admin',
+        'order.card_to_card',
+        'review.new',
+        'contact.new',
+    ];
+
     protected $fillable = [
-        'notifiable_type', 'notifiable_id', 'type',
+        'notifiable_type', 'notifiable_id', 'type', 'audience',
         'title', 'body', 'icon', 'link', 'is_read', 'data',
     ];
 
@@ -17,6 +34,18 @@ class Notification extends Model
         'is_read' => 'boolean',
         'data' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        // ایمنی برای ساخت مستقیم (تست/سیدر): اگر audience داده نشد از روی type استنتاج شود
+        static::creating(function (Notification $notification) {
+            if (empty($notification->audience)) {
+                $notification->audience = in_array($notification->type, self::ADMIN_TYPES, true)
+                    ? 'admin'
+                    : 'user';
+            }
+        });
+    }
 
     // ==================== Relationships ====================
 
@@ -49,19 +78,30 @@ class Notification extends Model
         return $query->where('type', $type);
     }
 
+    public function scopeOfAudience(Builder $query, string $audience): Builder
+    {
+        return $query->where('audience', $audience);
+    }
+
     /**
      * فقط اعلان‌های کاربری — فیلتر کردن اعلان‌های ادمین
      * چون کاربرهای ادمین هم می‌بینند اعلان‌های کاربری در site notifications
+     * دفاع دو‌لایه: audience + لیست type (برای رکوردهای قدیمی بدون audience)
      */
     public function scopeUserNotifications(Builder $query): Builder
     {
-        return $query->whereNotIn('type', [
-            'order.new',
-            'order.paid_admin',
-            'order.card_to_card',
-            'review.new',
-            'contact.new',
-        ]);
+        return $query->where('audience', 'user')
+            ->whereNotIn('type', self::ADMIN_TYPES);
+    }
+
+    /**
+     * فقط اعلان‌های ادمینی — قرینه userNotifications
+     * جلوگیری از نشت اعلان‌های شخصی ادمین (مثل order.created خودش) به پنل
+     */
+    public function scopeAdminNotifications(Builder $query): Builder
+    {
+        return $query->where('audience', 'admin')
+            ->whereIn('type', self::ADMIN_TYPES);
     }
 
     // ==================== Methods ====================
@@ -83,20 +123,39 @@ class Notification extends Model
         return $this->update(['is_read' => true]);
     }
 
-    public static function markAllAsRead(int $userId): int
+    public static function markAllAsRead(int $userId, ?string $audience = null): int
     {
-        return static::forUser($userId)
-            ->unread()
-            ->update(['is_read' => true]);
+        $query = static::forUser($userId)->unread();
+
+        if ($audience !== null) {
+            $query->ofAudience($audience);
+        }
+
+        return $query->update(['is_read' => true]);
     }
 
-    public static function getUnreadCount(int $userId): int
+    public static function getUnreadCount(int $userId, ?string $audience = null): int
     {
-        return static::forUser($userId)->unread()->count();
+        $query = static::forUser($userId)->unread();
+
+        if ($audience === 'user') {
+            $query->userNotifications();
+        } elseif ($audience === 'admin') {
+            $query->adminNotifications();
+        } elseif ($audience !== null) {
+            $query->ofAudience($audience);
+        }
+
+        return $query->count();
     }
 
-    public static function getAdminUnreadCount(): int
+    public static function getAdminUnreadCount(?int $adminId = null): int
     {
-        return static::forAdmins()->unread()->count();
+        // حالت قدیمی بدون آرگومان (سازگاری با تست‌ها): شمارش گلوبال
+        if ($adminId === null) {
+            return static::forAdmins()->unread()->adminNotifications()->count();
+        }
+
+        return static::forUser($adminId)->unread()->adminNotifications()->count();
     }
 }
