@@ -202,6 +202,9 @@ class DashboardController extends Controller
 
     public function wishlist()
     {
-        return view('site.dashboard.wishlist');
+        $wishlistService = app(\App\Services\WishlistService::class);
+        $products = $wishlistService->content();
+
+        return view('site.dashboard.wishlist', compact('products'));
     }
 }
