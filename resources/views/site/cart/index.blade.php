@@ -1415,6 +1415,7 @@
                 trackingInput.style.animation = 'none'; trackingInput.offsetHeight;
                 trackingInput.style.animation = 'shake 0.4s ease';
                 setTimeout(function() { trackingInput.style.borderColor = ''; }, 1500);
+                if (typeof showToast === 'function') showToast('کد پیگیری واریزی الزامی است.', 'error');
                 return;
             }
 
@@ -1426,6 +1427,7 @@
                 trackingInput.style.animation = 'shake 0.4s ease';
                 trackingInput.setAttribute('title', 'کد پیگیری باید فقط عدد باشد (۶ تا ۱۶ رقم)');
                 setTimeout(function() { trackingInput.style.borderColor = ''; trackingInput.removeAttribute('title'); }, 2000);
+                if (typeof showToast === 'function') showToast('کد پیگیری باید فقط عدد باشد (۶ تا ۱۶ رقم)', 'error');
                 return;
             }
             // مقدار تمیزشده را ذخیره کن (بدون فاصله و خط تیره)
