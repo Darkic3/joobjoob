@@ -237,7 +237,7 @@ class ProductController extends Controller
      */
     private function prepareShowData(Product $product): array
     {
-        $mainImage = $product->main_image_url ?? asset('assets/admin/images/image-not-found.png');
+        $mainImage = $product->main_image_url ?? '';
 
         // ۱) مشخصه‌های انتخابی گروه‌بندی‌شده: والد → [مقادیر]
         $specGroups = [];

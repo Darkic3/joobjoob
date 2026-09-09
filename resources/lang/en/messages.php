@@ -403,4 +403,7 @@ return [
     'confirm_remove_wishlist_title' => 'Remove from Wishlist',
     'confirm_remove_wishlist_confirm' => 'Yes, Remove',
     'confirm_remove_wishlist_cancel' => 'Cancel',
+
+    // Product image
+    'no_image' => 'No image available',
 ];

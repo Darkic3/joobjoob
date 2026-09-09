@@ -85,10 +85,19 @@
                             <div class="neu-card p-5 flex items-center gap-5 transition-all duration-300 hover:translate-y-[-2px] group {{ empty($item['is_in_stock']) ? 'opacity-50 grayscale pointer-events-none' : '' }}">
                                 <a href="{{ !empty($item['slug']) ? localizedRoute('products.show', ['product' => $item['slug']]) : localizedRoute('products.index') }}"
                                    class="shrink-0 block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden neu-flat-sm relative">
-                                     <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="{{ $item['name'] }}"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy"
-                                         onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'"
-                                         width="96" height="96">
+                                     @if(!empty($item['image']))
+                                         <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}"
+                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy"
+                                             onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"
+                                             width="96" height="96">
+                                         <div class="absolute inset-0 hidden items-center justify-center bg-gray-50">
+                                             <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Zm15.75-11.25H21v.75a.75.75 0 0 1-.75.75h-1.5" /></svg>
+                                         </div>
+                                     @else
+                                         <div class="w-full h-full flex items-center justify-center bg-gray-50">
+                                             <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Zm15.75-11.25H21v.75a.75.75 0 0 1-.75.75h-1.5" /></svg>
+                                         </div>
+                                     @endif
                                 </a>
 
                                 <div class="flex-1 min-w-0">
@@ -600,8 +609,17 @@
                                 @foreach($items as $item)
                                     <div class="flex items-center gap-4 py-3.5 @if(!$loop->last) border-b @endif"
                                          style="border-color: color-mix(in srgb, var(--text-primary) 6%, transparent);">
-                                        <img src="{{ $item['image'] ?? asset('assets/admin/images/image-not-found.png') }}" alt="" class="w-14 h-14 rounded-xl object-cover shrink-0 neu-flat-sm"
-                                             onerror="this.onerror=null;this.src='{{ asset('assets/admin/images/image-not-found.png') }}'">
+                                        @if(!empty($item['image']))
+                                            <img src="{{ $item['image'] }}" alt="" class="w-14 h-14 rounded-xl object-cover shrink-0 neu-flat-sm"
+                                                 onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                            <div class="w-14 h-14 rounded-xl shrink-0 neu-flat-sm hidden items-center justify-center bg-gray-50">
+                                                <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Zm15.75-11.25H21v.75a.75.75 0 0 1-.75.75h-1.5" /></svg>
+                                            </div>
+                                        @else
+                                            <div class="w-14 h-14 rounded-xl shrink-0 neu-flat-sm flex items-center justify-center bg-gray-50">
+                                                <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Zm15.75-11.25H21v.75a.75.75 0 0 1-.75.75h-1.5" /></svg>
+                                            </div>
+                                        @endif
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ $item['name'] }}</p>
                                             @if(!empty($item['variant_label']))

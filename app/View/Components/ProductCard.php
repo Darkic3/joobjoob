@@ -13,6 +13,9 @@ class ProductCard extends Component
 
     public string $imageUrl;
 
+    /** آیا محصول تصویر معتبری دارد؟ */
+    public bool $hasImage;
+
     public string $url;
 
     public bool $hasDiscount;
@@ -51,7 +54,8 @@ class ProductCard extends Component
         public ?int $soldPercent = null,
     ) {
         $this->name = $product->trans('name');
-        $this->imageUrl = $product->main_image_url ?? asset('assets/admin/images/image-not-found.png');
+        $this->imageUrl = $product->main_image_url ?? '';
+        $this->hasImage = filled($this->imageUrl);
         $this->url = localizedRoute('products.show', ['product' => $product->slug]);
 
         $this->hasDiscount = $product->has_discount;

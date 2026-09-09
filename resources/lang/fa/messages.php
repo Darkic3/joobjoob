@@ -404,5 +404,8 @@ return [
     'confirm_remove_wishlist_title' => 'حذف از علاقه‌مندی‌ها',
     'confirm_remove_wishlist_confirm' => 'بله، حذف کن',
     'confirm_remove_wishlist_cancel' => 'انصراف',
+
+    // تصویر محصول
+    'no_image' => 'تصویر موجود نیست',
 ];
 
