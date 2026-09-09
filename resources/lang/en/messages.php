@@ -177,6 +177,7 @@ return [
     'otp_mobile_blocked' => 'Access to this number is not allowed',
     'otp_code_invalid' => 'The code you entered is incorrect',
     'otp_code_expired' => 'The code has expired. Please request a new one',
+    'otp_too_many_attempts' => 'Too many failed attempts. Please request a new code',
     'otp_sms_failed' => 'Sending the SMS failed. Please try again shortly',
     'otp_sms_not_configured' => 'The SMS service is not configured yet. Please contact support',
     'otp_session_expired' => 'Your session expired. Please enter your number again',

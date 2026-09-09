@@ -321,38 +321,63 @@
                                 <form action="{{ localizedRoute('dashboard.addresses.create') }}" method="POST" class="space-y-3">
                                     @csrf
                                     <input type="hidden" name="redirect_to" value="{{ localizedRoute('cart.index') }}?step=2">
+
+                                    {{-- خطاهای ولیدیشن سمت سرور — با toast هم نمایش داده می‌شوند --}}
+                                    @if($errors->any())
+                                        <div class="rounded-2xl p-4 mb-1" style="background: color-mix(in srgb, var(--danger) 8%, transparent); border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);">
+                                            <p class="text-xs font-bold mb-1.5" style="color: var(--danger);">لطفاً موارد زیر را اصلاح کنید:</p>
+                                            <ul class="list-disc pe-4 space-y-0.5">
+                                                @foreach($errors->all() as $err)
+                                                    <li class="text-xs" style="color: var(--danger);">{{ $err }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">نام تحویل‌گیرنده</label>
-                                            <input type="text" name="receiptor_full_name" class="neu-input w-full text-sm py-3" required>
+                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">نام تحویل‌گیرنده <span class="text-rose-500">*</span></label>
+                                            <input type="text" name="receiptor_full_name" value="{{ old('receiptor_full_name') }}" class="neu-input w-full text-sm py-3" required maxlength="120"
+                                                   @error('receiptor_full_name') style="border-color: var(--danger);" @enderror>
+                                            @error('receiptor_full_name')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                         </div>
                                         <div>
-                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">موبایل</label>
-                                            <input type="text" name="receiptor_mobile" class="neu-input w-full text-sm py-3" required dir="ltr">
+                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">موبایل <span class="text-rose-500">*</span></label>
+                                            <input type="tel" name="receiptor_mobile" value="{{ old('receiptor_mobile') }}" class="neu-input w-full text-sm py-3" required dir="ltr" inputmode="tel" maxlength="11" placeholder="09123456789"
+                                                   @error('receiptor_mobile') style="border-color: var(--danger);" @enderror>
+                                            @error('receiptor_mobile')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                         </div>
                                         <div>
-                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">استان</label>
-                                            <select name="state_id" class="neu-input w-full text-sm py-3" id="newAddrState" onchange="loadCities(this.value, 'newAddrCity')" required>
+                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">استان <span class="text-rose-500">*</span></label>
+                                            <select name="state_id" class="neu-input w-full text-sm py-3" id="newAddrState" onchange="loadCities(this.value, 'newAddrCity')" required
+                                                    @error('state_id') style="border-color: var(--danger);" @enderror>
                                                 <option value="">انتخاب استان</option>
                                                 @foreach($states as $state)
-                                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                                    <option value="{{ $state->id }}" {{ (string) old('state_id') === (string) $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
                                                 @endforeach
                                             </select>
+                                            @error('state_id')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                         </div>
                                         <div>
-                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">شهر</label>
-                                            <select name="city_id" class="neu-input w-full text-sm py-3" id="newAddrCity" required>
+                                            <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">شهر <span class="text-rose-500">*</span></label>
+                                            <select name="city_id" class="neu-input w-full text-sm py-3" id="newAddrCity" required data-old-city="{{ old('city_id') }}"
+                                                    @error('city_id') style="border-color: var(--danger);" @enderror>
                                                 <option value="">انتخاب شهر</option>
                                             </select>
+                                            @error('city_id')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">آدرس کامل</label>
-                                        <textarea name="address" class="neu-input w-full text-sm py-3" rows="2" required></textarea>
+                                        <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">آدرس کامل <span class="text-rose-500">*</span></label>
+                                        <textarea name="address" class="neu-input w-full text-sm py-3" rows="2" required maxlength="1000"
+                                                  @error('address') style="border-color: var(--danger);" @enderror>{{ old('address') }}</textarea>
+                                        @error('address')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                     </div>
                                     <div>
-                                        <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">کدپستی</label>
-                                        <input type="text" name="postal_code" class="neu-input w-full text-sm py-3" required dir="ltr">
+                                        <label class="text-[11px] font-bold mb-1.5 block uppercase tracking-wide" style="color: var(--text-secondary);">کدپستی <span class="text-rose-500">*</span></label>
+                                        <input type="tel" name="postal_code" value="{{ old('postal_code') }}" class="neu-input w-full text-sm py-3" required dir="ltr" inputmode="numeric" maxlength="10" placeholder="۱۲۳۴۵۶۷۸۹۰"
+                                               @error('postal_code') style="border-color: var(--danger);" @enderror>
+                                        @error('postal_code')<p class="text-[10px] mt-1 font-bold" style="color: var(--danger);">{{ $message }}</p>@enderror
                                     </div>
                                     <div class="flex gap-2 pt-1">
                                         <button type="submit"
@@ -1341,17 +1366,47 @@
         }
 
         // ========== دریافت شهرها ==========
-        window.loadCities = function(stateId, targetId) {
+        window.loadCities = function(stateId, targetId, preselectId) {
+            if (!stateId) return;
             fetch(urls.cities + '?state_id=' + stateId)
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     var select = document.getElementById(targetId);
                     select.innerHTML = '<option value="">انتخاب شهر</option>';
                     data.cities.forEach(function(city) {
-                        select.innerHTML += '<option value="' + city.id + '">' + city.name + '</option>';
+                        var selected = (preselectId && String(city.id) === String(preselectId)) ? ' selected' : '';
+                        select.innerHTML += '<option value="' + city.id + '"' + selected + '>' + city.name + '</option>';
                     });
                 });
         };
+
+        // ── بازگرداندن حالت فرم آدرس بعد از خطای ولیدیشن سمت سرور ──
+        // اگر old('state_id') وجود دارد (کاربر فرم را با خطا سابمیت کرده)، پنل باید
+        // باز بماند و شهرِ انتخاب‌شده قبلی هم بازیابی شود.
+        (function() {
+            var stateSelect = document.getElementById('newAddrState');
+            var citySelect  = document.getElementById('newAddrCity');
+            var hasErrors   = @json($errors->any());
+            var oldState    = stateSelect ? stateSelect.value : '';
+            var oldCity     = citySelect ? citySelect.getAttribute('data-old-city') : '';
+
+            if (hasErrors && oldState) {
+                // پنل آدرس را باز نگه دار
+                var panel = document.getElementById('addAddressPanel');
+                if (panel) panel.classList.remove('hidden');
+                // شهرهای استان قبلی را بگیر و شهر قبلی را انتخاب کن
+                loadCities(oldState, 'newAddrCity', oldCity);
+            }
+
+            // ── Toast قرمز برای خطاهای ولیدیشن (همان‌جا، بدون از دست دادن فرم) ──
+            @if ($errors->any())
+            if (typeof showToast === 'function') {
+                @foreach ($errors->all() as $i => $err)
+                    setTimeout(function() { showToast({{ json_encode($err) }}, 'error'); }, {{ $i * 350 }});
+                @endforeach
+            }
+            @endif
+        })();
 
         // ========== انتخاب بانک ==========
         window.selectBank = function(bankId) {

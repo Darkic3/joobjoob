@@ -7,6 +7,7 @@ use App\Helpers\Sms;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -23,6 +24,12 @@ use Illuminate\Support\Str;
 class OtpService
 {
     private const CODE_LENGTH = 4;
+
+    /** حداکثر تلاش ناموفق برای وارد کردن کد، پیش از قفل موقت */
+    private const MAX_VERIFY_ATTEMPTS = 5;
+
+    /** پنجره‌ی شمارش تلاش‌ها (ثانیه) — با TTL کد OTP هم‌خانواده است */
+    private const ATTEMPT_TTL_SECONDS = 600;
 
     public function __construct(private readonly Sms $sms) {}
 
@@ -120,6 +127,9 @@ class OtpService
             'confirm_code_expires_at' => now()->addMinutes((int) config('kavenegar.otp_ttl_minutes', 2)),
         ]);
 
+        // کد تازه = شمارنده‌ی تلاش‌های ناموفق صفر می‌شود
+        Cache::forget($this->attemptsKey($mobile));
+
         $template = setting('otp_template') ?: 'verify';
 
         try {
@@ -153,24 +163,49 @@ class OtpService
         }
     }
 
+    /** کلید کش شمارش تلاش‌های ناموفق برای هر شماره */
+    private function attemptsKey(string $mobile): string
+    {
+        return 'otp_verify_attempts:'.sha1($mobile);
+    }
+
     /**
      * بررسی کد واردشده و لاگین کاربر.
+     *
+     * در برابر حدس زدن مقاوم شده:
+     *   - حداکثر ۵ تلاش ناموفق در ۱۰ دقیقه → قفل موقت تا دریافت کد جدید
+     *   - مقایسه‌ی کد به‌صورت timing-safe
      *
      * @return array{success: bool, message: string}
      */
     public function verify(string $mobile, string $code): array
     {
+        $attemptsKey = $this->attemptsKey($mobile);
+
+        if (Cache::get($attemptsKey, 0) >= self::MAX_VERIFY_ATTEMPTS) {
+            return ['success' => false, 'message' => __('messages.otp_too_many_attempts')];
+        }
+
         $user = User::where('mobile', $mobile)->first();
 
         if (! $user || ! $user->is_active) {
+            Cache::increment($attemptsKey);
+            Cache::put($attemptsKey, Cache::get($attemptsKey, 1), self::ATTEMPT_TTL_SECONDS);
+
             return ['success' => false, 'message' => __('messages.otp_code_invalid')];
         }
 
-        if (! $user->confirm_code || $user->confirm_code !== $code) {
+        if (! $user->confirm_code || ! hash_equals((string) $user->confirm_code, $code)) {
+            Cache::increment($attemptsKey);
+            Cache::put($attemptsKey, Cache::get($attemptsKey, 1), self::ATTEMPT_TTL_SECONDS);
+
             return ['success' => false, 'message' => __('messages.otp_code_invalid')];
         }
 
         if ($user->confirm_code_expires_at && $user->confirm_code_expires_at->isPast()) {
+            Cache::increment($attemptsKey);
+            Cache::put($attemptsKey, Cache::get($attemptsKey, 1), self::ATTEMPT_TTL_SECONDS);
+
             return ['success' => false, 'message' => __('messages.otp_code_expired')];
         }
 

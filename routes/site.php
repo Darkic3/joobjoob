@@ -12,6 +12,7 @@
 // ⚠️ چرا کپی جدا؟ پارامتر اختیاری در ابتدای URI ({locale?}/products) توسط
 //   کامپایلر Laravel الزامی می‌شود — پس نسخه‌ی پیشونددار با {locale} اجباری ثبت می‌شود.
 
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\CheckoutController;
 use App\Http\Controllers\Site\CartController;
@@ -40,6 +41,9 @@ $localePattern = '^(?:'.implode('|', array_map(fn (string $c) => preg_quote($c, 
 
 // بدنه‌ی روت‌های سایت — یک بار برای بدون پیشوند، یک بار برای پیشونددار
 $siteRoutes = function () {
+    // مانیتورینگ — endpoint عمومی سبک (دوقلوی locale هم دارد تا تست SEO روت‌ها پاس شود)
+    Route::get('/health', HealthController::class)->name('health');
+
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/seed', [HomeController::class, 'seed'])->name('seed');
 

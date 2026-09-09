@@ -22,18 +22,29 @@
             <span class="text-sm font-semibold" style="color: var(--success);">{{ session("success") }}</span>
         </div>
         @endif
-        <div x-show="showForm" x-transition x-cloak class="neu-card">
+        {{-- خطاهای ولیدیشن سمت سرور — پنل فرم باز می‌ماند --}}
+        @if($errors->any())
+        <div class="neu-card p-4" style="border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);">
+            <p class="text-xs font-bold mb-1.5" style="color: var(--danger);">لطفاً موارد زیر را اصلاح کنید:</p>
+            <ul class="list-disc pe-4 space-y-0.5">
+                @foreach($errors->all() as $err)
+                    <li class="text-xs" style="color: var(--danger);">{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+        <div x-show="showForm" x-transition x-cloak class="neu-card" @if($errors->any()) style="display: block;" x-init="showForm = true" @endif>
             <h3 class="text-sm font-bold mb-4" style="color: var(--text-primary);" x-text="editingId ? 'ویرایش آدرس' : 'آدرس جدید'"></h3>
             <form :action="editingId ? '{{ url("account/addresses") }}/' + editingId : '{{ route("dashboard.addresses.create") }}'" method="POST" class="space-y-3">
                 @csrf
                 <template x-if="editingId"><input type="hidden" name="_method" value="PUT"></template>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">نام تحویل‌گیرنده *</label><input type="text" name="receiptor_full_name" x-model="form.name" class="neu-input py-2.5 text-sm" required></div>
-                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">موبایل *</label><input type="text" name="receiptor_mobile" x-model="form.mobile" class="neu-input py-2.5 text-sm" dir="ltr" required></div>
-                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">استان *</label><select name="state_id" x-model="form.state_id" @change="loadCities(form.state_id)" class="neu-input py-2.5 text-sm" required><option value="">انتخاب استان</option>@foreach($states as $state)<option value="{{ $state->id }}">{{ $state->name }}</option>@endforeach</select></div>
+                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">نام تحویل‌گیرنده *</label><input type="text" name="receiptor_full_name" value="{{ old('receiptor_full_name') }}" x-model="form.name" class="neu-input py-2.5 text-sm" required maxlength="120"></div>
+                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">موبایل *</label><input type="tel" name="receiptor_mobile" value="{{ old('receiptor_mobile') }}" x-model="form.mobile" class="neu-input py-2.5 text-sm" dir="ltr" inputmode="tel" required maxlength="11" placeholder="09123456789"></div>
+                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">استان *</label><select name="state_id" x-model="form.state_id" @change="loadCities(form.state_id)" class="neu-input py-2.5 text-sm" required><option value="">انتخاب استان</option>@foreach($states as $state)<option value="{{ $state->id }}" @if((string) old('state_id') === (string) $state->id) selected @endif>{{ $state->name }}</option>@endforeach</select></div>
                     <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">شهر *</label><select name="city_id" x-model="form.city_id" class="neu-input py-2.5 text-sm" required><option value="">انتخاب شهر</option><template x-for="city in cities" :key="city.id"><option :value="city.id" x-text="city.name"></option></template></select></div>
-                    <div class="sm:col-span-2"><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">آدرس کامل *</label><textarea name="address" x-model="form.address" class="neu-input py-2.5 text-sm" rows="2" required></textarea></div>
-                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">کدپستی *</label><input type="text" name="postal_code" x-model="form.postal_code" class="neu-input py-2.5 text-sm" dir="ltr" required></div>
+                    <div class="sm:col-span-2"><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">آدرس کامل *</label><textarea name="address" x-model="form.address" class="neu-input py-2.5 text-sm" rows="2" required maxlength="1000">{{ old('address') }}</textarea></div>
+                    <div><label class="text-[11px] font-bold mb-1 block" style="color: var(--text-secondary);">کدپستی *</label><input type="tel" name="postal_code" value="{{ old('postal_code') }}" x-model="form.postal_code" class="neu-input py-2.5 text-sm" dir="ltr" inputmode="numeric" required maxlength="10"></div>
                 </div>
                 <div class="flex items-center gap-2 pt-2">
                     <button type="submit" class="neu-btn neu-btn-primary px-5 py-2.5 text-xs font-bold rounded-full">ذخیره</button>
@@ -78,6 +89,35 @@ function addressManager() {
         async loadCities(s) { if(!s){this.cities=[];return;} const r = await fetch('{{ route("dashboard.addresses.cities") }}?state_id='+s); const d = await r.json(); this.cities = d.cities||[]; }
     };
 }
+
+// ── بعد از خطای ولیدیشن سمت سرور: پنل را باز نگه دار + شهر قبلی را بازیابی کن + toast قرمز ──
+@if($errors->any())
+document.addEventListener('DOMContentLoaded', function () {
+    // toast قرمز برای هر خطا
+    if (typeof showToast === 'function') {
+        @foreach($errors->all() as $i => $err)
+            setTimeout(function() { showToast({{ json_encode($err) }}, 'error'); }, {{ $i * 350 }});
+        @endforeach
+    }
+
+    // اگر استان قبلی انتخاب بوده، شهرها را بگیر و شهر قبلی را preselect کن
+    var stateSelect = document.querySelector('select[name="state_id"]');
+    var oldState = stateSelect ? stateSelect.value : '';
+    if (oldState) {
+        var manager = document.querySelector('[x-data="addressManager()"]');
+        if (manager) {
+            var scope = Alpine.$data(manager);
+            fetch('{{ route("dashboard.addresses.cities") }}?state_id=' + oldState)
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    scope.cities = d.cities || [];
+                    var oldCity = '{{ old("city_id") }}';
+                    if (oldCity) scope.form.city_id = oldCity;
+                });
+        }
+    }
+});
+@endif
 </script>
 @endpush
 @endsection

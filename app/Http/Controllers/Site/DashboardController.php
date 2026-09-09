@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Site;
 
-use App\Helpers\NumberHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\StoreAddressRequest;
 use App\Http\Requests\Site\UpdateReceiptRequest;
 use App\Models\Address;
 use App\Models\Order;
@@ -129,27 +129,24 @@ class DashboardController extends Controller
     }
 
     /**
-     * ایجاد آدرس جدید
+     * ایجاد آدرس جدید.
+     *
+     * ولیدیشن کامل سمت سرور توسط StoreAddressRequest انجام می‌شود (ارقام فارسی
+     * نرمال می‌شوند؛ موبایل/کدپستی با فرمت واقعی چک می‌شوند). خطا → back()->withErrors
+     * با حفظ ورودی‌ها (old()) — هرگز 500.
      */
-    public function createAddress(Request $request)
+    public function createAddress(StoreAddressRequest $request)
     {
-        $request->validate([
-            'state_id' => 'required|exists:states,id',
-            'city_id' => 'required|exists:cities,id',
-            'address' => 'required|string|max:1000',
-            'receiptor_full_name' => 'required|string|max:255',
-            'receiptor_mobile' => 'required|string|max:20',
-            'postal_code' => 'required|string|max:20',
-        ]);
+        $data = $request->validated();
 
         AddressService::create(
             Auth::id(),
-            $request->state_id,
-            $request->city_id,
-            $request->address,
-            NumberHelper::persian2LatinDigit($request->postal_code),
-            $request->receiptor_full_name,
-            NumberHelper::persian2LatinDigit($request->receiptor_mobile)
+            (int) $data['state_id'],
+            (int) $data['city_id'],
+            $data['address'],
+            $data['postal_code'],
+            $data['receiptor_full_name'],
+            $data['receiptor_mobile']
         );
 
         $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
@@ -158,28 +155,24 @@ class DashboardController extends Controller
     }
 
     /**
-     * ویرایش آدرس
+     * ویرایش آدرس — همان اعتبارسنجی StoreAddressRequest.
      */
-    public function updateAddress(Request $request, int $id)
+    public function updateAddress(StoreAddressRequest $request, int $id)
     {
-        $request->validate([
-            'state_id' => 'required|exists:states,id',
-            'city_id' => 'required|exists:cities,id',
-            'address' => 'required|string|max:1000',
-            'receiptor_full_name' => 'required|string|max:255',
-            'receiptor_mobile' => 'required|string|max:20',
-            'postal_code' => 'required|string|max:20',
-        ]);
+        // مالکیت آدرس باید متعلق به کاربر فعلی باشد
+        \App\Models\Address::where('user_id', Auth::id())->findOrFail($id);
+
+        $data = $request->validated();
 
         AddressService::update(
             $id,
             Auth::id(),
-            $request->state_id,
-            $request->city_id,
-            $request->address,
-            NumberHelper::persian2LatinDigit($request->postal_code),
-            $request->receiptor_full_name,
-            NumberHelper::persian2LatinDigit($request->receiptor_mobile)
+            (int) $data['state_id'],
+            (int) $data['city_id'],
+            $data['address'],
+            $data['postal_code'],
+            $data['receiptor_full_name'],
+            $data['receiptor_mobile']
         );
 
         $redirect = $request->get('redirect_to') ? url($request->get('redirect_to')) : route('dashboard.addresses');
