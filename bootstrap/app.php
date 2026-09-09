@@ -11,6 +11,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -42,5 +44,43 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // 404 — صفحه یافت نشد
+        $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'صفحه مورد نظر یافت نشد.'], 404);
+            }
+            return response()->view('errors.404', [], 404);
+        });
+
+        // 429 — درخواست زیاد
+        $exceptions->renderable(function (TooManyRequestsHttpException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'درخواست‌های شما بیش از حد مجاز است. لطفاً کمی صبر کنید.'], 429);
+            }
+            return response()->view('errors.429', [], 429);
+        });
+
+        // 500 — خطای داخلی سرور
+        $exceptions->renderable(function (\Throwable $e, Request $request) {
+            \Log::error('Unhandled exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'url' => $request->fullUrl(),
+                'user_id' => $request->user()?->id,
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'خطای داخلی سرور رخ داد.'], 500);
+            }
+            return response()->view('errors.500', [], 500);
+        });
+
+        // 419 — CSRF token منقضی
+        $exceptions->renderable(function (\Illuminate\Session\TokenMismatchException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'جلسه شما منقضی شده. لطفاً صفحه را رفرش کنید.'], 419);
+            }
+            return redirect()->back()->with('error', 'جلسه شما منقضی شده. لطفاً دوباره تلاش کنید.');
+        });
     })->create();
