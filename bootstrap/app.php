@@ -44,6 +44,12 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        /*
+         * ⚠️ مهم: هرگز از \Throwable یا ValidationException برای renderable استفاده نکنید؛
+         * کچ-آل باعث می‌شود ValidationException (خطاهای فرم) به‌جای ریدایرکتِ back()->withErrors
+         * به صفحهٔ ۵۰۰ تبدیل شود. فقط استثناهای مشخص را هندل کنید.
+         */
+
         // 404 — صفحه یافت نشد
         $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson()) {
@@ -52,28 +58,12 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->view('errors.404', [], 404);
         });
 
-        // 429 — درخواست زیاد
+        // 429 — درخواست زیاد (rate limit)
         $exceptions->renderable(function (TooManyRequestsHttpException $e, Request $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'درخواست‌های شما بیش از حد مجاز است. لطفاً کمی صبر کنید.'], 429);
             }
             return response()->view('errors.429', [], 429);
-        });
-
-        // 500 — خطای داخلی سرور
-        $exceptions->renderable(function (\Throwable $e, Request $request) {
-            \Log::error('Unhandled exception', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'url' => $request->fullUrl(),
-                'user_id' => $request->user()?->id,
-            ]);
-
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'خطای داخلی سرور رخ داد.'], 500);
-            }
-            return response()->view('errors.500', [], 500);
         });
 
         // 419 — CSRF token منقضی
@@ -83,4 +73,10 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return redirect()->back()->with('error', 'جلسه شما منقضی شده. لطفاً دوباره تلاش کنید.');
         });
+
+        /*
+         * 500 — فقط استثناهای «روی‌کرده در رندر» را لاگ می‌کنیم؛ هندلر پیش‌فرض Laravel
+         * خودش خطاها را گزارش می‌کند و با APP_DEBUG=false صفحهٔ ۵۰۰ نمایش می‌دهد.
+         * اگر صفحهٔ سفارشی 500 می‌خواهید، فقط برای استثناهای مشخص (نه Throwable) بنویسید.
+         */
     })->create();

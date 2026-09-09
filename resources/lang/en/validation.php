@@ -307,6 +307,8 @@ return [
             'name_min'        => 'The name must be at least 2 characters.',
             'name_max'        => 'The name must not exceed 120 characters.',
             'general_error'   => 'An error occurred. Please try again.',
+            'code_required'   => 'Please enter the verification code.',
+            'code_digits'     => 'The verification code must be 4 digits.',
         ],
         'contact' => [
             'name_required'    => 'Full name is required.',

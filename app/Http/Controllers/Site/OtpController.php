@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\SendOtpAjaxRequest;
+use App\Http\Requests\Site\VerifyOtpRequest;
 use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -115,12 +116,14 @@ class OtpController extends Controller
 
     /**
      * تایید کد و ورود.
+     *
+     * اعتبارسنجی توسط VerifyOtpRequest انجام می‌شود: ارقام فارسی/عربی قبل از
+     * ولیدیشن به لاتین نرمال می‌شوند تا کاربر هرگز به‌خاطر خانوادهٔ ارقام خطا نگیرد.
+     * ولیدیشن ناموفق → redirect back با errors (نه 500!) و toast در فرانت.
      */
-    public function verify(Request $request): RedirectResponse
+    public function verify(VerifyOtpRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'code' => ['required', 'digits:4'],
-        ]);
+        $data = $request->validated();
 
         $mobile = $request->session()->get('otp_mobile');
 

@@ -189,6 +189,25 @@
 
 @push('scripts')
 <script>
+    // ── Toast قرمز برای خطاهای سرور (ولیدیشن/سشن) در همین صفحه ──
+    (function () {
+        var messages = [];
+        @if ($errors->any())
+            @foreach ($errors->all() as $err)
+                messages.push({{ json_encode($err) }});
+            @endforeach
+        @endif
+        @if (session('error'))
+            messages.push({{ json_encode(session('error')) }});
+        @endif
+
+        if (messages.length && typeof showToast === 'function') {
+            messages.forEach(function (m, i) {
+                setTimeout(function () { showToast(m, 'error'); }, i * 350);
+            });
+        }
+    })();
+
     (function () {
         var TOTAL = 30;
         var CIRC = 2 * Math.PI * 15.5;
