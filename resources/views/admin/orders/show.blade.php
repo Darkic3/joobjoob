@@ -191,7 +191,7 @@
                 </div>
                 @if($order->discount_price > 0)
                     <div class="flex justify-between">
-                        <span class="text-emerald-600 dark:text-emerald-400">{{ __('admin.orders.discount') }}</span>
+                        <span class="text-emerald-600 dark:text-emerald-400">{{ __('admin.orders.discount') }}{{ $order->discount?->code ? ' (' . $order->discount->code . ')' : '' }}</span>
                         <span class="font-semibold text-emerald-600 dark:text-emerald-400" dir="ltr">-{{ format_price($order->discount_price) }} {{ __('messages.toman') }}</span>
                     </div>
                 @endif

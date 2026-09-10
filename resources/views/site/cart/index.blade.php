@@ -485,6 +485,20 @@
                                     </button>
                                 </div>
                                 <div id="discountMessage" class="text-sm mt-3 font-bold" style="display: none;"></div>
+                                {{-- کد اعمال‌شده + دکمه لغو --}}
+                                <div id="appliedCouponBox" class="{{ session('coupon') ? '' : 'hidden' }} mt-4 flex items-center justify-between gap-3 p-3.5 rounded-2xl"
+                                     style="background: color-mix(in srgb, var(--success) 8%, transparent); border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);">
+                                    <span class="text-xs font-bold flex items-center gap-2 min-w-0" style="color: var(--success);">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                        <span class="truncate">{{ __('messages.coupon_code') }}: <span id="appliedCouponCode" class="mono" dir="ltr">{{ session('coupon.code') ?? '' }}</span></span>
+                                    </span>
+                                    <button type="button" onclick="removeDiscountCode()" id="removeCouponBtn"
+                                            class="shrink-0 text-[11px] font-bold inline-flex items-center gap-1 px-3.5 py-2 rounded-full transition-all duration-200 hover:scale-[1.04] active:scale-[0.97]"
+                                            style="background: color-mix(in srgb, #ef4444 10%, transparent); color: #ef4444;">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        {{ __('messages.coupon_remove') }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1641,64 +1655,132 @@
                 msgEl.textContent = data.message;
                 msgEl.style.color = data.success ? 'var(--success)' : 'var(--danger)';
                 if (data.success) {
-                    fetch(urls.orderPrice, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-                    })
-                    .then(function(r) { return r.json(); })
-                    .then(function(priceData) {
-                        discount = priceData.price_discount;
-                        totalWithoutShipping = priceData.price_cart - priceData.price_shipping;
-                        var total = priceData.price_cart;
-
-                        // مرحله ۳
-                        document.getElementById('step3-subtotal').textContent = formatNum(priceData.final_price_sum);
-                        var couponRow3 = document.getElementById('step3-coupon-row');
-                        if (priceData.price_discount > 0) {
-                            couponRow3.classList.remove('hidden');
-                            document.getElementById('step3-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
-                        } else {
-                            couponRow3.classList.add('hidden');
-                        }
-                        document.getElementById('step3-total').textContent = formatNum(total);
-                        // مرحله ۴
-                        document.getElementById('step4-subtotal').textContent = formatNum(priceData.final_price_sum);
-                        var couponRow4 = document.getElementById('step4-coupon-row');
-                        if (priceData.price_discount > 0) {
-                            couponRow4.classList.remove('hidden');
-                            document.getElementById('step4-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
-                        } else {
-                            couponRow4.classList.add('hidden');
-                        }
-                        document.getElementById('step4-total').textContent = formatNum(total);
-                        document.getElementById('step4-total-inline').textContent = formatNum(total);
-
-                        // مرحله ۲
-                        document.getElementById('step2-subtotal').textContent = formatNum(priceData.final_price_sum);
-                        var couponRow2 = document.getElementById('step2-coupon-row');
-                        if (priceData.price_discount > 0) {
-                            couponRow2.classList.remove('hidden');
-                            document.getElementById('step2-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
-                        } else {
-                            couponRow2.classList.add('hidden');
-                        }
-                        updateStep2Price();
-
-                        // مرحله ۱
-                        var subEl = document.getElementById('cart-subtotal');
-                        var totalEl = document.getElementById('cart-total');
-                        if (subEl) subEl.textContent = formatNum(priceData.final_price_sum);
-                        if (totalEl) totalEl.textContent = formatNum(priceData.final_price_sum - priceData.price_discount);
-                        var couponRow1 = document.getElementById('cart-coupon-row');
-                        if (priceData.price_discount > 0) {
-                            couponRow1.classList.remove('hidden');
-                            document.getElementById('cart-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
-                        } else {
-                            couponRow1.classList.add('hidden');
-                        }
-                    });
+                    // کد اعمال‌شده (از سرور) برای نمایش در ردیف‌های تخفیف
+                    var appliedCode = data.code || code.trim().toUpperCase();
+                    refreshAllPriceBoxes(appliedCode);
                 }
             });
         };
+
+        // ========== لغو کد تخفیف ==========
+        window.removeDiscountCode = function() {
+            var btn = document.getElementById('removeCouponBtn');
+            if (btn) btn.disabled = true;
+
+            fetch(urls.removeDiscount, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function() {
+                var msgEl = document.getElementById('discountMessage');
+                msgEl.style.display = '';
+                msgEl.textContent = '{{ __("messages.coupon_removed") }}';
+                msgEl.style.color = 'var(--text-secondary)';
+                var input = document.getElementById('discountCodeInput');
+                if (input) input.value = '';
+                refreshAllPriceBoxes(null);
+            })
+            .catch(function() {
+                if (btn) btn.disabled = false;
+            });
+        };
+
+        // ========== رفرش یکجای باکس‌های قیمت هر چهار مرحله + باکس کد اعمال‌شده ==========
+        // appliedCode: کد اعمال‌شده برای نمایش؛ null یعنی کوپنی فعال نیست (باکس لغو مخفی)
+        function refreshAllPriceBoxes(appliedCode) {
+            fetch(urls.orderPrice, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(priceData) {
+                discount = priceData.price_discount;
+                totalWithoutShipping = priceData.price_cart - priceData.price_shipping;
+                var total = priceData.price_cart;
+                var hasDiscount = priceData.price_discount > 0;
+
+                // باکس کد اعمال‌شده مرحله ۳
+                var appliedBox = document.getElementById('appliedCouponBox');
+                if (appliedBox) {
+                    if (hasDiscount && appliedCode) {
+                        document.getElementById('appliedCouponCode').textContent = appliedCode;
+                        appliedBox.classList.remove('hidden');
+                    } else if (!hasDiscount) {
+                        appliedBox.classList.add('hidden');
+                    }
+                }
+                var removeBtn = document.getElementById('removeCouponBtn');
+                if (removeBtn) removeBtn.disabled = false;
+
+                // به‌روزرسانی لیبل کد تخفیف در هر چهار مرحله
+                if (hasDiscount && appliedCode) {
+                    var couponLabel2 = document.querySelector('#step2-coupon-row span:first-child');
+                    if (couponLabel2) couponLabel2.textContent = 'تخفیف (' + appliedCode + ')';
+                    var couponLabel1 = document.querySelector('#cart-coupon-row span:first-child');
+                    if (couponLabel1) {
+                        // حفظ آیکون، فقط کد را به‌روز کن
+                        var svg1 = couponLabel1.querySelector('svg');
+                        couponLabel1.textContent = appliedCode;
+                        if (svg1) couponLabel1.prepend(svg1);
+                    }
+                    var couponLabel3 = document.querySelector('#step3-coupon-row span:first-child');
+                    if (couponLabel3) couponLabel3.textContent = 'تخفیف (' + appliedCode + ')';
+                    var couponLabel4 = document.querySelector('#step4-coupon-row span:first-child');
+                    if (couponLabel4) couponLabel4.textContent = 'تخفیف (' + appliedCode + ')';
+                }
+
+                // مرحله ۳
+                document.getElementById('step3-subtotal').textContent = formatNum(priceData.final_price_sum);
+                var couponRow3 = document.getElementById('step3-coupon-row');
+                if (priceData.price_discount > 0) {
+                    couponRow3.classList.remove('hidden');
+                    document.getElementById('step3-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
+                } else {
+                    couponRow3.classList.add('hidden');
+                }
+                document.getElementById('step3-total').textContent = formatNum(total);
+                // مرحله ۴
+                document.getElementById('step4-subtotal').textContent = formatNum(priceData.final_price_sum);
+                var couponRow4 = document.getElementById('step4-coupon-row');
+                if (priceData.price_discount > 0) {
+                    couponRow4.classList.remove('hidden');
+                    document.getElementById('step4-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
+                } else {
+                    couponRow4.classList.add('hidden');
+                }
+                document.getElementById('step4-total').textContent = formatNum(total);
+                document.getElementById('step4-total-inline').textContent = formatNum(total);
+
+                // مرحله ۲
+                document.getElementById('step2-subtotal').textContent = formatNum(priceData.final_price_sum);
+                var couponRow2 = document.getElementById('step2-coupon-row');
+                if (priceData.price_discount > 0) {
+                    couponRow2.classList.remove('hidden');
+                    document.getElementById('step2-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
+                } else {
+                    couponRow2.classList.add('hidden');
+                }
+                updateStep2Price();
+
+                // مرحله ۱
+                var subEl = document.getElementById('cart-subtotal');
+                var totalEl = document.getElementById('cart-total');
+                if (subEl) subEl.textContent = formatNum(priceData.final_price_sum);
+                if (totalEl) totalEl.textContent = formatNum(priceData.final_price_sum - priceData.price_discount);
+                var couponRow1 = document.getElementById('cart-coupon-row');
+                if (priceData.price_discount > 0) {
+                    couponRow1.classList.remove('hidden');
+                    document.getElementById('cart-coupon-amount').textContent = '-' + formatNum(priceData.price_discount);
+                } else {
+                    couponRow1.classList.add('hidden');
+                }
+            });
+        }
 
         // ========== به‌روزرسانی قیمت مرحله ۳ و ۴ ==========
         function updateStep34Price() {

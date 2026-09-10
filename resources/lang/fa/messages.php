@@ -51,6 +51,8 @@ return [
     'apply' => 'اعمال کد',
     'coupon_applied' => 'کد تخفیف با موفقیت اعمال شد',
     'coupon_invalid' => 'کد تخفیف معتبر نیست',
+    'coupon_remove' => 'لغو کد تخفیف',
+    'coupon_removed' => 'کد تخفیف حذف شد',
     'proceed_to_checkout' => 'ادامه فرآیند خرید',
     'shipping_address' => 'آدرس ارسال',
     'payment_method' => 'روش پرداخت',

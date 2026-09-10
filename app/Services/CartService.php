@@ -78,7 +78,7 @@ class CartService
             return;
         }
 
-        $products = Product::with('variants')->findMany($productIds);
+        $products = Product::with('variants')->findMany($productIds)->keyBy('id');
 
         foreach ($items as $item) {
             $product = $products->get($item->product_id);
@@ -187,7 +187,7 @@ class CartService
 
         $changed = false;
         $productIds = $cart->pluck('product_id')->unique()->filter()->all();
-        $products = empty($productIds) ? collect() : Product::with('variants')->findMany($productIds);
+        $products = empty($productIds) ? collect() : Product::with('variants')->findMany($productIds)->keyBy('id');
 
         $cart = $cart->map(function ($item) use ($products, &$changed) {
             $product = $products->get($item['product_id'] ?? null);
@@ -430,7 +430,7 @@ class CartService
     public function applyCoupon(string $code): bool
     {
         $couponService = app(\App\Services\CouponService::class);
-        $result = $couponService->apply($code, $this->subtotal());
+        $result = $couponService->apply($code, $this->subtotal(), $this);
 
         return $result['success'];
     }

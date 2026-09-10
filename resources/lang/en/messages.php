@@ -57,6 +57,8 @@ return [
     'apply' => 'Apply',
     'coupon_applied' => 'Coupon applied successfully',
     'coupon_invalid' => 'Invalid coupon code',
+    'coupon_remove' => 'Remove coupon',
+    'coupon_removed' => 'Coupon removed',
     'proceed_to_checkout' => 'Proceed to Checkout',
     'shipping_address' => 'Shipping Address',
     'payment_method' => 'Payment Method',

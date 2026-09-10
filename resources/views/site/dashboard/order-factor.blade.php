@@ -216,7 +216,7 @@
                 </div>
                 @if($order->discount_price > 0)
                     <div class="inv-total-row discount">
-                        <span>تخفیف</span>
+                        <span>تخفیف{{ $order->discount?->code ? ' (' . $order->discount->code . ')' : '' }}</span>
                         <span>-{{ format_price($order->discount_price) }} تومان</span>
                     </div>
                 @endif

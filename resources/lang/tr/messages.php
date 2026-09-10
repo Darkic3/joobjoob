@@ -57,6 +57,8 @@ return [
     'apply' => 'Uygula',
     'coupon_applied' => 'İndirim kodu başarıyla uygulandı',
     'coupon_invalid' => 'Geçersiz indirim kodu',
+    'coupon_remove' => 'Kuponu kaldır',
+    'coupon_removed' => 'Kupon kaldırıldı',
     'proceed_to_checkout' => 'Ödemeye Geç',
     'shipping_address' => 'Teslimat Adresi',
     'payment_method' => 'Ödeme Yöntemi',

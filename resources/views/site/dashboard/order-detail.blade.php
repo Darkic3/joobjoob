@@ -268,7 +268,7 @@
                 </div>
                 @if($order->discount_price > 0)
                     <div class="flex items-center justify-between py-1.5">
-                        <span class="text-xs" style="color: var(--success);">تخفیف</span>
+                        <span class="text-xs" style="color: var(--success);">تخفیف{{ $order->discount?->code ? ' (' . $order->discount->code . ')' : '' }}</span>
                         <span class="text-sm font-bold mono" style="color: var(--success);" dir="ltr">-{{ format_price($order->discount_price) }} <span class="text-[10px]">تومان</span></span>
                     </div>
                 @endif

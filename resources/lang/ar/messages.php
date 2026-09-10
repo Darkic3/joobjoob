@@ -57,6 +57,8 @@ return [
     'apply' => 'تطبيق',
     'coupon_applied' => 'تم تطبيق رمز الخصم بنجاح',
     'coupon_invalid' => 'رمز الخصم غير صالح',
+    'coupon_remove' => 'إلغاء رمز الخصم',
+    'coupon_removed' => 'تمت إزالة رمز الخصم',
     'proceed_to_checkout' => 'المتابعة للدفع',
     'shipping_address' => 'عنوان الشحن',
     'payment_method' => 'طريقة الدفع',

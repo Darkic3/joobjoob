@@ -13,15 +13,19 @@ class CouponService
     /**
      * اعتبارسنجی و اعمال کد تخفیف
      *
-     * @return array{success: bool, message?: string, discount?: Discount, discount_amount?: float}
+     * مبلغ تخفیف دقیقاً با همان منطق calculateForCart (آیتم‌های واجد شرایط:
+     * with_discount + pay_type) محاسبه می‌شود تا پیام موفقیت با مبلغی که
+     * بعداً در خلاصه سفارش نمایش داده و از جمع کم می‌شود یکی باشد.
+     *
+     * @return array{success: bool, message?: string, code?: string, discount?: Discount, discount_amount?: float}
      */
-    public function apply(string $code, float $subtotal): array
+    public function apply(string $code, float $subtotal, ?CartService $cart = null): array
     {
         $code = strtoupper(trim($code));
 
         // TOCTOU FIX: lockForUpdate + DB::transaction prevents two concurrent
         // requests from both passing hasReachedLimit() and both creating usage.
-        return DB::transaction(function () use ($code, $subtotal) {
+        return DB::transaction(function () use ($code, $subtotal, $cart) {
             // ۱) جستجوی کد تخفیف با قفل سطری (پیشگیری از Race Condition)
             $discount = Discount::where('code', $code)->lockForUpdate()->first();
 
@@ -60,11 +64,14 @@ class CouponService
                 return ['success' => false, 'message' => 'ظرفیت استفاده از این کد تمام شده است.'];
             }
 
-            // ۷) محاسبه مبلغ تخفیف
-            $discountAmount = $discount->calculateDiscount($subtotal);
+            // ۷) محاسبه مبلغ تخفیف روی آیتم‌های واجد شرایط (نه کل سبد خام)
+            // تا با calculateForCart/orderPrice/خلاصه سفارش کاملاً یکسان باشد.
+            // تخفیف فقط از جمع کالاها کم می‌شود، نه از هزینه ارسال.
+            $cart = $cart ?? app(CartService::class);
+            $discountAmount = $this->calculateDiscountForModel($discount, $cart, $subtotal);
 
             if ($discountAmount <= 0) {
-                return ['success' => false, 'message' => 'مبلغ تخفیف قابل محاسبه نیست.'];
+                return ['success' => false, 'message' => 'این کد شامل محصولات سبد شما نمی‌شود.'];
             }
 
             // ۸) ذخیره در session
@@ -86,6 +93,7 @@ class CouponService
             return [
                 'success' => true,
                 'message' => "کد تخفیف «{$discount->title}» با موفقیت اعمال شد. ({$formatted} تومان)",
+                'code' => $discount->code,
                 'discount' => $discount,
                 'discount_amount' => $discountAmount,
             ];
@@ -129,7 +137,10 @@ class CouponService
     /**
      * محاسبه تخفیف هوشمند بر اساس آیتم‌های سبد
      *
-     * با در نظر گرفتن pay_type و with_discount
+     * با در نظر گرفتن pay_type و with_discount.
+     * تخفیف نقدی (cash) فقط یک‌بار روی جمع واجدین شرایط اعمال می‌شود،
+     * نه به‌ازای هر قلم (جلوگیری از چندبرابر شدن تخفیف).
+     * تخفیف فقط از جمع کالاها کم می‌شود، نه از هزینه ارسال.
      */
     public function calculateForCart(CartService $cart): float
     {
@@ -140,19 +151,36 @@ class CouponService
         }
 
         $discount = Discount::find($coupon['discount_id'] ?? null);
-        $withDiscount = $discount?->appliesToDiscountedItems() ?? true;
-
-        // اگر تخفیف pay_type ندارد و روی محصولات تخفیف‌دار هم اعمال می‌شود
-        // → محاسبه ساده روی کل سبد
-        if (empty($coupon['pay_type']) && $withDiscount) {
-            return $this->calculate($cart->subtotal());
-        }
 
         if (! $discount) {
             return $this->calculate($cart->subtotal());
         }
 
-        $totalDiscount = 0.0;
+        return $this->calculateDiscountForModel($discount, $cart);
+    }
+
+    /**
+     * محاسبه تخفیف یک مدل Discount روی سبد — منطق واحد مورد استفاده
+     * هم در apply() و هم در calculateForCart() تا ناسازگاری
+     * «ثبت موفق ولی تخفیف صفر در خلاصه سفارش» رخ ندهد.
+     */
+    public function calculateDiscountForModel(Discount $discount, CartService $cart, ?float $subtotal = null): float
+    {
+        $subtotal = $subtotal ?? $cart->subtotal();
+
+        if ($subtotal <= 0) {
+            return 0;
+        }
+
+        $withDiscount = $discount->appliesToDiscountedItems();
+
+        // اگر تخفیف pay_type ندارد و روی محصولات تخفیف‌دار هم اعمال می‌شود
+        // → محاسبه ساده روی کل سبد
+        if (empty($discount->pay_type) && $withDiscount) {
+            return $discount->calculateDiscount($subtotal);
+        }
+
+        $eligibleTotal = 0.0;
 
         foreach ($cart->content() as $item) {
             $itemPrice = ($item['price'] ?? 0);
@@ -172,10 +200,17 @@ class CouponService
                 continue;
             }
 
-            $totalDiscount += $discount->calculateDiscount($itemTotal);
+            $eligibleTotal += $itemTotal;
         }
 
-        return min($totalDiscount, $cart->subtotal());
+        if ($eligibleTotal <= 0) {
+            return 0;
+        }
+
+        // درصدی روی جمع واجدین، نقدی فقط یک‌بار تا سقف جمع واجدین
+        $amount = $discount->calculateDiscount($eligibleTotal);
+
+        return min($amount, $subtotal);
     }
 
     /**

@@ -24,6 +24,16 @@
                     <h3 class="font-bold text-sm mb-3" style="color: var(--text-primary);">جزئیات سفارش</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex items-center justify-between">
+                            <span style="color: var(--text-secondary);">جمع کالاها</span>
+                            <span class="mono font-bold" dir="ltr">{{ format_price($order->total_price) }} {{ __('messages.toman') }}</span>
+                        </div>
+                        @if($order->discount_price > 0)
+                            <div class="flex items-center justify-between">
+                                <span style="color: var(--success);">تخفیف{{ $order->discount?->code ? ' (' . $order->discount->code . ')' : '' }}</span>
+                                <span class="mono font-bold" style="color: var(--success);" dir="ltr">-{{ format_price($order->discount_price) }} {{ __('messages.toman') }}</span>
+                            </div>
+                        @endif
+                        <div class="flex items-center justify-between">
                             <span style="color: var(--text-secondary);">مبلغ کل</span>
                             <span class="mono font-bold" dir="ltr">{{ format_price($order->payment_price) }} {{ __('messages.toman') }}</span>
                         </div>

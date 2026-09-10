@@ -265,6 +265,22 @@ class OrderService
             $old = $order->order_status;
             $order->update(['order_status' => 'pending_confirmation']);
             try { AuditService::orderStatusChanged($order, $old, 'pending_confirmation', Auth::check() ? Auth::user()->name : 'سیستم'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
+            // ثبت استفاده از کد تخفیف برای سفارش کارت‌به‌کارت (مبلغ واقعی سفارش)
+            $couponSession = session('coupon');
+            if ($order->discount_id && $couponSession) {
+                try {
+                    $couponService = app(\App\Services\CouponService::class);
+                    $couponService->recordUsage(
+                        $order->discount_id,
+                        $order->user_id,
+                        $order->id,
+                        (float) $order->discount_price
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('Coupon recordUsage failed for card-to-card order #' . $order->id, ['message' => $e->getMessage()]);
+                }
+            }
+            session()->forget('coupon');
             return redirect(route('checkout.success', $order->id))
                 ->with('success', 'سفارش شما ثبت شد و پس از تأیید پرداخت، سفارشتان پردازش می‌شود.');
         }
@@ -280,6 +296,7 @@ class OrderService
         try { AuditService::orderStatusChanged($order, $oldStatus, 'paid', 'سیستم - سفارش رایگان'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
 
         // ثبت استفاده از کد تخفیف برای سفارش رایگان (P1-07)
+        // مبلغ واقعی ذخیره‌شده روی سفارش ثبت می‌شود، نه مقدار لحظه‌ای سشن
         $couponSession = session('coupon');
         if ($order->discount_id && $couponSession) {
             try {
@@ -288,7 +305,7 @@ class OrderService
                     $order->discount_id,
                     $order->user_id,
                     $order->id,
-                    $couponSession['discount_amount'] ?? $order->discount_price
+                    (float) $order->discount_price
                 );
             } catch (\Throwable $e) {
                 Log::error('Coupon recordUsage failed for free order #' . $order->id, ['message' => $e->getMessage()]);
@@ -345,6 +362,7 @@ class OrderService
         }
 
         // ── ثبت استفاده از کد تخفیف (فقط پس از تایید پرداخت — P1-07) ──
+        // مبلغ واقعی ذخیره‌شده روی سفارش ثبت می‌شود، نه مقدار لحظه‌ای سشن
         $couponSession = session('coupon');
         if ($order->discount_id && $couponSession) {
             try {
@@ -353,7 +371,7 @@ class OrderService
                     $order->discount_id,
                     $order->user_id,
                     $order->id,
-                    $couponSession['discount_amount'] ?? $order->discount_price
+                    (float) $order->discount_price
                 );
             } catch (\Throwable $e) {
                 Log::error('Coupon recordUsage failed for order #' . $order->id, ['message' => $e->getMessage()]);

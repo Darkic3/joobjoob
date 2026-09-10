@@ -459,4 +459,56 @@ class CheckoutDiscountTest extends TestCase
         $this->assertStringContainsString('cart-coupon-row', $html);
         $this->assertStringContainsString('hidden', $html);
     }
+
+    public function test_step3_shows_remove_coupon_button_when_applied(): void
+    {
+        $this->actingAs($this->user);
+
+        $product = $this->makeProduct();
+        $this->post(route('cart.add', $product->id));
+
+        $this->createDiscount(['code' => 'REMOVEME']);
+        $this->postJson(route('checkout.apply-discount'), ['discount_code' => 'REMOVEME']);
+
+        $html = $this->get(route('cart.index'))->getContent();
+
+        // باکس کد اعمال‌شده + دکمه لغو باید با کد نمایان باشد
+        $this->assertStringContainsString('id="appliedCouponBox"', $html);
+        $this->assertStringContainsString('REMOVEME', $html);
+        $this->assertStringContainsString('removeDiscountCode()', $html);
+    }
+
+    public function test_step3_hides_remove_coupon_button_without_coupon(): void
+    {
+        $this->actingAs($this->user);
+
+        $product = $this->makeProduct();
+        $this->post(route('cart.add', $product->id));
+
+        $html = $this->get(route('cart.index'))->getContent();
+
+        // باکس لغو باید مخفی باشد
+        $this->assertStringContainsString('id="appliedCouponBox"', $html);
+        $this->assertStringContainsString('appliedCouponBox" class="hidden', $html);
+    }
+
+    public function test_remove_discount_updates_order_price_to_zero(): void
+    {
+        $this->actingAs($this->user);
+
+        $product = $this->makeProduct('remove-price', 100000);
+        $this->post(route('cart.add', $product->id));
+
+        $this->createDiscount(['code' => 'GONE20', 'amount' => 20, 'type' => 'percent']);
+        $this->postJson(route('checkout.apply-discount'), ['discount_code' => 'GONE20']);
+        $this->getJson(route('checkout.order-price'))->assertJson(['price_discount' => 20000]);
+
+        $this->postJson(route('checkout.remove-discount'))->assertJson(['success' => true]);
+
+        $this->getJson(route('checkout.order-price'))->assertJson([
+            'final_price_sum' => 100000,
+            'price_discount' => 0,
+            'price_cart' => 100000,
+        ]);
+    }
 }

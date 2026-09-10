@@ -126,7 +126,7 @@ class DiscountIntegrationTest extends TestCase
         $this->assertEquals(15000, $cart->discount());
     }
 
-    public function test_brand_restriction_all_items_ineligible_returns_zero_discount(): void
+    public function test_brand_restriction_all_items_ineligible_rejected_at_apply(): void
     {
         $this->actingAs($this->user);
         $brandA = $this->mb('brandA');
@@ -135,7 +135,8 @@ class DiscountIntegrationTest extends TestCase
         $this->add($productB);
         $discount = $this->cd(['code' => 'BRANDA2', 'amount' => 10, 'type' => 'percent', 'pay_type' => 'brand']);
         $discount->brands()->attach($brandA->id);
-        $this->cp('BRANDA2')->assertJson(['success' => true]);
+        // هیچ قلمی واجد شرایط نیست → اعمال باید رد شود (نه ثبت موفق با تخفیف صفر)
+        $this->cp('BRANDA2')->assertJson(['success' => false]);
         $cart = app(CartService::class);
         $this->assertEquals(0, $cart->discount());
     }

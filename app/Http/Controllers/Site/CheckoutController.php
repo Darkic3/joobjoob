@@ -141,7 +141,7 @@ class CheckoutController extends Controller
         }
 
         $couponService = app(\App\Services\CouponService::class);
-        $result = $couponService->apply($code, $this->cart->subtotal());
+        $result = $couponService->apply($code, $this->cart->subtotal(), $this->cart);
 
         return response()->json($result);
     }
