@@ -357,6 +357,8 @@ return [
     'footer_desc' => 'متجر إلكتروني بأفضل جودة وأسعار',
     'newsletter' => 'النشرة الإخبارية',
     'newsletter_email_placeholder' => 'بريدك الإلكتروني',
+    'newsletter_unsubscribed' => 'تم إلغاء اشتراكك في النشرة الإخبارية.',
+    'newsletter_disabled' => 'قسم النشرة الإخبارية معطل حالياً.',
     'welcome_back' => 'مرحبا بعودك',
 
     'no_orders_yet' => 'لم تقم بطلب أي طلبات بعد',

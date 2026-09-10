@@ -21,8 +21,72 @@ class DashboardController extends Controller
     public function index()
     {
         $orders = Auth::user()->orders()->latest()->take(5)->get();
+        $newsletterService = app(\App\Services\NewsletterService::class);
+        $newsletterEnabled = $newsletterService->isEnabled();
+        $newsletterSubscribed = $newsletterEnabled && $newsletterService->isSubscribed(Auth::user()->email);
 
-        return view('site.dashboard.index', compact('orders'));
+        return view('site.dashboard.index', compact('orders', 'newsletterEnabled', 'newsletterSubscribed'));
+    }
+
+    // ==================== ایمیل حساب کاربری ====================
+
+    /**
+     * ثبت/ویرایش ایمیل حساب کاربری.
+     */
+    public function updateEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'max:190', 'unique:users,email,' . Auth::id()],
+        ], [
+            'email.required' => __('validation.requests.newsletter.email_required'),
+            'email.email' => __('validation.requests.newsletter.email_invalid'),
+        ]);
+
+        Auth::user()->update(['email' => mb_strtolower(trim($validated['email']))]);
+
+        return back()->with('success', __('messages.email_saved'));
+    }
+
+    /**
+     * حذف ایمیل حساب کاربری (+ غیرفعال‌سازی عضویت خبرنامه همان کاربر).
+     */
+    public function destroyEmail()
+    {
+        $user = Auth::user();
+        $user->update(['email' => null]);
+
+        \App\Models\NewsletterSubscriber::where('user_id', $user->id)->update(['is_active' => false]);
+
+        return back()->with('success', __('messages.email_removed'));
+    }
+
+    /**
+     * روشن/خاموش کردن عضویت خبرنامه برای ایمیل حساب کاربری (AJAX).
+     */
+    public function toggleNewsletter()
+    {
+        $service = app(\App\Services\NewsletterService::class);
+        $user = Auth::user();
+
+        if (! $service->isEnabled()) {
+            return response()->json(['success' => false, 'message' => __('messages.newsletter_disabled')], 403);
+        }
+
+        if (! $user->email) {
+            return response()->json(['success' => false, 'message' => __('messages.email_required_first')], 422);
+        }
+
+        if ($service->isSubscribed($user->email)) {
+            $result = $service->unsubscribe($user->email, $user->id);
+        } else {
+            $result = $service->subscribe($user->email, $user->id);
+        }
+
+        return response()->json([
+            'success' => $result['success'],
+            'subscribed' => $service->isSubscribed($user->email),
+            'message' => $result['message'],
+        ]);
     }
 
     // ==================== سفارشات ====================

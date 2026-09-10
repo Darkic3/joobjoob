@@ -109,7 +109,8 @@
                     </div>
                 </nav>
 
-                {{-- ستون خبرنامه — آکاردئون در موبایل --}}
+                {{-- ستون خبرنامه — آکاردئون در موبایل (فقط وقتی از تنظیمات ادمین فعال است) --}}
+                @if(setting('newsletter_enabled', false))
                 <div class="site-footer-col site-footer-acc" data-footer-acc>
                     <button type="button" class="site-footer-acc-btn"
                             aria-expanded="false" aria-controls="footer-acc-newsletter"
@@ -126,10 +127,12 @@
                             <form class="site-footer-newsletter" x-data="newsletterForm()" x-on:submit.prevent>
                                 <input type="email" name="email" required
                                        x-model="email"
+                                       x-show="!success"
                                        placeholder="{{ settingOverride('newsletter_placeholder', __('messages.newsletter_email_placeholder')) }}"
                                        class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}"
                                        dir="ltr">
                                 <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}"
+                                        x-show="!success"
                                         x-on:click="submit()" :disabled="loading">
                                     <template x-if="loading">
                                         <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" opacity="0.25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" opacity="0.75"/></svg>
@@ -147,6 +150,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
             {{-- نوار پایین: نشان‌های اعتماد + حق‌کپی با خط مویی جداکننده --}}

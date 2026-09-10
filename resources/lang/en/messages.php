@@ -190,6 +190,11 @@ return [
     'newsletter_email_placeholder' => 'Your email',
     'newsletter_subscribed' => 'You have been successfully subscribed to our newsletter.',
     'newsletter_error' => 'An error occurred. Please try again.',
+    'newsletter_unsubscribed' => 'You have been unsubscribed from our newsletter.',
+    'newsletter_disabled' => 'The newsletter section is currently disabled.',
+    'email_saved' => 'Your email has been saved.',
+    'email_removed' => 'Your email has been removed.',
+    'email_required_first' => 'Please save your email first.',
 
     'socials' => [
         'instagram' => 'Instagram',

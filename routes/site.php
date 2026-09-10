@@ -163,6 +163,9 @@ $siteRoutes = function () {
 
     Route::middleware('auth')->group(function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
+        Route::put('/account/email', [DashboardController::class, 'updateEmail'])->name('dashboard.email.update');
+        Route::delete('/account/email', [DashboardController::class, 'destroyEmail'])->name('dashboard.email.destroy');
+        Route::post('/account/newsletter/toggle', [DashboardController::class, 'toggleNewsletter'])->name('dashboard.newsletter.toggle');
         Route::get('/account/orders', [DashboardController::class, 'orders'])->name('dashboard.orders');
         Route::get('/account/orders/{id}', [DashboardController::class, 'orderDetail'])->name('dashboard.order-detail');
         Route::patch('/account/orders/{id}/receipt', [DashboardController::class, 'updateReceipt'])->name('dashboard.order-receipt.update');

@@ -357,6 +357,8 @@ return [
     'footer_desc' => 'En iyi kalite ve fiyatlarla online mağaza',
     'newsletter' => 'Bülten',
     'newsletter_email_placeholder' => 'E-posta adresiniz',
+    'newsletter_unsubscribed' => 'Bülten aboneliğiniz iptal edildi.',
+    'newsletter_disabled' => 'Bülten bölümü şu anda devre dışı.',
     'welcome_back' => 'Tekrar hoş geldiniz',
 
     'no_orders_yet' => 'Henüz sipariş vermediniz',

@@ -57,18 +57,27 @@ class PageController extends Controller
 
     /**
      * عضویت در خبرنامه — AJAX.
+     *
+     * ایمیل در جدول newsletter_subscribers ذخیره می‌شود؛
+     * اگر خبرنامه از تنظیمات ادمین غیرفعال باشد، درخواست رد می‌شود.
      */
     public function subscribeNewsletter(NewsletterSubscribeRequest $request): JsonResponse
     {
         $email = $request->validated('email');
 
-        // ذخیره ایمیل (جدول newsletter_subscribers یا هر مکان دیگر)
-        // فعلاً فقط لاگ می‌کنیم — جدول واقعی بعداً اضافه می‌شود
-        Log::info('Newsletter subscription', ['email' => $email]);
+        $service = app(\App\Services\NewsletterService::class);
+        $result = $service->subscribe($email, auth()->id());
+
+        if (! $result['success']) {
+            return response()->json([
+                'success' => false,
+                'error' => $result['message'],
+            ], 403);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => __('messages.newsletter_subscribed'),
+            'message' => $result['message'],
         ]);
     }
 

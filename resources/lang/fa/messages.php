@@ -191,6 +191,11 @@ return [
     'newsletter_email_placeholder' => 'ایمیل شما',
     'newsletter_subscribed' => 'عضویت شما در خبرنامه با موفقیت ثبت شد.',
     'newsletter_error' => 'خطایی رخ داده است؛ لطفاً دوباره تلاش کنید.',
+    'newsletter_unsubscribed' => 'عضویت شما در خبرنامه لغو شد.',
+    'newsletter_disabled' => 'بخش خبرنامه در حال حاضر غیرفعال است.',
+    'email_saved' => 'ایمیل شما با موفقیت ذخیره شد.',
+    'email_removed' => 'ایمیل شما حذف شد.',
+    'email_required_first' => 'ابتدا ایمیل خود را ثبت کنید.',
 
     'socials' => [
         'instagram' => 'اینستاگرام',
