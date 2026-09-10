@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy via FTP
+    name: Deploy via FTPS
     runs-on: ubuntu-latest
 
     steps:
@@ -17,22 +17,22 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # <--- این خط را از 8.1 به 8.2 یا 8.3 تغییر دادیم
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, zip, curl, bcmath
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, mysql, zip, curl, bcmath
           coverage: none
 
       - name: Install Composer Dependencies
         run: |
           composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-      - name: Deploy to cPanel via FTP
+      - name: Deploy to cPanel via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          username: ${{ secrets.FTP_USERNAME }} # حالا فقط h422450 است
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
+          port: 21 # پورت 21 برای FTPS Explicit در سی‌پنل استاندارد است
+          protocol: ftps # <--- این خط را از ftp به ftps تغییر دادیم
           server-dir: ${{ secrets.FTP_DESTINATION }}
           exclude: |
             **/.git*
