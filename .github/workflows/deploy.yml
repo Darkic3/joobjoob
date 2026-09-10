@@ -2,28 +2,46 @@ name: Deploy Shop to cPanel
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
 
 jobs:
   deploy:
+    name: Deploy via FTP
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # آپدیت به v4 برای رفع هشدار
 
-      - name: Deploy Shop via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1' # ورژن PHP هاست خودت را اینجا بگذار (مثلا 8.1 یا 8.2)
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, zip, curl
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Deploy to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5 # آپدیت به آخرین نسخه
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp # اگر هاستت FTPS اجباری کرد، این را به ftps تغییر بده
           server-dir: ${{ secrets.FTP_DESTINATION }}
-          # فایل‌های زیر نباید روی هاست آپلود یا بازنویسی شوند
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
-            **/.env
-            **/.env.example
+            .env
+            .env.example
             **/storage/logs/**
             **/storage/framework/cache/data/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
+            **/tests/**
