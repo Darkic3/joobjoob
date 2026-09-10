@@ -21,16 +21,23 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name:  Deploy via FTP
-        uses: appleboy/ftp-action@master
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          source: "./"
-          target: "/public_html/shop/"
-          exclude: ".git,node_modules,.env,storage/logs/*,storage/framework/cache/*,storage/framework/sessions/*,storage/framework/views/*"
-          strip_components: 0
-          rm: false
+      - name: Deploy via lftp
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          lftp -e "
+            set ssl:verify-certificate no;
+            set ftp:ssl-allow yes;
+            set ftp:ssl-force no;
+            set net:timeout 30;
+            set net:max-retries 3;
+            open -u $FTP_USERNAME,$FTP_PASSWORD -p $FTP_PORT $FTP_HOST;
+            mirror -R --exclude-glob .git --exclude-glob node_modules --exclude-glob .env --exclude-glob 'storage/logs/*' --exclude-glob 'storage/framework/cache/*' --exclude-glob 'storage/framework/sessions/*' --exclude-glob 'storage/framework/views/*' ./ /public_html/shop/;
+            bye
+          "
