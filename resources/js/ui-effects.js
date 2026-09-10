@@ -797,11 +797,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(function (data) {
                 const active = !!data.in_wishlist;
-                btn.classList.toggle('active', active);
-                btn.setAttribute('data-wishlist-active', active ? '1' : '0');
-                // وقتی فعال شد، لِیبلِ آینده «حذف» است و برعکس
-                btn.setAttribute('aria-label', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
-                btn.setAttribute('title', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+                applyWishlistVisual(btn, active);
 
                 if (data.count !== undefined) {
                     ['wishlist-count', 'wishlist-count-mobile'].forEach(function (id) {
@@ -864,10 +860,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(function (data) {
                 const active = !!data.in_wishlist;
-                btn.classList.toggle('active', active);
-                btn.setAttribute('data-wishlist-active', active ? '1' : '0');
-                btn.setAttribute('aria-label', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
-                btn.setAttribute('title', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+                applyWishlistVisual(btn, active);
 
                 if (data.count !== undefined) {
                     ['wishlist-count', 'wishlist-count-mobile'].forEach(function (id) {
@@ -916,6 +909,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!visibleCards.length && emptyState) {
             emptyState.classList.remove('hidden');
         }
+    }
+
+    // به‌روزرسانی بصری قلب علاقه‌مندی: کلاس active، رنگ Tailwind، fill SVG
+    function applyWishlistVisual(btn, active) {
+        btn.classList.toggle('active', active);
+        btn.setAttribute('data-wishlist-active', active ? '1' : '0');
+        btn.setAttribute('aria-label', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+        btn.setAttribute('title', active ? btn.getAttribute('data-remove-label') : btn.getAttribute('data-add-label'));
+
+        // به‌روزرسانی fill SVG (overrides inline Blade-rendered attribute)
+        var svg = btn.querySelector('svg');
+        if (svg) svg.setAttribute('fill', active ? 'currentColor' : 'none');
+
+        // به‌روزرسانی کلاس‌های رنگ Tailwind
+        btn.classList.toggle('text-red-500', active);
+        btn.classList.toggle('text-gray-600', !active);
     }
 
     // انیمیشن fly-to-wishlist-badge: کپی کوچک از تصویر محصول → بج بالا صفحه

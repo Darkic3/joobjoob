@@ -74,7 +74,7 @@
         {{-- دکمه‌های عملیات سریع --}}
         <div class="absolute top-3 end-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 @if($rank) mt-14 @endif">
             <button type="button"
-                    class="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 {{ $inWishlist ? 'text-red-500' : 'text-gray-600 hover:text-red-500' }}"
+                    class="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 wishlist-heart {{ $inWishlist ? 'text-red-500' : 'text-gray-600 hover:text-red-500' }}"
                     data-wishlist-toggle
                     data-wishlist-url="{{ localizedRoute('wishlist.toggle', ['product' => $product->slug]) }}"
                     data-wishlist-active="{{ $inWishlist ? 1 : 0 }}"
