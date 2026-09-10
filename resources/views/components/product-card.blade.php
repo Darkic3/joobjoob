@@ -168,15 +168,14 @@
 
         {{-- ═══ دکمه افزودن به سبد ═══ --}}
         <button type="button"
-                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
+                class="add-to-cart w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
                        {{ $outOfStock
-                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                           : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]' }}"
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]' }}"
                 @disabled($outOfStock)
                 data-success="{{ __('messages.added_short') }}"
                 data-cart-url="{{ route('cart.add', ['product' => $product->id]) }}"
-                data-csrf="{{ csrf_token() }}"
-                onclick="event.stopPropagation()">
+                data-csrf="{{ csrf_token() }}">
 
             @if($outOfStock)
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

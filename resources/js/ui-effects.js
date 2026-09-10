@@ -242,18 +242,27 @@ function flyToCart(sourceEl) {
 }
 
 // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success ----------
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const btn = this;
+// تفویض‌شده (delegation) تا روی همهٔ کارت‌ها — از جمله سکشن پیشنهادهای ویژه (deals)،
+// کارت‌های داینامیک و کش‌شده — کار کند و کلیک هرگز به لینک کارت (<a data-card-link>) نرسد.
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.add-to-cart, button[data-cart-url]');
+    if (!btn) return;
+    // فقط دکمه‌های داخل کارت یا دارای data-cart-url
+    if (btn.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (btn.dataset.busy === '1') return;
+    btn.dataset.busy = '1';
             const originalText = btn.innerHTML;
             const successText = btn.dataset.success || '✓ اضافه شد';
             const cartUrl = btn.dataset.cartUrl;
 
             // اگر URL سبد وجود ندارد (مثلاً در quick-view)، از form والد استفاده کن
-            if (!cartUrl) return;
+            if (!cartUrl) { btn.dataset.busy = ''; return; }
 
             // حالت لودینگ
             btn.innerHTML = '<span class="btn-spinner"></span>';
@@ -282,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         btn.innerHTML = originalText;
                         btn.classList.remove('neu-btn-success');
                         btn.disabled = false;
+                        btn.dataset.busy = '';
                         return null;
                     });
                 }
@@ -332,30 +342,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     btn.innerHTML = originalText;
                     btn.classList.remove('neu-btn-success');
                     btn.disabled = false;
+                    btn.dataset.busy = '';
                 }, 1500);
             })
             .catch(() => {
                 btn.innerHTML = originalText;
                 btn.classList.remove('neu-btn-success');
                 btn.disabled = false;
+                btn.dataset.busy = '';
             });
-        });
-    });
 });
 
 
 // ---------- جلوگیری از ناوبری لینک کارت هنگام کلیک روی دکمه‌های داخل آن ----------
 // دکمه‌های "افزودن به سبد"، "علاقه‌مندی" و "پیش‌نمایش" داخل <a> کارت قرار دارند.
-// این هندلر مطمئن می‌شود کلیک روی دکمه‌ها باعث باز شدن صفحهٔ محصول نشود.
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('[data-card-link]').forEach(function (link) {
-        link.addEventListener('click', function (e) {
-            if (e.target.closest('button, [data-wishlist-toggle], [data-quick-view-url]')) {
-                e.preventDefault();
-            }
-        });
-    });
-});
+// کپچر (capture) تا حتی اگر دکمه stopPropagation کند، باز هم ناوبری لغو شود.
+document.addEventListener('click', function (e) {
+    const link = e.target.closest('[data-card-link]');
+    if (!link) return;
+    if (e.target.closest('button, .add-to-cart, [data-wishlist-toggle], [data-quick-view-url]')) {
+        e.preventDefault();
+    }
+}, true);
 
 
 // ---------- اسکرول افقی حرفه‌ای (محصولات ویژه / پرفروش‌ترین‌ها) ----------
