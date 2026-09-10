@@ -7,9 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy via FTPS
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,29 +17,20 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, xml, ctype, iconv, intl, pdo, mysql, zip, curl, bcmath
-          coverage: none
 
       - name: Install Composer Dependencies
-        run: |
-          composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+        run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: Deploy to cPanel via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name:  Deploy via FTP
+        uses: appleboy/ftp-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }} # حالا فقط h422450 است
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 21 # پورت 21 برای FTPS Explicit در سی‌پنل استاندارد است
-          protocol: ftps # <--- این خط را از ftp به ftps تغییر دادیم
-          server-dir: ${{ secrets.FTP_DESTINATION }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env
-            .env.example
-            **/storage/logs/**
-            **/storage/framework/cache/data/**
-            **/storage/framework/sessions/**
-            **/storage/framework/views/**
-            **/tests/**
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          source: "./"
+          target: "/public_html/shop/"
+          exclude: ".git,node_modules,.env,storage/logs/*,storage/framework/cache/*,storage/framework/sessions/*,storage/framework/views/*"
+          strip_components: 0
+          rm: false
