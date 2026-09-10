@@ -183,7 +183,7 @@ return [
         'sort_order' => 'sort order',
         'icon' => 'icon',
         'type' => 'type',
-        'code' => 'language code',
+        'code' => 'verification code',
         'native_name' => 'native name',
         'dir' => 'direction',
         'settings' => 'settings',

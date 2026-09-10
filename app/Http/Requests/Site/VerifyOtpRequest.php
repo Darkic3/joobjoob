@@ -18,7 +18,18 @@ class VerifyOtpRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // اطمینان از اینکه شماره موبایل در سشن موجود است (جلوگیری از دور زدن مرحله اول یا انقضای سشن)
+        return $this->session()->has('otp_mobile');
+    }
+
+    /**
+     * ریدایرکت کاربر در صورت انقضای سشن یا دسترسی غیرمجاز.
+     */
+    protected function failedAuthorization()
+    {
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            redirect()->route('login')->withErrors(['mobile' => __('messages.otp_session_expired')])
+        );
     }
 
     /**
@@ -37,8 +48,25 @@ class VerifyOtpRequest extends FormRequest
     {
         return [
             // بعد از prepareForValidation مقدار فقط می‌تواند شامل ارقام لاتین باشد.
+            // استفاده از 'digits:4' هم طول را چک می‌کند و هم عددی بودن را.
             'code' => ['required', 'string', 'digits:4'],
         ];
+    }
+
+    /**
+     * سفارشی‌سازی نمایش خطاها برای اطمینان از نمایش Toast در فرانت‌اِند.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        if ($this->expectsJson()) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(response()->json([
+                'success' => false,
+                'errors'  => $validator->errors(),
+                'message' => $validator->errors()->first(),
+            ], 422));
+        }
+
+        parent::failedValidation($validator);
     }
 
     public function messages(): array

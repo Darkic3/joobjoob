@@ -47,20 +47,9 @@ class OtpController extends Controller
     /**
      * دریافت شماره (+ نام در صورت کاربر جدید) و ارسال کد تایید.
      */
-    public function send(Request $request): RedirectResponse
+    public function send(\App\Http\Requests\Site\SendOtpRequest $request): RedirectResponse
     {
-        $mobile = $this->otpService->normalizeMobile((string) $request->input('mobile', ''));
-        $request->merge(['mobile' => $mobile]);
-
-        // ابتدا فرمت شماره موبایل را اعتبارسنجی می‌کنیم
-        $request->validate([
-            'mobile' => ['required', 'string', function (string $attribute, string $value, callable $fail): void {
-                if (! $this->otpService->isValidMobile($value)) {
-                    $fail(__('messages.otp_mobile_invalid'));
-                }
-            }],
-        ]);
-
+        $mobile = $request->input('mobile');
         $isNewUser = ! $this->otpService->userExists($mobile);
 
         if ($isNewUser) {

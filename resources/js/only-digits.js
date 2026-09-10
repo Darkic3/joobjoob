@@ -60,15 +60,51 @@
         var start = el.selectionStart;
         var before = el.value;
         var after = keepDigitsOnly(before);
+
         if (after === before) return;
 
         el.value = after;
+
         // مکان نما را سر جایش نگه دار (اگر کاراکتر پاک‌شده جلوی مکان‌نما بود)
         if (typeof start === 'number') {
-            var pos = Math.min(start, after.length);
+            // محاسبه مکان‌نمای جدید: تعداد کاراکترهای حذف شده قبل از مکان‌نما را کم کن
+            var removedBefore = 0;
+            for (var i = 0; i < start; i++) {
+                var code = before.charCodeAt(i);
+                // اگر کاراکتر فعلی عددی نیست، یعنی حذف شده است
+                if (!((code >= 48 && code <= 57) || (code >= 1632 && code <= 1641) || (code >= 1776 && code <= 1785))) {
+                    removedBefore++;
+                }
+            }
+            var pos = Math.max(0, start - removedBefore);
             try {
                 el.setSelectionRange(pos, pos);
-            } catch (_) { /* برخی مرورگرها (مثلاً نوع خاص) اجازه نمی‌دهند */ }
+            } catch (_) { }
         }
-    }, true); // capture → قبل از Alpine و هندلرهای دیگر صفحه
+    }, true);
+
+    // جلوگیری از ورود کاراکترهای غیرمجاز در هنگام فشردن کلید (UX بهتر)
+    document.addEventListener('keydown', function (e) {
+        var el = e.target;
+        if (!el || !el.getAttribute || !isDigitOnlyField(el)) return;
+
+        // کلیدهای کنترلی مجاز (BackSpace, Tab, Enter, Delete, Arrow keys, etc.)
+        var allowedKeys = [
+            'Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight',
+            'ArrowUp', 'ArrowDown', 'Home', 'End', 'Escape'
+        ];
+
+        // اجازه دادن به کلیدهای کنترلی و میانبرهای سیستم (Ctrl+A, Ctrl+C, etc.)
+        if (allowedKeys.indexOf(e.key) !== -1 || e.ctrlKey || e.metaKey || e.altKey) {
+            return;
+        }
+
+        // فقط اجازه به اعداد (از هر خانواده‌ای)
+        // اعداد لاتین (0-9)، فارسی (۰-۹) و عربی (٠-٩)
+        var isNumber = /^[0-9\u0660-\u0669\u06F0-\u06F9]$/.test(e.key);
+
+        if (!isNumber) {
+            e.preventDefault();
+        }
+    }, true);
 })();
