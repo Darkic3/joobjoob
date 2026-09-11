@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,27 +18,41 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, xml, ctype, iconv, intl, pdo, mysql, zip, curl, bcmath
+          tools: composer
 
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: Deploy via lftp
+      - name: Deploy via FTPS
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-          lftp -e "
-            set ssl:verify-certificate no;
-            set ftp:ssl-allow yes;
-            set ftp:ssl-force no;
+          lftp -c "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate false;
             set net:timeout 30;
             set net:max-retries 3;
-            open -u $FTP_USERNAME,$FTP_PASSWORD -p $FTP_PORT $FTP_HOST;
-            mirror -R --exclude-glob .git --exclude-glob node_modules --exclude-glob .env --exclude-glob 'storage/logs/*' --exclude-glob 'storage/framework/cache/*' --exclude-glob 'storage/framework/sessions/*' --exclude-glob 'storage/framework/views/*' ./ /public_html/shop/;
+            set net:reconnect-interval-base 5;
+
+            open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" ftp://$FTP_HOST:21;
+
+            mirror -R \
+              --verbose \
+              --parallel=2 \
+              --exclude-glob .git/ \
+              --exclude-glob node_modules/ \
+              --exclude-glob .env \
+              --exclude-glob 'storage/logs/*' \
+              --exclude-glob 'storage/framework/cache/*' \
+              --exclude-glob 'storage/framework/sessions/*' \
+              --exclude-glob 'storage/framework/views/*' \
+              ./ /public_html/shop/;
+
             bye
           "
