@@ -1,6 +1,277 @@
 <?php
+
 namespace App\Services;
-use App\Traits\HasSeoFeatures;
-use App\Services\Schema\ProductSchemaGenerator;
+
+use App\Models\MetaTag;
 use App\Services\Schema\BreadcrumbSchemaGenerator;
-use Illuminate\Database\Eloquent\Model; use Illuminate\Support\Arr; use Illuminate\Support\Str;  class SeoService {     protected ?Model $model = null;     protected array $meta = [];     protected array $schemas = [];      public function __construct(?Model $model = null, array $meta = [], array $schemas = [])     {         $this->model = $model;         $this->meta = $meta;         $this->schemas = $schemas;     }      public function getSeoData(): object     {         // 1. Initialize with default values from config         $seoData = (object) [             'title' => config('seo.default_title'),             'description' => config('seo.default_description'),             'keywords' => config('seo.default_keywords'),             'canonical_url' => url()->current(),             'robots' => config('seo.default_robots'),              // Open Graph             'og_title' => config('seo.default_title'),             'og_description' => config('seo.default_description'),             'og_image' => config('seo.default_image'),             'og_type' => config('seo.default_og_type'),             'og_url' => url()->current(),             'og_site_name' => config('seo.default_og_site_name'),              // Twitter Cards             'twitter_card' => config('seo.default_twitter_card'),             'twitter_site' => config('seo.default_twitter_site'),             'twitter_creator' => null,             'twitter_title' => config('seo.default_title'),             'twitter_description' => config('seo.default_description'),             'twitter_image' => config('seo.default_image'),              'schemas' => [],         ];          // 2. Override with model\'s meta tags and schema if HasSeoFeatures trait is used         if ($this->model && in_array(HasSeoFeatures::class, class_uses($this->model))) {             $metaTag = optional($this->model->metaTag); // Use optional helper              // Meta Tags             $seoData->title = $metaTag->title ?? $this->model->name ?? $this->model->title ?? $seoData->title;             $seoData->description = $metaTag->description ?? Str::limit($this->model->description ?? $this->model->excerpt ?? '', 160) ?? $seoData->description;             $seoData->keywords = $metaTag->keywords ?? optional($this->model->tags)->pluck('name')->implode(', ') ?? $seoData->keywords;             $seoData->canonical_url = $metaTag->canonical_url ?? (method_exists($this->model, 'getUrl') ? $this->model->getUrl() : $seoData->canonical_url);             $seoData->robots = $metaTag->robots ?? $seoData->robots;              // Open Graph             $seoData->og_title = $metaTag->og_title ?? $seoData->title;             $seoData->og_description = $metaTag->og_description ?? $seoData->description;             $seoData->og_image = $metaTag->og_image ?? optional($this->model->featured_image)->url ?? optional($this->model->image)->url ?? $seoData->og_image;             $seoData->og_type = $metaTag->og_type ?? $seoData->og_type;             $seoData->og_url = $metaTag->og_url ?? $seoData->canonical_url;              // Twitter Cards             $seoData->twitter_card = $metaTag->twitter_card ?? $seoData->twitter_card;             $seoData->twitter_site = $metaTag->twitter_site ?? $seoData->twitter_site;             $seoData->twitter_creator = $metaTag->twitter_creator ?? $seoData->twitter_creator;             $seoData->twitter_title = $metaTag->twitter_title ?? $seoData->og_title;             $seoData->twitter_description = $metaTag->twitter_description ?? $seoData->og_description;             $seoData->twitter_image = $metaTag->twitter_image ?? $seoData->og_image; // Fallback to OG image              // Schemas             $modelSchemas = $this->generateModelSchemas($this->model);             $seoData->schemas = array_merge($seoData->schemas, $modelSchemas);         }          // 3. Override with manually passed meta tags (higher priority)         foreach ($this->meta as $key => $value) {             if (property_exists($seoData, $key)) {                 $seoData->$key = $value;             }         }          // 4. Override with manually passed schemas         $seoData->schemas = array_merge($seoData->schemas, $this->schemas);          // 5. Ensure canonical and OG URLs are absolute         $seoData->canonical_url = filter_var($seoData->canonical_url, FILTER_VALIDATE_URL) ? $seoData->canonical_url : url($seoData->canonical_url);         $seoData->og_url = filter_var($seoData->og_url, FILTER_VALIDATE_URL) ? $seoData->og_url : url($seoData->og_url);          // 6. Filter out null/empty values from schemas         $seoData->schemas = array_map(fn($schema) => $this->arrayFilterRecursive($schema), $seoData->schemas);         $seoData->schemas = array_filter($seoData->schemas); // Remove empty schemas          return $seoData;     }      protected function generateModelSchemas(Model $model): array     {         $schemas = [];          if ($model instanceof \App\Models\Product) { // Adjust namespace             $schemas[] = (new ProductSchemaGenerator($model))->generate();         }          // For BreadcrumbList, it\'s often page-specific, so generating it here or directly in the component might be more flexible.         // If a model always has a breadcrumb trail, you could add logic here:         if (method_exists($model, 'getBreadcrumbs')) {              $breadcrumbs = $model->getBreadcrumbs();              if ($breadcrumbs->isNotEmpty()) {                  $schemas[] = (new BreadcrumbSchemaGenerator($breadcrumbs))->generate();              }         }          return $schemas;     }      /**      * Recursively filter out null values and empty arrays from an array.      */     protected function arrayFilterRecursive(array $array): array     {         foreach ($array as $key => $value) {             if (is_array($value)) {                 $array[$key] = $this->arrayFilterRecursive($value);             }             if (is_null($array[$key]) || (is_array($array[$key]) && empty($array[$key]))) {                 unset($array[$key]);             }         }         return $array;     } }
+use App\Services\Schema\ProductSchemaGenerator;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
+class SeoService
+{
+    protected ?Model $model = null;
+    protected array $metaData = [];
+
+    public function __construct(?Model $model = null, array $metaData = [])
+    {
+        $this->model = $model;
+        $this->metaData = $metaData;
+    }
+
+    /**
+     * Get the SEO title with fallback logic.
+     */
+    public function getTitle(): string
+    {
+        // 1. From passed metaData (highest priority)
+        if (!empty($this->metaData['title'])) {
+            return $this->replaceDynamicPlaceholders($this->metaData['title']);
+        }
+
+        // 2. From model's stored MetaTag
+        if ($this->model && $this->model->relationLoaded('metaTag') && $this->model->metaTag && !empty($this->model->metaTag->title)) {
+            return $this->replaceDynamicPlaceholders($this->model->metaTag->title);
+        }
+
+        // 3. From model's properties (e.g., product->name, category->title)
+        if ($this->model && property_exists($this->model, 'name') && !empty($this->model->name)) {
+            return $this->replaceDynamicPlaceholders($this->model->name);
+        }
+
+        if ($this->model && property_exists($this->model, 'title') && !empty($this->model->title)) {
+            return $this->replaceDynamicPlaceholders($this->model->title);
+        }
+
+        // 4. From config default
+        return config('seo.default_title', config('app.name', 'Shopora'));
+    }
+
+    /**
+     * Get the SEO description with fallback logic.
+     */
+    public function getDescription(): string
+    {
+        // 1. From passed metaData
+        if (!empty($this->metaData['description'])) {
+            return $this->replaceDynamicPlaceholders($this->metaData['description']);
+        }
+
+        // 2. From model's stored MetaTag
+        if ($this->model && $this->model->relationLoaded('metaTag') && $this->model->metaTag && !empty($this->model->metaTag->description)) {
+            return $this->replaceDynamicPlaceholders($this->model->metaTag->description);
+        }
+
+        // 3. From model's properties
+        if ($this->model && property_exists($this->model, 'description') && !empty($this->model->description)) {
+            return $this->replaceDynamicPlaceholders($this->model->description);
+        }
+
+        // 4. From config default
+        return config('seo.default_description', '');
+    }
+
+    /**
+     * Get the SEO keywords with fallback logic.
+     */
+    public function getKeywords(): string
+    {
+        // 1. From passed metaData
+        if (!empty($this->metaData['keywords'])) {
+            return $this->replaceDynamicPlaceholders($this->metaData['keywords']);
+        }
+
+        // 2. From model's stored MetaTag
+        if ($this->model && $this->model->relationLoaded('metaTag') && $this->model->metaTag && !empty($this->model->metaTag->keywords)) {
+            return $this->replaceDynamicPlaceholders($this->model->metaTag->keywords);
+        }
+
+        // 3. From config default
+        return config('seo.default_keywords', '');
+    }
+
+    /**
+     * Get the canonical URL with fallback logic.
+     */
+    public function getCanonicalUrl(): string
+    {
+        // 1. From passed metaData
+        if (!empty($this->metaData['canonical_url'])) {
+            return url($this->metaData['canonical_url']);
+        }
+
+        // 2. From model's stored MetaTag
+        if ($this->model && $this->model->relationLoaded('metaTag') && $this->model->metaTag && !empty($this->model->metaTag->canonical_url)) {
+            return url($this->model->metaTag->canonical_url);
+        }
+
+        // 3. From model's getUrl() method or current URL
+        if ($this->model && method_exists($this->model, 'getUrl')) {
+            return url($this->model->getUrl());
+        }
+
+        // Fallback to current URL
+        return url()->current();
+    }
+
+    /**
+     * Get the robots meta tag content with fallback logic.
+     */
+    public function getRobots(): string
+    {
+        // 1. From passed metaData
+        if (!empty($this->metaData['robots'])) {
+            return $this->metaData['robots'];
+        }
+
+        // 2. From model's stored MetaTag
+        if ($this->model && $this->model->relationLoaded('metaTag') && $this->model->metaTag && !empty($this->model->metaTag->robots)) {
+            return $this->model->metaTag->robots;
+        }
+
+        // 3. From config default
+        return config('seo.default_robots', 'index, follow');
+    }
+
+    /**
+     * Get the Open Graph data as an associative array.
+     */
+    public function getOgData(): array
+    {
+        $og = [];
+
+        // Title & Description
+        $og['og:title'] = $this->getTitle();
+        $og['og:description'] = $this->getDescription();
+
+        // Image
+        $image = Arr::get($this->metaData, 'og_image')
+            ?? Arr::get($this->model->metaTag ?? [], 'og_image')
+            ?? ($this->model && method_exists($this->model, 'getFeaturedImageUrl') ? $this->model->getFeaturedImageUrl() : null)
+            ?? ($this->model && property_exists($this->model, 'featured_image') ? asset('storage/' . $this->model->featured_image) : null)
+            ?? config('seo.default_og_image');
+
+        if ($image) {
+            $og['og:image'] = url($image);
+        }
+
+        // Type
+        $og['og:type'] = Arr::get($this->metaData, 'og_type')
+            ?? Arr::get($this->model->metaTag ?? [], 'og_type')
+            ?? (Str::contains(request()->url(), 'products') ? 'product' : 'website');
+
+        // URL & Site Name
+        $og['og:url'] = $this->getCanonicalUrl();
+        $og['og:site_name'] = config('app.name');
+
+        return array_filter($og);
+    }
+
+    /**
+     * Get the Twitter Card data as an associative array.
+     */
+    public function getTwitterData(): array
+    {
+        $twitter = [];
+
+        // Card Type
+        $twitter['twitter:card'] = Arr::get($this->metaData, 'twitter_card')
+            ?? Arr::get($this->model->metaTag ?? [], 'twitter_card')
+            ?? config('seo.default_twitter_card', 'summary_large_image');
+
+        // Title & Description
+        $twitter['twitter:title'] = $this->getTitle();
+        $twitter['twitter:description'] = $this->getDescription();
+
+        // Image (reusing OG image logic for simplicity)
+        $image = Arr::get($this->metaData, 'twitter_image')
+            ?? Arr::get($this->model->metaTag ?? [], 'twitter_image')
+            ?? ($this->model && method_exists($this->model, 'getFeaturedImageUrl') ? $this->model->getFeaturedImageUrl() : null)
+            ?? ($this->model && property_exists($this->model, 'featured_image') ? asset('storage/' . $this->model->featured_image) : null)
+            ?? config('seo.default_twitter_image');
+
+        if ($image) {
+            $twitter['twitter:image'] = url($image);
+        }
+
+        // Site & Creator (Twitter handles)
+        if (config('seo.twitter_site')) {
+            $twitter['twitter:site'] = config('seo.twitter_site');
+        }
+        if (config('seo.twitter_creator')) {
+            $twitter['twitter:creator'] = config('seo.twitter_creator');
+        }
+
+        return array_filter($twitter);
+    }
+
+    /**
+     * Get all structured data (JSON-LD) for the current context.
+     */
+    public function getSchemas(): array
+    {
+        $schemas = [];
+
+        if ($this->model instanceof \App\Models\Product) {
+            $schemas[] = (new ProductSchemaGenerator($this->model))->generate();
+        }
+
+        // Example: If you have breadcrumbs logic on the model
+        if ($this->model && method_exists($this->model, 'getBreadcrumbs')) {
+            $schemas[] = (new BreadcrumbSchemaGenerator($this->model->getBreadcrumbs()))->generate();
+        }
+
+        // Clean up null/empty values from schemas recursively
+        return array_map([$this, 'arrayFilterRecursive'], $schemas);
+    }
+
+    /**
+     * Replace dynamic placeholders in a string (e.g., {product_name}, {site_name}).
+     */
+    protected function replaceDynamicPlaceholders(string $value): string
+    {
+        $value = str_replace('{site_name}', config('app.name', 'Shopora'), $value);
+
+        if ($this->model) {
+            if (property_exists($this->model, 'name')) {
+                $value = str_replace(
+                    ['{name}', '{product_name}', '{category_name}', '{page_name}'],
+                    $this->model->name,
+                    $value
+                );
+            }
+            if (property_exists($this->model, 'title')) {
+                $value = str_replace(
+                    ['{title}', '{product_title}', '{category_title}', '{page_title}'],
+                    $this->model->title,
+                    $value
+                );
+            }
+            if (property_exists($this->model, 'description')) {
+                $value = str_replace(
+                    ['{description}', '{product_description}', '{category_description}', '{page_description}'],
+                    Str::limit($this->model->description, 150),
+                    $value
+                );
+            }
+            // Add more dynamic placeholders as needed
+        }
+
+        return $value;
+    }
+
+    /**
+     * Recursively filters out null and empty array values.
+     */
+    protected function arrayFilterRecursive(array $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->arrayFilterRecursive($value);
+            }
+        }
+
+        return array_filter($array, fn ($value) => !is_null($value) && $value !== '' && $value !== []);
+    }
+}

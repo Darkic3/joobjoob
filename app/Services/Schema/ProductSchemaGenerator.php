@@ -75,4 +75,6 @@ class ProductSchemaGenerator
             ],
             'aggregateRating' => $aggregateRating,
 // Add brand, review, etc. as needed
-//         ];     } }
+        ];
+    }
+}
