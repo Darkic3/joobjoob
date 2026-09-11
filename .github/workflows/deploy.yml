@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftps
-          security: strict
+          security: loose # <--- این خط جادویی است! گواهی SSL را نادیده می‌گیرد
           server-dir: /public_html/shop/
           exclude: |
             **/.git*
