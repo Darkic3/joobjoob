@@ -15,6 +15,8 @@ class Notification extends Model
         'order.cancelled',
         'discount.welcome',
         'discount.expiring',
+        'review.approved',
+        'review.replied',
     ];
 
     public const ADMIN_TYPES = [

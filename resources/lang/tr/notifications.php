@@ -56,6 +56,16 @@ return [
             'body'  => ':reviewer tarafından ":product_name" ürününe yeni bir yorum gönderildi.',
             'label' => 'Yeni yorum',
         ],
+        'approved' => [
+            'title' => 'Yorumunuz onaylandı',
+            'body'  => '":product_name" ürünü için yorumunuz onaylandı ve yayınlandı.',
+            'label' => 'Yorum onayı',
+        ],
+        'replied' => [
+            'title' => 'Yorumunuza yeni yanıt',
+            'body'  => '":product_name" ürünü hakkındaki yorumunuza yeni bir yanıt gönderildi.',
+            'label' => 'Yorum yanıtı',
+        ],
     ],
     'contact' => [
         'new' => [

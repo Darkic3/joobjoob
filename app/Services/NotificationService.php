@@ -18,6 +18,8 @@ class NotificationService
         'order.cancelled' => ['icon' => '❌', 'color' => 'danger'],
         'discount.welcome' => ['icon' => '🎁', 'color' => 'success'],
         'discount.expiring' => ['icon' => '⏰', 'color' => 'warning'],
+        'review.approved' => ['icon' => '✅', 'color' => 'success'],
+        'review.replied' => ['icon' => '↩️', 'color' => 'info'],
 
         // ── Admin notifications ──
         'order.new' => ['icon' => '📦', 'color' => 'accent'],

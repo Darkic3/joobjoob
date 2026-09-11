@@ -56,6 +56,16 @@ return [
             'body'  => 'A new review from :reviewer for the product ":product_name" has been submitted.',
             'label' => 'New review',
         ],
+        'approved' => [
+            'title' => 'Your review has been approved',
+            'body'  => 'Your review for the product ":product_name" has been approved and published.',
+            'label' => 'Review approved',
+        ],
+        'replied' => [
+            'title' => 'New reply to your review',
+            'body'  => 'A new reply has been posted to your review of the product ":product_name".',
+            'label' => 'Review reply',
+        ],
     ],
     'contact' => [
         'new' => [
