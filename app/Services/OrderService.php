@@ -131,7 +131,7 @@ class OrderService
                     'سفارش شما فعال شد',
                     null,
                     route('dashboard.order-detail', $order->id),
-                    ['order_id' => $order->id, 'from' => $oldStatus, 'to' => $newStatus]
+                    ['order_id' => $order->id, 'amount' => $order->payment_price, 'from' => $oldStatus, 'to' => $newStatus]
                 );
                 $notifService->notifyAdmins(
                     'order.paid_admin',
