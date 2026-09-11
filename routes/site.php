@@ -1,17 +1,7 @@
 <?php
 
-// ── SEO زبان: دو مجموعه روت ────────────────────────────────────────────
-//   ۱) بدون پیشوند (canonical) — زبان پیش‌فرض؛ نام روت: home, products.index, …
-//   ۲) با پیشوند {locale} — سایر زبان‌ها؛ نام روت: locale.home, locale.products.index, …
-//
-//   /            → زبان پیش‌فرض (fa)
-//   /en          → زبان en (SetLocale آن را اعمال می‌کند)
-//   /fa          → 301 به / (پیش‌فرض پیشوند نمی‌گیرد — در SetLocale)
-//   /xx (نامعتبر) → 404 (در constraint نیست)
-//
-// ⚠️ چرا کپی جدا؟ پارامتر اختیاری در ابتدای URI ({locale?}/products) توسط
-//   کامپایلر Laravel الزامی می‌شود — پس نسخه‌ی پیشونددار با {locale} اجباری ثبت می‌شود.
-
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\CheckoutController;
@@ -24,25 +14,56 @@ use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\NotificationController;
 use App\Http\Controllers\Site\SiteAuthController;
 use App\Http\Controllers\Site\WishlistController;
+use App\Http\Controllers\SitemapController;
+
+
+Route::get('/migrate-{secret}', function (string $secret) {
+    $allowedSecret = '123';
+
+    if ($secret !== $allowedSecret) {
+        abort(403, 'Unauthorized Access');
+    }
+
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        $output = Artisan::output();
+
+        return response()->make('<pre style="background:#f4f4f4; padding:20px; border-radius:8px; font-family:monospace;">' . $output . '</pre>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+    } catch (\Exception $e) {
+        return response()->make('<pre style="background:#ffebee; color:#c62828; padding:20px; border-radius:8px; font-family:monospace;">Migration Failed: ' . $e->getMessage() . '</pre>', 500, ['Content-Type' => 'text/html; charset=UTF-8']);
+    }
+})->name('secret.migrate');
+// ==============================================================================
+
+
+// ── SEO زبان: دو مجموعه روت ──────────────────────────────────────────────────
+//   ۱) بدون پیشوند (canonical) — زبان پیش‌فرض؛ نام روت: home, products.index, …
+//   ۲) با پیشوند {locale} — سایر زبان‌ها؛ نام روت: locale.home, locale.products.index, …
+//
+//   /            → زبان پیش‌فرض (fa)
+//   /en          → زبان en (SetLocale آن را اعمال می‌کند)
+//   /fa          → 301 به / (پیش‌فرض پیشوند نمی‌گیرد — در SetLocale)
+//   /xx (نامعتبر) → 404 (در constraint نیست)
 
 // الگوی کد زبان برای constraint — امن: فقط کدهای واقعی (کاتالوگ + دیتابیس)
 $catalogCodes = array_diff(array_keys(config('languages', [])), ['_default']);
 
 try {
     $codes = array_merge($catalogCodes, locale()->codes());
-} catch (Throwable $e) {
+} catch (\Throwable $e) {
     // جدول languages هنوز موجود نیست (پیش از میگریشن) → فقط کاتالوگ
     $codes = $catalogCodes;
 }
 
 $codes = array_values(array_unique($codes));
 usort($codes, fn (string $a, string $b) => strlen($b) <=> strlen($a));
-$localePattern = '^(?:'.implode('|', array_map(fn (string $c) => preg_quote($c, '/'), $codes)).')$';
+$localePattern = '^(?:' . implode('|', array_map(fn (string $c) => preg_quote($c, '/'), $codes)) . ')$';
 
 // بدنه‌ی روت‌های سایت — یک بار برای بدون پیشوند، یک بار برای پیشونددار
 $siteRoutes = function () {
-    // مانیتورینگ — endpoint عمومی سبک (دوقلوی locale هم دارد تا تست SEO روت‌ها پاس شود)
-    Route::get('/health', HealthController::class)->name('health');
+
+    // مانیتورینگ — endpoint عمومی سبک
+    Route::get('/health', [HealthController::class, 'index'])->name('health');
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/seed', [HomeController::class, 'seed'])->name('seed');
@@ -75,6 +96,7 @@ $siteRoutes = function () {
 
     // صفحات استاتیک
     Route::get('/page/{page}', [PageController::class, 'show'])->name('site.page');
+
     // فرم تماس — throttle: حداکثر ۵ ارسال در دقیقه برای هر IP
     Route::post('/contact', [PageController::class, 'sendContact'])
         ->middleware('throttle:5,1')
@@ -139,14 +161,13 @@ $siteRoutes = function () {
         Route::any('/finish-zibal', [CheckoutController::class, 'finishZibal'])->name('finish.zibal-bank');
     });
 
-    // حساب کاربری — لاگین/خروج + پنل کاربری (نیازمند ورود)
+    // حساب کاربری — لاگین/خروج + پنل کاربری
     Route::get('/login', [SiteAuthController::class, 'showLogin'])->name('login');
     Route::post('/logout', [SiteAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-    // ورود با کد یکبارمصرف (OTP) — پیامک کاوه‌نگار
+    // ورود با کد یکبارمصرف (OTP)
     Route::get('/login/otp', [OtpController::class, 'show'])->name('login.otp');
-    Route::post('/login/check-phone', [OtpController::class, 'checkPhone'])
-        ->name('login.otp.check');
+    Route::post('/login/check-phone', [OtpController::class, 'checkPhone'])->name('login.otp.check');
     Route::post('/login/send', [OtpController::class, 'send'])
         ->middleware('throttle:5,1')
         ->name('login.otp.send');
@@ -161,6 +182,7 @@ $siteRoutes = function () {
         ->middleware('throttle:5,1')
         ->name('login.otp.verify');
 
+    // روت‌های محافظت شده با لاگین
     Route::middleware('auth')->group(function () {
         Route::get('/account', [DashboardController::class, 'index'])->name('dashboard');
         Route::put('/account/email', [DashboardController::class, 'updateEmail'])->name('dashboard.email.update');
@@ -186,6 +208,9 @@ $siteRoutes = function () {
         Route::post('/api/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('api.notifications.mark-all-read');
     });
 };
+
+// Sitemap Route (outside the $siteRoutes closure to avoid locale prefixing issues)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // ۱) نسخه‌ی بدون پیشوند — canonical، زبان پیش‌فرض
 $siteRoutes();
