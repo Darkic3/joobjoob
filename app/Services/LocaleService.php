@@ -38,9 +38,13 @@ class LocaleService
             return self::$memory;
         }
 
-        return self::$memory = Cache::rememberForever(self::CACHE_ALL, function () {
-            return Language::ordered()->get()->keyBy('code')->all();
-        });
+        try {
+            return self::$memory = Cache::rememberForever(self::CACHE_ALL, function () {
+                return \App\Models\Language::ordered()->get()->keyBy('code')->all();
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            return [];
+        }
     }
 
     /**
