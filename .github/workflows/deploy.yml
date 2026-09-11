@@ -21,32 +21,31 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name:  Deploy via lftp (with proper exclude)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
+      - name: 🚀 Deploy via FTP (Optimized & Safe)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          security: loose
+          server-dir: /public_html/shop/
 
-          lftp -e "
-            set ssl:verify-certificate no;
-            set ftp:ssl-allow yes;
-            set net:timeout 60;
-            set net:max-retries 3;
-            open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_SERVER }};
-            mirror -R \
-              --exclude='.git*' \
-              --exclude='node_modules/' \
-              --exclude='vendor/' \
-              --exclude='tests/' \
-              --exclude='.documents/' \
-              --exclude='docs/' \
-              --exclude='.idea/' \
-              --exclude='.vscode/' \
-              --exclude='.env' \
-              --exclude='.env.example' \
-              --exclude='storage/logs/' \
-              --exclude='storage/framework/cache/data/' \
-              --exclude='storage/framework/sessions/' \
-              --exclude='storage/framework/views/' \
-              ./ /public_html/shop/;
-            bye
-          "
+          # 🔥 حیاتی‌ترین بخش: جلوگیری از آپلود پوشه‌های سنگین
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+            **/tests/**
+            **/docs/**
+            **/documents/**
+            **/.idea/**
+            **/.vscode/**
+            .env
+            .env.example
+            **/storage/logs/**
+            **/storage/framework/cache/data/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
