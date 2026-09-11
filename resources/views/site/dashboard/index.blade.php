@@ -142,9 +142,10 @@
             @enderror
         </div>
 
-        {{-- کارت عضویت در خبرنامه — سوییچ روشن/خاموش --}}
-        <div class="neu-card">
-            <div class="flex items-center gap-4">
+        {{-- کارت عضویت در خبرنامه — سوییچ روشن/خاموش (غیرفعال = خاکستری) --}}
+        @php $newsletterOn = ($newsletterEnabled ?? false); @endphp
+        <div class="neu-card" @unless($newsletterOn) title="خبرنامه غیرفعال است" @endunless>
+            <div class="flex items-center gap-4" @unless($newsletterOn) style="opacity: 0.55; filter: grayscale(1);" @endunless>
                 <div class="w-10 h-10 rounded-2xl grid place-items-center shrink-0"
                      style="background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -175,7 +176,7 @@
                 @else
                     <button type="button" disabled aria-checked="false" aria-label="عضویت در خبرنامه (غیرفعال)"
                             title="خبرنامه غیرفعال است"
-                            class="relative w-14 h-8 rounded-full shrink-0 opacity-50 cursor-not-allowed"
+                            class="relative w-14 h-8 rounded-full shrink-0 cursor-not-allowed"
                             style="background: color-mix(in srgb, var(--text-primary) 15%, transparent);">
                         <span class="absolute top-1 w-6 h-6 rounded-full bg-white shadow"
                               style="inset-inline-start: 0.25rem;"></span>
