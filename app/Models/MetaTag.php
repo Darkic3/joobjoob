@@ -1,1 +1,39 @@
-<?php\n\nnamespace App\Models;\n\nuse Illuminate\Database\Eloquent\Factories\HasFactory;\nuse Illuminate\Database\Eloquent\Model;\nuse Illuminate\Database\Eloquent\Relations\MorphTo;\n\nclass MetaTag extends Model\n{\n    use HasFactory;\n\n    /**\n     * The table associated with the model.\n     *\n     * @var string\n     */\n    protected $table = 'meta_tags';\n\n    /**\n     * The attributes that are mass assignable.\n     *\n     * @var array<int, string>\n     */\n    protected $fillable = [\n        'title',\n        'description',\n        'keywords',\n        'canonical_url',\n        'robots',\n        'og_title',\n        'og_description',\n        'og_image',\n        'og_type',\n        'og_url',\n        'twitter_card',\n        'twitter_site',\n        'twitter_creator',\n        'twitter_title',\n        'twitter_description',\n        'twitter_image',\n    ];\n\n    /**\n     * Get the parent meta_taggable model (product, category, etc.).\n     */\n    public function meta_taggable(): MorphTo\n    {\n        return $this->morphTo();\n    }\n}\n
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
+class MetaTag extends Model
+{
+//    use HasFactory;
+    /**      * The table associated with the model.      *      * @var string */
+    protected $table = 'meta_tags';
+    /**      * The attributes that are mass assignable.      *      * @var array<int, string> */
+    protected $fillable = [
+        'title',
+        'description',
+        'keywords',
+        'canonical_url',
+        'robots',
+        'og_title',
+        'og_description',
+        'og_image',
+        'og_type',
+        'og_url',
+        'twitter_card',
+        'twitter_site',
+        'twitter_creator',
+        'twitter_title',
+        'twitter_description',
+        'twitter_image',
+    ];
+
+    /**      * Get the parent meta_taggable model (product, category, etc.).      */
+    public function meta_taggable(): MorphTo
+    {
+        return $this->morphTo();
+    }
+}

@@ -1,1 +1,68 @@
-<?php\n\nnamespace App\Http\Requests\n\nuse Illuminate\Foundation\Http\FormRequest;\n\nclass MetaTagRequest extends FormRequest\n{\n    /**\n     * Determine if the user is authorized to make this request.\n     */\n    public function authorize(): bool\n    {\n        // Adjust authorization logic as needed, e.g., check user permissions\n        return true; \n    }\n\n    /**\n     * Get the validation rules that apply to the request.\n     *\n     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>\n     */\n    public function rules(): array\n    {\n        return [\n            'meta_title' => ['nullable', 'string', 'max:255'], // Max 60-70 for Google display\n            'meta_description' => ['nullable', 'string', 'max:500'], // Max 150-160 for Google display\n            'meta_keywords' => ['nullable', 'string', 'max:255'],\n            'meta_canonical_url' => ['nullable', 'url', 'max:500'],\n            'meta_robots' => ['nullable', 'string', 'max:255'],\n\n            // Open Graph\n            'meta_og_title' => ['nullable', 'string', 'max:255'],\n            'meta_og_description' => ['nullable', 'string', 'max:500'],\n            'meta_og_image' => ['nullable', 'url', 'max:500'],\n            'meta_og_type' => ['nullable', 'string', 'max:255'],\n            'meta_og_url' => ['nullable', 'url', 'max:500'],\n\n            // Twitter Cards\n            'meta_twitter_card' => ['nullable', 'string', 'max:255'],\n            'meta_twitter_site' => ['nullable', 'string', 'max:255'],\n            'meta_twitter_creator' => ['nullable', 'string', 'max:255'],\n            'meta_twitter_title' => ['nullable', 'string', 'max:255'],\n            'meta_twitter_description' => ['nullable', 'string', 'max:500'],\n            'meta_twitter_image' => ['nullable', 'url', 'max:500'],\n        ];\n    }\n\n    /**\n     * Get the error messages for the defined validation rules.\n     *\n     * @return array<string, string>\n     */\n    public function messages(): array\n    {\n        return [\n            'meta_title.max' => 'عنوان متا نباید بیشتر از 255 کاراکتر باشد.', // Consider 60-70 for better SEO\n            'meta_description.max' => 'توضیحات متا نباید بیشتر از 500 کاراکتر باشد.', // Consider 150-160 for better SEO\n            'meta_canonical_url.url' => 'آدرس Canonical باید یک URL معتبر باشد.',\n            // Add more custom messages as needed\n        ];\n    }\n\n    /**\n     * Prepare the data for validation.\n     *\n     * @return void\n     */\n    protected function prepareForValidation()\n    {\n        // Prefix all meta tag fields to avoid collision with main model fields\n        $this->merge([\n            'meta_title' => $this->title, // Assuming input name is 'title'\n            'meta_description' => $this->description,\n            // ... merge other meta fields\n        ]);\n    }\n}\n
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class MetaTagRequest extends FormRequest
+{
+    /**       * Determine if the user is authorized to make this request.       */
+    public function authorize(): bool
+    {          // Adjust authorization logic as needed, e.g., check user permissions
+        return true;
+    }
+
+
+    /**
+     * Get the validation rules that apply to the request.
+     * @return array<string, ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return ['meta_title' => ['nullable', 'string', 'max:255'],
+            // Max 60-70 for Google display
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            // Max 150-160 for Google display
+            'meta_keywords' => ['nullable', 'string', 'max:255'],
+            'meta_canonical_url' => ['nullable', 'url', 'max:500'],
+            'meta_robots' => ['nullable', 'string', 'max:255'],
+// Open Graph
+            'meta_og_title' => ['nullable', 'string', 'max:255'],
+            'meta_og_description' => ['nullable', 'string', 'max:500'],
+            'meta_og_image' => ['nullable', 'url', 'max:500'],
+            'meta_og_type' => ['nullable', 'string', 'max:255'],
+            'meta_og_url' => ['nullable', 'url', 'max:500'],
+// Twitter Cards
+            'meta_twitter_card' => ['nullable', 'string', 'max:255'],
+            'meta_twitter_site' => ['nullable', 'string', 'max:255'],
+            'meta_twitter_creator' => ['nullable', 'string', 'max:255'],
+            'meta_twitter_title' => ['nullable', 'string', 'max:255'],
+            'meta_twitter_description' => ['nullable', 'string', 'max:500'],
+            'meta_twitter_image' => ['nullable', 'url', 'max:500'],];
+    }
+
+    /**       * Get the error messages for the defined validation rules.       *       * @return array<string, string> */
+    public function messages(): array
+    {
+        return ['meta_title.max' => 'عنوان متا نباید بیشتر از 255 کاراکتر باشد.',
+// Consider 60-70 for better SEO
+            'meta_description.max' => 'توضیحات متا نباید بیشتر از 500 کاراکتر باشد.',
+// Consider 150-160 for better SEO
+            'meta_canonical_url.url' => 'آدرس Canonical باید یک URL معتبر باشد.',
+// Add more custom messages as needed
+        ];
+    }
+
+    /**       * Prepare the data for validation.       *       * @return void */
+    protected function prepareForValidation()
+    {
+        // Prefix all meta tag fields to avoid collision with main model fields
+        $this->merge([
+            'meta_title' => $this->title,
+// Assuming input name is 'title'
+            'meta_description' => $this->description,
+// ... merge other meta fields
+        ]);
+    }
+}
