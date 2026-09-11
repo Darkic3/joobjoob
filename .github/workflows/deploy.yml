@@ -21,7 +21,7 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: Deploy via FTPS
+      - name: 🚀 Deploy via FTP (Optimized for Shared Hosting)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -35,6 +35,7 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/vendor/**          # <--- این خط حیاتی است! به گیت‌هاب می‌گوید vendor را آپلود نکند
             **/tests/**
             **/.documents/**
             **/docs/**
