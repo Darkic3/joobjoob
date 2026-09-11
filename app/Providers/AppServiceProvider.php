@@ -10,7 +10,9 @@ use App\Listeners\SendOrderNotificationListener;
 use App\Models\Order;
 use App\Observers\OrderObserver;
 use App\Services\CartService;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use App\Services\MetaService;
 use App\Services\RecentlyViewedService;
 use App\Services\WishlistService;
 use App\View\Composers\AdminLayoutComposer;
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RecentlyViewedService::class);
         $this->app->singleton(WishlistService::class);
         $this->app->singleton(CartService::class);
+        $this->app->singleton(MetaService::class);
     }
 
     /**
@@ -54,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(OrderCreated::class, RecordCouponUsageListener::class);
         Event::listen(OrderPaid::class, RecordAuditListener::class);
 
-        Gate::define('admin', fn ($user) => $user->isAdmin());
+        Gate::define('admin', fn($user) => $user->isAdmin());
 
         // ── Rate Limiters ──────────────────────────────────────────────
         // Reviews: 5/min per IP — prevent spam reviews
@@ -93,5 +96,10 @@ class AppServiceProvider extends ServiceProvider
 
         // نشان‌های اعتماد نوار پایین فوتر (اینماد، درگاه پرداخت و…)
         View::composer('components.footer', FooterComposer::class);
+
+        // Blade Directive for Meta Tags
+        Blade::directive('meta', function () {
+            return "<?php echo app(\App\Services\MetaService::class)->render(); ?>";
+        });
     }
 }
