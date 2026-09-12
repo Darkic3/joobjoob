@@ -40,13 +40,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CartService::class);
         $this->app->singleton(MetaService::class);
 
-//        TODO: ahora_fix ino hamin bmoone ye bayad fix she ?
-        if (! function_exists('seo')) {
-            require_once base_path('app/Helpers/seo.php');
-        }
-
-        // SEO — singleton تا `seo()` در کنترلر و کامپوننت <x-seo-head /> به یک نمونه برسند.
-        // state واقعی روی Request نگه داشته می‌شود، پس بین درخواست‌ها نشت نمی‌کند.
         $this->app->singleton(SeoManager::class);
         $this->app->singleton(SeoResolver::class);
     }

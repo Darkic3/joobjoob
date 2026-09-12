@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Services\Seo\SeoManager;
 use App\Services\Seo\SeoResolver;
 
 if (! function_exists('seo')) {
     /**
-     * دسترسی آسان به جمع‌کنندهٔ متای SEO درخواست جاری.
+     * دسترسی آسان و روان (Fluent) به مدیریت متای SEO درخواست جاری.
      *
      * استفاده در کنترلر (بالاترین اولویت زنجیرهٔ fallback):
      *     seo()->title($product->trans('name'))->description(...)->image(...);
@@ -24,8 +26,11 @@ if (! function_exists('seo')) {
 
 if (! function_exists('seo_resolver')) {
     /**
-     * حل‌کنندهٔ متای نهایی صفحه — استفادهٔ عادی در کنترلر نیست؛
-     * کامپوننت `<x-seo-head />` و میدل‌ور هدرها از آن استفاده می‌کنند.
+     * حل‌کنندهٔ نهایی متا تگ‌ها.
+     * این تابع معمولاً مستقیماً در کنترلر صدا زده نمی‌شود و توسط
+     * کامپوننت <x-seo-head /> یا Blade Directive ها استفاده می‌شود.
+     *
+     * @return SeoResolver
      */
     function seo_resolver(): SeoResolver
     {
