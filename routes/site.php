@@ -28,6 +28,16 @@ Route::get('/_dev/echo-seo', function () {
     ];
 })->middleware('auth')->name('dev.echo-seo');
 
+Route::get('/_dev/optimize-seo-cache', function () {
+    $output = [];
+    $output[] = 'config:clear = ' . (Artisan::call('config:clear') ? 'ok' : 'fail');
+    $output[] = 'composer dump-autoload = start';
+
+    // اینجا نمی‌توانید composer را از داخل artisan فراخوانی کنید;
+    // راه‌حل: یک قابلیت دستی از طریق terminal.
+    return response(var_export($output, true), 200);
+})->middleware('auth')->name('dev.optimize-seo-cache');
+
 
 Route::get('/migrate-{secret}', function (string $secret) {
     $allowedSecret = '123';
