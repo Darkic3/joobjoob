@@ -104,6 +104,38 @@ Route::get('/clear-all-cache-{secret}', function (string $secret) {
 })->name('secret.clear-cache');
 
 
+// ==============================================================================
+// ⚠️  migrate:fresh
+// ==============================================================================
+Route::get('/fresh-{secret}', function (string $secret) {
+    $allowedSecret = '123'; // ⚠️ حتماً تغییر دهید
+
+    if ($secret !== $allowedSecret) {
+        abort(403, 'Unauthorized Access');
+    }
+
+    try {
+        // اجرای migrate:fresh که اول همه جداول را دراپ می‌کند و بعد می‌سازد
+        Artisan::call('migrate:fresh', ['--force' => true]);
+        $output = Artisan::output();
+
+        return response()->make(
+            '<h3 style="color: #e65100;">⚠️ migrate:fresh Executed (All tables dropped and recreated)</h3>' .
+            '<pre style="background:#fff3e0; padding:20px; border-radius:8px; font-family:monospace; border: 1px solid #ffb74d;">' . htmlspecialchars($output) . '</pre>',
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    } catch (\Exception $e) {
+        return response()->make(
+            '<pre style="background:#ffebee; color:#c62828; padding:20px; border-radius:8px; font-family:monospace;">Migration Fresh Failed: ' . htmlspecialchars($e->getMessage()) . '</pre>',
+            500,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    }
+})->name('secret.fresh');
+// ==============================================================================
+
+
 // ── SEO زبان: دو مجموعه روت ──────────────────────────────────────────────────
 //   ۱) بدون پیشوند (canonical) — زبان پیش‌فرض؛ نام روت: home, products.index, …
 //   ۲) با پیشوند {locale} — سایر زبان‌ها؛ نام روت: locale.home, locale.products.index, …
