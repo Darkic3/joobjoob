@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasSeoMeta;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasSeoMeta;
 
     protected $fillable = [
         'product_category_id', 'brand_id', 'name', 'slug', 'main_image', 'short_description', 'description',

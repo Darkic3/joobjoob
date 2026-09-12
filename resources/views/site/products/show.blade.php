@@ -5,20 +5,8 @@
 {{-- داده‌های نمایشی (mainImage/specGroups/textValues/mainSpecs/variantsData/minVariant) در کنترلر آماده می‌شود --}}
 @section('content')
 
-    {{-- Breadcrumb --}}
-    @php
-        $breadcrumbItems = [
-            ['label' => __('messages.products'), 'url' => localizedRoute('products.index')],
-        ];
-        if ($product->category) {
-            $breadcrumbItems[] = [
-                'label' => $product->category->trans('name'),
-                'url' => localizedRoute('products.index', ['category' => $product->category->slug]),
-            ];
-        }
-        $breadcrumbItems[] = ['label' => $product->trans('name')];
-    @endphp
-    @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
+    {{-- Breadcrumb — داده از سرویس مشترک با اسکیمای BreadcrumbList می‌آید --}}
+    <x-breadcrumbs />
 
     <div class="grid lg:grid-cols-2 gap-10 mb-14">
 
@@ -616,24 +604,10 @@
     @endif
 
     {{-- ۶. اسکیمای JSON-LD --}}
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": "{{ $product->trans('name') }}",
-        "image": "{{ $mainImage }}",
-        @if($product->brand)
-            "brand": { "@type": "Brand", "name": "{{ $product->brand->trans('title') }}" },
-        @endif
-        "offers": {
-            "@type": "Offer",
-            "url": "{{ url()->current() }}",
-            "priceCurrency": "IRR",
-            "price": "{{ $product->final_price * 10 }}",
-            "availability": "{{ $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}"
-        }
-    }
-    </script>
+    {{-- اسکیمای Product در همین صفحه حذف شد و به‌صورت مرکزی در `<x-seo-head />`
+         (سرویس SchemaBuilder) تولید می‌شود تا در همهٔ زبان‌ها و همهٔ محصولات یکسان باشد
+         و با json_encode ساخته شود (نسخهٔ قدیم با string interpolation روی نام محصول
+         می‌شکست). --}}
 @endsection
 
 @push('scripts')

@@ -1,1 +1,11 @@
-{!! '<' . '?' . 'xml version="1.0" encoding="UTF-8"?' . '>' !!}\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n    {{-- Static Pages --}}\n    <url>\n        <loc>{{ url('/') }}</loc>\n        <lastmod>{{ now()->tz('UTC')->toAtomString() }}</lastmod>\n        <changefreq>daily</changefreq>\n        <priority>1.0</priority>\n    </url>\n\n    {{-- Categories --}}\n    @foreach ($categories as $category)\n        <url>\n            <loc>{{ route('products.category', $category->slug) }}</loc>\n            <lastmod>{{ $category->updated_at->tz('UTC')->toAtomString() }}</lastmod>\n            <changefreq>weekly</changefreq>\n            <priority>0.8</priority>\n        </url>\n    @endforeach\n\n    {{-- Products --}}\n    @foreach ($products as $product)\n        <url>\n            <loc>{{ route('products.show', $product->slug) }}</loc>\n            <lastmod>{{ $product->updated_at->tz('UTC')->toAtomString() }}</lastmod>\n            <changefreq>weekly</changefreq>\n            <priority>0.9</priority>\n        </url>\n    @endforeach\n</urlset>\n
+{!! '<' . '?' . 'xml version="1.0" encoding="UTF-8"?' . '>' !!}
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+@foreach ($children as $child)
+    <sitemap>
+        <loc>{{ $child['loc'] }}</loc>
+@if ($child['lastmod'])
+        <lastmod>{{ $child['lastmod'] }}</lastmod>
+@endif
+    </sitemap>
+@endforeach
+</sitemapindex>

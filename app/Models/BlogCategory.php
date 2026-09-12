@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasSeoMeta;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BlogCategory extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSeoMeta;
 
     protected $fillable = [
         'parent_id', 'title', 'slug', 'description', 'image',

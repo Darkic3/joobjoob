@@ -14,7 +14,9 @@ use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\NotificationController;
 use App\Http\Controllers\Site\SiteAuthController;
 use App\Http\Controllers\Site\WishlistController;
+use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
+use App\Services\Seo\SitemapBuilder;
 
 
 Route::get('/migrate-{secret}', function (string $secret) {
@@ -309,8 +311,29 @@ $siteRoutes = function () {
     });
 };
 
-// Sitemap Route (outside the $siteRoutes closure to avoid locale prefixing issues)
+// ── robots.txt و sitemap‌ها — بیرون از closure زبان‌دار ─────────────────────
+// این‌ها محتوای صفحه‌ای نیستند و نباید دوقلوی locale.* بگیرند؛ نسخهٔ چندزبانه‌شان
+// با xhtml:link داخل همان فایل اعلام می‌شود.
+
+Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
+
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+// constraint صریح روی {type} لازم است، وگرنه الگوی /sitemap-{type}.xml
+// مقدار «products-2» را هم می‌بلعد و مسیر صفحه‌بندی هرگز match نمی‌شود.
+$sitemapTypePattern = implode('|', array_map(
+    fn (string $type) => preg_quote($type, '/'),
+    SitemapBuilder::TYPES
+));
+
+Route::get('/sitemap-{type}-{page}.xml', [SitemapController::class, 'chunk'])
+    ->where('type', $sitemapTypePattern)
+    ->whereNumber('page')
+    ->name('sitemap.chunk');
+
+Route::get('/sitemap-{type}.xml', [SitemapController::class, 'show'])
+    ->where('type', $sitemapTypePattern)
+    ->name('sitemap.child');
 
 // ۱) نسخه‌ی بدون پیشوند — canonical، زبان پیش‌فرض
 $siteRoutes();

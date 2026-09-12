@@ -5,6 +5,7 @@ use App\Http\Middleware\LocalizeHtmlDigits;
 use App\Http\Middleware\LogAdminRequests;
 use App\Http\Middleware\RefreshRememberMeCookie;
 use App\Http\Middleware\SecureHeadersMiddleware;
+use App\Http\Middleware\SeoHeaders;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTheme;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             SetTheme::class,
             LocalizeHtmlDigits::class,
+            SeoHeaders::class, // X-Robots-Tag برای سیاست‌های نوایندکس
         ]);
 
         // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین (ادمین یا سایت)

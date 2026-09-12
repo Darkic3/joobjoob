@@ -80,6 +80,20 @@ class ProductController extends Controller
         $selectedBrand = $request->input('brand');
         $selectedSort = $request->input('sort', 'default');
 
+        // SEO: فهرست محصولات مدل ندارد ⇒ متای مسیر؛ فیلتر/مرتب‌سازی با canonical به همین صفحه ادغام می‌شود.
+        // listItems ⇒ اسکیمای ItemList برای همین صفحه (فقط محصولات همین صفحه).
+        seo()
+            ->forPath('/products')
+            ->listItems(
+                $products->getCollection()
+                    ->map(fn (Product $product) => [
+                        'name' => (string) ($product->trans('name') ?? $product->slug),
+                        'url' => localizedRoute('products.show', ['product' => $product->slug]),
+                    ])
+                    ->all(),
+                ($products->currentPage() - 1) * $products->perPage(),
+            );
+
         return view('site.products.index', compact('products', 'categories', 'brands', 'filters', 'selectedCategories', 'selectedBrand', 'selectedSort'));
     }
 
@@ -127,6 +141,19 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->whereIn('product_category_id', $this->categoryIdsWithDescendants([$category->slug]))
             ->paginate(12);
+
+        // SEO: متای اختصاصی دسته‌بندی (per-locale از seo_meta) + مقادیر مشتق‌شده از مدل
+        seo()
+            ->forModel($category)
+            ->listItems(
+                $products->getCollection()
+                    ->map(fn (Product $product) => [
+                        'name' => (string) ($product->trans('name') ?? $product->slug),
+                        'url' => localizedRoute('products.show', ['product' => $product->slug]),
+                    ])
+                    ->all(),
+                ($products->currentPage() - 1) * $products->perPage(),
+            );
 
         return view('site.product-categories.show', compact('category', 'products'));
     }
@@ -196,6 +223,9 @@ class ProductController extends Controller
 
         // بررسی علاقه‌مندی
         $inWishlist = app(\App\Services\WishlistService::class)->has($product);
+
+        // SEO: منبع متا و مقادیر مشتق‌شده (نام/توضیح/تصویر محصول)
+        seo()->forModel($product);
 
         return view('site.products.show', array_merge(compact(
             'product', 'related', 'complement', 'reviewTree', 'trustBadges', 'dealEndsAt', 'inWishlist'

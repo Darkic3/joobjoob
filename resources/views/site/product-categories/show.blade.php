@@ -3,13 +3,7 @@
 @section('title', $category->trans('name') ?? __('messages.categories'))
 
 @section('content')
-    @php
-        $breadcrumbItems = [
-            ['label' => __('messages.products'), 'url' => localizedRoute('products.index')],
-            ['label' => $category->trans('name') ?? $category->slug],
-        ];
-    @endphp
-    @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
+    <x-breadcrumbs />
 
     {{-- سربرگ دسته‌بندی --}}
     <div class="neu-flat rounded-3xl p-6 md:p-8 mb-8 flex items-center gap-5">

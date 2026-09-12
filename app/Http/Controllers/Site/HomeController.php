@@ -86,6 +86,10 @@ class HomeController extends Controller
         // محصولات اخیراً مشاهده‌شده — حداکثر ۸ آیتم
         $recentlyViewed = $this->recentlyViewed->content(8);
 
+        // SEO: صفحهٔ اصلی مدل ندارد ⇒ با مسیر شناسایی می‌شود (ردیف seo_meta با path = "/"").
+        // عنوان/توضیحات از @section('title') ویو و در نهایت از تنظیمات سایت می‌آید.
+        seo()->forPath('/');
+
         return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners', 'recentlyViewed'));
     }
 

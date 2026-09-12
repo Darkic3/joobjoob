@@ -44,12 +44,15 @@ class LocalizeHtmlDigits
             return $response;
         }
 
-        // اگر نوع محتوا صریحاً غیر-HTML است رد کن. پاسخ‌های معمول Blade هنوز هدر
-        // ندارند (prepare بعداً انجام می‌شود) و در این مرحله HTML فرض می‌شوند.
+        // فقط HTML را بومی‌سازی کن. پاسخ‌های معمول Blade هنوز هدر ندارند (prepare
+        // بعداً انجام می‌شود) و در این مرحله HTML فرض می‌شوند.
+        //
+        // ⚠️ عمداً `text/*` هم رد می‌شود، نه فقط انواع غیرمتن: محتوای
+        // `text/plain` (robots.txt) و `text/xml` هرگز نباید ارقامشان عوض شود —
+        // robots.txt با ارقام فارسی عملاً برای خزنده‌ها بی‌معنا می‌شود و sitemap
+        // با تاریخ فارسی نامعتبر است. فقط HTML واقعی تبدیل می‌شود.
         $contentType = strtolower((string) $response->headers->get('Content-Type', ''));
-        if ($contentType !== ''
-            && ! str_contains($contentType, 'text/html')
-            && ! str_starts_with($contentType, 'text/')) {
+        if ($contentType !== '' && ! str_contains($contentType, 'text/html')) {
             return $response;
         }
 

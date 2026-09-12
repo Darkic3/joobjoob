@@ -13,8 +13,7 @@
         </div>
 
         <div class="relative z-10">
-            @php $breadcrumbItems = [['label' => $title]]; @endphp
-            @include('site.partials.breadcrumb', ['items' => $breadcrumbItems])
+            <x-breadcrumbs />
 
             <span class="page-eyebrow">{{ $data['hero_badge'] ?? '' }}</span>
             <h1 class="page-title">{{ $title }}</h1>

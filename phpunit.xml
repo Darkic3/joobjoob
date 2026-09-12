@@ -19,6 +19,10 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- APP_URL قطعی برای تست‌ها: canonical/hreflang/sitemap همه از ریشهٔ درخواست ساخته می‌شوند.
+             بدون این خط، مقدار APP_URL فایل .env توسعه‌دهنده به تست‌ها نشت می‌کند
+             (مثلاً http://shopora.test) و تست‌های canonical/hreflang می‌شکنند. -->
+        <env name="APP_URL" value="http://localhost"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>

@@ -3,17 +3,7 @@
 @section('title', $blog->title)
 
 @section('content')
-    @php
-        $blogBreadcrumb = [['label' => __('messages.blogs'), 'url' => localizedRoute('blogs.index')]];
-        if ($blog->category) {
-            $blogBreadcrumb[] = [
-                'label' => $blog->category->title,
-                'url' => localizedRoute('blogs.category', ['category' => $blog->category->slug]),
-            ];
-        }
-        $blogBreadcrumb[] = ['label' => $blog->title];
-    @endphp
-    @include('site.partials.breadcrumb', ['items' => $blogBreadcrumb])
+    <x-breadcrumbs />
 
     <div class="max-w-3xl mx-auto">
         <article class="neu-flat rounded-3xl overflow-hidden">

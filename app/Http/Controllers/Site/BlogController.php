@@ -18,6 +18,19 @@ class BlogController extends Controller
 
         $categories = BlogCategory::active()->withCount('blogs')->get();
 
+        // SEO: فهرست بلاگ مدل ندارد ⇒ متای مسیر
+        seo()
+            ->forPath('/blogs')
+            ->listItems(
+                $blogs->getCollection()
+                    ->map(fn (Blog $blog) => [
+                        'name' => (string) $blog->title,
+                        'url' => localizedRoute('blogs.show', ['blog' => $blog->slug]),
+                    ])
+                    ->all(),
+                ($blogs->currentPage() - 1) * $blogs->perPage(),
+            );
+
         return view('site.blogs.index', compact('blogs', 'categories'));
     }
 
@@ -27,7 +40,9 @@ class BlogController extends Controller
 
         abort_unless($blog->is_active, 404);
 
-        $blog->load('category');
+        // author هم لود می‌شود تا اسکیمای BlogPosting نام نویسندهٔ واقعی را داشته باشد
+        // (سیگنال E-E-A-T) و به نام سایت تنزل نکند.
+        $blog->load(['category', 'author']);
         $blog->incrementViews();
 
         // مقالات مرتبط: از همان دسته‌بندی (اگر دسته‌ای داشته باشد)
@@ -37,6 +52,9 @@ class BlogController extends Controller
             ->latest()
             ->take(3)
             ->get();
+
+        // SEO: متای اختصاصی مقاله (per-locale) + عنوان/خلاصه/تصویر مقاله
+        seo()->forModel($blog);
 
         return view('site.blogs.show', compact('blog', 'related'));
     }
@@ -57,6 +75,19 @@ class BlogController extends Controller
 
         $categories = BlogCategory::active()->withCount('blogs')->get();
         $activeCategory = $category;
+
+        // SEO: متای اختصاصی دسته‌بندی مقاله
+        seo()
+            ->forModel($category)
+            ->listItems(
+                $blogs->getCollection()
+                    ->map(fn (Blog $blog) => [
+                        'name' => (string) $blog->title,
+                        'url' => localizedRoute('blogs.show', ['blog' => $blog->slug]),
+                    ])
+                    ->all(),
+                ($blogs->currentPage() - 1) * $blogs->perPage(),
+            );
 
         return view('site.blogs.index', compact('blogs', 'categories', 'activeCategory'));
     }

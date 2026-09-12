@@ -9,16 +9,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', setting('site_name', __('messages.site_name')))</title>
-
-    {{-- SEO: canonical + hreflang + Open Graph locale --}}
-    <link rel="canonical" href="{{ localizedUrl() }}">
-    @foreach(locale()->active() as $code => $lang)
-        <link rel="alternate" hreflang="{{ $code }}" href="{{ localizedUrl($code) }}">
-    @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ localizedUrl(locale()->defaultCode()) }}">
-    <meta property="og:locale" content="{{ ogLocale() }}">
-    <meta property="og:locale:alternate" content="{{ ogLocale(locale()->defaultCode()) }}">
+    {{-- SEO — تنها منبع تولید title/meta/canonical/hreflang/OG/Twitter.
+         زنجیرهٔ fallback: seo()->... → سیاست مسیر → ردیف seo_meta → @section('title')
+         → مقدار مشتق‌شده از مدل → تنظیمات ادمین → config/seo.php --}}
+    <x-seo-head />
 
     @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">

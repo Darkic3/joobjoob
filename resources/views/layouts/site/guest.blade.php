@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', setting('site_name', __('messages.site_name')))</title>
+    {{-- این چیدمان فقط برای جریان ورود/تأیید کد یک‌بارمصرف است — هرگز نباید ایندکس شود --}}
+    <meta name="robots" content="noindex, nofollow">
 
     @if($direction === 'rtl')
         <link rel="preconnect" href="https://fonts.googleapis.com">

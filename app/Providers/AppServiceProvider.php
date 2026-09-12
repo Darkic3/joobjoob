@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use App\Services\MetaService;
 use App\Services\RecentlyViewedService;
+use App\Services\Seo\SeoManager;
+use App\Services\Seo\SeoResolver;
 use App\Services\WishlistService;
 use App\View\Composers\AdminLayoutComposer;
 use App\View\Composers\FooterComposer;
@@ -37,6 +39,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(WishlistService::class);
         $this->app->singleton(CartService::class);
         $this->app->singleton(MetaService::class);
+
+        // SEO — singleton تا `seo()` در کنترلر و کامپوننت <x-seo-head /> به یک نمونه برسند.
+        // state واقعی روی Request نگه داشته می‌شود، پس بین درخواست‌ها نشت نمی‌کند.
+        $this->app->singleton(SeoManager::class);
+        $this->app->singleton(SeoResolver::class);
     }
 
     /**

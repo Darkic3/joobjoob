@@ -33,6 +33,7 @@
             "app/Helpers/date.php",
             "app/Helpers/settings.php",
             "app/Helpers/locale.php",
+            "app/Helpers/seo.php",
             "app/Helpers/format_price.php",
             "app/Helpers/card.php"
         ]

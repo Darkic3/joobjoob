@@ -4,7 +4,7 @@
 
 @section('content')
     {{-- ═══ Breadcrumb ═══ --}}
-    @include('site.partials.breadcrumb', ['items' => [['label' => __('messages.products')]]])
+    <x-breadcrumbs />
 
     {{-- ═══ هدر صفحه ═══ --}}
     <div class="flex items-center justify-between mb-8">

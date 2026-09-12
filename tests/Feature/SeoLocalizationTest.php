@@ -12,6 +12,22 @@ class SeoLocalizationTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * روت‌های زیرساختی که عمداً دوقلوی locale.* ندارند — افزودن هر مورد جدید باید آگاهانه باشد.
+     *
+     * sitemap.* → محتوای غیرصفحه‌ای؛ alternates را خودش با xhtml:link اعلام می‌کند
+     * robots    → خروجی متنی برای خزنده‌ها، نه صفحه
+     * secret.*  → روت‌های عملیاتی استقرار، نه محتوای عمومی
+     */
+    private const INFRASTRUCTURE_ROUTES_WITHOUT_LOCALE_TWIN = [
+        'sitemap',
+        'robots',
+        'secret.migrate',
+        'secret.seed',
+        'secret.clear-cache',
+        'secret.fresh',
+    ];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -176,6 +192,8 @@ class SeoLocalizationTest extends TestCase
             ->reject(fn (string $n) => str_starts_with($n, 'admin.'))
             ->reject(fn (string $n) => str_starts_with($n, 'locale.'))
             ->reject(fn (string $n) => str_starts_with($n, 'ignition.'))
+            ->reject(fn (string $n) => str_starts_with($n, 'sitemap.'))
+            ->reject(fn (string $n) => in_array($n, self::INFRASTRUCTURE_ROUTES_WITHOUT_LOCALE_TWIN, true))
             ->reject(fn (string $n) => $names->contains('locale.'.$n))
             ->values();
 
@@ -188,5 +206,27 @@ class SeoLocalizationTest extends TestCase
             ->values();
 
         $this->assertSame([], $orphans->all(), 'روت locale.* بدون نسخه‌ی اصلی: '.implode(', ', $orphans->all()));
+    }
+
+    /**
+     * معافیت روت‌های زیرساختی صریح است، نه فراموشی:
+     * هر نام در allowlist باید واقعاً وجود داشته باشد و نباید دوقلوی locale.* گرفته باشد.
+     * اگر روزی روت زیرساختی ناخواسته دوقلوی locale بگیرد، این تست آن را می‌گیرد.
+     */
+    public function test_infrastructure_routes_are_explicitly_exempt_from_locale_twin(): void
+    {
+        $names = collect(app('router')->getRoutes()->getRoutesByName())->keys();
+
+        foreach (self::INFRASTRUCTURE_ROUTES_WITHOUT_LOCALE_TWIN as $name) {
+            $this->assertTrue(
+                $names->contains($name),
+                "روت زیرساختی «{$name}» وجود ندارد — allowlist این تست باید به‌روز شود."
+            );
+
+            $this->assertFalse(
+                $names->contains('locale.'.$name),
+                "روت زیرساختی «{$name}» نباید دوقلوی locale.* داشته باشد."
+            );
+        }
     }
 }

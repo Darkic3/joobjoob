@@ -15,7 +15,7 @@ use Illuminate\View\View;
 class PageController extends Controller
 {
     /** صفحات استاتیک معتبر — متن آن‌ها از فایل‌های ترجمه (messages.pages.*) خوانده می‌شود */
-    private const PAGES = ['contact', 'about', 'faq', 'terms', 'privacy'];
+    public const PAGES = ['contact', 'about', 'faq', 'terms', 'privacy'];
 
     public function show(string $page): View
     {
@@ -28,6 +28,13 @@ class PageController extends Controller
         $description = (string) ($content['description'] ?? '');
 
         $data = $this->pageData($page, $content);
+
+        // SEO: صفحات استاتیک محتوایشان از فایل ترجمه می‌آید ⇒ عنوان/توضیح صریح +
+        // مسیر ثابت برای امکان ویرایش متا از پنل (ردیف seo_meta با path = "/page/{page}").
+        seo()
+            ->forPath('/page/'.$page)
+            ->title($title)
+            ->description($description !== '' ? $description : null);
 
         return view('site.pages.show', compact('page', 'title', 'description', 'data'));
     }
