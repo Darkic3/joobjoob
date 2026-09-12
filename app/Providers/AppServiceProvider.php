@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CartService::class);
         $this->app->singleton(MetaService::class);
 
+//        TODO: ahora_fix ino hamin bmoone ye bayad fix she ?
         if (! function_exists('seo')) {
             require_once base_path('app/Helpers/seo.php');
         }
