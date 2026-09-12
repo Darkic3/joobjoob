@@ -64,6 +64,46 @@ Route::get('/seed-{secret}', function (string $secret) {
 // ==============================================================================
 
 
+// ==============================================================================
+// ⚠️ Cache
+// ==============================================================================
+Route::get('/clear-all-cache-{secret}', function (string $secret) {
+    $allowedSecret = '1';
+
+    if ($secret !== $allowedSecret) {
+        abort(403, 'دسترسی غیرمجاز');
+    }
+
+    try {
+        $results = [];
+
+        // اجرای دستورات آرتیسان و بررسی کد خروجی (0 به معنی موفقیت است)
+        $results[] = "1. route:clear    => " . (Artisan::call('route:clear') === 0 ? '✅ موفق' : '❌ خطا');
+        $results[] = "2. config:clear   => " . (Artisan::call('config:clear') === 0 ? '✅ موفق' : '❌ خطا');
+        $results[] = "3. view:clear     => " . (Artisan::call('view:clear') === 0 ? '✅ موفق' : '❌ خطا');
+        $results[] = "4. cache:clear    => " . (Artisan::call('cache:clear') === 0 ? '✅ موفق' : '❌ خطا');
+        $results[] = "5. optimize:clear => " . (Artisan::call('optimize:clear') === 0 ? '✅ موفق' : '❌ خطا');
+
+        $output = implode("\n", $results);
+
+        return response()->make(
+            '<h3 style="color: #2e7d32; font-family: Tahoma, sans-serif;">✅ پاک‌سازی کش با موفقیت انجام شد!</h3>' .
+            '<pre style="background:#f4f4f4; padding:20px; border-radius:8px; font-family:monospace; direction: ltr; text-align: left; border: 1px solid #ccc;">' . htmlspecialchars($output) . '</pre>' .
+            '<p style="color: #d32f2f; font-weight: bold; font-family: Tahoma, sans-serif; margin-top: 20px;">⚠️ هشدار امنیتی: لطفاً بلافاصله پس از استفاده، این کد را از فایل routes/web.php حذف یا کامنت کنید.</p>',
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    } catch (\Exception $e) {
+        return response()->make(
+            '<h3 style="color: #c62828; font-family: Tahoma, sans-serif;">❌ خطا در پاک‌سازی کش</h3>' .
+            '<pre style="background:#ffebee; color:#c62828; padding:20px; border-radius:8px; font-family:monospace; direction: ltr; text-align: left;">' . htmlspecialchars($e->getMessage()) . '</pre>',
+            500,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    }
+})->name('secret.clear-cache');
+
+
 // ── SEO زبان: دو مجموعه روت ──────────────────────────────────────────────────
 //   ۱) بدون پیشوند (canonical) — زبان پیش‌فرض؛ نام روت: home, products.index, …
 //   ۲) با پیشوند {locale} — سایر زبان‌ها؛ نام روت: locale.home, locale.products.index, …
