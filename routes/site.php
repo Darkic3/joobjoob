@@ -19,6 +19,16 @@ use App\Http\Controllers\SitemapController;
 use App\Services\Seo\SitemapBuilder;
 
 
+
+Route::get('/_dev/echo-seo', function () {
+    return [
+        'file_exists' => file_exists(base_path('app/Helpers/seo.php')),
+        'function_exists_seo' => function_exists('seo'),
+        'class_exists_seomanager' => class_exists(App\Services\Seo\SeoManager::class),
+    ];
+})->middleware('auth')->name('dev.echo-seo');
+
+
 Route::get('/migrate-{secret}', function (string $secret) {
     $allowedSecret = '123';
 
