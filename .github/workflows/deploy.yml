@@ -21,7 +21,7 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: 🚀 Deploy via FTP (Optimized & Safe)
+      - name: 🚀 Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -30,9 +30,9 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           security: loose
-          server-dir: /public_html/shop/
+          server-dir: public_html/shop/          # ← این رو اول تست کن
+          log-level: verbose
 
-          # 🔥 حیاتی‌ترین بخش: جلوگیری از آپلود پوشه‌های سنگین
           exclude: |
             **/.git*
             **/.git*/**
