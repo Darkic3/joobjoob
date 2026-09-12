@@ -39,6 +39,49 @@ Route::get('/_dev/optimize-seo-cache', function () {
 })->middleware('auth')->name('dev.optimize-seo-cache');
 
 
+Route::get('/composer-dump-{secret}', function (string $secret) {
+    $allowedSecret = '1'; // رمز عبور را می‌توانید تغییر دهید
+
+    if ($secret !== $allowedSecret) {
+        abort(403, 'دسترسی غیرمجاز');
+    }
+
+    $output = [];
+    $return_var = 0;
+
+    try {
+        // تلاش برای اجرای دستور کامپوزر
+        // از base_path() برای اطمینان از اجرای دستور در ریشه پروژه استفاده می‌کنیم
+        $command1 = 'cd ' . base_path() . ' && composer dump-autoload 2>&1';
+        exec($command1, $output, $return_var);
+
+        // اگر دستور بالا کار نکرد، شاید نیاز باشد مستقیماً php composer.phar صدا زده شود
+        if ($return_var !== 0 && file_exists(base_path('composer.phar'))) {
+            $output = [];
+            $command2 = 'cd ' . base_path() . ' && php composer.phar dump-autoload 2>&1';
+            exec($command2, $output, $return_var);
+        }
+
+        $outputText = implode("\n", $output);
+        $status = ($return_var === 0) ? '✅ موفق' : '❌ خطا (کد خروجی: ' . $return_var . ')';
+
+        return response()->make(
+            '<h3 style="color: ' . ($return_var === 0 ? '#2e7d32' : '#c62828') . '; font-family: Tahoma, sans-serif;">وضعیت: ' . $status . '</h3>' .
+            '<pre style="background:#f4f4f4; padding:20px; border-radius:8px; font-family:monospace; direction: ltr; text-align: left; border: 1px solid #ccc; white-space: pre-wrap;">' . htmlspecialchars($outputText) . '</pre>' .
+            '<p style="color: #d32f2f; font-weight: bold; font-family: Tahoma, sans-serif; margin-top: 20px;">⚠️ هشدار امنیتی: لطفاً بلافاصله این کد را از routes/web.php حذف کنید.</p>',
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    } catch (\Exception $e) {
+        return response()->make(
+            '<h3 style="color: #c62828; font-family: Tahoma, sans-serif;">❌ خطای استثناء</h3>' .
+            '<pre style="background:#ffebee; color:#c62828; padding:20px; border-radius:8px; font-family:monospace; direction: ltr; text-align: left;">' . htmlspecialchars($e->getMessage()) . '</pre>',
+            500,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    }
+})->name('secret.composer-dump');
+
 Route::get('/migrate-{secret}', function (string $secret) {
     $allowedSecret = '123';
 
