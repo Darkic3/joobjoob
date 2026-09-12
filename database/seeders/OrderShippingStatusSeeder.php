@@ -21,7 +21,7 @@ class OrderShippingStatusSeeder extends Seeder
         ];
 
         foreach ($statuses as $status) {
-            DB::table('order_shipping_statuses')->updateOrCreate(
+            DB::table('order_shipping_statuses')->updateOrInsert(
                 ['title' => $status['title']],
                 $status,
             );
