@@ -30,10 +30,13 @@ trait HasSeoFeatures
         $fillableMetaKeys = (new MetaTag())->getFillable();
         $metaData = array_intersect_key($data, array_flip($fillableMetaKeys));
 
-        return $this->metaTag()->updateOrCreate(
-            [], // No unique identifier needed for updateOrCreate on a morphOne relationship
-            $metaData
-        );
+        if ($this->metaTag) {
+            $this->metaTag->update($metaData);
+        } else {
+            $this->metaTag()->create($metaData);
+        }
+
+        return $this->metaTag()->first();
     }
 
     /**
