@@ -35,6 +35,34 @@ Route::get('/migrate-{secret}', function (string $secret) {
 })->name('secret.migrate');
 // ==============================================================================
 
+Route::get('/seed-{secret}', function (string $secret) {
+    $allowedSecret = '123';
+
+    if ($secret !== $allowedSecret) {
+        abort(403, 'Unauthorized Access');
+    }
+
+    try {
+        Artisan::call('db:seed', ['--force' => true]);
+        $output = Artisan::output();
+
+        return response()->make(
+            '<h3 style="color: #2e7d32;">✅ Database Seeding Successful</h3>' .
+            '<pre style="background:#f4f4f4; padding:20px; border-radius:8px; font-family:monospace;">' . htmlspecialchars($output) . '</pre>',
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    } catch (\Exception $e) {
+        return response()->make(
+            '<h3 style="color: #c62828;">❌ Database Seeding Failed</h3>' .
+            '<pre style="background:#ffebee; color:#c62828; padding:20px; border-radius:8px; font-family:monospace;">' . htmlspecialchars($e->getMessage()) . '</pre>',
+            500,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
+    }
+})->name('secret.seed');
+// ==============================================================================
+
 
 // ── SEO زبان: دو مجموعه روت ──────────────────────────────────────────────────
 //   ۱) بدون پیشوند (canonical) — زبان پیش‌فرض؛ نام روت: home, products.index, …
