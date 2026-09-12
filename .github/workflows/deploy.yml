@@ -30,7 +30,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           security: loose
-          server-dir: public_html/shop/
+          server-dir: ./
           log-level: verbose
 
           exclude: |
