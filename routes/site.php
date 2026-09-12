@@ -53,13 +53,13 @@ Route::get('/composer-dump-{secret}', function (string $secret) {
         // تلاش برای اجرای دستور کامپوزر
         // از base_path() برای اطمینان از اجرای دستور در ریشه پروژه استفاده می‌کنیم
         $command1 = 'cd ' . base_path() . ' && composer dump-autoload 2>&1';
-        exec($command1, $output, $return_var);
+        \exec($command1, $output, $return_var);
 
         // اگر دستور بالا کار نکرد، شاید نیاز باشد مستقیماً php composer.phar صدا زده شود
         if ($return_var !== 0 && file_exists(base_path('composer.phar'))) {
             $output = [];
             $command2 = 'cd ' . base_path() . ' && php composer.phar dump-autoload 2>&1';
-            exec($command2, $output, $return_var);
+            \exec($command2, $output, $return_var);
         }
 
         $outputText = implode("\n", $output);
