@@ -755,3 +755,44 @@
         padding: 1rem !important;
     }
 }
+
+/* ==========================================
+   9. Cropper.js RTL & Tailwind Reset Fixes
+   ========================================== */
+.cropper-container {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+.cropper-container *,
+.cropper-container *::before,
+.cropper-container *::after {
+    box-sizing: content-box !important;
+}
+
+.cropper-view-box {
+    box-sizing: border-box !important;
+}
+
+.cropper-crop-box,
+.cropper-canvas {
+    right: auto !important;
+    left: 0 !important;
+    direction: ltr !important;
+}
+
+.cropper-container img,
+.cropper-view-box img,
+.cropper-wrap-box img,
+.cropper-canvas img {
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    transition: none !important;
+    animation: none !important;
+    transform-origin: center center !important;
+    position: static !important;
+    display: block !important;
+}
+

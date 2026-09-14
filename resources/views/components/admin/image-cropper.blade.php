@@ -18,6 +18,81 @@
 @once
     <link rel="stylesheet" href="{{ asset('assets/admin/cropper/cropper.min.css') }}">
     <script src="{{ asset('assets/admin/cropper/cropper.min.js') }}"></script>
+    <style>
+        /* ایزولاسیون کامل و حل باگ RTL و Tailwind برای Cropper.js */
+        #image-cropper-modal .cropper-container {
+            direction: ltr !important;
+            text-align: left !important;
+            position: relative !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            margin: 0 auto !important;
+        }
+
+        #image-cropper-modal .cropper-container *,
+        #image-cropper-modal .cropper-container *::before,
+        #image-cropper-modal .cropper-container *::after {
+            box-sizing: content-box !important;
+        }
+
+        #image-cropper-modal .cropper-view-box {
+            box-sizing: border-box !important;
+            outline: 2px solid #6366f1 !important;
+            outline-color: rgba(99, 102, 241, 0.9) !important;
+        }
+
+        #image-cropper-modal .cropper-view-box,
+        #image-cropper-modal .cropper-face {
+            border-radius: 0 !important;
+        }
+
+        /* جلوگیری از خروج کادر کراپ از سمت راست یا تغییر موقعیت در قالب RTL */
+        #image-cropper-modal .cropper-crop-box,
+        #image-cropper-modal .cropper-canvas {
+            right: auto !important;
+            left: 0 !important;
+            direction: ltr !important;
+        }
+
+        #image-cropper-modal .cropper-wrap-box,
+        #image-cropper-modal .cropper-drag-box,
+        #image-cropper-modal .cropper-modal {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            direction: ltr !important;
+        }
+
+        #image-cropper-modal .cropper-container img,
+        #image-cropper-modal .cropper-view-box img,
+        #image-cropper-modal .cropper-wrap-box img,
+        #image-cropper-modal .cropper-canvas img {
+            max-width: none !important;
+            max-height: none !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            transition: none !important;
+            animation: none !important;
+            transform-origin: center center !important;
+            position: static !important;
+            display: block !important;
+        }
+
+        #image-cropper-modal .cropper-point {
+            background-color: #6366f1 !important;
+            width: 8px !important;
+            height: 8px !important;
+            opacity: 0.95 !important;
+        }
+
+        #image-cropper-modal .cropper-line {
+            background-color: #6366f1 !important;
+        }
+    </style>
     <script>
         window.ImageCropper = (function () {
             let cropper = null;
@@ -32,7 +107,7 @@
 
                 modalEl = document.createElement('div');
                 modalEl.id = 'image-cropper-modal';
-                modalEl.className = 'fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4';
+                modalEl.className = 'fixed inset-0 z-[9999] hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm';
                 modalEl.innerHTML = `
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh]">
                         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -45,10 +120,11 @@
                             </button>
                         </div>
 
-                        {{-- ناحیه تصویر: بدون اسکرول — هر تصویری با هر ابعادی داخل همین فضا فیت می‌شود
-                             (flex-1 min-h-0 = باقی‌ماندهٔ ارتفاع؛ Cropper با viewMode:2 تصویر را در همین فضا محدود می‌کند) --}}
-                        <div class="p-4 overflow-hidden bg-gray-100 dark:bg-gray-900 flex-1 min-h-0 flex items-center justify-center">
-                            <img id="image-cropper-source" alt="تصویر برای برش" class="block max-w-full max-h-full mx-auto">
+                        {{-- ناحیه تصویر: بدون اسکرول — ایزوله در جهت LTR برای هماهنگی کامل با Cropper.js --}}
+                        <div class="bg-gray-950 flex-1 min-h-[360px] max-h-[62vh] flex items-center justify-center overflow-hidden" dir="ltr" style="direction: ltr; text-align: left;">
+                            <div class="w-full h-full flex items-center justify-center" dir="ltr" style="direction: ltr;">
+                                <img id="image-cropper-source" alt="تصویر برای برش" class="block max-w-full max-h-[60vh] mx-auto" style="direction: ltr;">
+                            </div>
                         </div>
 
                         <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
@@ -165,22 +241,25 @@
                     reader.onload = (e) => {
                         imageEl.src = e.target.result;
                         imageEl.onload = () => {
-                            // ابتدا مدال را نشان بده تا کانتینر اندازهٔ واقعی داشته باشد؛
-                            // بعد Cropper را بساز تا تصویر دقیقاً در فضای بدون‌اسکرول فیت شود.
                             show();
-                            if (cropper) cropper.destroy();
-                            cropper = new Cropper(imageEl, {
-                                viewMode: 2,
-                                dragMode: 'crop',
-                                autoCropArea: 0.9,
-                                aspectRatio: currentOptions.aspectRatio || undefined,
-                                background: false,
-                                guides: true,
-                                center: true,
-                                highlight: true,
-                                responsive: true,
-                                checkOrientation: true,
-                                modal: true,
+                            if (cropper) {
+                                cropper.destroy();
+                                cropper = null;
+                            }
+                            requestAnimationFrame(() => {
+                                cropper = new Cropper(imageEl, {
+                                    viewMode: 2,
+                                    dragMode: 'crop',
+                                    autoCropArea: 0.9,
+                                    aspectRatio: currentOptions.aspectRatio || undefined,
+                                    background: false,
+                                    guides: true,
+                                    center: true,
+                                    highlight: true,
+                                    responsive: true,
+                                    checkOrientation: true,
+                                    modal: true,
+                                });
                             });
                         };
                     };
