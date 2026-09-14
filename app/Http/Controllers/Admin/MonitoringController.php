@@ -122,13 +122,27 @@ class MonitoringController extends Controller
                 'recent_slow'     => RequestPerformanceLog::recent(24)->slow()->latest()->take(5)->get(),
             ];
 
-            $failedJobs = [
-                'total'  => DB::table('failed_jobs')->count(),
-                // ⚠️ failed_jobs در اسکیمای قدیمی ستون created_at ندارد — failed_at استاندارد است
-                'recent' => Schema::hasColumn('failed_jobs', 'failed_at')
-                    ? DB::table('failed_jobs')->orderByDesc('failed_at')->take(5)->get()
-                    : DB::table('failed_jobs')->take(5)->get(),
-            ];
+            try {
+                // ⚠️ اسکیمای قدیمی failed_jobs ستون created_at ندارد (failed_at استاندارد است)
+                // و روی بعضی هاست‌ها خودِ جدول هم ممکن است در دسترس نباشد.
+                // داشبورد مانیتورینگ نباید به‌خاطر این جدول ۵۰۰ بدهد.
+                $failedJobsQuery = DB::table('failed_jobs');
+                if (Schema::hasColumn('failed_jobs', 'failed_at')) {
+                    $failedJobsQuery->orderByDesc('failed_at');
+                } elseif (Schema::hasColumn('failed_jobs', 'created_at')) {
+                    $failedJobsQuery->orderByDesc('created_at');
+                }
+                $failedJobs = [
+                    'total'  => $failedJobsQuery->count(),
+                    'recent' => $failedJobsQuery->take(5)->get(),
+                ];
+            } catch (\Throwable $e) {
+                Log::warning('Monitoring: failed_jobs query failed', ['error' => $e->getMessage()]);
+                $failedJobs = [
+                    'total'  => 0,
+                    'recent' => collect(),
+                ];
+            }
         }
 
         $systemStatus = $this->determineSystemStatus($errorStats, $payments, $sms, $performance);
@@ -192,7 +206,76 @@ class MonitoringController extends Controller
     {
         $error->load('user');
 
-        return view('admin.monitoring.error-show', compact('error'));
+        // trace می‌تواند رشته (خروجی getTraceAsString) یا آرایه (JSON قدیمی) باشد
+        $traceString = is_array($error->trace)
+            ? implode("\n", $error->trace)
+            : (string) $error->trace;
+
+        return view('admin.monitoring.error-show', [
+            'error'       => $error,
+            'traceFrames' => $this->parseTraceFrames($traceString),
+            'traceRaw'    => $traceString,
+        ]);
+    }
+
+    /**
+     * تبدیل رشته‌ی استاندارد stack trace به فریم‌های ساخت‌یافته
+     * تا در صفحه‌ی جزئیات خطا خوانا نمایش داده شود.
+     *
+     * نمونه‌ی خط ورودی:
+     * #12 /home/user/public_html/shop/vendor/.../Connection.php(779): Illuminate\Database\Connection->runQueryCallback()
+     */
+    private function parseTraceFrames(?string $trace): array
+    {
+        if (blank($trace)) {
+            return [];
+        }
+
+        $frames = [];
+
+        foreach (preg_split('/\r?\n/', $trace) as $line) {
+            $line = trim($line);
+
+            if ($line === '') {
+                continue;
+            }
+
+            // فریم استاندارد: #N مسیر/فایل.php(خط): کلاس->متد(...)
+            // در فرمت getTraceAsString عدد داخل پرانتز بعد از فایل، شماره‌ی خط است
+            if (preg_match('/^#(\d+)\s+(.+?)(?:\((.*)\))?:\s*(.+)$/', $line, $m)) {
+                $file   = $m[2];
+                $lineNo = null;
+
+                if (($m[3] ?? '') !== '' && is_numeric($m[3])) {
+                    $lineNo = (int) $m[3];
+                } elseif (preg_match('/^(.*)\((\d+)\)$/', $m[2], $f)) {
+                    // حالت احتیاطی: اگر شماره خط داخل m[2] مانده باشد
+                    $file   = $f[1];
+                    $lineNo = (int) $f[2];
+                }
+
+                $frames[] = [
+                    'num'  => $m[1],
+                    'file' => trim($file) !== '' ? $file : null,
+                    'line' => $lineNo,
+                    'call' => trim($m[4]) !== '' ? trim($m[4]) : null,
+                ];
+
+                continue;
+            }
+
+            // خطوط غیراستاندارد مثل «#13 {main}»
+            if (preg_match('/^(?:#(\d+)\s+)?(.+)$/', $line, $m)) {
+                $frames[] = [
+                    'num'  => $m[1] ?? null,
+                    'file' => null,
+                    'line' => null,
+                    'call' => $m[2],
+                ];
+            }
+        }
+
+        return $frames;
     }
 
     /**

@@ -3,7 +3,7 @@
 @section('tab-name', __('admin.monitoring.error_detail'))
 
 @section('content')
-<div class="space-y-6 animate-slide-up max-w-4xl">
+<div class="space-y-6 animate-slide-up">
 
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -18,12 +18,12 @@
     </div>
 
     {{-- Status & Level --}}
-    <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
         <span class="inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-full
             {{ $error->level === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : '' }}
             {{ $error->level === 'error' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : '' }}
             {{ $error->level === 'warning' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : '' }}">
-            {{ $error->level }}
+            {{ __('admin.monitoring.level_' . $error->level) }}
         </span>
         @if($error->is_resolved)
             <span class="inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
@@ -34,11 +34,11 @@
                 @endif
             </span>
         @else
-            <form action="{{ route('admin.monitoring.errors.resolve', $error->id) }}" method="POST" class="inline" x-data="{ showNote: false }">
+            <form action="{{ route('admin.monitoring.errors.resolve', $error->id) }}" method="POST" class="inline-flex flex-wrap items-center gap-2" x-data="{ showNote: false }">
                 @csrf
                 <input type="hidden" name="note" :value="showNote ? $refs.noteInput.value : ''">
                 <button type="button" @click="showNote = !showNote" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-xl transition-all">{{ __('admin.monitoring.mark_resolved') }}</button>
-                <div x-show="showNote" x-transition class="inline-flex items-center gap-2 mt-2">
+                <div x-show="showNote" x-transition class="inline-flex items-center gap-2">
                     <input x-ref="noteInput" type="text" placeholder="{{ __('admin.monitoring.resolve_note_placeholder') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 w-64">
                     <button type="submit" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-xl transition-all">ذخیره</button>
                 </div>
@@ -47,79 +47,100 @@
     </div>
 
     {{-- Message --}}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-        <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{{ __('admin.monitoring.message') }}</h3>
-        <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed">{{ $error->message }}</p>
-    </div>
+    <x-admin.card :title="__('admin.monitoring.message')">
+        <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed break-words" dir="auto">{{ $error->message }}</p>
+    </x-admin.card>
 
-    {{-- Exception & File Info --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
-            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{{ __('admin.monitoring.exception') }}</h3>
-            <p class="text-sm text-gray-800 dark:text-gray-200 font-mono">{{ $error->exception_class }}</p>
+    {{-- Exception Class --}}
+    <x-admin.card :title="__('admin.monitoring.exception')">
+        <p class="font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 rounded-xl px-4 py-3 break-all text-left" dir="ltr">{{ $error->exception_class }}</p>
+    </x-admin.card>
+
+    {{-- File & Line --}}
+    <x-admin.card :title="__('admin.monitoring.file')">
+        <div class="flex flex-wrap items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded-xl px-4 py-3" dir="ltr">
+            <p class="font-mono text-sm text-gray-800 dark:text-gray-200 break-all flex-1 min-w-0 text-left">{{ $error->file }}</p>
+            @if($error->line)
+                <span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 text-xs font-bold font-mono">line {{ $error->line }}</span>
+            @endif
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
-            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{{ __('admin.monitoring.file') }}</h3>
-            <p class="text-sm text-gray-800 dark:text-gray-200 font-mono" dir="ltr">{{ $error->file }}{{ $error->line ? ':' . $error->line : '' }}</p>
-        </div>
-    </div>
+    </x-admin.card>
 
     {{-- Request Info --}}
     @if($error->url || $error->method || $error->ip)
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">اطلاعات درخواست</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <x-admin.card :title="__('admin.monitoring.request_info')">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 @if($error->method)
                     <div>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">{{ __('admin.monitoring.method') }}</p>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                            {{ $error->method === 'GET' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }}">
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1.5">{{ __('admin.monitoring.method') }}</p>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold
+                            {{ $error->method === 'GET' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }}" dir="ltr">
                             {{ $error->method }}
                         </span>
                     </div>
                 @endif
                 @if($error->ip)
                     <div>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">{{ __('admin.monitoring.ip') }}</p>
-                        <p class="text-sm text-gray-800 dark:text-gray-200 font-mono" dir="ltr">{{ $error->ip }}</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1.5">{{ __('admin.monitoring.ip') }}</p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 font-mono break-all" dir="ltr">{{ $error->ip }}</p>
                     </div>
                 @endif
                 <div>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">{{ __('admin.monitoring.user') }}</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-1.5">{{ __('admin.monitoring.user') }}</p>
                     <p class="text-sm text-gray-800 dark:text-gray-200">{{ $error->user?->name ?? __('admin.monitoring.no_user') }}</p>
                 </div>
             </div>
             @if($error->url)
-                <div class="mt-4">
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">URL</p>
-                    <p class="text-sm text-gray-800 dark:text-gray-200 font-mono break-all" dir="ltr">{{ $error->url }}</p>
+                <div class="mt-5">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-1.5">URL</p>
+                    <p class="text-sm text-gray-800 dark:text-gray-200 font-mono break-all bg-gray-50 dark:bg-gray-900 rounded-lg px-3 py-2 text-left" dir="ltr">{{ $error->url }}</p>
                 </div>
             @endif
-        </div>
+        </x-admin.card>
     @endif
 
     {{-- Stack Trace --}}
-    @if(filled($error->trace) && (is_array($error->trace) ? count($error->trace) > 0 : true))
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ __('admin.monitoring.trace') }}</h3>
+    <x-admin.card :title="__('admin.monitoring.trace')" :subtitle="count($traceFrames) ? trans('admin.monitoring.trace_frames', ['count' => count($traceFrames)]) : null" :padding="false">
+        @if(!empty($traceFrames))
+            <div class="divide-y divide-gray-100 dark:divide-gray-700" dir="ltr">
+                @foreach($traceFrames as $frame)
+                    <div class="flex items-start gap-3 px-4 sm:px-6 py-3 {{ $loop->first ? 'bg-orange-50/60 dark:bg-orange-900/10' : '' }}">
+                        <span class="shrink-0 mt-0.5 inline-flex items-center justify-center min-w-[2.75rem] px-2 py-1 rounded-lg text-xs font-mono font-bold
+                            {{ $loop->first ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' }}">
+                            #{{ $frame['num'] ?? '•' }}
+                        </span>
+                        <div class="min-w-0 flex-1 space-y-1.5">
+                            @if($frame['call'])
+                                <p class="font-mono text-[13px] font-semibold text-indigo-600 dark:text-indigo-400 break-words text-left">{{ $frame['call'] }}</p>
+                            @endif
+                            @if($frame['file'])
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="font-mono text-xs text-gray-600 dark:text-gray-300 break-all min-w-0">{{ $frame['file'] }}</p>
+                                    @if($frame['line'])
+                                        <span class="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 text-[11px] font-mono font-bold">:{{ $frame['line'] }}</span>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
             </div>
+        @elseif($traceRaw)
             <div class="p-4">
-                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed" dir="ltr">{{ is_array($error->trace) ? implode("\n", $error->trace) : (string) $error->trace }}</pre>
+                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left" dir="ltr">{{ $traceRaw }}</pre>
             </div>
-        </div>
-    @endif
+        @else
+            <p class="px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">—</p>
+        @endif
+    </x-admin.card>
 
     {{-- Context --}}
     @if(filled($error->context) && (is_array($error->context) ? count($error->context) > 0 : true))
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ __('admin.monitoring.context') }}</h3>
-            </div>
+        <x-admin.card :title="__('admin.monitoring.context')" :padding="false">
             <div class="p-4">
-                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed">{{ json_encode($error->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left" dir="ltr">{{ json_encode($error->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) }}</pre>
             </div>
-        </div>
+        </x-admin.card>
     @endif
 
 </div>
