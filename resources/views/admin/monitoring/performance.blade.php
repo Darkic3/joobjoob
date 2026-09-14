@@ -5,6 +5,15 @@
 @section('content')
 <div class="space-y-6 animate-slide-up">
 
+    {{-- هشدار: جداول مانیتورینگ مایگریت نشده‌اند --}}
+    @if(isset($tablesReady) && !$tablesReady)
+        <div class="rounded-2xl p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+            <h3 class="font-bold text-amber-800 dark:text-amber-300">جداول مانیتورینگ یافت نشد</h3>
+            <p class="text-sm text-amber-600 dark:text-amber-400 mt-1">مایگریشن‌ها اجرا نشده‌اند — این دستور را روی سرور اجرا کنید:</p>
+            <code class="block mt-2 px-3 py-2 bg-amber-100/60 dark:bg-amber-900/40 rounded-lg text-xs font-mono text-amber-800 dark:text-amber-300" dir="ltr">php artisan migrate --force</code>
+        </div>
+    @endif
+
     <div>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">{{ __('admin.monitoring.performance_list') }}</h1>
         <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">{{ __('admin.monitoring.performance_subtitle') }}</p>

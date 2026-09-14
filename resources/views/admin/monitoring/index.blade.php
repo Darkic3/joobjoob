@@ -5,6 +5,20 @@
 @section('content')
 <div class="space-y-6 animate-slide-up">
 
+    {{-- هشدار: جداول مانیتورینگ روی این محیط مایگریت نشده‌اند --}}
+    @if(isset($tablesReady) && !$tablesReady)
+        <div class="rounded-2xl p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-bold text-base text-amber-800 dark:text-amber-300">جداول مانیتورینگ یافت نشد</h3>
+                <p class="text-sm text-amber-600 dark:text-amber-400 mt-1">مایگریشن‌های مانیتورینگ هنوز روی دیتابیس این محیط اجرا نشده‌اند. روی سرور این دستور را اجرا کنید:</p>
+                <code class="block mt-2 px-3 py-2 bg-amber-100/60 dark:bg-amber-900/40 rounded-lg text-xs font-mono text-amber-800 dark:text-amber-300" dir="ltr">php artisan migrate --force</code>
+            </div>
+        </div>
+    @endif
+
     {{-- Status Banner --}}
     <div class="rounded-2xl p-5 flex items-center gap-4 border transition-colors
         {{ $systemStatus['color'] === 'success' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700' : '' }}
@@ -46,15 +60,15 @@
                 <div class="w-11 h-11 bg-red-50 dark:bg-red-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
                 </div>
-                @if($errors['unresolved'] > 0)
-                    <span class="text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-lg">{{ $errors['unresolved'] }} {{ __('admin.monitoring.unresolved') }}</span>
+                @if($errorStats['unresolved'] > 0)
+                    <span class="text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-lg">{{ $errorStats['unresolved'] }} {{ __('admin.monitoring.unresolved') }}</span>
                 @else
                     <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">✓</span>
                 @endif
             </div>
-            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $errors['unresolved'] }}</p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $errorStats['unresolved'] }}</p>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">{{ __('admin.monitoring.unresolved_errors') }}</p>
-            <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{{ $errors['total_24h'] }} {{ __('admin.monitoring.errors_24h') }}</p>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{{ $errorStats['total_24h'] }} {{ __('admin.monitoring.errors_24h') }}</p>
         </a>
 
         {{-- Payments --}}
@@ -134,7 +148,7 @@
 
         {{-- Recent Errors --}}
         <x-admin.card :title="__('admin.monitoring.recent_errors')">
-            @forelse($errors['recent'] as $error)
+            @forelse($errorStats['recent'] as $error)
                 <div class="flex items-start gap-3 py-3 {{ !$loop->last ? 'border-b border-gray-100 dark:border-gray-700' : '' }}">
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium flex-shrink-0
                         {{ $error->level === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : '' }}

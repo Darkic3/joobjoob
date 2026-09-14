@@ -8,63 +8,133 @@ use App\Models\RequestPerformanceLog;
 use App\Models\SmsLog;
 use App\Models\SystemError;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class MonitoringController extends Controller
 {
+    /**
+     * آیا جداول مانیتورینگ در دیتابیس موجودند؟
+     *
+     * ⚠️ روی محیط production ممکن است مایگریشن‌ها هنوز اجرا نشده باشند
+     * (دیپلوی فقط FTP است). مانیتورینگ نباید باعث ۵۰۰ شود —
+     * در نبود جداول، داشبورد با مقادیر صفر و یک بنر هشدار نمایش داده می‌شود.
+     */
+    private function monitoringTablesReady(): bool
+    {
+        try {
+            return Schema::hasTable('system_errors')
+                && Schema::hasTable('payment_logs')
+                && Schema::hasTable('sms_logs')
+                && Schema::hasTable('request_performance_logs');
+        } catch (\Throwable $e) {
+            Log::warning('Monitoring: table check failed', ['error' => $e->getMessage()]);
+
+            return false;
+        }
+    }
+
     /**
      * داشبورد اصلی مانیتورینگ.
      */
     public function index()
     {
-        $errors = [
-            'unresolved'    => SystemError::unresolved()->count(),
-            'total_24h'     => SystemError::recent(24)->count(),
-            'critical_24h'  => SystemError::recent(24)->byLevel('critical')->count(),
-            'error_24h'     => SystemError::recent(24)->byLevel('error')->count(),
-            'warning_24h'   => SystemError::recent(24)->byLevel('warning')->count(),
-            'recent'        => SystemError::with('user')->recent(24)->latest()->take(10)->get(),
+        $tablesReady = $this->monitoringTablesReady();
+
+        $errorStats = [
+            'unresolved'    => 0,
+            'total_24h'     => 0,
+            'critical_24h'  => 0,
+            'error_24h'     => 0,
+            'warning_24h'   => 0,
+            'recent'        => collect(),
         ];
 
         $payments = [
-            'total_24h'     => PaymentLog::recent(24)->count(),
-            'success_24h'   => PaymentLog::recent(24)->where('status', 'success')->count(),
-            'failed_24h'    => PaymentLog::recent(24)->where('status', 'failed')->count(),
+            'total_24h'     => 0,
+            'success_24h'   => 0,
+            'failed_24h'    => 0,
             'failure_rate'  => 0,
-            'recent_failed' => PaymentLog::recent(24)->failed()->latest()->take(5)->get(),
+            'recent_failed' => collect(),
         ];
-        if ($payments['total_24h'] > 0) {
-            $payments['failure_rate'] = round(($payments['failed_24h'] / $payments['total_24h']) * 100, 1);
-        }
 
         $sms = [
-            'total_24h'     => SmsLog::recent(24)->count(),
-            'sent_24h'      => SmsLog::recent(24)->where('status', 'sent')->count(),
-            'failed_24h'    => SmsLog::recent(24)->where('status', 'failed')->count(),
-            'skipped_24h'   => SmsLog::recent(24)->where('status', 'skipped')->count(),
+            'total_24h'     => 0,
+            'sent_24h'      => 0,
+            'failed_24h'    => 0,
+            'skipped_24h'   => 0,
             'failure_rate'  => 0,
-            'recent_failed' => SmsLog::recent(24)->failed()->latest()->take(5)->get(),
+            'recent_failed' => collect(),
         ];
-        if ($sms['total_24h'] > 0) {
-            $sms['failure_rate'] = round(($sms['failed_24h'] / $sms['total_24h']) * 100, 1);
-        }
 
         $performance = [
-            'total_24h'       => RequestPerformanceLog::recent(24)->count(),
-            'slow_24h'        => RequestPerformanceLog::recent(24)->slow()->count(),
-            'avg_response_ms' => round(RequestPerformanceLog::recent(24)->avg('response_time_ms') ?? 0),
-            'recent_slow'     => RequestPerformanceLog::recent(24)->slow()->latest()->take(5)->get(),
+            'total_24h'       => 0,
+            'slow_24h'        => 0,
+            'avg_response_ms' => 0,
+            'recent_slow'     => collect(),
         ];
 
         $failedJobs = [
-            'total'  => DB::table('failed_jobs')->count(),
-            'recent' => DB::table('failed_jobs')->latest()->take(5)->get(),
+            'total'  => 0,
+            'recent' => collect(),
         ];
 
-        $systemStatus = $this->determineSystemStatus($errors, $payments, $sms, $performance);
+        if ($tablesReady) {
+            $errorStats = [
+                'unresolved'    => SystemError::unresolved()->count(),
+                'total_24h'     => SystemError::recent(24)->count(),
+                'critical_24h'  => SystemError::recent(24)->byLevel('critical')->count(),
+                'error_24h'     => SystemError::recent(24)->byLevel('error')->count(),
+                'warning_24h'   => SystemError::recent(24)->byLevel('warning')->count(),
+                'recent'        => SystemError::with('user')->recent(24)->latest()->take(10)->get(),
+            ];
+
+            $payments = [
+                'total_24h'     => PaymentLog::recent(24)->count(),
+                'success_24h'   => PaymentLog::recent(24)->where('status', 'success')->count(),
+                'failed_24h'    => PaymentLog::recent(24)->where('status', 'failed')->count(),
+                'failure_rate'  => 0,
+                'recent_failed' => PaymentLog::recent(24)->failed()->latest()->take(5)->get(),
+            ];
+            if ($payments['total_24h'] > 0) {
+                $payments['failure_rate'] = round(($payments['failed_24h'] / $payments['total_24h']) * 100, 1);
+            }
+
+            $sms = [
+                'total_24h'     => SmsLog::recent(24)->count(),
+                'sent_24h'      => SmsLog::recent(24)->where('status', 'sent')->count(),
+                'failed_24h'    => SmsLog::recent(24)->where('status', 'failed')->count(),
+                'skipped_24h'   => SmsLog::recent(24)->where('status', 'skipped')->count(),
+                'failure_rate'  => 0,
+                'recent_failed' => SmsLog::recent(24)->failed()->latest()->take(5)->get(),
+            ];
+            if ($sms['total_24h'] > 0) {
+                $sms['failure_rate'] = round(($sms['failed_24h'] / $sms['total_24h']) * 100, 1);
+            }
+
+            $performance = [
+                'total_24h'       => RequestPerformanceLog::recent(24)->count(),
+                'slow_24h'        => RequestPerformanceLog::recent(24)->slow()->count(),
+                'avg_response_ms' => round(RequestPerformanceLog::recent(24)->avg('response_time_ms') ?? 0),
+                'recent_slow'     => RequestPerformanceLog::recent(24)->slow()->latest()->take(5)->get(),
+            ];
+
+            $failedJobs = [
+                'total'  => DB::table('failed_jobs')->count(),
+                // ⚠️ failed_jobs در اسکیمای قدیمی ستون created_at ندارد — failed_at استاندارد است
+                'recent' => Schema::hasColumn('failed_jobs', 'failed_at')
+                    ? DB::table('failed_jobs')->orderByDesc('failed_at')->take(5)->get()
+                    : DB::table('failed_jobs')->take(5)->get(),
+            ];
+        }
+
+        $systemStatus = $this->determineSystemStatus($errorStats, $payments, $sms, $performance);
 
         return view('admin.monitoring.index', compact(
-            'errors', 'payments', 'sms', 'performance', 'failedJobs', 'systemStatus'
+            'errorStats', 'payments', 'sms', 'performance', 'failedJobs', 'systemStatus', 'tablesReady'
         ));
     }
 
@@ -73,40 +143,46 @@ class MonitoringController extends Controller
      */
     public function errors(Request $request)
     {
-        $query = SystemError::with('user');
+        $tablesReady = $this->monitoringTablesReady();
 
-        if ($request->filled('level')) {
-            $query->byLevel($request->input('level'));
-        }
+        if ($tablesReady) {
+            $query = SystemError::with('user');
 
-        if ($request->filled('resolved')) {
-            if ($request->input('resolved') === 'yes') {
-                $query->where('is_resolved', true);
-            } else {
-                $query->unresolved();
+            if ($request->filled('level')) {
+                $query->byLevel($request->input('level'));
             }
+
+            if ($request->filled('resolved')) {
+                if ($request->input('resolved') === 'yes') {
+                    $query->where('is_resolved', true);
+                } else {
+                    $query->unresolved();
+                }
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('message', 'like', "%{$search}%")
+                      ->orWhere('exception_class', 'like', "%{$search}%")
+                      ->orWhere('file', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('from_date')) {
+                $query->where('created_at', '>=', $request->input('from_date'));
+            }
+
+            if ($request->filled('to_date')) {
+                $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+            }
+
+            $errorLogs = $query->latest()->paginate(20)->withQueryString();
+        } else {
+            $errorLogs = new LengthAwarePaginator(collect(), 0, 20);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('message', 'like', "%{$search}%")
-                  ->orWhere('exception_class', 'like', "%{$search}%")
-                  ->orWhere('file', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
-        }
-
-        $errors = $query->latest()->paginate(20)->withQueryString();
-
-        return view('admin.monitoring.errors', compact('errors'));
+        return view('admin.monitoring.errors', compact('errorLogs', 'tablesReady'));
     }
 
     /**
@@ -150,36 +226,42 @@ class MonitoringController extends Controller
      */
     public function payments(Request $request)
     {
-        $query = PaymentLog::query();
+        $tablesReady = $this->monitoringTablesReady();
 
-        if ($request->filled('gateway')) {
-            $query->byGateway($request->input('gateway'));
+        if ($tablesReady) {
+            $query = PaymentLog::query();
+
+            if ($request->filled('gateway')) {
+                $query->byGateway($request->input('gateway'));
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->input('status'));
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('reference_id', 'like', "%{$search}%")
+                      ->orWhere('error_message', 'like', "%{$search}%")
+                      ->orWhere('order_id', $search);
+                });
+            }
+
+            if ($request->filled('from_date')) {
+                $query->where('created_at', '>=', $request->input('from_date'));
+            }
+
+            if ($request->filled('to_date')) {
+                $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+            }
+
+            $payments = $query->latest()->paginate(20)->withQueryString();
+        } else {
+            $payments = new LengthAwarePaginator(collect(), 0, 20);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('reference_id', 'like', "%{$search}%")
-                  ->orWhere('error_message', 'like', "%{$search}%")
-                  ->orWhere('order_id', $search);
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
-        }
-
-        $payments = $query->latest()->paginate(20)->withQueryString();
-
-        return view('admin.monitoring.payments', compact('payments'));
+        return view('admin.monitoring.payments', compact('payments', 'tablesReady'));
     }
 
     /**
@@ -187,36 +269,42 @@ class MonitoringController extends Controller
      */
     public function smsLogs(Request $request)
     {
-        $query = SmsLog::query();
+        $tablesReady = $this->monitoringTablesReady();
 
-        if ($request->filled('type')) {
-            $query->byType($request->input('type'));
+        if ($tablesReady) {
+            $query = SmsLog::query();
+
+            if ($request->filled('type')) {
+                $query->byType($request->input('type'));
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->input('status'));
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('mobile', 'like', "%{$search}%")
+                      ->orWhere('error_message', 'like', "%{$search}%")
+                      ->orWhere('template', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('from_date')) {
+                $query->where('created_at', '>=', $request->input('from_date'));
+            }
+
+            if ($request->filled('to_date')) {
+                $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+            }
+
+            $smsLogs = $query->latest()->paginate(20)->withQueryString();
+        } else {
+            $smsLogs = new LengthAwarePaginator(collect(), 0, 20);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('mobile', 'like', "%{$search}%")
-                  ->orWhere('error_message', 'like', "%{$search}%")
-                  ->orWhere('template', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
-        }
-
-        $smsLogs = $query->latest()->paginate(20)->withQueryString();
-
-        return view('admin.monitoring.sms', compact('smsLogs'));
+        return view('admin.monitoring.sms', compact('smsLogs', 'tablesReady'));
     }
 
     /**
@@ -224,32 +312,38 @@ class MonitoringController extends Controller
      */
     public function performance(Request $request)
     {
-        $query = RequestPerformanceLog::query();
+        $tablesReady = $this->monitoringTablesReady();
 
-        if ($request->boolean('slow_only')) {
-            $query->slow();
+        if ($tablesReady) {
+            $query = RequestPerformanceLog::query();
+
+            if ($request->boolean('slow_only')) {
+                $query->slow();
+            }
+
+            if ($request->filled('method')) {
+                $query->where('method', strtoupper($request->input('method')));
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where('path', 'like', "%{$search}%");
+            }
+
+            if ($request->filled('from_date')) {
+                $query->where('created_at', '>=', $request->input('from_date'));
+            }
+
+            if ($request->filled('to_date')) {
+                $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+            }
+
+            $performanceLogs = $query->latest()->paginate(20)->withQueryString();
+        } else {
+            $performanceLogs = new LengthAwarePaginator(collect(), 0, 20);
         }
 
-        if ($request->filled('method')) {
-            $query->where('method', strtoupper($request->input('method')));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('path', 'like', "%{$search}%");
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
-        }
-
-        $performanceLogs = $query->latest()->paginate(20)->withQueryString();
-
-        return view('admin.monitoring.performance', compact('performanceLogs'));
+        return view('admin.monitoring.performance', compact('performanceLogs', 'tablesReady'));
     }
 
     /**

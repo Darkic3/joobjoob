@@ -99,19 +99,19 @@
     @endif
 
     {{-- Stack Trace --}}
-    @if($error->trace && count($error->trace) > 0)
+    @if(filled($error->trace) && (is_array($error->trace) ? count($error->trace) > 0 : true))
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ __('admin.monitoring.trace') }}</h3>
             </div>
             <div class="p-4">
-                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed" dir="ltr">{{ implode("\n", $error->trace) }}</pre>
+                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed" dir="ltr">{{ is_array($error->trace) ? implode("\n", $error->trace) : (string) $error->trace }}</pre>
             </div>
         </div>
     @endif
 
     {{-- Context --}}
-    @if($error->context && count($error->context) > 0)
+    @if(filled($error->context) && (is_array($error->context) ? count($error->context) > 0 : true))
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ __('admin.monitoring.context') }}</h3>

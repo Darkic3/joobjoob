@@ -21,8 +21,6 @@ class LogSmsJob implements ShouldQueue
 
     public int $timeout = 15;
 
-    public string $queue = 'default';
-
     public function __construct(
         public array $data,
     ) {}

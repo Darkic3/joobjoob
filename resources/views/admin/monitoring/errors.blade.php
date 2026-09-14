@@ -5,6 +5,14 @@
 @section('content')
 <div class="space-y-6 animate-slide-up">
 
+    {{-- هشدار: جداول مانیتورینگ مایگریت نشده‌اند --}}        @if(isset($tablesReady) && !$tablesReady)
+        <div class="rounded-2xl p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+            <h3 class="font-bold text-amber-800 dark:text-amber-300">جداول مانیتورینگ یافت نشد</h3>
+            <p class="text-sm text-amber-600 dark:text-amber-400 mt-1">مایگریشن‌ها اجرا نشده‌اند — این دستور را روی سرور اجرا کنید:</p>
+            <code class="block mt-2 px-3 py-2 bg-amber-100/60 dark:bg-amber-900/40 rounded-lg text-xs font-mono text-amber-800 dark:text-amber-300" dir="ltr">php artisan migrate --force</code>
+        </div>
+    @endif
+
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -12,7 +20,7 @@
             <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">{{ __('admin.monitoring.errors_subtitle') }}</p>
         </div>
         <div class="flex items-center gap-2">
-            @if($errors->where('is_resolved', false)->count() > 0)
+            @if($tablesReady && $errorLogs->where('is_resolved', false)->count() > 0)
                 <form action="{{ route('admin.monitoring.errors.bulk-resolve') }}" method="POST" class="inline" onsubmit="return confirm('آیا همه خطاهای حل‌نشده علامت‌گذاری شوند؟')">
                     @csrf
                     <input type="hidden" name="note" value="حل دسته‌ای">
@@ -84,7 +92,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @forelse($errors as $error)
+                    @forelse($errorLogs as $error)
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors">
                             <td class="px-6 py-4 text-gray-500">{{ $error->id }}</td>
                             <td class="px-6 py-4">
@@ -135,7 +143,7 @@
             </table>
         </div>
         <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-            {{ $errors->links() }}
+            {{ $errorLogs->links() }}
         </div>
     </div>
 </div>

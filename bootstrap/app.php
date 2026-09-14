@@ -103,19 +103,41 @@ return Application::configure(basePath: dirname(__DIR__))
 
         /*
          * صفحه سفارشی 500 — فقط برای خطاهای واقعی سرور
+         * ⚠️ استثناهای معنادار (auth/validation/404/403/...) که لاراول خودش
+         * هندل می‌کند نباید اینجا شکار شوند — وگرنه به‌جای redirect لاگین،
+         * خطای 500 نمایش داده می‌شود.
          */
         $exceptions->renderable(function (\Throwable $e, Request $request) {
-            // ValidationException باید به صورت عادی handle شود
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
-                return;
+            $handledExceptions = [
+                \Illuminate\Validation\ValidationException::class,
+                \Illuminate\Session\TokenMismatchException::class,
+                \Illuminate\Auth\AuthenticationException::class,
+                \Illuminate\Auth\Access\AuthorizationException::class,
+                \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+                \Symfony\Component\HttpKernel\Exception\HttpException::class,
+                \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
+                \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class,
+            ];
+
+            foreach ($handledExceptions as $type) {
+                if ($e instanceof $type) {
+                    return; // اجازه بده لاراول خودش هندل کند (redirect/403/404/...)
+                }
             }
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'خطای داخلی سرور'], 500);
             }
 
-            if (view()->exists('errors.500')) {
-                return response()->view('errors.500', [], 500);
+            try {
+                if (view()->exists('errors.500')) {
+                    return response()->view('errors.500', [], 500);
+                }
+            } catch (\Throwable $renderError) {
+                // اگر حتی رندر صفحهٔ ۵۰۰ شکست خورد (مثلاً دیتابیس در دسترس نیست)،
+                // حداقل یک پاسخ ساده برگردان تا به‌جای صفحهٔ خطا، سفیدکشی نشود.
+                return response('Server Error', 500)
+                    ->header('Content-Type', 'text/plain; charset=utf-8');
             }
         });
     })->create();
