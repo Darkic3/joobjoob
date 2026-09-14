@@ -49,22 +49,9 @@
                 </div>
             @endif
 
-            {{-- لایت‌باکس تمام‌صفحه --}}
-            <div class="lightbox" id="product-lightbox">
-                <button type="button" class="lightbox__close" onclick="closeLightbox()" aria-label="بستن">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <button type="button" class="lightbox__arrow lightbox__arrow--prev" onclick="lightboxNav(-1)" aria-label="قبلی">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <div class="lightbox__img-wrap">
-                    <img class="lightbox__img" id="lightbox-img" src="" alt="">
-                </div>
-                <button type="button" class="lightbox__arrow lightbox__arrow--next" onclick="lightboxNav(1)" aria-label="بعدی">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
-                <div class="lightbox__counter" id="lightbox-counter"></div>
-            </div>
+            {{-- لایت‌باکس تمام‌صفحه — به انتهای صفحه منتقل شد (قبل از @endsection)؛
+                 چون والد با animation-fill-mode: both یک transform ماندگار دارد و
+                 position:fixed داخل آن به‌جای viewport به همان ستون محدود می‌شد --}}
         </div>
 
         {{-- ۲. اطلاعات محصول --}}
@@ -608,6 +595,22 @@
          (سرویس SchemaBuilder) تولید می‌شود تا در همهٔ زبان‌ها و همهٔ محصولات یکسان باشد
          و با json_encode ساخته شود (نسخهٔ قدیم با string interpolation روی نام محصول
          می‌شکست). --}}
+    {{-- لایت‌باکس تمام‌صفحه — خارج از هر والدِ transform/animation دار تا position:fixed به کل viewport بچسبد --}}
+    <div class="lightbox" id="product-lightbox">
+        <button type="button" class="lightbox__close" onclick="closeLightbox()" aria-label="بستن">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button type="button" class="lightbox__arrow lightbox__arrow--prev" onclick="lightboxNav(-1)" aria-label="قبلی">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="lightbox__img-wrap">
+            <img class="lightbox__img" id="lightbox-img" src="" alt="">
+        </div>
+        <button type="button" class="lightbox__arrow lightbox__arrow--next" onclick="lightboxNav(1)" aria-label="بعدی">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="lightbox__counter" id="lightbox-counter"></div>
+    </div>
 @endsection
 
 @push('scripts')
