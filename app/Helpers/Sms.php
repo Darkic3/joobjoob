@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Services\SmsLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -118,12 +119,13 @@ class Sms
     public function sendLookup(string $template, array $tokens, string $mobile, string $type = 'sms')
     {
         $tokens_query = http_build_query($tokens);
+        $originalMobile = $mobile;
 
         if (app()->environment('local')) {
             $localMobile = config('kavenegar.local_mobile');
             if (! $localMobile) {
                 Log::info("Kavenegar lookup skipped in local (LOCAL_MOBILE not set) for {$mobile}");
-
+                SmsLogService::recordSkipped('otp', $originalMobile, $template);
                 return false;
             }
             $mobile = $localMobile;
@@ -132,10 +134,16 @@ class Sms
         $url = "verify/lookup.json?receptor=$mobile&type=$type&template=$template&$tokens_query";
 
         try {
-            return $this->execute($url);
+            $result = $this->execute($url);
+            if ($result === false) {
+                SmsLogService::recordFailure('otp', $originalMobile, 'API request failed', $template);
+            } else {
+                SmsLogService::recordSuccess('otp', $originalMobile, $template);
+            }
+            return $result;
         } catch (\Exception $e) {
             Log::info($e);
-
+            SmsLogService::recordFailure('otp', $originalMobile, $e->getMessage(), $template);
             return false;
         }
     }
@@ -165,15 +173,16 @@ class Sms
             $res_json = json_decode($res);
 
             if (isset($res_json->return) && $res_json->return->status == 200) {
+                SmsLogService::recordSuccess('notification', $mobile);
                 return ['success' => true];
             }
 
             $error_message = isset($res_json->return->message) ? $res_json->return->message : 'Unknown error';
-
+            SmsLogService::recordFailure('notification', $mobile, $error_message);
             return ['success' => false, 'message' => $error_message];
         } catch (\Exception $e) {
             Log::error('Exception during sending SMS: '.$e->getMessage());
-
+            SmsLogService::recordFailure('notification', $mobile, $e->getMessage());
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }

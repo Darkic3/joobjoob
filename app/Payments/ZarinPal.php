@@ -3,6 +3,7 @@
 namespace App\Payments;
 
 use App\Models\Order;
+use App\Services\PaymentLogService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +37,19 @@ class ZarinPal implements PaymentGateway
             'metadata' => [],
         ];
 
+        $startTime = microtime(true);
         $resp = $this->sendJsonRequest(self::EP_REQUEST, $payload);
+        $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+
+        $status = $resp['ok'] ? 'success' : 'failed';
+        PaymentLogService::logTokenRequest(
+            $order,
+            'zarinpal',
+            $payload,
+            $resp['json'] ?? [],
+            $responseTimeMs,
+            $status
+        );
 
         if (! $resp['ok']) {
             return PaymentPostDTO::fromData('failed');
@@ -67,7 +80,35 @@ class ZarinPal implements PaymentGateway
             'amount' => $amountRial,
         ];
 
+        $startTime = microtime(true);
         $resp = $this->sendJsonRequest(self::EP_VERIFY, $payload);
+        $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+
+        $status = $resp['ok'] ? 'success' : 'failed';
+        $referenceId = null;
+        $errorMessage = null;
+
+        if ($resp['ok'] && isset($resp['json']['data']['code'])) {
+            $code = (int) $resp['json']['data']['code'];
+            if ($code === 100 || $code === 101) {
+                $referenceId = $resp['json']['data']['ref_id'] ?? null;
+            } else {
+                $errorMessage = 'Gateway code: ' . $code;
+            }
+        }
+
+        if ($order) {
+            PaymentLogService::logVerify(
+                $order,
+                'zarinpal',
+                $callbackData,
+                $resp['json'] ?? [],
+                $responseTimeMs,
+                $status,
+                $referenceId,
+                $errorMessage
+            );
+        }
 
         if (! $resp['ok']) {
             return PaymentVerifyDTO::fromData('failed');

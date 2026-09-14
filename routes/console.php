@@ -11,3 +11,10 @@ Artisan::command('inspire', function () {
 
 // لغو خودکار سفارشات منقضی شده (هر ۵ دقیقه)
 Schedule::command('orders:cancel-expired --minutes=15')->everyFiveMinutes()->withoutOverlapping();
+
+// ── Monitoring ──────────────────────────────────────────────────
+// بررسی سلامت سیستم (هر ساعت)
+Schedule::command('monitoring:check-health')->hourly();
+
+// پاکسازی لاگ‌های قدیمی (روزانه ساعت ۳ صبح)
+Schedule::command('monitoring:cleanup')->dailyAt('03:00');

@@ -3,11 +3,13 @@
 use App\Http\Middleware\AdminPermission;
 use App\Http\Middleware\LocalizeHtmlDigits;
 use App\Http\Middleware\LogAdminRequests;
+use App\Http\Middleware\LogRequestPerformance;
 use App\Http\Middleware\RefreshRememberMeCookie;
 use App\Http\Middleware\SecureHeadersMiddleware;
 use App\Http\Middleware\SeoHeaders;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTheme;
+use App\Services\ErrorLogService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -36,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetTheme::class,
             LocalizeHtmlDigits::class,
             SeoHeaders::class, // X-Robots-Tag برای سیاست‌های نوایندکس
+            LogRequestPerformance::class, // Request performance tracking
         ]);
 
         // مهمان‌هایی که به روت‌های محافظت‌شده (auth) می‌روند → لاگین (ادمین یا سایت)
@@ -77,8 +80,42 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         /*
-         * 500 — فقط استثناهای «روی‌کرده در رندر» را لاگ می‌کنیم؛ هندلر پیش‌فرض Laravel
-         * خودش خطاها را گزارش می‌کند و با APP_DEBUG=false صفحهٔ ۵۰۰ نمایش می‌دهد.
-         * اگر صفحهٔ سفارشی 500 می‌خواهید، فقط برای استثناهای مشخص (نه Throwable) بنویسید.
+         * 500 — ثبت خطاهای سیستمی در دیتابیس.
+         * ⚠️ فقط برای استثناهای واقعی (نه ValidationException) ثبت می‌شود.
+         * note: reportable callback فقط Throwable $e را دریافت می‌کند.
          */
+        $exceptions->reportable(function (\Throwable $e) {
+            // ValidationException خطا نیست — لاگ نکن
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return;
+            }
+
+            // TokenMismatch خطا نیست — لاگ نکن
+            if ($e instanceof \Illuminate\Session\TokenMismatchException) {
+                return;
+            }
+
+            // 404 به صورت warning ثبت شود (نه error)
+            $level = $e instanceof NotFoundHttpException ? 'warning' : 'error';
+
+            ErrorLogService::record($e, null, $level);
+        });
+
+        /*
+         * صفحه سفارشی 500 — فقط برای خطاهای واقعی سرور
+         */
+        $exceptions->renderable(function (\Throwable $e, Request $request) {
+            // ValidationException باید به صورت عادی handle شود
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'خطای داخلی سرور'], 500);
+            }
+
+            if (view()->exists('errors.500')) {
+                return response()->view('errors.500', [], 500);
+            }
+        });
     })->create();

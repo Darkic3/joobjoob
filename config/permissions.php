@@ -14,6 +14,8 @@ return [
         'admin.ckeditor.upload',
         'admin.logout',
         'admin.dashboard.index',
+        'admin.monitoring.index',          // مانیتورینگ — فقط نمای کلی، بدون قدرت تخریبی
+        'admin.monitoring.errors.resolve',  // علامت‌گذاری حل خطا — بی‌خطر
     ],
 
     'permissions' => [

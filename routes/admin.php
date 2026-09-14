@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PromoBannerController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\TrustBadgeController;
@@ -118,6 +119,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('audit-logs/product/{productId}', [AuditLogController::class, 'productHistory'])->name('audit-logs.product-history');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+        // ========== مانیتورینگ سیستم ==========
+        Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+        Route::post('monitoring/errors/{errorId}/resolve', [MonitoringController::class, 'resolveError'])->name('monitoring.errors.resolve');
 
         Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
     });
