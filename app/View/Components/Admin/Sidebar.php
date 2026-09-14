@@ -5,13 +5,14 @@ namespace App\View\Components\Admin;
 use App\Models\ContactRequest;
 use App\Models\Order;
 use App\Models\Review;
+use App\Models\SystemError;
 use Closure;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
 class Sidebar extends Component
 {
-    /** @var Closure(string): bool بررسی دسترسی کاربر جاری */
+    /** @var Closure(string): bool */
     public Closure $can;
 
     public bool $productsOpen;
@@ -26,11 +27,15 @@ class Sidebar extends Component
 
     public bool $showSettingsDivider;
 
+    public bool $showAuditLogs;
+
     public int $pendingReviewsCount = 0;
 
     public int $newOrdersCount = 0;
 
     public int $unreadContactsCount = 0;
+
+    public int $unresolvedErrorsCount = 0;
 
     public function __construct()
     {
@@ -62,12 +67,10 @@ class Sidebar extends Component
             || ($this->can)('admin.banks.index');
         $this->showAuditLogs = ($this->can)('admin.audit-logs.index');
 
-        // تعداد نظرات در انتظار تأیید
         if (($this->can)('admin.reviews.index')) {
             $this->pendingReviewsCount = Review::pending()->count();
         }
 
-        // تعداد سفارشات جدید (در انتظار تأیید فیش یا پرداخت)
         if (($this->can)('admin.orders.index')) {
             $this->newOrdersCount = Order::whereIn('order_status', [
                 'wait_for_verification',
@@ -75,9 +78,15 @@ class Sidebar extends Component
             ])->count();
         }
 
-        // تعداد پیام‌های تماس خوانده‌نشده
         if (($this->can)('admin.contact.index')) {
             $this->unreadContactsCount = ContactRequest::unread()->count();
+        }
+
+        // تعداد خطاهای حل‌نشده سیستمی
+        try {
+            $this->unresolvedErrorsCount = SystemError::unresolved()->count();
+        } catch (\Throwable $e) {
+            $this->unresolvedErrorsCount = 0;
         }
     }
 

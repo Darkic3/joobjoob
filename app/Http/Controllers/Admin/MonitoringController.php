@@ -13,14 +13,10 @@ use Illuminate\Support\Facades\DB;
 class MonitoringController extends Controller
 {
     /**
-     * نمایش داشبورد مانیتورینگ سیستم.
+     * داشبورد اصلی مانیتورینگ.
      */
     public function index()
     {
-        $hours24 = now()->subHours(24);
-        $hours1 = now()->subHour();
-
-        // آمار خطاهای سیستمی
         $errors = [
             'unresolved'    => SystemError::unresolved()->count(),
             'total_24h'     => SystemError::recent(24)->count(),
@@ -30,7 +26,6 @@ class MonitoringController extends Controller
             'recent'        => SystemError::with('user')->recent(24)->latest()->take(10)->get(),
         ];
 
-        // آمار پرداخت‌ها
         $payments = [
             'total_24h'     => PaymentLog::recent(24)->count(),
             'success_24h'   => PaymentLog::recent(24)->where('status', 'success')->count(),
@@ -42,7 +37,6 @@ class MonitoringController extends Controller
             $payments['failure_rate'] = round(($payments['failed_24h'] / $payments['total_24h']) * 100, 1);
         }
 
-        // آمار SMS
         $sms = [
             'total_24h'     => SmsLog::recent(24)->count(),
             'sent_24h'      => SmsLog::recent(24)->where('status', 'sent')->count(),
@@ -55,31 +49,207 @@ class MonitoringController extends Controller
             $sms['failure_rate'] = round(($sms['failed_24h'] / $sms['total_24h']) * 100, 1);
         }
 
-        // آمار پرفورمانس
         $performance = [
-            'total_24h'        => RequestPerformanceLog::recent(24)->count(),
-            'slow_24h'         => RequestPerformanceLog::recent(24)->slow()->count(),
-            'avg_response_ms'  => round(RequestPerformanceLog::recent(24)->avg('response_time_ms') ?? 0),
-            'recent_slow'      => RequestPerformanceLog::recent(24)->slow()->latest()->take(5)->get(),
+            'total_24h'       => RequestPerformanceLog::recent(24)->count(),
+            'slow_24h'        => RequestPerformanceLog::recent(24)->slow()->count(),
+            'avg_response_ms' => round(RequestPerformanceLog::recent(24)->avg('response_time_ms') ?? 0),
+            'recent_slow'     => RequestPerformanceLog::recent(24)->slow()->latest()->take(5)->get(),
         ];
 
-        // آمار Failed Jobs
         $failedJobs = [
-            'total'    => DB::table('failed_jobs')->count(),
-            'recent'   => DB::table('failed_jobs')->latest()->take(5)->get(),
+            'total'  => DB::table('failed_jobs')->count(),
+            'recent' => DB::table('failed_jobs')->latest()->take(5)->get(),
         ];
 
-        // وضعیت کلی سیستم
         $systemStatus = $this->determineSystemStatus($errors, $payments, $sms, $performance);
 
         return view('admin.monitoring.index', compact(
-            'errors',
-            'payments',
-            'sms',
-            'performance',
-            'failedJobs',
-            'systemStatus'
+            'errors', 'payments', 'sms', 'performance', 'failedJobs', 'systemStatus'
         ));
+    }
+
+    /**
+     * لیست خطاهای سیستمی با فیلتر.
+     */
+    public function errors(Request $request)
+    {
+        $query = SystemError::with('user');
+
+        if ($request->filled('level')) {
+            $query->byLevel($request->input('level'));
+        }
+
+        if ($request->filled('resolved')) {
+            if ($request->input('resolved') === 'yes') {
+                $query->where('is_resolved', true);
+            } else {
+                $query->unresolved();
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('message', 'like', "%{$search}%")
+                  ->orWhere('exception_class', 'like', "%{$search}%")
+                  ->orWhere('file', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->where('created_at', '>=', $request->input('from_date'));
+        }
+
+        if ($request->filled('to_date')) {
+            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+        }
+
+        $errors = $query->latest()->paginate(20)->withQueryString();
+
+        return view('admin.monitoring.errors', compact('errors'));
+    }
+
+    /**
+     * جزئیات یک خطا.
+     */
+    public function showError(SystemError $error)
+    {
+        $error->load('user');
+
+        return view('admin.monitoring.error-show', compact('error'));
+    }
+
+    /**
+     * حل دسته‌ای خطاهای حل‌نشده.
+     */
+    public function bulkResolveErrors(Request $request)
+    {
+        $note = $request->input('note', 'حل دسته‌ای توسط ادمین');
+        SystemError::unresolved()->update([
+            'is_resolved'   => true,
+            'resolved_note' => $note,
+        ]);
+
+        return back()->with('success', 'همه خطاهای حل‌نشده علامت‌گذاری شدند.');
+    }
+
+    /**
+     * حذف خطاهای حل‌شده قدیمی (بیشتر از ۳۰ روز).
+     */
+    public function deleteResolvedErrors()
+    {
+        $deleted = SystemError::where('is_resolved', true)
+            ->where('created_at', '<', now()->subDays(30))
+            ->delete();
+
+        return back()->with('success', "{$deleted} خطای حل‌شده قدیمی حذف شد.");
+    }
+
+    /**
+     * لیست لاگ پرداخت‌ها با فیلتر.
+     */
+    public function payments(Request $request)
+    {
+        $query = PaymentLog::query();
+
+        if ($request->filled('gateway')) {
+            $query->byGateway($request->input('gateway'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_id', 'like', "%{$search}%")
+                  ->orWhere('error_message', 'like', "%{$search}%")
+                  ->orWhere('order_id', $search);
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->where('created_at', '>=', $request->input('from_date'));
+        }
+
+        if ($request->filled('to_date')) {
+            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+        }
+
+        $payments = $query->latest()->paginate(20)->withQueryString();
+
+        return view('admin.monitoring.payments', compact('payments'));
+    }
+
+    /**
+     * لیست لاگ SMS با فیلتر.
+     */
+    public function smsLogs(Request $request)
+    {
+        $query = SmsLog::query();
+
+        if ($request->filled('type')) {
+            $query->byType($request->input('type'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('mobile', 'like', "%{$search}%")
+                  ->orWhere('error_message', 'like', "%{$search}%")
+                  ->orWhere('template', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('from_date')) {
+            $query->where('created_at', '>=', $request->input('from_date'));
+        }
+
+        if ($request->filled('to_date')) {
+            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+        }
+
+        $smsLogs = $query->latest()->paginate(20)->withQueryString();
+
+        return view('admin.monitoring.sms', compact('smsLogs'));
+    }
+
+    /**
+     * لیست لاگ پرفورمانس با فیلتر.
+     */
+    public function performance(Request $request)
+    {
+        $query = RequestPerformanceLog::query();
+
+        if ($request->boolean('slow_only')) {
+            $query->slow();
+        }
+
+        if ($request->filled('method')) {
+            $query->where('method', strtoupper($request->input('method')));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('path', 'like', "%{$search}%");
+        }
+
+        if ($request->filled('from_date')) {
+            $query->where('created_at', '>=', $request->input('from_date'));
+        }
+
+        if ($request->filled('to_date')) {
+            $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+        }
+
+        $performanceLogs = $query->latest()->paginate(20)->withQueryString();
+
+        return view('admin.monitoring.performance', compact('performanceLogs'));
     }
 
     /**
@@ -103,19 +273,15 @@ class MonitoringController extends Controller
         if ($errors['critical_24h'] > 0) {
             $issues[] = 'خطاهای بحرانی ثبت شده';
         }
-
         if ($errors['unresolved'] > 10) {
             $issues[] = 'تعداد خطاهای حل‌نشده زیاد است';
         }
-
         if ($payments['failure_rate'] > 30) {
             $issues[] = 'نرخ شكست پرداخت بالاست';
         }
-
         if ($sms['failure_rate'] > 50) {
             $issues[] = 'نرخ شكست SMS بالاست';
         }
-
         if ($performance['slow_24h'] > 10) {
             $issues[] = 'درخواست‌های کند زیاد هستند';
         }

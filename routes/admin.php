@@ -122,7 +122,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ========== مانیتورینگ سیستم ==========
         Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+        Route::get('monitoring/errors', [MonitoringController::class, 'errors'])->name('monitoring.errors');
+        Route::get('monitoring/errors/{error}', [MonitoringController::class, 'showError'])->name('monitoring.errors.show');
         Route::post('monitoring/errors/{errorId}/resolve', [MonitoringController::class, 'resolveError'])->name('monitoring.errors.resolve');
+        Route::post('monitoring/errors/bulk-resolve', [MonitoringController::class, 'bulkResolveErrors'])->name('monitoring.errors.bulk-resolve');
+        Route::delete('monitoring/errors/resolved', [MonitoringController::class, 'deleteResolvedErrors'])->name('monitoring.errors.delete-resolved');
+        Route::get('monitoring/payments', [MonitoringController::class, 'payments'])->name('monitoring.payments');
+        Route::get('monitoring/sms', [MonitoringController::class, 'smsLogs'])->name('monitoring.sms');
+        Route::get('monitoring/performance', [MonitoringController::class, 'performance'])->name('monitoring.performance');
 
         Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
     });
