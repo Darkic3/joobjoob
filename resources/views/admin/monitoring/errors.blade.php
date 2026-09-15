@@ -62,11 +62,28 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('admin.monitoring.filter_date') }} از</label>
-                <input type="date" name="from_date" value="{{ request('from_date') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                @if(!empty($isJalaliCalendar))
+                    {{-- تقویم شمسی پروژه: نمایش جلالی، ارسال میلادی به سرور (سینک خودکار سراسری) --}}
+                    <input type="hidden" name="from_date" id="filter_from_date" value="{{ request('from_date') }}">
+                    <input type="text" data-jdp data-jdp-only-date data-jdp-format="YYYY/MM/DD"
+                           data-jdp-init-date="{{ $fromDateJalali ?? '' }}" data-target="filter_from_date"
+                           value="{{ $fromDateJalali ?? '' }}" placeholder="۱۴۰۳/۰۶/۲۴" autocomplete="off" dir="ltr"
+                           class="w-40 px-3 py-2 text-sm text-left border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                @else
+                    <input type="date" name="from_date" value="{{ request('from_date') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                @endif
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">تا</label>
-                <input type="date" name="to_date" value="{{ request('to_date') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                @if(!empty($isJalaliCalendar))
+                    <input type="hidden" name="to_date" id="filter_to_date" value="{{ request('to_date') }}">
+                    <input type="text" data-jdp data-jdp-only-date data-jdp-format="YYYY/MM/DD"
+                           data-jdp-init-date="{{ $toDateJalali ?? '' }}" data-target="filter_to_date"
+                           value="{{ $toDateJalali ?? '' }}" placeholder="۱۴۰۳/۰۶/۲۴" autocomplete="off" dir="ltr"
+                           class="w-40 px-3 py-2 text-sm text-left border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                @else
+                    <input type="date" name="to_date" value="{{ request('to_date') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                @endif
             </div>
             <div class="flex gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-all">فیلتر</button>

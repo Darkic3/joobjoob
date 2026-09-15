@@ -7,6 +7,8 @@ use App\Models\PaymentLog;
 use App\Models\RequestPerformanceLog;
 use App\Models\SmsLog;
 use App\Models\SystemError;
+use App\Services\LocaleService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -184,11 +186,17 @@ class MonitoringController extends Controller
             }
 
             if ($request->filled('from_date')) {
-                $query->where('created_at', '>=', $request->input('from_date'));
+                $from = $this->parseFilterDate($request->input('from_date'), true);
+                if ($from !== null) {
+                    $query->where('created_at', '>=', $from);
+                }
             }
 
             if ($request->filled('to_date')) {
-                $query->where('created_at', '<=', $request->input('to_date') . ' 23:59:59');
+                $to = $this->parseFilterDate($request->input('to_date'), false);
+                if ($to !== null) {
+                    $query->where('created_at', '<=', $to);
+                }
             }
 
             $errorLogs = $query->latest()->paginate(20)->withQueryString();
@@ -196,7 +204,54 @@ class MonitoringController extends Controller
             $errorLogs = new LengthAwarePaginator(collect(), 0, 20);
         }
 
-        return view('admin.monitoring.errors', compact('errorLogs', 'tablesReady'));
+        $isJalaliCalendar = app(LocaleService::class)->isJalali(app()->getLocale());
+
+        return view('admin.monitoring.errors', [
+            'errorLogs'        => $errorLogs,
+            'tablesReady'      => $tablesReady,
+            'isJalaliCalendar' => $isJalaliCalendar,
+            'fromDateJalali'   => $isJalaliCalendar ? $this->toJalaliDateInput($request->input('from_date')) : '',
+            'toDateJalali'     => $isJalaliCalendar ? $this->toJalaliDateInput($request->input('to_date')) : '',
+        ]);
+    }
+
+    /**
+     * نرمال‌سازی تاریخ فیلتر به شروع/پایان روز.
+     *
+     * ورودی می‌تواند Y-m-d (اینپوت میلادی) یا Y-m-d H:i (خروجی سینک پیکر شمسی) باشد؛
+     * مقدار نامعتبر نادیده گرفته می‌شود تا فیلتر باعث ۵۰۰ یا نتیجه‌ی خالی کاذب نشود.
+     */
+    private function parseFilterDate(mixed $value, bool $startOfDay): ?string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        try {
+            $dt = Carbon::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return ($startOfDay ? $dt->startOfDay() : $dt->endOfDay())->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * تبدیل تاریخ میلادی ورودی فیلتر به رشته‌ی نمایشی شمسی (YYYY/MM/DD) برای پیکر جلالی.
+     */
+    private function toJalaliDateInput(mixed $value): string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return '';
+        }
+
+        try {
+            $timestamp = Carbon::parse($value)->timestamp;
+
+            return jdate_format('Y/m/d', $timestamp, '', 'Asia/Tehran', 'en');
+        } catch (\Throwable) {
+            return '';
+        }
     }
 
     /**
