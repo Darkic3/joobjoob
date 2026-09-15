@@ -66,6 +66,19 @@ class MonitoringResolveErrorTest extends TestCase
         $this->assertSame('fixed via patch', $fresh->resolved_note);
     }
 
+    public function test_monitoring_dashboard_loads_without_500(): void
+    {
+        // رگرسیون خطای #2: داشبورد نباید به‌خاطر failed_jobs (ستون/جدول ناسازگار) ۵۰۰ بدهد.
+        $this->actingAs($this->makeAdmin());
+
+        $this->get(route('admin.monitoring.index'))->assertOk();
+    }
+
+    public function test_health_check_command_does_not_crash(): void
+    {
+        $this->artisan('monitoring:check-health')->assertOk();
+    }
+
     public function test_error_detail_page_renders_summary_card(): void
     {
         $this->actingAs($this->makeAdmin());

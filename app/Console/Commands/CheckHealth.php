@@ -25,6 +25,19 @@ class CheckHealth extends Command
 
     public function handle(): int
     {
+        // واچ‌داگ ساعتی نباید خودش crash کند — هر خطای غیرمنتظره لاگ و FAILURE می‌شود.
+        try {
+            return $this->runChecks();
+        } catch (\Throwable $e) {
+            Log::error('monitoring:check-health failed', ['message' => $e->getMessage()]);
+            $this->error('❌ خطا در اجرای بررسی سلامت: ' . $e->getMessage());
+
+            return Command::FAILURE;
+        }
+    }
+
+    private function runChecks(): int
+    {
         $issues = [];
         $config = config('monitoring.alerts', []);
 
@@ -64,8 +77,13 @@ class CheckHealth extends Command
             $issues[] = "درخواست‌های کند در ساعت اخیر: {$slowCount} (آستانه: {$threshold})";
         }
 
-        // ۵. بررسی Failed Jobs
-        $failedJobs = DB::table('failed_jobs')->count();
+        // ۵. بررسی Failed Jobs — جدول ممکن است روی بعضی هاست‌ها نباشد
+        try {
+            $failedJobs = DB::table('failed_jobs')->count();
+        } catch (\Throwable $e) {
+            Log::warning('monitoring:check-health: failed_jobs query failed', ['error' => $e->getMessage()]);
+            $failedJobs = 0;
+        }
         if ($failedJobs > 0) {
             $issues[] = "تعداد Failed Jobs: {$failedJobs}";
         }
