@@ -323,7 +323,14 @@ class MonitoringController extends Controller
      */
     public function bulkResolveErrors(Request $request)
     {
-        $note = $request->input('note', 'حل دسته‌ای توسط ادمین');
+        $validated = $request->validate([
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $note = $validated['note'] ?? null;
+        if ($note === null || trim($note) === '') {
+            $note = 'حل دسته‌ای توسط ادمین';
+        }
         SystemError::unresolved()->update([
             'is_resolved'   => true,
             'resolved_note' => $note,
@@ -474,8 +481,12 @@ class MonitoringController extends Controller
      */
     public function resolveError(Request $request, int $errorId)
     {
+        $validated = $request->validate([
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
         $error = SystemError::findOrFail($errorId);
-        $error->markResolved($request->input('note', ''));
+        $error->markResolved($validated['note'] ?? '');
 
         return back()->with('success', 'خطا به عنوان حل‌شده علامت‌گذاری شد.');
     }

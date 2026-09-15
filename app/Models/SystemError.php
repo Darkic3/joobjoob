@@ -61,11 +61,11 @@ class SystemError extends Model
 
     // ==================== Helpers ====================
 
-    public function markResolved(string $note = ''): void
+    public function markResolved(?string $note = ''): void
     {
         $this->update([
             'is_resolved'   => true,
-            'resolved_note' => $note,
+            'resolved_note' => $note ?? '',
         ]);
     }
 

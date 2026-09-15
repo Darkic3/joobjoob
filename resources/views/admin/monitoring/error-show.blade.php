@@ -36,10 +36,9 @@
         @else
             <form action="{{ route('admin.monitoring.errors.resolve', $error->id) }}" method="POST" class="inline-flex flex-wrap items-center gap-2" x-data="{ showNote: false }">
                 @csrf
-                <input type="hidden" name="note" :value="showNote ? $refs.noteInput.value : ''">
                 <button type="button" @click="showNote = !showNote" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-xl transition-all">{{ __('admin.monitoring.mark_resolved') }}</button>
                 <div x-show="showNote" x-transition class="inline-flex items-center gap-2">
-                    <input x-ref="noteInput" type="text" placeholder="{{ __('admin.monitoring.resolve_note_placeholder') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 w-64">
+                    <input name="note" type="text" maxlength="500" placeholder="{{ __('admin.monitoring.resolve_note_placeholder') }}" class="px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 w-64">
                     <button type="submit" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-xl transition-all">ذخیره</button>
                 </div>
             </form>
