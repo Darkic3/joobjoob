@@ -46,6 +46,20 @@
         @endif
     </div>
 
+    {{-- خلاصه خطا — کپی یک‌کلیکه برای بررسی / ارسال به AI --}}
+    <x-admin.card :title="__('admin.monitoring.error_summary')" :subtitle="__('admin.monitoring.error_summary_subtitle')" :padding="false">
+        <x-slot name="actions">
+            <button type="button" id="copyErrorSummaryBtn"
+                class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-xl transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span id="copyErrorSummaryLabel">{{ __('admin.monitoring.copy_summary') }}</span>
+            </button>
+        </x-slot>
+        <div class="p-4">
+            <pre id="errorSummaryPre" class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left max-h-96 overflow-y-auto" dir="ltr">{{ $errorSummary ?? '' }}</pre>
+        </div>
+    </x-admin.card>
+
     {{-- Message --}}
     <x-admin.card :title="__('admin.monitoring.message')">
         <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed break-words" dir="auto">{{ $error->message }}</p>
@@ -144,4 +158,51 @@
     @endif
 
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    var btn = document.getElementById('copyErrorSummaryBtn');
+    var label = document.getElementById('copyErrorSummaryLabel');
+    var pre = document.getElementById('errorSummaryPre');
+    if (!btn || !pre) return;
+
+    var defaultLabel = label ? label.textContent : '';
+    var doneLabel = @json(__('admin.monitoring.copied'));
+    var failLabel = @json(__('admin.monitoring.copy_failed'));
+
+    function flash(text) {
+        if (!label) return;
+        label.textContent = text;
+        setTimeout(function () { label.textContent = defaultLabel; }, 2000);
+    }
+
+    function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+    }
+
+    btn.addEventListener('click', function () {
+        var text = pre.innerText || pre.textContent || '';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { flash(doneLabel); },
+                function () { flash(fallbackCopy(text) ? doneLabel : failLabel); }
+            );
+        } else {
+            flash(fallbackCopy(text) ? doneLabel : failLabel);
+        }
+    });
+})();
+</script>
+@endpush
 @endsection

@@ -268,6 +268,11 @@ return [
         'bulk_resolve' => 'حل دسته‌ای حل‌نشده‌ها',
         'delete_resolved' => 'حذف حل‌شده‌های قدیمی',
         'back_to_dashboard' => 'بازگشت به داشبورد',
+        'error_summary' => 'خلاصه خطا',
+        'error_summary_subtitle' => 'همه اطلاعات خطا در یک متن آماده کپی برای بررسی یا ارسال به AI',
+        'copy_summary' => 'کپی خلاصه خطا',
+        'copied' => 'کپی شد ✓',
+        'copy_failed' => 'کپی ناموفق بود',
     ],
 
     'common' => [

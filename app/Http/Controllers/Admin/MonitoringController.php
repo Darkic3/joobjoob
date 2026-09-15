@@ -212,10 +212,50 @@ class MonitoringController extends Controller
             : (string) $error->trace;
 
         return view('admin.monitoring.error-show', [
-            'error'       => $error,
-            'traceFrames' => $this->parseTraceFrames($traceString),
-            'traceRaw'    => $traceString,
+            'error'        => $error,
+            'traceFrames'  => $this->parseTraceFrames($traceString),
+            'traceRaw'     => $traceString,
+            'errorSummary' => $this->buildErrorSummary($error, $traceString),
         ]);
+    }
+
+    /**
+     * ساخت متن «خلاصه خطا» — یک خروجی متنی کامل و آماده‌ی کپی
+     * تا ادمین بتواند با یک دکمه همه‌ی اطلاعات خطا را برای
+     * بررسی یا ارسال به AI کپی کند.
+     */
+    private function buildErrorSummary(SystemError $error, string $traceString): string
+    {
+        $contextJson = '';
+        if (filled($error->context)) {
+            $contextJson = is_array($error->context)
+                ? json_encode($error->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)
+                : (string) $error->context;
+        }
+
+        $lines = [
+            '===== SYSTEM ERROR SUMMARY =====',
+            'ID: ' . $error->id,
+            'Level: ' . ($error->level ?? '-'),
+            'Status: ' . ($error->is_resolved ? 'resolved' . ($error->resolved_note ? " ({$error->resolved_note})" : '') : 'unresolved'),
+            'Date: ' . optional($error->created_at)->format('Y-m-d H:i:s'),
+            'Exception: ' . ($error->exception_class ?? '-'),
+            'Message: ' . ($error->message ?? '-'),
+            'File: ' . ($error->file ?? '-') . ':' . ($error->line ?? '?'),
+            'Method: ' . ($error->method ?? '-'),
+            'URL: ' . ($error->url ?? '-'),
+            'IP: ' . ($error->ip ?? '-'),
+            'User: ' . ($error->user?->name ?? 'guest') . ($error->user_id ? " (id={$error->user_id})" : ''),
+            '',
+            '----- Context (JSON) -----',
+            $contextJson !== '' ? $contextJson : '(empty)',
+            '',
+            '----- Stack Trace -----',
+            $traceString !== '' ? $traceString : '(empty)',
+            '===== END =====',
+        ];
+
+        return implode("\n", $lines);
     }
 
     /**
