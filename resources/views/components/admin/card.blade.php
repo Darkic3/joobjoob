@@ -15,17 +15,17 @@
     'p-5 sm:p-6' => $padding,
 ]) }}>
     @if($title || $subtitle || isset($actions))
-    <div class="flex items-center justify-between mb-5">
-        <div>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 {{ $padding ? '' : 'px-5 sm:px-6 pt-5 sm:pt-6' }}">
+        <div class="min-w-0">
             @if($title)
-                <h3 class="text-base font-semibold text-gray-800">{{ $title }}</h3>
+                <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100">{{ $title }}</h3>
             @endif
             @if($subtitle)
-                <p class="text-sm text-gray-400 mt-0.5">{{ $subtitle }}</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{{ $subtitle }}</p>
             @endif
         </div>
         @if(isset($actions))
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
                 {{ $actions }}
             </div>
         @endif
@@ -33,7 +33,7 @@
     @endif
 
     @if(isset($header) && !$title && !$subtitle)
-        <div class="mb-5">
+        <div class="mb-5 {{ $padding ? '' : 'px-5 sm:px-6 pt-5 sm:pt-6' }}">
             {{ $header }}
         </div>
     @endif

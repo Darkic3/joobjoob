@@ -65,4 +65,16 @@ class MonitoringResolveErrorTest extends TestCase
         $this->assertTrue($fresh->is_resolved);
         $this->assertSame('fixed via patch', $fresh->resolved_note);
     }
+
+    public function test_error_detail_page_renders_summary_card(): void
+    {
+        $this->actingAs($this->makeAdmin());
+        $error = $this->makeError();
+
+        $this->get(route('admin.monitoring.errors.show', $error->id))
+            ->assertOk()
+            ->assertSee('خلاصه خطا', false)
+            ->assertSee('copyErrorSummaryBtn', false)
+            ->assertSee('SYSTEM ERROR SUMMARY', false);
+    }
 }

@@ -54,8 +54,8 @@
                 <span id="copyErrorSummaryLabel">{{ __('admin.monitoring.copy_summary') }}</span>
             </button>
         </x-slot>
-        <div class="p-4">
-            <pre id="errorSummaryPre" class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left max-h-96 overflow-y-auto" dir="ltr">{{ $errorSummary ?? '' }}</pre>
+        <div class="px-5 sm:px-6 pb-5 sm:pb-6">
+            <pre id="errorSummaryPre" class="m-0 whitespace-pre bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700/60 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-auto leading-relaxed text-left max-h-96" dir="ltr">{{ $errorSummary ?? '' }}</pre>
         </div>
     </x-admin.card>
 
@@ -117,7 +117,7 @@
         @if(!empty($traceFrames))
             <div class="divide-y divide-gray-100 dark:divide-gray-700" dir="ltr">
                 @foreach($traceFrames as $frame)
-                    <div class="flex items-start gap-3 px-4 sm:px-6 py-3 {{ $loop->first ? 'bg-orange-50/60 dark:bg-orange-900/10' : '' }}">
+                    <div class="flex items-start gap-3 px-5 sm:px-6 py-3 {{ $loop->first ? 'bg-orange-50/60 dark:bg-orange-900/10' : '' }}">
                         <span class="shrink-0 mt-0.5 inline-flex items-center justify-center min-w-[2.75rem] px-2 py-1 rounded-lg text-xs font-mono font-bold
                             {{ $loop->first ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' }}">
                             #{{ $frame['num'] ?? '•' }}
@@ -139,19 +139,19 @@
                 @endforeach
             </div>
         @elseif($traceRaw)
-            <div class="p-4">
-                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left" dir="ltr">{{ $traceRaw }}</pre>
+            <div class="px-5 sm:px-6 pb-5 sm:pb-6">
+                <pre class="m-0 whitespace-pre bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700/60 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-auto leading-relaxed text-left" dir="ltr">{{ $traceRaw }}</pre>
             </div>
         @else
-            <p class="px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">—</p>
+            <p class="px-5 sm:px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">—</p>
         @endif
     </x-admin.card>
 
     {{-- Context --}}
     @if(filled($error->context) && (is_array($error->context) ? count($error->context) > 0 : true))
         <x-admin.card :title="__('admin.monitoring.context')" :padding="false">
-            <div class="p-4">
-                <pre class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto leading-relaxed text-left" dir="ltr">{{ json_encode($error->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) }}</pre>
+            <div class="px-5 sm:px-6 pb-5 sm:pb-6">
+                <pre class="m-0 whitespace-pre bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700/60 rounded-xl p-4 text-xs text-gray-700 dark:text-gray-300 overflow-auto leading-relaxed text-left" dir="ltr">{{ json_encode($error->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) }}</pre>
             </div>
         </x-admin.card>
     @endif
