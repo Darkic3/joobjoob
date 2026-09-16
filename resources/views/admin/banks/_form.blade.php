@@ -26,6 +26,15 @@
                     @endif
                 </div>
 
+                <div class="sm:col-span-2" id="zarinPalNotice" style="{{ (old('bank_type', $bank->bank_type ?? 'zarinPal') !== 'zarinPal') ? 'display:none' : '' }}">
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:border-amber-500/20 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                        تنظیمات زرین‌پال از فایل <code class="font-mono" dir="ltr">.env</code> خوانده می‌شود
+                        (<code class="font-mono" dir="ltr">ZARINPAL_MERCHANT_ID</code>،
+                        <code class="font-mono" dir="ltr">ZARINPAL_SANDBOX</code>).
+                        مقدار قدیمی <code class="font-mono" dir="ltr">MerchantId</code> داخل config فقط به‌عنوان فالبک استفاده می‌شود.
+                    </div>
+                </div>
+
                 <div class="sm:col-span-2">
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.banks.field_config') }}</label>
                     <textarea name="config" rows="3" class="input-custom !py-1.5 !text-sm font-mono text-xs" placeholder='{"merchant_id": "...", "api_key": "..."}'>{{ old('config', is_array($bank->config ?? null) ? json_encode($bank->config, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : ($bank->config ?? '')) }}</textarea>
@@ -86,6 +95,8 @@
         if (bankTypeSelect && cardToCardFields) {
             bankTypeSelect.addEventListener('change', function() {
                 cardToCardFields.classList.toggle('hidden', this.value !== 'card_to_card');
+                var notice = document.getElementById('zarinPalNotice');
+                if (notice) notice.style.display = this.value === 'zarinPal' ? '' : 'none';
             });
         }
 

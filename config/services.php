@@ -31,4 +31,21 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | ZarinPal Payment Gateway (https://www.zarinpal.com/docs/paymentGateway/connectToGateway)
+    |--------------------------------------------------------------------------
+    |
+    | مبالغ فروشگاه به تومان ذخیره می‌شوند؛ هنگام ارسال به زرین‌پال به ریال
+    | تبدیل می‌شوند (×۱۰) و currency=IRR ارسال می‌شود.
+    | حالت sandbox برای تست بدون پرداخت واقعی است.
+    |
+    */
+    'zarinpal' => [
+        'merchant_id' => env('ZARINPAL_MERCHANT_ID'),
+        'sandbox' => env('ZARINPAL_SANDBOX', false),
+        'currency' => env('ZARINPAL_CURRENCY', 'IRR'),
+        'sandbox_merchant_id' => env('ZARINPAL_SANDBOX_MERCHANT_ID', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'),
+    ],
+
 ];

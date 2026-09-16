@@ -3,21 +3,20 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\CardToCardCheckoutRequest;
 use App\Models\Address;
 use App\Models\Bank;
-use App\Models\Discount;
 use App\Models\Order;
 use App\Models\ShippingMethod;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CityService;
+use App\Services\CouponService;
 use App\Services\OrderService;
 use App\Services\ShippingCalculator;
 use App\Services\StockService;
-use App\Http\Requests\Site\CardToCardCheckoutRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -140,7 +139,7 @@ class CheckoutController extends Controller
             return response()->json(['success' => false, 'message' => 'کد تخفیف را وارد نمایید.']);
         }
 
-        $couponService = app(\App\Services\CouponService::class);
+        $couponService = app(CouponService::class);
         $result = $couponService->apply($code, $this->cart->subtotal(), $this->cart);
 
         return response()->json($result);
@@ -151,7 +150,7 @@ class CheckoutController extends Controller
      */
     public function removeDiscount(): JsonResponse
     {
-        $couponService = app(\App\Services\CouponService::class);
+        $couponService = app(CouponService::class);
         $couponService->remove();
 
         return response()->json(['success' => true]);
@@ -248,7 +247,6 @@ class CheckoutController extends Controller
 
             $result = $orderService->checkout($order);
 
-
             // پاکسازی سبد
             $this->cart->clear();
             // coupon session حفظ می‌شود تا پس از پرداخت موفق پاک شود (P1-07)
@@ -298,9 +296,15 @@ class CheckoutController extends Controller
     public function finishZarinPal(Request $request)
     {
         $input = $request->all();
+
+        // بدون Authority امکان تطبیق سفارش نیست؛ مستقیم خطا بده تا سفارش اشتباهی لمس نشود.
+        if (empty($input['Authority'])) {
+            return redirect(route('cart.index'))->with('error', 'فاکتور معتبر نمی باشد');
+        }
+
         $orderService = app(OrderService::class);
 
-        return $orderService->callback('transaction_info->post->Authority', $input['Authority'] ?? '', $input);
+        return $orderService->callback('transaction_info->post->Authority', $input['Authority'], $input);
     }
 
     public function finishSaman(Request $request)

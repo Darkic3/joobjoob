@@ -6,17 +6,15 @@ use App\Models\Bank;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShippingStatus;
-use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Services\NotificationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\RedirectResponse;
 
 class OrderService
 {
     protected BankPaymentService $bankPaymentService;
+
     protected StockService $stockService;
 
     public function __construct(BankPaymentService $bankPaymentService, StockService $stockService)
@@ -35,7 +33,28 @@ class OrderService
 
     public static function findByField(string $field, mixed $value): ?Order
     {
-        return Order::orderBy('id', 'DESC')->where($field, $value)->first();
+        if ($value === '' || $value === null) {
+            return null;
+        }
+
+        $order = Order::orderBy('id', 'DESC')->where($field, $value)->first();
+
+        if ($order || ! str_contains($field, '->')) {
+            return $order;
+        }
+
+        // فالبک مستقل از درایور دیتابیس: اگر کوئری روی ستون JSON جواب نداد
+        // (مثلاً تفاوت رفتار MySQL/SQLite)، جدیدترین سفارش‌های درگیر پرداخت
+        // در PHP مقایسه می‌شوند. 'transaction_info->post->Authority' ← 'post.Authority'
+        $segments = explode('->', $field);
+        array_shift($segments);
+        $dotPath = implode('.', $segments);
+
+        return Order::orderBy('id', 'DESC')
+            ->whereNotNull('transaction_info')
+            ->limit(200)
+            ->get()
+            ->first(fn (Order $o) => (string) data_get($o->transaction_info ?? [], $dotPath, '') === (string) $value);
     }
 
     // === Central status transition with stock + audit ===
@@ -52,7 +71,7 @@ class OrderService
      */
     public function updateOrderStatus(Order $order, string $newStatus, ?string $actor = null): void
     {
-        $allowed = ['paying','paid','deposit_paid','pending_confirmation','wait_for_verification','unpaid','cancelled'];
+        $allowed = ['paying', 'paid', 'deposit_paid', 'pending_confirmation', 'wait_for_verification', 'unpaid', 'cancelled'];
         if (! in_array($newStatus, $allowed, true)) {
             throw new \InvalidArgumentException("وضعیت نامعتبر: {$newStatus}");
         }
@@ -92,7 +111,7 @@ class OrderService
         try {
             AuditService::orderStatusChanged($order, $oldStatus, $newStatus, $actorName);
         } catch (\Throwable $e) {
-            Log::error('AuditLog orderStatusChanged failed for order #' . $order->id, ['message' => $e->getMessage()]);
+            Log::error('AuditLog orderStatusChanged failed for order #'.$order->id, ['message' => $e->getMessage()]);
         }
 
         // restore: رزرو -> آزاد  => بعد از تغییر وضعیت موجودی بازگردانده شود
@@ -104,7 +123,7 @@ class OrderService
                     'actor' => $actorName,
                 ]);
             } catch (\Throwable $e) {
-                Log::error('Stock restoration failed for order #' . $order->id . " ({$oldStatus} -> {$newStatus})", [
+                Log::error('Stock restoration failed for order #'.$order->id." ({$oldStatus} -> {$newStatus})", [
                     'message' => $e->getMessage(),
                     'actor' => $actorName,
                 ]);
@@ -123,7 +142,7 @@ class OrderService
                     route('dashboard.order-detail', $order->id),
                     ['order_id' => $order->id, 'from' => $oldStatus, 'to' => $newStatus]
                 );
-            } elseif (in_array($newStatus, ['paid', 'deposit_paid'], true) && in_array($oldStatus, ['cancelled','unpaid'], true)) {
+            } elseif (in_array($newStatus, ['paid', 'deposit_paid'], true) && in_array($oldStatus, ['cancelled', 'unpaid'], true)) {
                 // بازگشت از لغو/پرداخت‌نشده به پرداخت‌شده (re-activate) — اطلاع به کاربر
                 $notifService->notifyUser(
                     $order->user,
@@ -142,7 +161,7 @@ class OrderService
                 );
             }
         } catch (\Throwable $e) {
-            Log::error('Notification failed for order #' . $order->id . " status {$oldStatus} -> {$newStatus}", ['message' => $e->getMessage()]);
+            Log::error('Notification failed for order #'.$order->id." status {$oldStatus} -> {$newStatus}", ['message' => $e->getMessage()]);
         }
     }
 
@@ -209,15 +228,23 @@ class OrderService
         try {
             $this->stockService->reserveStock($order);
         } catch (\RuntimeException $e) {
-            Log::warning('Stock reservation failed for order #' . $order->id, ['message' => $e->getMessage()]);
+            Log::warning('Stock reservation failed for order #'.$order->id, ['message' => $e->getMessage()]);
             // موجودی کافی نیست => سفارش به cancelled تغییر کند (بدون بازگردانی چون هنوز رزرو نشده بود)
             // مستقیم update می‌کنیم تا حلقه re-reserve رخ ندهد
             $order->update(['order_status' => 'cancelled']);
-            try { AuditService::orderStatusChanged($order, 'paying', 'cancelled', 'سیستم - کمبود موجودی'); } catch (\Throwable $ex) { Log::error('AuditLog failed', ['message' => $ex->getMessage()]); }
+            try {
+                AuditService::orderStatusChanged($order, 'paying', 'cancelled', 'سیستم - کمبود موجودی');
+            } catch (\Throwable $ex) {
+                Log::error('AuditLog failed', ['message' => $ex->getMessage()]);
+            }
             throw $e;
         }
 
-        try { AuditService::orderCreated($order); } catch (\Throwable $e) { Log::error('AuditLog failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+        try {
+            AuditService::orderCreated($order);
+        } catch (\Throwable $e) {
+            Log::error('AuditLog failed for order #'.$order->id, ['message' => $e->getMessage()]);
+        }
 
         // ── Notification: new order ──
         try {
@@ -238,7 +265,9 @@ class OrderService
                 route('admin.orders.show', $order->id),
                 ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
             );
-        } catch (\Throwable $e) { Log::error('Notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+        } catch (\Throwable $e) {
+            Log::error('Notification failed for order #'.$order->id, ['message' => $e->getMessage()]);
+        }
 
         return $order->fresh(['items.product', 'shippingStatus', 'bank']);
     }
@@ -264,12 +293,16 @@ class OrderService
             // card_to_card: paying (reserved) -> pending_confirmation (reserved) : بدون تغییر موجودی
             $old = $order->order_status;
             $order->update(['order_status' => 'pending_confirmation']);
-            try { AuditService::orderStatusChanged($order, $old, 'pending_confirmation', Auth::check() ? Auth::user()->name : 'سیستم'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
+            try {
+                AuditService::orderStatusChanged($order, $old, 'pending_confirmation', Auth::check() ? Auth::user()->name : 'سیستم');
+            } catch (\Throwable $e) {
+                Log::error('AuditLog failed', ['message' => $e->getMessage()]);
+            }
             // ثبت استفاده از کد تخفیف برای سفارش کارت‌به‌کارت (مبلغ واقعی سفارش)
             $couponSession = session('coupon');
             if ($order->discount_id && $couponSession) {
                 try {
-                    $couponService = app(\App\Services\CouponService::class);
+                    $couponService = app(CouponService::class);
                     $couponService->recordUsage(
                         $order->discount_id,
                         $order->user_id,
@@ -277,10 +310,11 @@ class OrderService
                         (float) $order->discount_price
                     );
                 } catch (\Throwable $e) {
-                    Log::error('Coupon recordUsage failed for card-to-card order #' . $order->id, ['message' => $e->getMessage()]);
+                    Log::error('Coupon recordUsage failed for card-to-card order #'.$order->id, ['message' => $e->getMessage()]);
                 }
             }
             session()->forget('coupon');
+
             return redirect(route('checkout.success', $order->id))
                 ->with('success', 'سفارش شما ثبت شد و پس از تأیید پرداخت، سفارشتان پردازش می‌شود.');
         }
@@ -293,14 +327,18 @@ class OrderService
         // free order: paying (reserved) -> paid (reserved) : بدون تغییر موجودی
         $oldStatus = $order->order_status;
         $order->update(['order_status' => 'paid']);
-        try { AuditService::orderStatusChanged($order, $oldStatus, 'paid', 'سیستم - سفارش رایگان'); } catch (\Throwable $e) { Log::error('AuditLog failed', ['message' => $e->getMessage()]); }
+        try {
+            AuditService::orderStatusChanged($order, $oldStatus, 'paid', 'سیستم - سفارش رایگان');
+        } catch (\Throwable $e) {
+            Log::error('AuditLog failed', ['message' => $e->getMessage()]);
+        }
 
         // ثبت استفاده از کد تخفیف برای سفارش رایگان (P1-07)
         // مبلغ واقعی ذخیره‌شده روی سفارش ثبت می‌شود، نه مقدار لحظه‌ای سشن
         $couponSession = session('coupon');
         if ($order->discount_id && $couponSession) {
             try {
-                $couponService = app(\App\Services\CouponService::class);
+                $couponService = app(CouponService::class);
                 $couponService->recordUsage(
                     $order->discount_id,
                     $order->user_id,
@@ -308,12 +346,13 @@ class OrderService
                     (float) $order->discount_price
                 );
             } catch (\Throwable $e) {
-                Log::error('Coupon recordUsage failed for free order #' . $order->id, ['message' => $e->getMessage()]);
+                Log::error('Coupon recordUsage failed for free order #'.$order->id, ['message' => $e->getMessage()]);
             }
         }
         session()->forget('coupon');
 
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
+
         return redirect(route('checkout.success', $order->id));
     }
 
@@ -339,13 +378,19 @@ class OrderService
         }
 
         $this->handleFailedPayment($order);
-        return redirect(route('checkout.failed'))->with('error', 'خطا در پرداخت، مجدد تلاش نمایید.');
+
+        // پیام دقیق درگاه (مثلاً «پرداخت توسط شما لغو شد» یا متن کد خطا) از verify ذخیره‌شده خوانده می‌شود.
+        $verifyData = $order->fresh()->transaction_info['verify'] ?? [];
+        $gatewayMessage = $verifyData['ErrorMessage'] ?? null;
+
+        return redirect(route('checkout.failed'))->with('error', $gatewayMessage ?? 'خطا در پرداخت، مجدد تلاش نمایید.');
     }
 
     public function handleSuccessOrderPayment(Order $order): RedirectResponse
     {
         if ($order->order_status === 'paid') {
             session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
+
             return redirect(route('checkout.success', $order->id));
         }
 
@@ -357,7 +402,8 @@ class OrderService
         try {
             $this->updateOrderStatus($order, $newStatus, 'سیستم - پرداخت موفق');
         } catch (\RuntimeException $e) {
-            Log::error('Re-reserve failed on payment success for order #' . $order->id, ['message' => $e->getMessage()]);
+            Log::error('Re-reserve failed on payment success for order #'.$order->id, ['message' => $e->getMessage()]);
+
             return redirect(route('checkout.failed'))->with('error', 'پرداخت موفق بود اما موجودی محصول کافی نیست. با پشتیبانی تماس بگیرید.');
         }
 
@@ -366,7 +412,7 @@ class OrderService
         $couponSession = session('coupon');
         if ($order->discount_id && $couponSession) {
             try {
-                $couponService = app(\App\Services\CouponService::class);
+                $couponService = app(CouponService::class);
                 $couponService->recordUsage(
                     $order->discount_id,
                     $order->user_id,
@@ -374,7 +420,7 @@ class OrderService
                     (float) $order->discount_price
                 );
             } catch (\Throwable $e) {
-                Log::error('Coupon recordUsage failed for order #' . $order->id, ['message' => $e->getMessage()]);
+                Log::error('Coupon recordUsage failed for order #'.$order->id, ['message' => $e->getMessage()]);
             }
         }
         session()->forget('coupon');
@@ -398,10 +444,13 @@ class OrderService
                     route('admin.orders.show', $order->id),
                     ['order_id' => $order->id, 'user_name' => $order->user->name, 'amount' => $order->payment_price]
                 );
-            } catch (\Throwable $e) { Log::error('Notification failed for order #' . $order->id, ['message' => $e->getMessage()]); }
+            } catch (\Throwable $e) {
+                Log::error('Notification failed for order #'.$order->id, ['message' => $e->getMessage()]);
+            }
         }
 
         session()->flash('success', 'سفارش شما با موفقیت ثبت شد.');
+
         return redirect(route('checkout.success', $order->id));
     }
 
@@ -413,7 +462,7 @@ class OrderService
         try {
             $this->updateOrderStatus($order, 'unpaid', 'سیستم - پرداخت ناموفق');
         } catch (\Throwable $e) {
-            Log::error('handleFailedPayment failed for order #' . $order->id, ['message' => $e->getMessage()]);
+            Log::error('handleFailedPayment failed for order #'.$order->id, ['message' => $e->getMessage()]);
         }
     }
 

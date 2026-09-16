@@ -5,11 +5,9 @@ namespace App\Services;
 use App\Models\Bank;
 use App\Models\Order;
 use App\Payments\PaymentGatewayFactory;
-use App\Services\StockService;
-use App\Services\AuditService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\RedirectResponse;
 
 class BankPaymentService
 {
@@ -25,23 +23,30 @@ class BankPaymentService
         Auth::loginUsingId($order->user_id);
 
         if ($response->getStatus() === 'failed') {
+            $postData = $response->getPostData();
+            $gatewayMessage = $postData['ErrorMessage'] ?? null;
+
             // P0-03 Fix + rework: use centralized status transition so stock logic is consistent
             try {
-                $orderService = app(\App\Services\OrderService::class);
+                $orderService = app(OrderService::class);
                 $orderService->updateOrderStatus($order, 'unpaid', 'Gateway token failed');
             } catch (\Throwable $e) {
-                Log::error('updateOrderStatus unpaid failed on token failure for order #' . $order->id, [
+                Log::error('updateOrderStatus unpaid failed on token failure for order #'.$order->id, [
                     'message' => $e->getMessage(),
                 ]);
                 // fallback: ensure status is unpaid even if stock logic threw
                 if ($order->order_status !== 'unpaid') {
                     $order->update(['order_status' => 'unpaid']);
-                    try { AuditService::orderStatusChanged($order, $order->order_status, 'unpaid', 'Gateway token failed'); } catch (\Throwable $ex) { Log::error('AuditLog failed', ['message' => $ex->getMessage()]); }
+                    try {
+                        AuditService::orderStatusChanged($order, $order->order_status, 'unpaid', 'Gateway token failed');
+                    } catch (\Throwable $ex) {
+                        Log::error('AuditLog failed', ['message' => $ex->getMessage()]);
+                    }
                 }
             }
 
             return redirect(route('checkout.failed'))
-                ->with('error', 'خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.');
+                ->with('error', $gatewayMessage ?? 'خطا در ارتباط با درگاه پرداخت، لطفاً مجدداً تلاش کنید.');
         }
 
         $order->update([
@@ -51,11 +56,7 @@ class BankPaymentService
             ],
         ]);
 
-        ob_start();
-        $gateway->redirect($response, $order);
-        $content = ob_get_clean();
-
-        return response($content);
+        return $gateway->redirect($response, $order);
     }
 
     /**
@@ -69,6 +70,7 @@ class BankPaymentService
 
         Auth::loginUsingId($order->user_id);
 
+        // post قبلی (Authority و مبلغ درخواستی) حفظ می‌شود؛ فقط verify به‌روز می‌شود.
         $transactionInfo = $order->transaction_info ?? [];
         $transactionInfo['verify'] = $response->getVerifyData() ?? [];
 
