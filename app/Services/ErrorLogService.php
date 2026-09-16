@@ -83,6 +83,28 @@ class ErrorLogService
     }
 
     /**
+     * آیا این استثنا اصلاً نباید در داشبورد مانیتورینگ ثبت شود؟
+     *
+     * خطاهای تایپی ابزارهای کنسول (tinker، آپشن/کامند اشتباه artisan)
+     * باگ پروژه نیستند و ترمینال خودش آن‌ها را نشان می‌دهد؛
+     * ثبت‌شان در جدول system_errors فقط نویز تولید می‌کند
+     * (مثل Psy\Exception\ParseErrorException از یک تایپو در tinker).
+     *
+     * فقط در محیط کنسول و فقط برای همین جنس خطاها true برمی‌گرداند —
+     * خطاهای واقعی کامندها (مثل QueryException در job زمان‌بندی‌شده)
+     * همچنان ثبت می‌شوند.
+     */
+    public static function shouldIgnore(Throwable $e): bool
+    {
+        if (! app()->runningInConsole()) {
+            return false;
+        }
+
+        return $e instanceof \Symfony\Component\Console\Exception\ExceptionInterface
+            || $e instanceof \Psy\Exception\Exception;
+    }
+
+    /**
      * ثبت خطای سطح 404 (warning نه error).
      */
     public static function recordNotFound(Request $request): SystemError

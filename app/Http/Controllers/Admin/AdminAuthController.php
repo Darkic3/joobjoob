@@ -27,7 +27,21 @@ class AdminAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
+        try {
+            $authenticated = Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'));
+        } catch (\RuntimeException $e) {
+            // هش ذخیره‌شده با الگوریتم bcrypt لاراول ساخته نشده
+            // (مثلاً $2a$ به‌جای $2y$) — BcryptHasher در این حالت استثنا می‌دهد.
+            // به‌جای خطای ۵۰۰، مثل «رمز اشتباه» رفتار کن تا پیام یکسان بماند
+            // و اطلاعات لو نرود؛ بقیه RuntimeExceptionها باید بالا بروند.
+            if (! str_contains($e->getMessage(), 'Bcrypt')) {
+                throw $e;
+            }
+
+            $authenticated = false;
+        }
+
+        if ($authenticated) {
             $user = Auth::user();
 
             // چک «ادمین واقعی»: سوپرادمین یا حداقل یک نقش.

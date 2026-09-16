@@ -4,8 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\SystemError;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AdminAuthTest extends TestCase
@@ -104,6 +107,24 @@ class AdminAuthTest extends TestCase
             'email' => 'admin@test.dev',
             'password' => 'wrong-password',
         ])->assertRedirect()->assertSessionHasErrors('email');
+    }
+
+    public function test_login_with_legacy_non_bcrypt_hash_fails_gracefully(): void
+    {
+        // هش قدیمی با پیشوند $2a$ (ساخته‌شده خارج از لاراول) باعث می‌شود
+        // BcryptHasher استثنا بدهد — لاگین باید مثل «رمز اشتباه» رد شود، نه ۵۰۰.
+        $user = $this->makeUser(['email' => 'legacy@test.dev', 'is_admin' => true]);
+        DB::table('users')->where('id', $user->id)->update([
+            'password' => str_replace('$2y$', '$2a$', Hash::make('password123')),
+        ]);
+
+        $this->post('/admin/login', [
+            'email' => 'legacy@test.dev',
+            'password' => 'password123',
+        ])->assertRedirect()->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+        $this->assertSame(0, SystemError::count());
     }
 
     public function test_super_admin_can_login_and_access_panel(): void

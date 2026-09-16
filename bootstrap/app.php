@@ -95,6 +95,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 return;
             }
 
+            // تایپوهای کنسول (tinker، artisan) باگ پروژه نیستند — لاگ نکن
+            if (ErrorLogService::shouldIgnore($e)) {
+                return;
+            }
+
             // 404 به صورت warning ثبت شود (نه error)
             $level = $e instanceof NotFoundHttpException ? 'warning' : 'error';
 
