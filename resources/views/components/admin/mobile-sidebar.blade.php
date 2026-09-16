@@ -1,22 +1,41 @@
 {{-- دسترسی‌ها و مقصد محصولات در کلاس Admin\MobileSidebar آماده می‌شود --}}
-{{-- Overlay --}}
-<div x-show="mobileSidebar" x-transition:enter="transition ease-out duration-300"
-     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-200"
-     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-     @click="$dispatch('close-mobile')"
-     class="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" x-cloak></div>
+@php
+    // جهت صفحه از LocaleComposer سراسری می‌آید. برای چسباندن کشو به لبه، از کلاس‌های
+    // فیزیکی (right-0/left-0) استفاده می‌شود؛ چون خاصیت منطقی inset-inline-start
+    // (start-0) روی مرورگرهای قدیمی سامسونگ پشتیبانی نمی‌شود و کشو وسط صفحه می‌افتاد.
+    // کلاس‌های اسلاید هم سمت سرور ثابت ساخته می‌شوند؛ Alpine بایندینگِ داینامیک
+    // `:x-transition:enter-start` را به‌عنوان دایرکتیو ترنزیشن اجرا نمی‌کند.
+    $isRtl = ($direction ?? 'ltr') === 'rtl';
+    $edgeClass = $isRtl ? 'right-0' : 'left-0';
+    $slideClass = $isRtl ? 'translate-x-full' : '-translate-x-full';
+@endphp
 
-{{-- Sidebar Drawer --}}
-<aside x-show="mobileSidebar" x-cloak
-       x-data="{ isRtl: document.documentElement.getAttribute('dir') === 'rtl' }"
-       x-transition:enter="transition ease-out duration-300"
-       :x-transition:enter-start="isRtl ? 'translate-x-full' : '-translate-x-full'"
-       x-transition:enter-end="translate-x-0"
-       x-transition:leave="transition ease-in duration-200"
-       x-transition:leave-start="translate-x-0"
-       :x-transition:leave-end="isRtl ? 'translate-x-full' : '-translate-x-full'"
-       class="fixed inset-y-0 start-0 w-72 bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col shadow-lg">
+{{-- کشو خودمحتهای state دارد و مستقیم زیر <body> تله‌پورت می‌شود تا هیچ --}}
+{{-- والدی (flex/transform/overflow) روی position:fixed اثر نگذارد --}}
+<div x-data="{ mobileSidebar: false }"
+     @toggle-mobile.window="mobileSidebar = true"
+     @close-mobile.window="mobileSidebar = false">
+
+    <template x-teleport="body">
+        <div x-cloak>
+
+    {{-- Overlay --}}
+    <div x-show="mobileSidebar" x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         @click="$dispatch('close-mobile')"
+         class="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" x-cloak></div>
+
+    {{-- Sidebar Drawer --}}
+    <aside x-show="mobileSidebar" x-cloak
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="{{ $slideClass }}"
+           x-transition:enter-end="translate-x-0"
+           x-transition:leave="transition ease-in duration-200"
+           x-transition:leave-start="translate-x-0"
+           x-transition:leave-end="{{ $slideClass }}"
+           class="fixed inset-y-0 {{ $edgeClass }} w-72 bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col shadow-lg">
 
     <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 dark:border-gray-700">
         <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-2.5">
@@ -201,4 +220,8 @@
         </form>
 
     </nav>
-</aside>
+    </aside>
+
+        </div>
+    </template>
+</div>
