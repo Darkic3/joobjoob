@@ -1,15 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
-  <defs>
-    <linearGradient id="fb-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6c63ff"/>
-      <stop offset="60%" stop-color="#5248d6"/>
-      <stop offset="100%" stop-color="#2b2763"/>
-    </linearGradient>
-    <radialGradient id="fb-glow" cx="0.72" cy="0.28" r="0.65">
-      <stop offset="0%" stop-color="#a79bff" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#a79bff" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="1600" height="1000" fill="url(#fb-bg)"/>
-  <rect width="1600" height="1000" fill="url(#fb-glow)"/>
+  <!-- هیرو fallback — Playful Brutalism: جوراب خط‌ضخیم روی کاغذ کرم با شبکه نقطه‌ای -->
+  <rect width="1600" height="1000" fill="#F7F2E7"/>
+  <g fill="#17151F" opacity="0.07">
+    <circle cx="80" cy="80" r="4"/><circle cx="240" cy="80" r="4"/><circle cx="400" cy="80" r="4"/><circle cx="560" cy="80" r="4"/><circle cx="720" cy="80" r="4"/><circle cx="880" cy="80" r="4"/><circle cx="1040" cy="80" r="4"/><circle cx="1200" cy="80" r="4"/><circle cx="1360" cy="80" r="4"/><circle cx="1520" cy="80" r="4"/>
+    <circle cx="80" cy="920" r="4"/><circle cx="240" cy="920" r="4"/><circle cx="400" cy="920" r="4"/><circle cx="560" cy="920" r="4"/><circle cx="720" cy="920" r="4"/><circle cx="880" cy="920" r="4"/><circle cx="1040" cy="920" r="4"/><circle cx="1200" cy="920" r="4"/><circle cx="1360" cy="920" r="4"/><circle cx="1520" cy="920" r="4"/>
+  </g>
+
+  <!-- بلوک رنگی پس‌زمینه -->
+  <rect x="560" y="140" width="520" height="480" fill="#FFE500" stroke="#17151F" stroke-width="14"/>
+
+  <!-- جوراب بزرگ -->
+  <g stroke="#17151F" stroke-width="16" stroke-linejoin="round" transform="translate(800 520) rotate(-8) translate(-800 -520)">
+    <path d="M700 220 h220 v300 c0 60 10 90 60 140 c60 55 60 120 0 160 c-55 36 -110 22 -170 -25 l-150 -115 c-40 -32 -40 -80 -40 -130 v-330 z" fill="#3A3AF2"/>
+    <!-- نوار مچ -->
+    <rect x="692" y="212" width="236" height="70" fill="#FF5DA2"/>
+    <!-- خطوط روی بدنه -->
+    <path d="M700 340 h220 M700 400 h218" stroke="#F7F2E7" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <!-- ستاره/اسپارک تزئینی -->
+  <g stroke="#FF5DA2" stroke-width="14" stroke-linecap="round">
+    <path d="M1180 300 v90 M1135 345 h90"/>
+    <path d="M1150 315 l60 60 M1210 315 l-60 60" opacity="0"/>
+  </g>
+  <g stroke="#17151F" stroke-width="12" stroke-linecap="round">
+    <path d="M420 640 v70 M385 675 h70"/>
+  </g>
+  <!-- موجک -->
+  <path d="M380 780 c40 -60 80 60 120 0 s80 60 120 0" fill="none" stroke="#17151F" stroke-width="12" stroke-linecap="round"/>
 </svg>

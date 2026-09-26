@@ -178,6 +178,15 @@ return [
     'festive_badge' => 'Bayram İndirimi',
     'hero_default_title' => 'Çevrimiçi alışveriş, basit ve güvenli',
     'hero_default_desc' => 'Orijinallik garantisi ve hızlı teslimatla en iyi ürünlerden seçkiler.',
+    'hero_kicker' => 'ÇORAP LAB ✦ özel çoraplar',
+    'hero_sticker' => '%100 PAMUK',
+    'hero_marquee' => [
+        'Hızlı ülke geneli kargo',
+        'Orijinallik garantisi',
+        '7 gün içinde iade',
+        'Kapıda ödeme',
+        'Fantezi ve klasik çoraplar',
+    ],
 
     // Sosyal medya + kayıt
     'socials' => [

@@ -2,6 +2,11 @@
 
 @section('main_class', 'pt-0 pb-6')
 
+@push('styles')
+    {{-- فونت نمایشی تیتر هیرو (Estedad) — فقط در صفحهٔ اصلی --}}
+    <link rel="preload" href="{{ asset('fonts/estedad/Estedad-Black.woff2') }}" as="font" type="font/woff2" crossorigin>
+@endpush
+
 @section('title', __('messages.site_name') . ' - ' . __('messages.home'))
 
 @section('content')

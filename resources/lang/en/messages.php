@@ -256,6 +256,15 @@ return [
     'festive_badge' => 'Festive Discount',
     'hero_default_title' => 'Online shopping, made simple',
     'hero_default_desc' => 'A curated selection of quality products with an authenticity guarantee and fast delivery.',
+    'hero_kicker' => 'SOCK LAB ✦ premium socks',
+    'hero_sticker' => '100% COTTON',
+    'hero_marquee' => [
+        'Fast nationwide shipping',
+        'Authenticity guaranteed',
+        '7-day returns',
+        'Cash on delivery',
+        'Fun & classic socks',
+    ],
 
     // Static pages
     'pages' => [
