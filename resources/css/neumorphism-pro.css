@@ -235,11 +235,30 @@ html, body {
 }
 
 /* ==========================================================================
-   4) HERO — Playful Brutalism × Neo-Tokyo Minimal (تک‌اسلاید، تمام‌عرض)
+   3.5) توکن‌های بروتالیست مشترک (هیرو + هدر/منو)
    --------------------------------------------------------------------------
-    توکن‌ها عمداً روی .hero-brutal اسکوپ شده‌اند تا بقیهٔ سایت همان نیومورفیسم
-    بماند؛ در فاز بازسازی سراسری همین توکن‌ها به :root ارتقا پیدا می‌کنند.
+    مقادیر خام پالت روی :root تعریف می‌شوند تا هیرو و منو یک منبع حقیقت
+    داشته باشند. این متغیرها تا وقتی جایی ارجاع نشوند بی‌اثرند؛ پس سایر
+    بخش‌های سایت تا فاز بازسازی خودشان همان نیومورفیسم می‌مانند.
    ========================================================================== */
+:root {
+    /* کاغذ کرم + جوهر مشکی + نئون‌های نو-توکیو */
+    --b-paper: #F7F2E7;
+    --b-ink: #17151F;
+    --b-lemon: #FFE500;
+    --b-blue: #3A3AF2;
+    --b-pink: #FF5DA2;
+    --b-field: #FFFFFF;
+    --b-dot: color-mix(in srgb, var(--b-ink) 7%, transparent);
+    --b-line: 3px;
+    --b-shadow: 7px 7px 0 var(--b-ink);
+    --b-font-display: 'Estedad', 'Vazirmatn', sans-serif;
+}
+[data-theme^="dark"] {
+    --b-paper: #101017;
+    --b-ink: #F3EEE1;
+    --b-field: #1C1B24;
+}
 
 @font-face {
     font-family: 'Estedad';
@@ -258,19 +277,12 @@ html, body {
    clip برخلاف hidden استخرج اسکرول نمی‌سازد و position:sticky هدر می‌شکند/نمی‌شکند — سالم می‌ماند. */
 html { overflow-x: clip; }
 
-/* ---------- 4.1) توکن‌های بروتالیسم (اسکوپ هیرو) + پوستهٔ تمام‌عرض ---------- */
-.hero-minimal.hero-brutal {
-    /* کاغذ کرم + جوهر مشکی + نئون‌های نو-توکیو */
-    --b-paper: #F7F2E7;
-    --b-ink: #17151F;
-    --b-lemon: #FFE500;
-    --b-blue: #3A3AF2;
-    --b-pink: #FF5DA2;
-    --b-dot: color-mix(in srgb, var(--b-ink) 7%, transparent);
-    --b-line: 3px;
-    --b-shadow: 7px 7px 0 var(--b-ink);
-    --b-font-display: 'Estedad', 'Vazirmatn', sans-serif;
+/* ==========================================================================
+   4) HERO — Playful Brutalism × Neo-Tokyo Minimal (تک‌اسلاید، تمام‌عرض)
+   ========================================================================== */
 
+/* ---------- 4.1) پوستهٔ تمام‌عرض (توکن‌ها در بلوک «۳.۵» تعریف شده‌اند) ---------- */
+.hero-minimal.hero-brutal {
     position: relative;
     /* فرار از ظرف max-w-7xl + pxِ <main> → لبه‌به‌لبهٔ ویوپورت */
     width: 100vw;
@@ -291,11 +303,6 @@ html { overflow-x: clip; }
     background-image: radial-gradient(var(--b-dot) 1.5px, transparent 1.6px);
     background-size: 22px 22px;
     pointer-events: none;
-}
-
-[data-theme^="dark"] .hero-minimal.hero-brutal {
-    --b-paper: #101017;
-    --b-ink: #F3EEE1;
 }
 
 /* ---------- 4.2) محفظهٔ محتوا (هم‌تراز بقیهٔ سایت) ---------- */
@@ -3478,4 +3485,380 @@ html[dir="rtl"].js .hero-brutal .hero-brutal-media img { animation-name: brutalT
     .site-footer-links a, .site-footer-newsletter-btn, .site-footer-newsletter-input { transition: none; }
     .site-footer-acc-body, .site-footer-acc-chevron { transition: none; }
     .site-footer-badge { transition: none; }
+}
+
+/* ==========================================================================
+   10) هدر + منوی موبایل — Playful Brutalism × Neo-Tokyo Minimal
+   --------------------------------------------------------------------------
+   هم‌زبان با هیرو: کاغذ کرم، بوردر جوهری ۳px، سایهٔ هارد و نئون‌ها.
+   همهٔ قواعد با .header-brutal / .menu-brutal اسکوپ شده‌اند تا بدون جنگِ
+   specificity روی قواعد نیومورفیک غلبه کنند و بقیهٔ سایت دست‌نخورده بماند.
+   ========================================================================== */
+
+/* ---------- 10.1) نوار اعلان — نوار جوهری با خط نئونی لیمویی ---------- */
+.announce-bar {
+    background: var(--b-ink);
+    color: var(--b-paper);
+    border-bottom: var(--b-line) solid var(--b-lemon);
+    font-weight: 800;
+    letter-spacing: .01em;
+}
+
+/* ---------- 10.2) نوار هدر تمام‌عرض ---------- */
+.site-header-wrap.header-brutal {
+    padding-block: 0;
+    background: var(--b-paper);
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.header-brutal .site-header {
+    gap: .5rem;
+    padding: .6rem clamp(1rem, 4vw, 2.5rem);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+@media (min-width: 768px) {
+    .header-brutal .site-header { gap: .7rem; padding: .7rem clamp(1rem, 4vw, 2.5rem); }
+}
+
+/* ---------- 10.3) لوگو — بلوک لیمویی با سایهٔ هارد ---------- */
+.header-brutal .site-logo { gap: .55rem; }
+.header-brutal .site-logo-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    border: 2.5px solid var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+    font-size: 1.05rem;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.header-brutal .site-logo:hover .site-logo-mark {
+    transform: translate(-1px, -1px) rotate(-4deg);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+[dir="ltr"] .header-brutal .site-logo:hover .site-logo-mark {
+    transform: translate(-1px, -1px) rotate(4deg);
+}
+.header-brutal .site-logo-text {
+    color: var(--b-ink);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
+/* ---------- 10.4) لینک‌های ناو — بلوک‌های مربعی ---------- */
+.header-brutal .site-nav-link {
+    padding: .5rem .9rem;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    color: var(--b-ink);
+    font-size: .84rem;
+    font-weight: 800;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out), color .16s var(--ease-out), border-color .16s var(--ease-out);
+}
+.header-brutal .site-nav-link::after { content: none; }
+.header-brutal .site-nav-link:hover {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    border-color: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    transform: translate(-1px, -1px);
+}
+.header-brutal .site-nav-link.is-active {
+    color: var(--b-paper);
+    background: var(--b-ink);
+    border-color: var(--b-ink);
+    box-shadow: none;
+}
+
+/* ---------- 10.5) جستجو — فیلد جوهری‌قاب ---------- */
+.header-brutal .site-search-input {
+    padding-block: .7rem;
+    padding-inline-start: 2.6rem;
+    padding-inline-end: 1rem;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-field);
+    color: var(--b-ink);
+    font-weight: 600;
+    box-shadow: none;
+}
+.header-brutal .site-search-input::placeholder { color: color-mix(in srgb, var(--b-ink) 55%, transparent); }
+.header-brutal .site-search-input:focus {
+    box-shadow: none;
+    outline: 3px solid var(--b-lemon);
+    outline-offset: 1px;
+}
+.header-brutal .site-search-icon { color: var(--b-ink); }
+
+/* ---------- 10.6) سوییچر زبان ---------- */
+.header-brutal .site-lang-btn {
+    min-height: 40px;
+    padding: 0 .7rem;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    font-weight: 800;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out), color .16s var(--ease-out);
+}
+.header-brutal .site-lang-btn:hover {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+.header-brutal .site-lang-menu {
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    box-shadow: 5px 5px 0 var(--b-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+.header-brutal .site-lang-item { border-radius: 2px; color: var(--b-ink); font-weight: 700; }
+.header-brutal .site-lang-item:hover { background: var(--b-lemon); color: var(--b-ink); }
+.header-brutal .site-lang-item.is-active {
+    color: var(--b-ink);
+    font-weight: 900;
+    background: color-mix(in srgb, var(--b-lemon) 45%, transparent);
+}
+.header-brutal .site-lang-code {
+    border-radius: 2px;
+    background: var(--b-ink);
+    color: var(--b-paper);
+}
+
+/* ---------- 10.7) تاگل تم — مربعی ---------- */
+.header-brutal .neu-toggle,
+.menu-brutal .neu-toggle {
+    width: 54px;
+    height: 30px;
+    border-radius: 2px;
+    background: var(--b-paper);
+    border: 2.5px solid var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+}
+.header-brutal .neu-toggle-dot,
+.menu-brutal .neu-toggle-dot {
+    top: 2px;
+    inset-inline-start: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 2px;
+    background: var(--b-ink);
+    box-shadow: none;
+}
+[data-theme^="dark"] .header-brutal .neu-toggle-dot,
+[data-theme^="dark"] .menu-brutal .neu-toggle-dot { inset-inline-start: 26px; }
+
+/* ---------- 10.8) دکمه‌های اکشن + بج ---------- */
+.header-brutal .site-action-btn {
+    width: 44px;
+    height: 44px;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out), color .16s var(--ease-out);
+}
+.header-brutal .site-action-btn:hover {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+.header-brutal .site-badge {
+    top: -8px;
+    inset-inline-end: -8px;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 4px;
+    border-radius: 2px;
+    color: var(--b-ink);
+    background: var(--b-pink);
+    border: 2px solid var(--b-ink);
+    box-shadow: 2px 2px 0 var(--b-ink);
+    font-weight: 900;
+}
+.header-brutal .site-notif-badge {
+    position: absolute;
+    top: -8px;
+    inset-inline-end: -8px;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 2px;
+    color: var(--b-ink);
+    background: var(--b-pink);
+    border: 2px solid var(--b-ink);
+    box-shadow: 2px 2px 0 var(--b-ink);
+    font-size: .6rem;
+    font-weight: 900;
+    line-height: 1;
+}
+.header-brutal .site-notif-menu {
+    background: var(--b-paper);
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    box-shadow: 6px 6px 0 var(--b-ink);
+}
+
+/* ---------- 10.9) آواتار و ورود ---------- */
+.header-brutal .site-account-avatar {
+    border-radius: 2px;
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    border: 2.5px solid var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.header-brutal .site-account-btn { border-radius: 2px; transition: transform .16s cubic-bezier(.16,1,.3,1); }
+.header-brutal .site-account-btn:hover { transform: translate(-1px, -1px); box-shadow: none; }
+.header-brutal .site-account-btn:hover .site-account-avatar { transform: none; box-shadow: 4px 4px 0 var(--b-ink); }
+.header-brutal .site-login-btn {
+    min-height: 44px;
+    padding: 0 1.1rem;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    color: #fff;
+    background: var(--b-blue);
+    box-shadow: 4px 4px 0 var(--b-ink);
+    font-weight: 900;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.header-brutal .site-login-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--b-ink); }
+.header-brutal .site-login-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--b-ink); }
+
+/* ---------- 10.10) هامبرگر مورف ---------- */
+.header-brutal .site-hamburger {
+    width: 46px;
+    height: 46px;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.header-brutal .site-hamburger:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--b-ink); }
+.header-brutal .site-hamburger:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--b-ink); }
+.header-brutal .site-hamburger span {
+    inset-inline-start: 12px;
+    width: 22px;
+    height: 3px;
+    border-radius: 0;
+    background: var(--b-ink);
+}
+
+/* ---------- 10.11) منوی تمام‌صفحهٔ موبایل ---------- */
+.menu-brutal .site-menu-backdrop {
+    background: color-mix(in srgb, var(--b-ink) 58%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+.menu-brutal .site-menu-panel {
+    background: var(--b-paper);
+    border-inline: var(--b-line) solid var(--b-ink);
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.menu-brutal .site-menu-link {
+    align-items: center;
+    gap: .9rem;
+    padding: .7rem .9rem;
+    border: 2.5px solid transparent;
+    border-radius: 2px;
+    color: var(--b-ink);
+    font-family: var(--b-font-display);
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    transition: opacity .55s var(--ease-out), transform .55s var(--ease-spring), color .16s var(--ease-out),
+                background-color .16s var(--ease-out), border-color .16s var(--ease-out), box-shadow .16s var(--ease-out);
+}
+.menu-brutal .site-menu-link:hover,
+.menu-brutal .site-menu-link.is-active {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    border-color: var(--b-ink);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+.menu-brutal .site-menu-num {
+    padding: .15rem .35rem;
+    border: 2px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    font-size: .68rem;
+    font-weight: 800;
+    opacity: 1;
+}
+.menu-brutal .site-menu-account-link {
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    box-shadow: 4px 4px 0 var(--b-ink);
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.menu-brutal .site-menu-account-link:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--b-ink); }
+.menu-brutal .site-menu-account-icon {
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+}
+.menu-brutal .site-menu-account-title { color: var(--b-ink); font-weight: 900; }
+.menu-brutal .site-menu-account-sub { color: color-mix(in srgb, var(--b-ink) 62%, transparent); }
+.menu-brutal .site-menu-account-arrow { color: var(--b-ink); opacity: 1; }
+.menu-brutal .site-menu-lang {
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-ink);
+    font-weight: 800;
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out);
+}
+.menu-brutal .site-menu-lang:hover {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+.menu-brutal .site-menu-lang.is-active {
+    color: var(--b-ink);
+    background: var(--b-lemon);
+    box-shadow: 4px 4px 0 var(--b-ink);
+}
+.menu-brutal .site-menu-theme { border-top: 2.5px solid var(--b-ink); }
+.menu-brutal .site-menu-theme-label { color: var(--b-ink); font-weight: 900; }
+
+@media (prefers-reduced-motion: reduce) {
+    .header-brutal .site-nav-link:hover,
+    .header-brutal .site-lang-btn:hover,
+    .header-brutal .site-action-btn:hover,
+    .header-brutal .site-hamburger:hover,
+    .header-brutal .site-account-btn:hover,
+    .header-brutal .site-login-btn:hover,
+    .menu-brutal .site-menu-link:hover,
+    .menu-brutal .site-menu-account-link:hover,
+    .menu-brutal .site-menu-lang:hover { transform: none; }
 }

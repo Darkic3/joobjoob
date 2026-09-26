@@ -8,7 +8,7 @@
 
 <section class="hero-minimal hero-brutal">
     {{-- برچسب مختصات (تزئینی) --}}
-    <span class="hero-brutal-coords" aria-hidden="true">SOCK://SHOP — N°01</span>
+{{--    <span class="hero-brutal-coords" aria-hidden="true">SOCK://SHOP — N°01</span>--}}
 
     <div class="hero-brutal-shell{{ $heroSlide && $heroSlide->imageUrl() ? '' : ' hero-brutal-shell--solo' }}">
 
