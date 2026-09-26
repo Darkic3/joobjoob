@@ -39,7 +39,6 @@ class AdminAuthTest extends TestCase
             '/admin/blog-categories',
             '/admin/blog-categories/create',
             '/admin/hero-slides',
-            '/admin/hero-slides/create',
             '/admin/trust-badges',
             '/admin/trust-badges/create',
             '/admin/products',

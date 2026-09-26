@@ -9,7 +9,7 @@ return [
         'specifications' => 'Özellikler',
         'blogs' => 'Blog Yazıları',
         'blog-categories' => 'Blog Kategorileri',
-        'hero-slides' => 'Ana Slider',
+        'hero-slides' => 'Ana Sayfa Herosu',
         'trust-badges' => 'Güven Rozetleri',
         'promo-banners' => 'Tanıtım Afişleri',
         'settings' => 'Ayarlar',
@@ -59,10 +59,8 @@ return [
             'delete' => 'Kategoriyi sil',
         ],
         'hero-slides' => [
-            'index' => 'Slaytları görüntüle',
-            'create' => 'Slayt ekle',
-            'edit' => 'Slaytı düzenle',
-            'delete' => 'Slaytı sil',
+            'index' => 'Heroyu görüntüle',
+            'edit' => 'Heroyu düzenle',
         ],
         'trust-badges' => [
             'index' => 'Rozetleri görüntüle',

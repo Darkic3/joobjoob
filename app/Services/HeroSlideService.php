@@ -23,46 +23,82 @@ class HeroSlideService
     }
 
     /**
-     * لیست کامل اسلایدها به ترتیب نمایش (sort_order) — بدون صفحه‌بندی،
-     * چون ترتیب با درگ‌اندروپ روی کل لیست انجام می‌شود (الگوی صفحهٔ زبان‌ها).
+     * هیرو فعلی سایت — همان رکوردی که صفحهٔ اصلی نمایش می‌دهد:
+     * اولین اسلاید فعال (ترتیب sort_order)؛ اگر هیچ فعالی نبود اولین اسلاید موجود.
      */
-    public function getOrdered()
+    public function primaryForAdmin(): ?HeroSlide
     {
-        return HeroSlide::orderBy('sort_order', 'asc')->orderBy('id')->get();
+        return HeroSlide::query()
+            ->when(
+                HeroSlide::where('is_active', true)->exists(),
+                fn ($q) => $q->where('is_active', true)
+            )
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'asc')
+            ->first();
     }
 
-    public function store(HeroSlideDTO $dto): HeroSlide
+    /**
+     * ذخیرهٔ هیرو (اگر اسلایدی نباشد ساخته می‌شود) — یک‌جا آپلود/حذف تصویر.
+     */
+    public function save(?HeroSlide $slide, HeroSlideDTO $dto): HeroSlide
     {
         $data = $this->prepareData($dto);
 
-        // ترتیب از فرم حذف شده — اسلاید جدید همیشه به انتهای لیست اضافه می‌شود (سورت از ایندکس با درگ‌اندروپ)
-        $data['sort_order'] = (int) HeroSlide::max('sort_order') + 1;
+        if ($slide) {
+            $newImage = $dto->image ? $this->handleImageUpload($dto->image) : null;
+            if ($newImage) {
+                $this->deleteImage($slide->image);
+                $data['image'] = $newImage;
+            } elseif ($dto->removeImage && $slide->image) {
+                // حذف واقعی تصویر فعلی (دکمهٔ حذف در کامپوننت آپلود)
+                $this->deleteImage($slide->image);
+                $data['image'] = null;
+            }
+            $slide->update($data);
 
-        $data['image'] = $this->handleImageUpload($dto->image);
+            return $slide;
+        }
+
+        $data['sort_order'] = (int) HeroSlide::max('sort_order') + 1;
+        if ($dto->image) {
+            $data['image'] = $this->handleImageUpload($dto->image);
+        }
 
         return HeroSlide::create($data);
     }
 
-    public function update(HeroSlide $slide, HeroSlideDTO $dto): bool
+    /**
+     * حذف اسلایدهای اضافی (نسخهٔ مینیمال تنها یک هیرو نمایش می‌دهد) —
+     * بهجز اسلاید اصلیِ داده‌شده.
+     *
+     * @return int تعداد حذف‌شده‌ها
+     */
+    public function pruneOthers(?HeroSlide $keep): int
     {
-        $data = $this->prepareData($dto);
-        if ($dto->image) {
-            $this->deleteImage($slide->image);
-            $data['image'] = $this->handleImageUpload($dto->image);
-        } elseif ($dto->removeImage && $slide->image) {
-            // حذف واقعی تصویر فعلی (دکمهٔ حذف در کامپوننت آپلود)
-            $this->deleteImage($slide->image);
-            $data['image'] = null;
+        if (! $keep) {
+            return 0;
         }
 
-        return $slide->update($data);
+        $others = HeroSlide::whereKeyNot($keep->getKey())->get();
+        foreach ($others as $slide) {
+            $this->deleteImage($slide->image);
+            $slide->delete();
+        }
+
+        return $others->count();
     }
 
-    public function destroy(HeroSlide $slide): bool
+    /**
+     * تعداد اسلایدهای اضافی (غیر از هیرو اصلی) — برای اطلاع‌رسانی در فرم ادمین.
+     */
+    public function extraCount(?HeroSlide $primary): int
     {
-        $this->deleteImage($slide->image);
+        if (! $primary) {
+            return HeroSlide::count();
+        }
 
-        return $slide->delete();
+        return HeroSlide::whereKeyNot($primary->getKey())->count();
     }
 
     private function prepareData(HeroSlideDTO $dto): array
@@ -74,12 +110,6 @@ class HeroSlideService
             'btn_text' => $dto->btn_text,
             'linkable_type' => $dto->getLinkableType(),
             'linkable_id' => $dto->getLinkableId(),
-            'price' => $dto->price ?? 0,
-            'old_price' => $dto->old_price,
-            'currency' => $dto->currency,
-            'rating' => $dto->rating,
-            'viewers' => $dto->viewers ?? 0,
-            'trusts' => $dto->trusts,
             'is_active' => $dto->is_active,
         ];
     }

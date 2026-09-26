@@ -67,7 +67,7 @@ class AdminImageCropperTest extends TestCase
     {
         $this->actingAsSuperAdmin();
 
-        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+        $html = $this->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
         $this->assertStringContainsString('window.ImageCropper', $html);
         $this->assertStringContainsString('dropzone-area', $html);

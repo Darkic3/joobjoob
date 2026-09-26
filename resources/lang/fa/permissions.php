@@ -9,7 +9,7 @@ return [
         'specifications' => 'مشخصات (ویژگی‌ها)',
         'blogs' => 'مقالات وبلاگ',
         'blog-categories' => 'دسته‌بندی وبلاگ',
-        'hero-slides' => 'اسلایدر اصلی',
+        'hero-slides' => 'هیرو صفحهٔ اصلی',
         'trust-badges' => 'نشان‌های اعتماد',
         'promo-banners' => 'بنرهای میانی',
         'settings' => 'تنظیمات',
@@ -62,10 +62,8 @@ return [
             'delete' => 'حذف دسته‌بندی',
         ],
         'hero-slides' => [
-            'index' => 'مشاهده اسلایدها',
-            'create' => 'افزودن اسلاید',
-            'edit' => 'ویرایش اسلاید',
-            'delete' => 'حذف اسلاید',
+            'index' => 'مشاهده هیرو',
+            'edit' => 'ویرایش هیرو',
         ],
         'trust-badges' => [
             'index' => 'مشاهده نشان‌ها',

@@ -29,7 +29,7 @@ class AdminMessagesLocalizationTest extends TestCase
             'admin.users.created', 'admin.users.updated', 'admin.users.last_super_admin_error',
             'admin.settings.saved', 'admin.roles.created', 'admin.roles.deleted',
             'admin.trust_badges.created', 'admin.brands.updated', 'admin.specifications.deleted',
-            'admin.hero_slides.created', 'admin.blog_categories.has_blogs_error',
+            'admin.hero_slides.updated', 'admin.blog_categories.has_blogs_error',
             'admin.blog_categories.self_parent_error', 'admin.product_categories.has_products_error',
             'admin.product_categories.has_children_error',
         ];

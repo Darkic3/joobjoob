@@ -48,7 +48,7 @@ return [
     'sidebar' => [
         'dashboard' => 'لوحة المعلومات',
         'content_mgmt' => 'إدارة المحتوى',
-        'hero_slider' => 'الشريط الرئيسي',
+        'hero_slider' => 'هيرو الصفحة الرئيسية',
         'slides_list' => 'قائمة الشرائح',
         'add_slide' => 'إضافة شريحة',
         'products' => 'المنتجات',

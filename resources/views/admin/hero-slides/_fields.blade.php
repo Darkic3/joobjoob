@@ -1,15 +1,9 @@
-{{-- دادهٔ فرم (linkType/linkValue/hasButton/hasRating/hasViewers/trusts) در HeroSlideController::formData آماده می‌شود --}}
-{{-- نکته: داخل attribute نباید کوتیشن دوبل خام باشد (attribute را می‌شکند و کل اسکوپ x-data از کار می‌افتد) — همهٔ JSONها با {{ }} escape می‌شوند. _key پایدار برای هر آیتم لازمهٔ درگ‌اند‌دراپ است (با :key="i" ترتیب‌دهی دوباره DOM به‌هم می‌ریزد) --}}
+{{-- فیلدهای ادیتور تک‌هیرو — دادهٔ فرم (linkType/linkValue/hasButton/selectedModel) در HeroSlideController::formData آماده می‌شود --}}
+{{-- نکته: داخل attribute نباید کوتیشن دوبل خام باشد (attribute را می‌شکند و کل اسکوپ x-data از کار می‌افتد) --}}
 @props(['heroSlide' => null])
 
 <div x-data="{
     buttonActive: '{{ old('button_active', $formData['hasButton'] ? '1' : '0') }}' === '1',
-    ratingActive: '{{ old('rating_active', $formData['hasRating'] ? '1' : '0') }}' === '1',
-    viewersActive: '{{ old('viewers_active', $formData['hasViewers'] ? '1' : '0') }}' === '1',
-    icons: {{ json_encode(array_keys(config('trust-icons')), JSON_UNESCAPED_UNICODE) }},
-    trusts: {{ json_encode(old('trusts', $formData['trusts']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}.map((t, i) => ({ _key: 't' + i + '-' + Date.now(), ...t })),
-    dragFrom: null,
-    iconPicker: null,
     linkType: '{{ old('link_type', $formData['linkType']) }}',
     customUrl: '{{ old('link_type', $formData['linkType']) === 'custom' ? old('link_value', $formData['linkValue']) : '' }}',
     pageValue: '{{ old('link_type', $formData['linkType']) === 'page' ? old('link_value', $formData['linkValue']) : '' }}',
@@ -18,23 +12,11 @@
     isSearching: false,
     selectedModel: {{ json_encode($formData['selectedModel'] ?? null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
     linkableId: '{{ old('link_type', $formData['linkType']) === 'product' || old('link_type', $formData['linkType']) === 'product_category' || old('link_type', $formData['linkType']) === 'blog' || old('link_type', $formData['linkType']) === 'blog_category' ? old('link_value', $formData['linkValue']) : '' }}',
-    price: {{ json_encode(old('price', $heroSlide?->price ?? 0), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
-    oldPrice: {{ json_encode(old('old_price', $heroSlide?->old_price ?? 0), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }},
-
-    // برچسب‌های محلی‌شده (از فایل ترجمه) — برای نمایش در x-text
-    labels: {
-        // نکته: مقادیر JSON اینجا escape می‌شوند؛ دایرکتیو json خام کوتیشن دوبل می‌سازد و
-        // attribute را می‌شکند و کل اسکوپ x-data از کار می‌افتاد
-        item: {{ json_encode(__('admin.hero_slides.item_label'), JSON_UNESCAPED_UNICODE) }},
-        maxItems: {{ json_encode(__('admin.hero_slides.max_items'), JSON_UNESCAPED_UNICODE) }},
-    },
 
     get isCustomUrl() { return this.linkType === 'custom'; },
     get isStaticPage() { return this.linkType === 'page'; },
     get isModel() { return ['product', 'product_category', 'blog', 'blog_category'].includes(this.linkType); },
     get linkValue() { return this.isCustomUrl ? this.customUrl : (this.isStaticPage ? this.pageValue : this.linkableId); },
-    // وقتی محصولی انتخاب شده، قیمت‌ها خودکار از محصول خوانده می‌شوند و قابل ویرایش نیستند
-    get isPriceAuto() { return this.linkType === 'product' && !!this.selectedModel; },
 
     async searchModels() {
         if (this.searchQuery.length < 2) {
@@ -58,34 +40,13 @@
         this.linkableId = model.id;
         this.searchQuery = model.title || model.name || '';
         this.searchResults = [];
-
-        // قیمت‌ها به‌صورت خودکار از محصول انتخاب‌شده پر می‌شوند
-        if (this.linkType === 'product' && model.price !== undefined && model.price !== null) {
-            this.price = model.price;
-            this.oldPrice = model.old_price ?? 0;
-        }
     },
 
     clearSelection() {
         this.selectedModel = null;
         this.linkableId = '';
         this.searchQuery = '';
-    },
-
-    addTrust() {
-        if (this.trusts.length >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}) return;
-        this.trusts.push({ _key: 'n' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), icon: 'badge-check', fa: '', en: '' });
-    },
-
-    // درگ‌اند‌دراپ: مرتب‌سازی آیتم‌های اعتماد — سه آیتم اول همیشه در هیرو نمایش داده می‌شوند
-    startDrag(i) { this.dragFrom = i; },
-    overDrag(i) {
-        if (this.dragFrom === null || this.dragFrom === i) return;
-        const [item] = this.trusts.splice(this.dragFrom, 1);
-        this.trusts.splice(i, 0, item);
-        this.dragFrom = i;
-    },
-    endDrag() { this.dragFrom = null; }
+    }
 }" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <div class="lg:col-span-2 space-y-6">
@@ -94,38 +55,38 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                اطلاعات متنی
+                {{ __('admin.hero_slides.text_info') }}
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عنوان (فارسی) <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.title_fa') }} <span class="text-red-500">*</span></label>
                     <input type="text" name="title[fa]" value="{{ old('title.fa', $heroSlide?->title['fa'] ?? '') }}" class="input-custom" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title (English)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.title_en') }}</label>
                     <input type="text" name="title[en]" value="{{ old('title.en', $heroSlide?->title['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">توضیحات (فارسی)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.desc_fa') }}</label>
                     <textarea name="desc[fa]" rows="3" class="input-custom resize-y">{{ old('desc.fa', $heroSlide?->desc['fa'] ?? '') }}</textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (English)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.desc_en') }}</label>
                     <textarea name="desc[en]" rows="3" class="input-custom resize-y" dir="ltr">{{ old('desc.en', $heroSlide?->desc['en'] ?? '') }}</textarea>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نشان / برچسب (فارسی)</label>
-                    <input type="text" name="badge[fa]" value="{{ old('badge.fa', $heroSlide?->badge['fa'] ?? '') }}" class="input-custom" placeholder="مثال: پیشنهاد ویژه">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.badge_fa') }}</label>
+                    <input type="text" name="badge[fa]" value="{{ old('badge.fa', $heroSlide?->badge['fa'] ?? '') }}" class="input-custom" placeholder="{{ __('admin.hero_slides.badge_ph') }}">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Badge (English)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.badge_en') }}</label>
                     <input type="text" name="badge[en]" value="{{ old('badge.en', $heroSlide?->badge['en'] ?? '') }}" class="input-custom" dir="ltr">
                 </div>
             </div>
@@ -136,7 +97,7 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                     <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    تنظیمات دکمه و مقصد
+                    {{ __('admin.hero_slides.link_settings') }}
                 </h3>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="hidden" name="button_active" value="0">
@@ -148,11 +109,11 @@
             <div x-show="buttonActive" x-transition class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">متن دکمه (فارسی)</label>
-                        <input type="text" name="btn_text[fa]" value="{{ old('btn_text.fa', $heroSlide?->btn_text['fa'] ?? '') }}" class="input-custom" placeholder="مثال: مشاهده محصول">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.btn_text_fa') }}</label>
+                        <input type="text" name="btn_text[fa]" value="{{ old('btn_text.fa', $heroSlide?->btn_text['fa'] ?? '') }}" class="input-custom" placeholder="{{ __('admin.hero_slides.btn_ph') }}">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Text (English)</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.btn_text_en') }}</label>
                         <input type="text" name="btn_text[en]" value="{{ old('btn_text.en', $heroSlide?->btn_text['en'] ?? '') }}" class="input-custom" dir="ltr">
                     </div>
                 </div>
@@ -161,33 +122,33 @@
 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع مقصد لینک</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.link_type') }}</label>
                         <select x-model="linkType" name="link_type" class="input-custom" @change="clearSelection()">
-                            <option value="custom">آدرس دلخواه (URL خارجی)</option>
-                            <option value="page">صفحه استاتیک</option>
-                            <option value="product">محصول</option>
-                            <option value="product_category">دسته‌بندی محصول</option>
-                            <option value="blog">مقاله وبلاگ</option>
-                            <option value="blog_category">دسته‌بندی مقالات</option>
+                            <option value="custom">{{ __('admin.hero_slides.link_custom') }}</option>
+                            <option value="page">{{ __('admin.hero_slides.link_page') }}</option>
+                            <option value="product">{{ __('admin.hero_slides.link_product') }}</option>
+                            <option value="product_category">{{ __('admin.hero_slides.link_category') }}</option>
+                            <option value="blog">{{ __('admin.hero_slides.link_blog') }}</option>
+                            <option value="blog_category">{{ __('admin.hero_slides.link_blog_category') }}</option>
                         </select>
                     </div>
 
                     {{-- URL دلخواه --}}
                     <div x-show="isCustomUrl" x-transition>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس لینک (URL)</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.link_url') }}</label>
                         <input type="url" x-model="customUrl" class="input-custom font-mono" dir="ltr" placeholder="https://example.com">
                     </div>
 
                     {{-- صفحات استاتیک --}}
                     <div x-show="isStaticPage" x-transition>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">انتخاب صفحه</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.link_page_pick') }}</label>
                         <select x-model="pageValue" class="input-custom">
-                            <option value="">-- انتخاب کنید --</option>
-                            <option value="contact">تماس با ما</option>
-                            <option value="about">درباره ما</option>
-                            <option value="faq">سوالات متداول</option>
-                            <option value="terms">قوانین و مقررات</option>
-                            <option value="privacy">حریم خصوصی</option>
+                            <option value="">-- {{ __('admin.hero_slides.link_page_pick_ph') }} --</option>
+                            <option value="contact">{{ __('messages.pages.contact.title') }}</option>
+                            <option value="about">{{ __('messages.pages.about.title') }}</option>
+                            <option value="faq">{{ __('messages.pages.faq.title') }}</option>
+                            <option value="terms">{{ __('messages.pages.terms.title') }}</option>
+                            <option value="privacy">{{ __('messages.pages.privacy.title') }}</option>
                         </select>
                     </div>
 
@@ -197,7 +158,7 @@
                     {{-- مدل‌ها (محصول، دسته‌بندی، مقاله) --}}
                     <div x-show="isModel" x-transition class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">جستجو و انتخاب</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('admin.hero_slides.link_search') }}</label>
                             {{-- @click.outside روی wrapper است تا کلیک روی خودِ نتایج، پنجره را نبندد --}}
                             <div class="relative" @click.outside="searchResults = []">
                                 <input
@@ -205,10 +166,10 @@
                                     x-model="searchQuery"
                                     @input.debounce.300ms="searchModels()"
                                     class="input-custom"
-                                    placeholder="برای جستجو تایپ کنید..."
+                                    placeholder="{{ __('admin.hero_slides.link_search_ph') }}"
                                 >
                                 <div x-show="isSearching" class="absolute left-3 top-1/2 -translate-y-1/2">
-                                    <svg class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <svg class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                                 </div>
 
                                 {{-- نتایج جستجو — داخل همین باکس relative تا دقیقاً هم‌عرضِ input و چسبیده به آن باز شود --}}
@@ -242,225 +203,22 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
-
-                        {{-- اطلاعات بازاریابی محصول --}}
-                        <div x-show="linkType === 'product' && selectedModel" class="space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                اطلاعات بازاریابی محصول
-                                <span x-show="isPriceAuto" class="inline-flex items-center gap-1 text-[10px] font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                                    خودکار از محصول
-                                </span>
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">قیمت فعلی</label>
-                                    <input type="number" name="price" x-model="price" :disabled="isPriceAuto" class="input-custom disabled:opacity-60 disabled:cursor-not-allowed" placeholder="قیمت محصول" min="0">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">قیمت قدیمی (برای نمایش تخفیف)</label>
-                                    <input type="number" name="old_price" x-model="oldPrice" :disabled="isPriceAuto" class="input-custom disabled:opacity-60 disabled:cursor-not-allowed" placeholder="برای نمایش تخفیف">
-                                </div>
-                            </div>
-                            <p x-show="isPriceAuto" class="text-[11px] text-primary-600 dark:text-primary-300 leading-relaxed">
-                                قیمت و تخفیف به‌صورت خودکار از محصول خوانده می‌شوند — اگر قیمت محصول در آینده تغییر کند، این‌جا هم خودکار به‌روز می‌شود.
-                            </p>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">واحد پول</label>
-                                <select name="currency" class="input-custom">
-                                    <option value="IRT" {{ old('currency', $heroSlide?->currency ?? 'IRT') == 'IRT' ? 'selected' : '' }}>تومان (IRT)</option>
-                                    <option value="USD" {{ old('currency', $heroSlide?->currency ?? '') == 'USD' ? 'selected' : '' }}>دلار (USD)</option>
-                                </select>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- ۳. باکس امتیاز (Rating) --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                    امتیاز (Rating)
-                </h3>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="rating_active" value="0">
-                    <input type="checkbox" name="rating_active" value="1" x-model="ratingActive" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                </label>
-            </div>
-
-            <div x-show="ratingActive" x-transition>
-                <input type="text" name="rating" value="{{ old('rating', $heroSlide?->rating ?? '') }}" class="input-custom" placeholder="مثال: 4.8 از 5">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">اگر مقدار وارد شود، در سمت سایت نمایش داده می‌شود.</p>
-            </div>
-        </div>
-
-        {{-- ۴. باکس بازدیدکنندگان زنده --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    بازدیدکنندگان زنده
-                </h3>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="viewers_active" value="0">
-                    <input type="checkbox" name="viewers_active" value="1" x-model="viewersActive" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                </label>
-            </div>
-
-            <div x-show="viewersActive" x-transition>
-                <input type="number" name="viewers" value="{{ old('viewers', $heroSlide?->viewers ?? '') }}" class="input-custom" placeholder="مثال: 42" min="0">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">اگر مقدار وارد شود، در سمت سایت نمایش داده می‌شود.</p>
-            </div>
-        </div>
-
-        {{-- ۵. باکس آیتم‌های اعتماد (مشتریان راضی، تضمین اصالت و…) --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    {{ __('admin.hero_slides.trust_items') }}
-                </h3>
-                <button
-                    type="button"
-                    @click="addTrust()"
-                    :disabled="trusts.length >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}"
-                    class="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    {{ __('admin.hero_slides.add_trust_item') }}
-                </button>
-            </div>
-
-            {{-- اطلاع‌رسانی: سقف نمایش در هیرو کمتر از سقف ذخیره‌سازی است —
-                 آیتم‌های اضافی ذخیره می‌شوند ولی در سایت نمایش داده نمی‌شوند --}}
-            <div class="flex items-start gap-2.5 rounded-xl border border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-900/30 px-3.5 py-2.5 text-xs leading-relaxed text-sky-800 dark:text-sky-200">
-                <svg class="w-4 h-4 shrink-0 mt-0.5 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <p>{{ __('admin.hero_slides.trust_max_display', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN, 'store' => \App\Models\HeroSlide::MAX_TRUST_ITEMS]) }}</p>
-            </div>
-
-            <p class="flex items-start gap-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg>
-                <span>{{ __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN]) }}</span>
-            </p>
-
-            {{-- آیتم‌ها در دسکتاپ دو‌ستونه (کنار هم) — در موبایل تک‌ستونه
-                 درگ‌اند‌دراپ: کارت را بگیرید و بکشید تا ترتیب تغییر کند —
-                 سه آیتم اول (MAX_TRUST_ITEMS_SHOWN) در هیرو نمایش داده می‌شوند و بقیه خاموش/خط‌چین نشان داده می‌شوند --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <template x-for="(trust, i) in trusts" :key="trust._key">
-                <div
-                    draggable="true"
-                    @dragstart="startDrag(i)"
-                    @dragover.prevent="overDrag(i)"
-                    @dragend="endDrag()"
-                    @drop.prevent="endDrag()"
-                    class="p-3 rounded-xl border space-y-3 cursor-grab active:cursor-grabbing select-none transition-colors"
-                    :class="dragFrom === i
-                        ? 'opacity-60 border-primary-400 ring-2 ring-primary-300 bg-primary-50 dark:bg-primary-900/20'
-                        : (i >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}
-                            ? 'border-dashed border-gray-300 dark:border-gray-500 bg-gray-50/70 dark:bg-gray-800/40'
-                            : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50')"
-                >
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1.5 min-w-0">
-                            <svg class="w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 15h8M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg>
-                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="labels.item + ' ' + (i + 1)"></span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span x-show="i < {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                {{ __('admin.hero_slides.shown_in_hero') }}
-                            </span>
-                            <span x-show="i >= {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN }}" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                                {{ __('admin.hero_slides.hidden_in_hero') }}
-                            </span>
-                            <button type="button" @click="trusts.splice(i, 1)" class="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                {{ __('admin.common.delete') }}
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- انتخاب آیکون — جمع‌وجور: با کلیک روی دکمه، پاپ‌اور کوچکی کنار آن باز می‌شود --}}
-                    <div class="relative" @click.outside="iconPicker = null">
-                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">{{ __('admin.hero_slides.icon_label') }}</label>
-                        <input type="hidden" :name="'trusts[' + i + '][icon]'" :value="trust.icon">
-                        <button
-                            type="button"
-                            @click="iconPicker = (iconPicker === i ? null : i)"
-                            class="inline-flex items-center gap-2 w-full px-2.5 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-primary-400 transition-colors text-xs font-medium"
-                        >
-                            <span class="relative w-8 h-8 shrink-0 rounded-full grid place-items-center bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300">
-                                @foreach(config('trust-icons') as $iconKey => $iconSvg)
-                                    <svg x-show="trust.icon === '{{ $iconKey }}'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
-                                @endforeach
-                                <span x-show="!icons.includes(trust.icon)" class="text-[11px] font-bold leading-none" x-text="trust.icon">✓</span>
-                            </span>
-                            <span class="flex-1 text-start truncate">{{ __('admin.hero_slides.icon_label') }}</span>
-                            <svg class="w-3.5 h-3.5 shrink-0 text-gray-400 transition-transform" :class="iconPicker === i && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </button>
-
-                        <div
-                            x-show="iconPicker === i"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
-                            class="absolute z-30 top-full mt-1.5 start-0 w-56 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl grid grid-cols-6 gap-1"
-                        >
-                            @foreach(config('trust-icons') as $iconKey => $iconSvg)
-                                <button
-                                    type="button"
-                                    @click="trust.icon = '{{ $iconKey }}'; iconPicker = null"
-                                    :class="trust.icon === '{{ $iconKey }}'
-                                        ? 'bg-primary-600 border-primary-600 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-300'"
-                                    class="flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-100"
-                                    :title="'{{ $iconKey }}'"
-                                    aria-label="{{ $iconKey }}"
-                                >
-                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $iconSvg !!}</svg>
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.text_fa') }}</label>
-                            <input type="text" x-model="trust.fa" :name="'trusts[' + i + '][fa]'" class="input-custom" placeholder="مثال: +۱۲,۰۰۰ مشتری راضی">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('admin.hero_slides.text_en') }}</label>
-                            <input type="text" x-model="trust.en" :name="'trusts[' + i + '][en]'" class="input-custom" dir="ltr" placeholder="+12,000 happy customers">
-                        </div>
-                    </div>
-                </div>
-            </template>
-            </div>
-
-            <p x-show="trusts.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
-                {{ __('admin.hero_slides.trusts_empty') }}
-            </p>
-            <p class="text-xs text-gray-400 dark:text-gray-500" x-text="labels.maxItems + trusts.length + ' / {{ \App\Models\HeroSlide::MAX_TRUST_ITEMS }}'"></p>
         </div>
     </div>
 
-    {{-- ستون کناری: تصویر و تنظیمات --}}
+    {{-- ستون کناری: وضعیت و تصویر --}}
     <div class="space-y-6">
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 space-y-4">
             <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                تنظیمات نمایش
+                {{ __('admin.hero_slides.display_settings') }}
             </h3>
 
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">فعال</span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('admin.hero_slides.active_label') }}</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="hidden" name="is_active" value="0">
                     <input type="checkbox" name="is_active" value="1" {{ old('is_active', $heroSlide?->is_active ?? true) ? 'checked' : '' }} class="sr-only peer">
@@ -468,13 +226,13 @@
                 </label>
             </div>
 
-            {{-- ترتیب با درگ‌اندروپ در صفحهٔ ایندکس تنظیم می‌شود — اینجا فیلدی ندارد --}}
+            <p class="text-xs leading-relaxed text-gray-500 dark:text-gray-400">{{ __('admin.hero_slides.inactive_hint') }}</p>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
-            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                تصویر اسلاید
+                {{ __('admin.hero_slides.image') }}
 
                 {{-- راهنمای fallback تصویر — فقط وقتی مدلی (محصول/مقاله/دسته) لینک شده باشد --}}
                 <span x-show="isModel" class="relative inline-flex ms-1 group" aria-label="{{ __('admin.hero_slides.help') }}">
@@ -485,22 +243,23 @@
                 </span>
             </h3>
 
+            <p class="text-xs leading-relaxed text-gray-500 dark:text-gray-400 mb-4">{{ __('admin.hero_slides.image_no_hint') }}</p>
+
             {{-- پیش‌نمایش + کراپ تصویر با کامپوننت همگانی image-upload --}}
             <x-admin.image-upload
                 name="image"
                 :currentImage="$heroSlide?->imageUrl()"
                 :removable="true"
-                hint="کراپ آزاد — هر سایزی دلخواه · حداکثر حجم: ۲۰ مگابایت"
+                hint="{{ __('admin.hero_slides.image_hint') }}"
                 :maxSize="20 * 1024 * 1024" />
         </div>
     </div>
 </div>
 
-{{-- دکمه‌های اکشن --}}
+{{-- دکمهٔ ذخیره --}}
 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-700 mt-6">
-    <a href="{{ route('admin.hero-slides.index') }}" class="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium">{{ __('admin.common.cancel') }}</a>
     <button type="submit" class="btn-primary flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-        {{ $heroSlide ? __('admin.hero_slides.edit') : __('admin.hero_slides.create') }}
+        {{ __('admin.hero_slides.save') }}
     </button>
 </div>

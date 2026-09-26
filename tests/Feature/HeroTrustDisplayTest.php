@@ -17,51 +17,44 @@ class HeroTrustDisplayTest extends TestCase
         $this->seed(LanguageSeeder::class);
     }
 
-    private function trustPayload(int $count): array
-    {
-        return collect(range(1, $count))->map(fn (int $i) => [
-            'icon' => 'check',
-            'text' => ['fa' => "متن اعتماد {$i}", 'en' => "trust {$i}"],
-        ])->all();
-    }
-
-    public function test_hero_never_renders_trust_chips(): void
-    {
-        // هیرو مینیمال شد: چیپ‌های اعتماد/امتیاز/ویور حذف‌اند — حتی اگر ادمین ذخیره کرده باشد
-        HeroSlide::create([
-            'hero_type' => 'informational',
-            'title' => ['fa' => 'اسلاید تست', 'en' => 'Test slide'],
-            'is_active' => true,
-            'sort_order' => 1,
-            'trusts' => $this->trustPayload(5),
-        ]);
-
-        $html = $this->get('/')->assertOk()->getContent();
-
-        $this->assertStringNotContainsString('class="hero-trust-chip"', $html);
-        $this->assertStringContainsString('hero-minimal', $html);
-        $this->assertStringContainsString('اسلاید تست', $html);
-    }
-
-    public function test_first_active_slide_by_sort_order_is_rendered(): void
+    public function test_home_renders_only_the_first_active_slide_in_minimal_hero(): void
     {
         HeroSlide::create([
-            'hero_type' => 'informational',
-            'title' => ['fa' => 'اسلاید دوم', 'en' => 'Second'],
-            'is_active' => true,
-            'sort_order' => 2,
-        ]);
-        HeroSlide::create([
-            'hero_type' => 'informational',
             'title' => ['fa' => 'اسلاید اول', 'en' => 'First'],
             'is_active' => true,
             'sort_order' => 1,
         ]);
+        HeroSlide::create([
+            'title' => ['fa' => 'اسلاید دوم', 'en' => 'Second'],
+            'is_active' => true,
+            'sort_order' => 2,
+        ]);
 
         $html = $this->get('/')->assertOk()->getContent();
 
+        $this->assertStringContainsString('hero-minimal', $html);
         $this->assertStringContainsString('اسلاید اول', $html);
+        // اسلاید دوم هرگز در نسخهٔ مینیمال نمایش داده نمی‌شود
         $this->assertStringNotContainsString('اسلاید دوم', $html);
+    }
+
+    public function test_first_slide_wins_even_when_an_earlier_inactive_one_exists(): void
+    {
+        HeroSlide::create([
+            'title' => ['fa' => 'خاموش', 'en' => 'Off'],
+            'is_active' => false,
+            'sort_order' => 1,
+        ]);
+        HeroSlide::create([
+            'title' => ['fa' => 'روشن', 'en' => 'On'],
+            'is_active' => true,
+            'sort_order' => 5,
+        ]);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('روشن', $html);
+        $this->assertStringNotContainsString('خاموش', $html);
     }
 
     public function test_default_hero_renders_when_no_active_slide(): void

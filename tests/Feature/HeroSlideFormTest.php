@@ -22,44 +22,36 @@ class HeroSlideFormTest extends TestCase
     {
         $this->actingAsSuperAdmin();
 
-        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+        $html = $this->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
         $this->assertStringContainsString('assets/admin/js/sweetalert2.all.min.js', $html);
     }
 
-    public function test_hero_form_trust_items_are_drag_sortable_with_visibility_badges(): void
+    public function test_hero_editor_is_single_form_without_slider_chrome(): void
     {
         $this->actingAsSuperAdmin();
 
-        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+        $html = $this->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
-        // درگ‌اند‌دراپ روی کارت‌های آیتم اعتماد
-        $this->assertStringContainsString('draggable="true"', $html);
-        $this->assertStringContainsString('@dragstart="startDrag(i)"', $html);
-        $this->assertStringContainsString('@dragover.prevent="overDrag(i)"', $html);
-        $this->assertStringContainsString('@dragend="endDrag()"', $html);
+        // متن‌ها، دکمه/لینک و تصویر — همه در یک فرم PUT
+        $this->assertStringContainsString('name="title[fa]"', $html);
+        $this->assertStringContainsString('name="badge[fa]"', $html);
+        $this->assertStringContainsString('name="link_value"', $html);
+        $this->assertStringContainsString('name="image"', $html);
+        $this->assertStringContainsString('action="' . route('admin.hero-slides.update') . '"', $html);
 
-        // بج وضعیت نمایش (سه آیتم اول نمایش داده می‌شوند)
-        $this->assertStringContainsString(__('admin.hero_slides.shown_in_hero'), $html);
-        $this->assertStringContainsString(__('admin.hero_slides.hidden_in_hero'), $html);
-        $this->assertStringContainsString(
-            // خروجی HTML سمت سرور بومی است (عدد داخل پیام هم فارسی می‌شود)
-            \App\Helpers\NumberHelper::localizeText(
-                __('admin.hero_slides.drag_hint', ['max' => \App\Models\HeroSlide::MAX_TRUST_ITEMS_SHOWN])
-            ),
-            $html
-        );
-
-        // پیکر آیکون جمع‌وجور: پاپ‌اور به‌جای گرید بزرگ همیشگی
-        $this->assertStringContainsString('iconPicker === i', $html);
-        $this->assertStringContainsString('grid grid-cols-6 gap-1', $html);
+        // فیچرهای حذف‌شدهٔ اسلایدر: قیمت/امتیاز/بازدید زنده/آیتم اعتماد
+        $this->assertStringNotContainsString('name="price"', $html);
+        $this->assertStringNotContainsString('name="rating"', $html);
+        $this->assertStringNotContainsString('name="viewers"', $html);
+        $this->assertStringNotContainsString('name="trusts', $html);
     }
 
     public function test_hero_form_xdata_attribute_is_intact_and_valid(): void
     {
         $this->actingAsSuperAdmin();
 
-        $html = $this->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+        $html = $this->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
         // رگرسیون: اگر داخل x-data کوتیشن دوبل خام بیفتد (مثل @json یا کامنت حاوی :key="i")
         // attribute زودتر از موعد بسته می‌شود و کل اسکوپ Alpine از کار می‌افتد.
@@ -74,12 +66,13 @@ class HeroSlideFormTest extends TestCase
         // کل آبجکت باید داخل attribute باشد — اگر جایی کوتیشن خام بیفتد، این‌جا قطع می‌شود
         $this->assertStringEndsWith('}', $xData);
         $this->assertStringContainsString('buttonActive:', $xData);
-        $this->assertStringContainsString('ratingActive:', $xData);
-        $this->assertStringContainsString('viewersActive:', $xData);
-        $this->assertStringContainsString('icons: [&quot;badge-check&quot;,&quot;shield-check&quot;', $xData);
-        $this->assertStringContainsString('trusts: [{&quot;icon&quot;:', $xData);
-        $this->assertStringContainsString('labels:', $xData);
-        $this->assertStringContainsString('.map((t, i) => ({ _key:', $xData);
+        $this->assertStringContainsString('linkType:', $xData);
+        $this->assertStringContainsString('selectedModel:', $xData);
+        $this->assertStringContainsString('async searchModels()', $xData);
+        // فیلدهای حذف‌شده نباید به x-data برگردند
+        $this->assertStringNotContainsString('ratingActive:', $xData);
+        $this->assertStringNotContainsString('viewersActive:', $xData);
+        $this->assertStringNotContainsString('trusts:', $xData);
     }
 
     public function test_hero_form_shows_validation_errors_via_swal(): void
@@ -94,25 +87,12 @@ class HeroSlideFormTest extends TestCase
         ]));
 
         $html = $this->withSession(['errors' => $bag])
-            ->get(route('admin.hero-slides.create'))->assertOk()->getContent();
+            ->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
         $this->assertStringContainsString('Swal.fire', $html);
         $this->assertStringContainsString('خطا در ذخیره‌سازی', $html);
         $this->assertStringContainsString('عنوان فارسی الزامی است.', $html);
         $this->assertStringContainsString('حجم تصویر نباید بیشتر از ۲۰ مگابایت باشد.', $html);
-    }
-
-    public function test_hero_form_shows_validation_errors_via_swal_on_edit(): void
-    {
-        $this->actingAsSuperAdmin();
-
-        $bag = new ViewErrorBag;
-        $bag->put('default', new MessageBag(['title.fa' => 'عنوان فارسی الزامی است.']));
-
-        $html = $this->withSession(['errors' => $bag])
-            ->get(route('admin.hero-slides.create'))->assertOk()->getContent();
-
-        $this->assertStringContainsString('errorMessages', $html);
     }
 
     public function test_hero_image_rule_allows_up_to_20mb(): void

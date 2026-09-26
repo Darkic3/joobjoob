@@ -26,11 +26,6 @@ class ImageRemovalTest extends TestCase
             'badge' => ['fa' => '', 'en' => ''],
             'button_active' => 0,
             'btn_text' => ['fa' => '', 'en' => ''],
-            'price' => 0,
-            'old_price' => 0,
-            'currency' => 'IRT',
-            'rating_active' => 0,
-            'viewers_active' => 0,
             'is_active' => 1,
         ], $overrides);
     }
@@ -64,7 +59,7 @@ class ImageRemovalTest extends TestCase
         ]);
 
         $this->actingAs($this->superAdmin())
-            ->put("/admin/hero-slides/{$slide->id}", $this->heroSlidePayload(['remove_image' => '1']))
+            ->put(route('admin.hero-slides.update'), $this->heroSlidePayload(['remove_image' => '1']))
             ->assertRedirect(route('admin.hero-slides.index'));
 
         $this->assertNull($slide->refresh()->image);
@@ -79,10 +74,31 @@ class ImageRemovalTest extends TestCase
         ]);
 
         $this->actingAs($this->superAdmin())
-            ->put("/admin/hero-slides/{$slide->id}", $this->heroSlidePayload(['title' => ['fa' => 'جدید', 'en' => 'New']]))
+            ->put(route('admin.hero-slides.update'), $this->heroSlidePayload(['title' => ['fa' => 'جدید', 'en' => 'New']]))
             ->assertRedirect(route('admin.hero-slides.index'));
 
         $this->assertSame('keep-hero.webp', $slide->refresh()->image);
+    }
+
+    public function test_hero_prune_extras_removes_other_slides_only_when_requested(): void
+    {
+        $primary = HeroSlide::create(['title' => ['fa' => 'اصلی'], 'is_active' => true, 'sort_order' => 1]);
+        $extra = HeroSlide::create(['title' => ['fa' => 'اضافی'], 'is_active' => true, 'sort_order' => 2]);
+
+        // بدون تیک حذف → اسلاید اضافی می‌ماند
+        $this->actingAs($this->superAdmin())
+            ->put(route('admin.hero-slides.update'), $this->heroSlidePayload())
+            ->assertRedirect(route('admin.hero-slides.index'));
+        $this->assertDatabaseCount('hero_slides', 2);
+
+        // با تیک حذف → فقط هیرو اصلی می‌ماند
+        $this->actingAs($this->superAdmin())
+            ->put(route('admin.hero-slides.update'), $this->heroSlidePayload(['prune_extras' => '1']))
+            ->assertRedirect(route('admin.hero-slides.index'));
+
+        $this->assertDatabaseCount('hero_slides', 1);
+        $this->assertDatabaseHas('hero_slides', ['id' => $primary->id]);
+        $this->assertDatabaseMissing('hero_slides', ['id' => $extra->id]);
     }
 
     public function test_blog_update_with_remove_image_clears_image(): void

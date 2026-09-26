@@ -48,7 +48,7 @@ return [
     'sidebar' => [
         'dashboard' => 'Kontrol Paneli',
         'content_mgmt' => 'İçerik Yönetimi',
-        'hero_slider' => 'Ana Slider',
+        'hero_slider' => 'Ana Sayfa Herosu',
         'slides_list' => 'Slayt Listesi',
         'add_slide' => 'Slayt Ekle',
         'products' => 'Ürünler',

@@ -47,9 +47,6 @@ class HeroSlideSearchController extends Controller
                 'title' => $product->trans('name'),
                 'subtitle' => number_format($product->final_price).' تومان',
                 'image' => $product->main_image_url,
-                // قیمت‌ها برای پر شدن خودکار فیلدهای هیرو از محصول
-                'price' => (int) $product->final_price,
-                'old_price' => (int) ($product->price > $product->final_price ? $product->price : 0),
             ]);
 
         return $products->toArray();

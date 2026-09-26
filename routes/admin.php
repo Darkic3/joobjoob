@@ -39,7 +39,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('blogs', BlogController::class);
         Route::resource('blog-categories', BlogCategoryController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
-        Route::resource('hero-slides', HeroSlideController::class)->except('show');
+        // هیرو صفحهٔ اصلی — نسخهٔ مینیمال: تک‌ادیتور (بدون لیست اسلایدر)
+        Route::get('hero-slides', [HeroSlideController::class, 'index'])->name('hero-slides.index');
+        Route::put('hero-slides', [HeroSlideController::class, 'update'])->name('hero-slides.update');
         Route::get('hero-slides/search-model', [HeroSlideSearchController::class, 'searchModel'])->name('hero-slides.search-model');
         Route::resource('trust-badges', TrustBadgeController::class);
         // بنرهای میانی صفحهٔ اصلی — show عمداً حذف شده (کنترلر متد show ندارد)
@@ -65,7 +67,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('languages/{language}/make-default', [LanguageController::class, 'makeDefault'])->name('languages.make-default');
         // ذخیره ترتیب درگ‌اندروپ (ایندکس) — با پرمیشن ویرایش
         Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
-        Route::post('hero-slides/reorder', [HeroSlideController::class, 'reorder'])->name('hero-slides.reorder');
         Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
         Route::post('promo-banners/reorder', [PromoBannerController::class, 'reorder'])->name('promo-banners.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');

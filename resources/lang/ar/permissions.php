@@ -9,7 +9,7 @@ return [
         'specifications' => 'المواصفات',
         'blogs' => 'مقالات المدونة',
         'blog-categories' => 'فئات المدونة',
-        'hero-slides' => 'الشريط الرئيسي',
+        'hero-slides' => 'هيرو الصفحة الرئيسية',
         'trust-badges' => 'شارات الثقة',
         'promo-banners' => 'اللافتات الترويجية',
         'settings' => 'الإعدادات',
@@ -59,10 +59,8 @@ return [
             'delete' => 'حذف فئة',
         ],
         'hero-slides' => [
-            'index' => 'عرض الشرائح',
-            'create' => 'إضافة شريحة',
-            'edit' => 'تعديل شريحة',
-            'delete' => 'حذف شريحة',
+            'index' => 'عرض الهيرو',
+            'edit' => 'تعديل الهيرو',
         ],
         'trust-badges' => [
             'index' => 'عرض الشارات',

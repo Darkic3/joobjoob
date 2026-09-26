@@ -99,14 +99,10 @@ return [
         'hero-slides' => [
             'title' => 'permissions.groups.hero-slides',
             'access' => [
+                // هیرو مینیمال — تک‌ادیتور: نمایش فرم + ذخیره + جستجوی مقصد لینک
                 'index' => 'permissions.access.hero-slides.index',
-                'create' => 'permissions.access.hero-slides.create',
-                'store' => 'permissions.access.hero-slides.create',
-                'edit' => 'permissions.access.hero-slides.edit',
                 'update' => 'permissions.access.hero-slides.edit',
-                'reorder' => 'permissions.access.hero-slides.edit',
                 'search-model' => 'permissions.access.hero-slides.edit',
-                'destroy' => 'permissions.access.hero-slides.delete',
             ],
         ],
 

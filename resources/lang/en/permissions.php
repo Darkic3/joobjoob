@@ -9,7 +9,7 @@ return [
         'specifications' => 'Specifications',
         'blogs' => 'Blog Posts',
         'blog-categories' => 'Blog Categories',
-        'hero-slides' => 'Main Slider',
+        'hero-slides' => 'Homepage Hero',
         'trust-badges' => 'Trust Badges',
         'promo-banners' => 'Promo Banners',
         'settings' => 'Settings',
@@ -62,10 +62,8 @@ return [
             'delete' => 'Delete category',
         ],
         'hero-slides' => [
-            'index' => 'View slides',
-            'create' => 'Add slide',
-            'edit' => 'Edit slide',
-            'delete' => 'Delete slide',
+            'index' => 'View hero',
+            'edit' => 'Edit hero',
         ],
         'trust-badges' => [
             'index' => 'View badges',
