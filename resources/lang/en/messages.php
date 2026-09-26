@@ -254,6 +254,8 @@ return [
     'latest_articles' => 'Latest Articles',
     'latest_articles_subtitle' => 'Fresh reads and store news',
     'festive_badge' => 'Festive Discount',
+    'hero_default_title' => 'Online shopping, made simple',
+    'hero_default_desc' => 'A curated selection of quality products with an authenticity guarantee and fast delivery.',
 
     // Static pages
     'pages' => [

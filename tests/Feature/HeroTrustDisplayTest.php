@@ -25,8 +25,9 @@ class HeroTrustDisplayTest extends TestCase
         ])->all();
     }
 
-    public function test_hero_shows_at_most_max_trust_items_shown_chips(): void
+    public function test_hero_never_renders_trust_chips(): void
     {
+        // هیرو مینیمال شد: چیپ‌های اعتماد/امتیاز/ویور حذف‌اند — حتی اگر ادمین ذخیره کرده باشد
         HeroSlide::create([
             'hero_type' => 'informational',
             'title' => ['fa' => 'اسلاید تست', 'en' => 'Test slide'],
@@ -37,27 +38,37 @@ class HeroTrustDisplayTest extends TestCase
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $shown = HeroSlide::MAX_TRUST_ITEMS_SHOWN;
-
-        // فقط به اندازهٔ سقف نمایش، چیپ در هیرو رندر می‌شود
-        $this->assertSame($shown, substr_count($html, 'class="hero-trust-chip"'));
-        // خروجی HTML سمت سرور بومی است
-        $this->assertStringContainsString('متن اعتماد ۱', $html);
-        $this->assertStringNotContainsString('متن اعتماد ۴', $html);
+        $this->assertStringNotContainsString('class="hero-trust-chip"', $html);
+        $this->assertStringContainsString('hero-minimal', $html);
+        $this->assertStringContainsString('اسلاید تست', $html);
     }
 
-    public function test_hero_hides_trust_band_when_no_trust_items(): void
+    public function test_first_active_slide_by_sort_order_is_rendered(): void
     {
         HeroSlide::create([
             'hero_type' => 'informational',
-            'title' => ['fa' => 'اسلاید تست', 'en' => 'Test slide'],
+            'title' => ['fa' => 'اسلاید دوم', 'en' => 'Second'],
+            'is_active' => true,
+            'sort_order' => 2,
+        ]);
+        HeroSlide::create([
+            'hero_type' => 'informational',
+            'title' => ['fa' => 'اسلاید اول', 'en' => 'First'],
             'is_active' => true,
             'sort_order' => 1,
-            'trusts' => [],
         ]);
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('class="hero-trust-chip"', $html);
+        $this->assertStringContainsString('اسلاید اول', $html);
+        $this->assertStringNotContainsString('اسلاید دوم', $html);
+    }
+
+    public function test_default_hero_renders_when_no_active_slide(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('hero-minimal', $html);
+        $this->assertStringContainsString(__('messages.hero_default_title'), $html);
     }
 }

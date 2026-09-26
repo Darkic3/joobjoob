@@ -176,6 +176,8 @@ return [
     'latest_articles' => 'Son Yazılar',
     'latest_articles_subtitle' => 'Mağazadan taze yazılar ve haberler',
     'festive_badge' => 'Bayram İndirimi',
+    'hero_default_title' => 'Çevrimiçi alışveriş, basit ve güvenli',
+    'hero_default_desc' => 'Orijinallik garantisi ve hızlı teslimatla en iyi ürünlerden seçkiler.',
 
     // Sosyal medya + kayıt
     'socials' => [

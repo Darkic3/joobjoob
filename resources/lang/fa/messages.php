@@ -255,6 +255,8 @@ return [
     'latest_articles' => 'آخرین مقالات',
     'latest_articles_subtitle' => 'جدیدترین مطالب و اخبار فروشگاه',
     'festive_badge' => 'تخفیف جشن',
+    'hero_default_title' => 'خرید آنلاین، ساده و مطمئن',
+    'hero_default_desc' => 'منتخبی از بهترین محصولات با ضمانت اصالت کالا و ارسال سریع.',
 
     // صفحات استاتیک
     'pages' => [

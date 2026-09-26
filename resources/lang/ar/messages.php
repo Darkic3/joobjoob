@@ -176,6 +176,8 @@ return [
     'latest_articles' => 'أحدث المقالات',
     'latest_articles_subtitle' => 'أحدث المواضيع وأخبار المتجر',
     'festive_badge' => 'خصم الاحتفال',
+    'hero_default_title' => 'تسوّق إلكتروني بسيط وموثوق',
+    'hero_default_desc' => 'مختارات من أفضل المنتجات مع ضمان الأصالة وتوصيل سريع.',
 
     // الشبكات الاجتماعية + التسجيل
     'socials' => [

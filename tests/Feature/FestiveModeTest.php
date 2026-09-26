@@ -40,21 +40,14 @@ class FestiveModeTest extends TestCase
         $this->assertDatabaseHas('settings', ['key' => 'festive_mode', 'value' => '1']);
     }
 
-    public function test_home_hero_has_confetti_canvas_when_enabled(): void
+    public function test_home_hero_never_renders_festive_chrome(): void
     {
-        $service = app(SettingService::class);
-        $service->updateGroup('appearance', ['festive_mode' => '1'], []);
-
+        // هیرو مینیمال شد: کانفتی و بج جشن هرگز در صفحهٔ اصلی رندر نمی‌شوند،
+        // حتی وقتی festive_mode فعال است (تنظیمات فقط در ادمین کاربرد دارند)
         $this->get('/')
             ->assertOk()
-            ->assertSee('id="festive-confetti"', false);
-    }
-
-    public function test_home_hero_has_no_confetti_canvas_when_disabled(): void
-    {
-        $this->get('/')
-            ->assertOk()
-            ->assertDontSee('festive-confetti', false);
+            ->assertDontSee('festive-confetti', false)
+            ->assertDontSee('class="festive-badge"', false);
     }
 
     public function test_settings_appearance_page_renders_festive_toggle(): void
@@ -82,7 +75,7 @@ class FestiveModeTest extends TestCase
         $this->assertDatabaseHas('settings', ['key' => 'festive_style', 'value' => 'snow']);
     }
 
-    public function test_home_hero_canvas_carries_festive_style(): void
+    public function test_home_hero_ignores_festive_mode_and_style(): void
     {
         $service = app(SettingService::class);
 
@@ -90,8 +83,8 @@ class FestiveModeTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('id="festive-confetti"', false)
-            ->assertSee('data-style="colorful"', false);
+            ->assertDontSee('id="festive-confetti"', false)
+            ->assertDontSee('data-style="colorful"', false);
     }
 
     public function test_settings_appearance_page_renders_festive_style_select(): void
@@ -107,32 +100,25 @@ class FestiveModeTest extends TestCase
         $this->assertStringContainsString('value="hearts"', $html);
     }
 
-    public function test_home_hero_shows_festive_badge_when_enabled(): void
+    public function test_home_hero_never_shows_festive_badge_even_when_enabled(): void
     {
         $service = app(SettingService::class);
         $service->updateGroup('appearance', ['festive_mode' => '1'], []);
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('class="festive-badge"', false)
-            ->assertSee(__('messages.festive_badge'));
+            ->assertDontSee('class="festive-badge"', false);
     }
 
-    public function test_home_hero_hides_festive_badge_when_disabled(): void
-    {
-        $this->get('/')
-            ->assertOk()
-            ->assertDontSee('festive-badge', false);
-    }
-
-    public function test_festive_badge_uses_custom_text_from_settings(): void
+    public function test_festive_badge_text_saves_but_is_not_rendered_on_home(): void
     {
         $service = app(SettingService::class);
         $service->updateGroup('appearance', ['festive_mode' => '1', 'festive_badge_text' => 'تخفیف نوروزی'], []);
 
+        $this->assertSame('تخفیف نوروزی', setting('festive_badge_text'));
         $this->get('/')
             ->assertOk()
-            ->assertSee('تخفیف نوروزی');
+            ->assertDontSee('تخفیف نوروزی');
     }
 
     public function test_settings_appearance_page_renders_festive_badge_text_field(): void

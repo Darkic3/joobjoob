@@ -75,7 +75,8 @@ class HomeController extends Controller
         $reviewsAvg = round($reviews->avg('rating') ?? 0, 1);
         // آخرین مقالات برای صفحهٔ اصلی (۳ مقالهٔ فعال و جدید)
         $latestBlogs = Blog::with('category')->active()->latest()->take(3)->get();
-        $slides = $this->heroSlideService->getSlides();
+        // هیرو مینیمال: تنها اولین اسلاید فعال (ترتیب sort_order) نمایش داده می‌شود
+        $heroSlide = $this->heroSlideService->getSlides()->first();
 
         // نشان‌های اعتماد فعال — محدودیت و کش داخل سرویس مدیریت می‌شود
         $trustBadges = $this->trustBadgeService->getActiveForSite();
@@ -90,7 +91,7 @@ class HomeController extends Controller
         // عنوان/توضیحات از @section('title') ویو و در نهایت از تنظیمات سایت می‌آید.
         seo()->forPath('/');
 
-        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'slides', 'trustBadges', 'promoBanners', 'recentlyViewed'));
+        return view('site.home.index', compact('categories', 'deals', 'dealEndsAt', 'featured', 'bestSellers', 'reviews', 'reviewBatches', 'reviewsAvg', 'latestBlogs', 'heroSlide', 'trustBadges', 'promoBanners', 'recentlyViewed'));
     }
 
     /**

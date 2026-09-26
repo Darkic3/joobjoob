@@ -6,8 +6,8 @@
 
 @section('content')
 
-    {{-- ۱. اسلایدر هیرو --}}
-    @include('site.home.hero', ['slides' => $slides])
+    {{-- ۱. هیرو مینیمال (تک‌اسلاید) --}}
+    @include('site.home.hero', ['heroSlide' => $heroSlide])
 
     {{-- ۲. دسته‌بندی‌ها --}}
     @if($categories->isNotEmpty())
