@@ -14,24 +14,27 @@
     {{-- ۱. هیرو مینیمال (تک‌اسلاید) --}}
     @include('site.home.hero', ['heroSlide' => $heroSlide])
 
-    {{-- ۲. دسته‌بندی‌ها --}}
+    {{-- ۲. دسته‌بندی‌ها — Playful Brutalism × Neo-Tokyo Minimal --}}
     @if($categories->isNotEmpty())
-        <section class="reveal-on-scroll mt-10 mb-8">
-            <div class="section-head mb-6">
-                <div class="section-head-main">
-                    <span class="section-icon" aria-hidden="true">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                    </span>
-                    <div>
-                        <h2 class="section-title">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
+        <section class="categories-brutal reveal-on-scroll mt-12 mb-10">
+            <header class="categories-brutal-head">
+                <div class="categories-brutal-head-main">
+                    <span class="categories-brutal-coords" aria-hidden="true">SOCK://SHOP — N°02</span>
+                    <div class="categories-brutal-kicker">
+                        <span class="categories-brutal-kicker-dot" aria-hidden="true"></span>
+                        <span>{{ __('messages.categories') }}</span>
+                        <span class="categories-brutal-kicker-num" aria-hidden="true">/ {{ $categories->count() }}</span>
                     </div>
+                    <h2 class="categories-brutal-title">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
                 </div>
-                <a href="{{ localizedRoute('products.index') }}" class="section-link">
-                    {{ settingOverride('home_view_all', __('messages.view_all')) }}
+                <a href="{{ localizedRoute('products.index') }}" class="categories-brutal-link">
+                    <span>{{ settingOverride('home_view_all', __('messages.view_all')) }}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
-            </div>
-            {{-- گرید خودکار: با تعداد کم وسط‌چین و با تعداد زیاد تمام‌عرض — ورود پله‌ای (data-stagger) --}}
-            <div class="grid grid-cols-[repeat(auto-fit,minmax(130px,150px))] justify-center gap-4" data-stagger>
+            </header>
+
+            {{-- کالکشن کارت‌ها: چیدمان ریتمیک با چرخش متناوب، ورود پله‌ای --}}
+            <div class="categories-brutal-grid" data-stagger>
                 @foreach($categories as $cat)
                     <x-category-card :category="$cat"/>
                 @endforeach

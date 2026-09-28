@@ -3862,3 +3862,258 @@ html[dir="rtl"].js .hero-brutal .hero-brutal-media img { animation-name: brutalT
     .menu-brutal .site-menu-account-link:hover,
     .menu-brutal .site-menu-lang:hover { transform: none; }
 }
+
+/* ==========================================================================
+   11) بخش دسته‌بندی‌های صفحهٔ اصلی — Playful Brutalism × Neo-Tokyo Minimal
+   --------------------------------------------------------------------------
+   هم‌زبان با هیرو و هدر: کاغذ کرم + بوردر جوهری + سایهٔ هارد + نوار نئونی.
+   همهٔ قواعد با .categories-brutal / .category-brutal-* اسکوپ شده‌اند تا
+   بدون جنگِ specificity روی قواعد نیومورفیک غلبه کنند؛ سایر بخش‌های سایت
+   (پیشنهادات داغ، ویژه، پرفروش و …) دست‌نخورده می‌مانند.
+   ========================================================================== */
+
+/* ---------- 11.1) سربرگ بخش (شامل کیکر مونو + عنوان + لینک) ---------- */
+.categories-brutal-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.categories-brutal-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+    min-width: 0;
+}
+.categories-brutal-coords {
+    font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    color: color-mix(in srgb, var(--b-ink) 55%, transparent);
+}
+.categories-brutal-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    align-self: flex-start;
+    padding: .32rem .75rem;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-lemon);
+    color: var(--b-ink);
+    font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 0 var(--b-ink);
+}
+.categories-brutal-kicker-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--b-ink);
+    box-shadow: 0 0 0 2px var(--b-lemon);
+}
+.categories-brutal-kicker-num { opacity: .65; }
+.categories-brutal-title {
+    color: var(--b-ink);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+    font-size: clamp(1.4rem, 1vw + 1.05rem, 1.85rem);
+    line-height: 1.15;
+    letter-spacing: -.005em;
+}
+.categories-brutal-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .65rem 1.1rem;
+    border: 2.5px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 var(--b-ink);
+    transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out), color .16s var(--ease-out);
+}
+.categories-brutal-link:hover {
+    color: var(--b-paper);
+    background: var(--b-ink);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--b-ink);
+}
+.categories-brutal-link:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--b-ink); }
+
+/* ---------- 11.2) گرید کارت‌ها (با فلکس‌ورپ برای چیدمان ریتمیک) ---------- */
+.categories-brutal-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(1rem, 2.2vw, 1.6rem);
+}
+
+/* ---------- 11.3) کارت — کاغذ چرخیده با سایهٔ هارد ---------- */
+.category-brutal-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .7rem;
+    width: 168px;
+    padding: 1rem 1rem .9rem;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 2px;
+    box-shadow: 5px 5px 0 var(--b-ink);
+    text-decoration: none;
+    transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s cubic-bezier(.16,1,.3,1),
+                background-color .16s var(--ease-out);
+}
+.category-brutal-card:nth-child(odd) { transform: rotate(-1.4deg); }
+.category-brutal-card:nth-child(even) { transform: rotate(1.4deg); }
+[dir="rtl"] .category-brutal-card:nth-child(odd) { transform: rotate(1.4deg); }
+[dir="rtl"] .category-brutal-card:nth-child(even) { transform: rotate(-1.4deg); }
+
+.category-brutal-card:hover {
+    transform: rotate(0) translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--b-ink);
+}
+.category-brutal-card:active {
+    transform: rotate(0) translate(4px, 4px);
+    box-shadow: 0 0 0 var(--b-ink);
+}
+
+/* نوار نئونی بالای کارت — رنگ‌بندی ریتمیک با nth-child */
+.category-brutal-tape {
+    position: absolute;
+    top: -3px;
+    inset-inline-start: -3px;
+    inset-inline-end: -3px;
+    height: 10px;
+    background: var(--b-lemon);
+    border-block: var(--b-line) solid var(--b-ink);
+}
+.category-brutal-card:nth-child(3n+2) .category-brutal-tape { background: var(--b-blue); }
+.category-brutal-card:nth-child(3n+3) .category-brutal-tape { background: var(--b-pink); }
+
+/* بلوک آیکون — مربعی ۵۶×۵۶ با سایهٔ هارد */
+.category-brutal-icon {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-top: 8px;
+    background: var(--b-paper);
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 2px;
+    box-shadow: 4px 4px 0 var(--b-ink);
+    overflow: hidden;
+    transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s cubic-bezier(.16,1,.3,1);
+}
+.category-brutal-card:hover .category-brutal-icon {
+    transform: rotate(-6deg) translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--b-ink);
+}
+[dir="rtl"] .category-brutal-card:hover .category-brutal-icon { transform: rotate(6deg) translate(-2px, -2px); }
+.category-brutal-emoji {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+/* نام — Estedad Black */
+.category-brutal-name {
+    text-align: center;
+    line-height: 1.3;
+    color: var(--b-ink);
+    font-family: var(--b-font-display);
+    font-weight: 900;
+    font-size: .92rem;
+    max-width: 100%;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+}
+
+/* چیپ شمارنده — مربعی مونو با بوردر جوهری */
+.category-brutal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .5rem;
+    border: 2px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: color-mix(in srgb, var(--b-ink) 72%, transparent);
+    font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+    font-size: .62rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.category-brutal-chip-num {
+    color: var(--b-ink);
+    font-weight: 900;
+}
+
+/* فلش پایین — در هاور لیز می‌خورد */
+.category-brutal-arrow {
+    position: absolute;
+    inset-inline-end: 8px;
+    inset-block-end: 6px;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--b-ink);
+    border-radius: 2px;
+    background: var(--b-paper);
+    color: var(--b-ink);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity .16s var(--ease-out), transform .2s cubic-bezier(.16,1,.3,1), background-color .16s;
+}
+[dir="ltr"] .category-brutal-arrow { transform: translateX(4px); }
+.category-brutal-card:hover .category-brutal-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    background: var(--b-lemon);
+}
+[dir="ltr"] .category-brutal-card:hover .category-brutal-arrow { transform: translateX(0); }
+.category-brutal-card:focus-visible {
+    outline: 3px solid var(--b-lemon);
+    outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+    .categories-brutal-link { padding: .55rem .9rem; font-size: .64rem; }
+    .category-brutal-card { width: 152px; }
+    .category-brutal-icon { width: 56px; height: 56px; }
+    .category-brutal-emoji { font-size: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .category-brutal-card,
+    .category-brutal-card:nth-child(odd),
+    .category-brutal-card:nth-child(even),
+    [dir="rtl"] .category-brutal-card:nth-child(odd),
+    [dir="rtl"] .category-brutal-card:nth-child(even) { transform: none !important; }
+    .category-brutal-card:hover { transform: translate(-2px, -2px) !important; }
+    .category-brutal-card:hover .category-brutal-icon { transform: none !important; }
+    .category-brutal-card:hover .category-brutal-arrow { transform: translateX(0) !important; }
+    .category-brutal-arrow { transition: opacity .16s; }
+}
