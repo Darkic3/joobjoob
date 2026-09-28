@@ -32,6 +32,9 @@ class SeoLocalizationTest extends TestCase
     {
         parent::setUp();
 
+        // Test multi-lingual behavior: disable public locale lock
+        config(['site-features.public_locale_locked' => false]);
+
         app(LocaleService::class)->flush();
         $this->seed(LanguageSeeder::class);
     }

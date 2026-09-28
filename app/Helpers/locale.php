@@ -28,6 +28,12 @@ if (! function_exists('localizedRoute')) {
      */
     function localizedRoute(string $name, array $params = [], ?string $code = null): string
     {
+        // Public locale lock: always generate canonical unprefixed URL for public site.
+        // Admin routes use route() directly and are unaffected by this helper.
+        if (config('site-features.public_locale_locked', false)) {
+            return route($name, $params);
+        }
+
         $code ??= app()->getLocale();
 
         if ($code === locale()->defaultCode()) {

@@ -43,40 +43,6 @@
         {{-- اکشن‌ها — در موبایل فقط هامبرگر می‌ماند (زبان/تم داخل منو، سبد/علاقه‌مندی در نوار پایین) --}}
         <div class="flex items-center gap-2 ms-auto lg:ms-0">
 
-            @if (count($locales) > 1)
-                <div class="relative hidden lg:block">
-                    <button type="button" data-lang-dropdown-btn
-                            class="site-lang-btn text-xs font-bold"
-                            title="{{ __('messages.language') }}" aria-haspopup="true" aria-expanded="false">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"/>
-                            <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" stroke-linecap="round"/>
-                        </svg>
-                        <span>{{ strtoupper($currentLocale) }}</span>
-                        <svg class="w-3 h-3 site-lang-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="m6 9 6 6 6-6"/>
-                        </svg>
-                    </button>
-                    <div data-lang-dropdown-menu class="site-lang-menu hidden absolute end-0 top-full mt-2 p-2 w-44 z-50">
-                        @foreach($locales as $code => $lang)
-                            <a href="{{ localizedUrl($code) }}"
-                               class="site-lang-item {{ $currentLocale === $code ? 'is-active' : '' }}">
-                                <span class="site-lang-code">{{ strtoupper($code) }}</span>
-                                <span class="flex-1">{{ $lang->localizedName() }}</span>
-                                @if ($currentLocale === $code)
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6" d="m5 13 4 4L19 7"/>
-                                    </svg>
-                                @endif
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            <button type="button" id="theme-toggle" class="neu-toggle hidden lg:block" title="{{ __('messages.dark_mode') }}">
-                <span class="neu-toggle-dot"></span>
-            </button>
 
             {{-- سبد/علاقه‌مندی/اعلانات/حساب فقط برای اعضا؛ مهمان فقط دکمهٔ ورود/ثبت‌نام --}}
             @auth
@@ -258,24 +224,6 @@
         </div>
 
         <div class="site-menu-footer">
-            @if (count($locales) > 1)
-                <div class="site-menu-langs" aria-label="{{ __('messages.language') }}">
-                    @foreach($locales as $code => $lang)
-                        <a href="{{ localizedUrl($code) }}"
-                           class="site-menu-lang {{ $currentLocale === $code ? 'is-active' : '' }}">
-                            {{ $lang->localizedName() }}
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-
-            <div class="site-menu-theme">
-                <span class="site-menu-theme-label">{{ __('messages.dark_mode') }}</span>
-                <button type="button" id="theme-toggle-menu" class="neu-toggle"
-                        title="{{ __('messages.dark_mode') }}" aria-label="{{ __('messages.dark_mode') }}">
-                    <span class="neu-toggle-dot"></span>
-                </button>
-            </div>
         </div>
     </div>
 </div>

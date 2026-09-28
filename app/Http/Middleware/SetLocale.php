@@ -20,6 +20,11 @@ use Symfony\Component\HttpFoundation\Response;
  * پنل ادمین (بدون پیشوند) زنجیره‌ی قدیمی را حفظ می‌کند:
  *   ?lang= → کاربر لاگین‌شده → session → پیش‌فرض
  *
+ * حالت قفل زبان عمومی (config/site-features.php):
+ *   وقتی public_locale_locked=true باشد، سایت عمومی فقط به یک زبان اجرا می‌شود.
+ *   هر URL پیشونددار یا ?lang= با 301 به نسخه‌ی canonical بدون پیشوند برمی‌گردد.
+ *   پنل ادمین از این قفل مستثنا است و رفتار چندزبانه‌اش دست‌نخورده می‌ماند.
+ *
  * ⚠️ این میدلور در گروه وب است و پیش از resolve شدن روت اجرا می‌شود —
  * پس `$request->route('locale')` در دسترس نیست و پیشوند را از `$request->path()` می‌خوانیم.
  */
@@ -30,6 +35,45 @@ class SetLocale
         $locales = app(LocaleService::class);
         $default = $locales->defaultCode();
         $isAdmin = str_starts_with($request->path(), 'admin');
+
+        // ── حالت قفل زبان سایت عمومی ─────────────────────────────────────────
+        // فقط سایت عمومی قفل می‌شود؛ ادمین دست‌نخورده می‌ماند.
+        if (! $isAdmin && config('site-features.public_locale_locked', false)) {
+            $publicLocale = (string) config('site-features.public_locale', $default);
+
+            // هر مسیر پیشونددار (/en/...، /xx/...) → 301 به نسخه‌ی بدون پیشوند
+            $segments = explode('/', $request->path());
+            $first = $segments[0] ?? '';
+
+            if ($first !== '' && $locales->has($first)) {
+                return redirect()->to($this->canonicalPath($request, $segments), 301);
+            }
+
+            // هر ?lang=xx → 301 به همان مسیر بدون پارامتر
+            if ($request->query->has('lang')) {
+                $query = $request->query->all();
+                unset($query['lang']);
+
+                $clean = '/'.ltrim($request->path(), '/');
+
+                return redirect()->to(
+                    $clean.(count($query) ? '?'.http_build_query($query) : ''),
+                    301
+                );
+            }
+
+            // زبان عمومی قفل‌شده را اعمال کن
+            app()->setLocale($publicLocale);
+            session(['locale' => $publicLocale]);
+
+            view()->share('direction', $locales->isRtl($publicLocale) ? 'rtl' : 'ltr');
+            view()->share('currentLocale', $publicLocale);
+            view()->share('publicLocaleLocked', true);
+
+            return $next($request);
+        }
+
+        // ── رفتار عادی (پنل ادمین یا سایت عمومی بدون قفل) ─────────────────────
 
         // استخراج پیشوند زبان از مسیر (مثل en/products → en)
         $segments = explode('/', $request->path());
@@ -91,6 +135,7 @@ class SetLocale
         // جهت متن برای استفاده در ویوها — از سرویس
         view()->share('direction', $locales->isRtl($locale) ? 'rtl' : 'ltr');
         view()->share('currentLocale', $locale);
+        view()->share('publicLocaleLocked', false);
 
         return $next($request);
     }

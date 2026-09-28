@@ -22,11 +22,14 @@
 {{-- canonical: همیشه self-referencing برای زبان جاری --}}
 <link rel="canonical" href="{{ $seo['canonical'] }}">
 
+{{-- hreflang: only when multi-lingual is active (hidden in public locale lock mode) --}}
+@if (! ($publicLocaleLocked ?? false))
 {{-- hreflang: هر زبان فعال + x-default به زبان پیش‌فرض --}}
 @foreach ($seo['alternates'] as $code => $url)
     <link rel="alternate" hreflang="{{ $code }}" href="{{ $url }}">
 @endforeach
 <link rel="alternate" hreflang="x-default" href="{{ $seo['x_default'] }}">
+@endif
 
 {{-- Open Graph --}}
 <meta property="og:type" content="{{ $seo['og']['type'] }}">
@@ -42,9 +45,11 @@
     <meta property="og:site_name" content="{{ $seo['og']['site_name'] }}">
 @endif
 <meta property="og:locale" content="{{ $seo['og']['locale'] }}">
+@if (! ($publicLocaleLocked ?? false))
 @foreach ($seo['og']['locale_alternates'] as $alternateLocale)
     <meta property="og:locale:alternate" content="{{ $alternateLocale }}">
 @endforeach
+@endif
 
 {{-- Twitter Card --}}
 <meta name="twitter:card" content="{{ $seo['twitter']['card'] }}">

@@ -3,16 +3,6 @@ import './localize-digits.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ---------- تاگل تم: فقط data-theme را عوض می‌کنیم، بقیه (موقعیت دات) با CSS خودکار است ----------
-    // دو نمونه دارد: یکی در هدر دسکتاپ و یکی داخل منوی موبایل
-    const root = document.documentElement;
-    document.querySelectorAll('#theme-toggle, #theme-toggle-menu').forEach(function (toggle) {
-        toggle.addEventListener('click', function () {
-            const next = root.getAttribute('data-theme') === 'dark-neumorphism' ? 'light-neumorphism' : 'dark-neumorphism';
-            root.setAttribute('data-theme', next);
-            localStorage.setItem('site_theme', next);
-        });
-    });
 
     // ---------- دکمهٔ افزودن به سبد: idle -> loading -> success (هندلر اصلی پایین است) ----------
 
@@ -50,21 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     }
 
-    // ---------- دراپ‌داون زبان (aria-expanded برای چرخش شورون) ----------
-    const langBtn = document.querySelector('[data-lang-dropdown-btn]');
-    const langMenu = document.querySelector('[data-lang-dropdown-menu]');
-    if (langBtn && langMenu) {
-        langBtn.addEventListener('click', function () {
-            const nowHidden = langMenu.classList.toggle('hidden');
-            langBtn.setAttribute('aria-expanded', String(!nowHidden));
-        });
-        document.addEventListener('click', function (e) {
-            if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) {
-                langMenu.classList.add('hidden');
-                langBtn.setAttribute('aria-expanded', 'false');
-            }
-        });
-    }
 
     // ---------- منوی موبایل (همبرگر مورف) ----------
     // با JS خالص: باز/بسته با کلاس open، قفل اسکرول بدنه، بستن با کلیک/اسکیپ.
@@ -91,13 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.key === 'Escape') setMenu(false);
         });
     }
-    document.querySelectorAll('[data-lang-select]').forEach(function (el) {
-        el.addEventListener('click', function () {
-            const url = new URL(window.location.href);
-            url.searchParams.set('lang', el.getAttribute('data-lang-select'));
-            window.location.href = url.toString();
-        });
-    });
 
     document.querySelectorAll('[data-brand-chip]').forEach(function (chip) {
         chip.addEventListener('click', function () {
