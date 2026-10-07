@@ -5,7 +5,7 @@
 @endphp
 
 {{-- هدر بروتالیست تمام‌عرض (هم‌زبان با هیرو) — دسکتاپ: نوار کرم با بوردر جوهری؛ موبایل: لوگو + همبرگر مورف --}}
-<header class="site-header-wrap header-brutal sticky top-0 z-50">
+<header class="site-header-wrap sticky top-0 z-50">
     <div class="site-header max-w-7xl mx-auto">
 
         {{-- لوگو: مارک گرادینتی (Double-Bezel) + نام --}}
@@ -84,57 +84,57 @@
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
                          class="absolute end-0 top-full mt-2 w-80 site-notif-menu overflow-hidden z-50">
-                        <div class="flex items-center justify-between px-4 py-3" style="border-bottom: 2.5px solid var(--b-ink);">
-                            <p class="text-sm font-bold" style="color: var(--b-ink);">{{ __('messages.notifications') }}</p>
+                        <div class="flex items-center justify-between px-4 py-3" style="border-bottom: 1px solid var(--eco-line);">
+                            <p class="text-sm font-bold" style="color: var(--eco-ink);">{{ __('messages.notifications') }}</p>
                             <button x-show="count > 0" @click="markAllRead()" type="button"
                                     class="text-[11px] font-bold transition-opacity hover:opacity-70"
-                                    style="color: var(--b-blue);">
+                                    style="color: var(--eco-clay-ink);">
                                 {{ __('messages.mark_all_read') }}
                             </button>
                         </div>
                         <div class="max-h-72 overflow-y-auto">
                             <template x-if="loading">
                                 <div class="px-4 py-8 text-center">
-                                    <p class="text-xs font-bold" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent);">{{ __('messages.loading') }}</p>
+                                    <p class="text-xs font-bold" style="color: var(--eco-ink-2);">{{ __('messages.loading') }}</p>
                                 </div>
                             </template>
                             <template x-if="!loading && items.length === 0">
                                 <div class="px-4 py-8 text-center">
-                                    <svg class="w-10 h-10 mx-auto mb-2" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent); opacity: 0.4;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
-                                    <p class="text-xs font-bold" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent);">{{ __('messages.no_notifications') }}</p>
+                                    <svg class="w-10 h-10 mx-auto mb-2" style="color: var(--eco-ink-2); opacity: 0.4;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+                                    <p class="text-xs font-bold" style="color: var(--eco-ink-2);">{{ __('messages.no_notifications') }}</p>
                                 </div>
                             </template>
                             <template x-for="item in items" :key="item.id">
                                 <template x-if="item.link">
                                     <a :href="item.link"
                                        class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
-                                       :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--b-blue) 5%, transparent);'">
+                                       :style="item.is_read ? '' : 'background: var(--eco-clay-soft);'"
                                         <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-xs font-bold truncate" style="color: var(--b-ink);" x-text="item.title"></p>
-                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent);" x-text="item.body"></p>
-                                            <p class="text-[10px] mt-1" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent); opacity: 0.6;" x-text="item.created_at"></p>
+                                            <p class="text-xs font-bold truncate" style="color: var(--eco-ink);" x-text="item.title"></p>
+                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--eco-ink-2);" x-text="item.body"></p>
+                                            <p class="text-[10px] mt-1" style="color: var(--eco-ink-2); opacity: 0.6;" x-text="item.created_at"></p>
                                         </div>
-                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--b-blue);"></span>
+                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--eco-clay);"></span>
                                     </a>
                                 </template>
                                 <template x-if="!item.link">
                                     <div class="flex items-start gap-3 px-4 py-3 transition-colors hover:opacity-80"
-                                         :style="item.is_read ? '' : 'background: color-mix(in srgb, var(--b-blue) 5%, transparent);'">
+                                         :style="item.is_read ? '' : 'background: var(--eco-clay-soft);'"
                                         <span class="text-lg shrink-0 mt-0.5" x-text="item.icon || '🔔'"></span>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-xs font-bold truncate" style="color: var(--b-ink);" x-text="item.title"></p>
-                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent);" x-text="item.body"></p>
-                                            <p class="text-[10px] mt-1" style="color: color-mix(in srgb, var(--b-ink) 62%, transparent); opacity: 0.6;" x-text="item.created_at"></p>
+                                            <p class="text-xs font-bold truncate" style="color: var(--eco-ink);" x-text="item.title"></p>
+                                            <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--eco-ink-2);" x-text="item.body"></p>
+                                            <p class="text-[10px] mt-1" style="color: var(--eco-ink-2); opacity: 0.6;" x-text="item.created_at"></p>
                                         </div>
-                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--b-blue);"></span>
+                                        <span x-show="!item.is_read" class="w-2 h-2 rounded-full shrink-0 mt-1.5" style="background: var(--eco-clay);"></span>
                                     </div>
                                 </template>
                             </template>
                         </div>
                         <a href="{{ route('dashboard.notifications') }}"
                            class="block text-center py-2.5 text-xs font-bold transition-opacity hover:opacity-80"
-                           style="color: var(--b-blue); border-top: 2.5px solid var(--b-ink);">
+                           style="color: var(--eco-clay-ink); border-top: 1px solid var(--eco-line);">
                             {{ __('messages.view_all_notifications') }}
                         </a>
                     </div>
@@ -170,7 +170,7 @@
 </header>
 
 {{-- منوی تمام‌صفحه موبایل — z پایین‌تر از هدر تا همبرگر مورف‌شده روی آن دیده شود --}}
-<div class="site-menu menu-brutal lg:hidden" id="site-menu" data-site-menu
+<div class="site-menu lg:hidden" id="site-menu" data-site-menu
      role="dialog" aria-modal="true" aria-label="{{ __('messages.navigation') }}" aria-hidden="true">
     <div class="site-menu-backdrop" data-menu-close></div>
     <div class="site-menu-panel">

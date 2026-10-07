@@ -1,0 +1,571 @@
+/* ===================================================================
+   Eco-Collectible — Shell (فاز ۲)
+   -------------------------------------------------------------------
+   پوستهٔ سایت عمومی: نوار اعلان، هدر، منوی موبایل، نوار پایین موبایل،
+   فوتر، بازگشت‌به‌بالا. همهٔ قواعد زیر [data-theme="eco-collectible"]
+   اسکوپ شده‌اند؛ ساختار Blade و منطق JS/Alpine دست نمی‌خورد.
+   جایگزین ظاهر بروتالیست (بوردر جوهری ۲.۵px، سایهٔ هارد، گرادیان) با
+   زبان Eco: بوردر ۱px، شعاع ۸/۱۲/۱۸، سایهٔ محو، حرکت آرام.
+   =================================================================== */
+
+/* ================= ۱) نوار اعلان ================= */
+
+[data-theme="eco-collectible"] .announce-bar {
+    background: var(--eco-ink);
+    color: var(--eco-canvas);
+    border-bottom: 1px solid var(--eco-ink);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+/* ================= ۲) هدر ================= */
+
+[data-theme="eco-collectible"] .site-header-wrap {
+    padding-block: .5rem;
+    background: var(--eco-canvas-2);
+    border-bottom: 1px solid var(--eco-line);
+}
+
+/* خنثی‌سازی حالت‌های قدیمی (جزیرهٔ شیشه‌ای / بروتال تمام‌عرض) */
+[data-theme="eco-collectible"] .site-header,
+[data-theme="eco-collectible"] .header-brutal .site-header {
+    gap: .5rem;
+    padding: .55rem 1rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+@media (min-width: 768px) {
+    [data-theme="eco-collectible"] .site-header,
+    [data-theme="eco-collectible"] .header-brutal .site-header {
+        gap: .75rem;
+        padding: .6rem 1.25rem;
+    }
+}
+
+/* ---------- لوگو ---------- */
+[data-theme="eco-collectible"] .site-logo-mark,
+[data-theme="eco-collectible"] .header-brutal .site-logo-mark {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-clay);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 800;
+    box-shadow: none;
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-logo:hover .site-logo-mark,
+[data-theme="eco-collectible"] .header-brutal .site-logo:hover .site-logo-mark {
+    transform: translateY(-1px);
+    background: var(--eco-clay-deep);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .site-logo-text,
+[data-theme="eco-collectible"] .header-brutal .site-logo-text {
+    color: var(--eco-ink);
+    font-family: var(--eco-font-display);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+/* ---------- لینک‌های ناو ---------- */
+[data-theme="eco-collectible"] .site-nav-link,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link {
+    padding: .5rem .9rem;
+    border: 1px solid transparent;
+    border-radius: var(--eco-radius-sm);
+    color: var(--eco-ink-2);
+    font-size: .84rem;
+    font-weight: 600;
+    box-shadow: none;
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-nav-link::after,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link::after {
+    content: none;
+}
+[data-theme="eco-collectible"] .site-nav-link:hover,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link:hover {
+    color: var(--eco-clay-ink);
+    background: var(--eco-clay-soft);
+    border-color: transparent;
+    box-shadow: none;
+    transform: none;
+}
+[data-theme="eco-collectible"] .site-nav-link.is-active,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link.is-active {
+    color: #fff;
+    background: var(--eco-ink);
+    border-color: var(--eco-ink);
+    box-shadow: none;
+}
+
+/* ---------- جستجو ---------- */
+[data-theme="eco-collectible"] .site-search-input,
+[data-theme="eco-collectible"] .header-brutal .site-search-input {
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-surface);
+    color: var(--eco-ink);
+    font-weight: 400;
+    box-shadow: none;
+    outline: none;
+}
+[data-theme="eco-collectible"] .site-search-input::placeholder,
+[data-theme="eco-collectible"] .header-brutal .site-search-input::placeholder {
+    color: var(--eco-ink-3);
+}
+[data-theme="eco-collectible"] .site-search-input:focus,
+[data-theme="eco-collectible"] .header-brutal .site-search-input:focus {
+    border-color: var(--eco-clay);
+    box-shadow: var(--eco-focus-ring);
+    outline: none;
+}
+[data-theme="eco-collectible"] .site-search-icon,
+[data-theme="eco-collectible"] .header-brutal .site-search-icon {
+    color: var(--eco-ink-3);
+}
+
+/* ---------- دکمه‌های اکشن + بج ---------- */
+[data-theme="eco-collectible"] .site-action-btn,
+[data-theme="eco-collectible"] .header-brutal .site-action-btn {
+    width: 42px;
+    height: 42px;
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-surface);
+    color: var(--eco-ink-2);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-action-btn:hover,
+[data-theme="eco-collectible"] .header-brutal .site-action-btn:hover {
+    color: var(--eco-ink);
+    background: var(--eco-surface);
+    border-color: var(--eco-line-strong);
+    transform: translateY(-1px);
+    box-shadow: var(--eco-shadow-xs);
+}
+/* آیکون‌های داخل دکمه‌های اکشن: اندازهٔ قطعی (رفع کلاپس flex در برخی
+   چینش‌ها که آیکون سبد مهمان را نامرئی می‌کرد) */
+[data-theme="eco-collectible"] .site-action-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+[data-theme="eco-collectible"] .site-badge,
+[data-theme="eco-collectible"] .header-brutal .site-badge,
+[data-theme="eco-collectible"] .header-brutal .site-notif-badge {
+    top: -6px;
+    inset-inline-end: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 5px;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-clay);
+    border: 1px solid var(--eco-surface);
+    box-shadow: var(--eco-shadow-xs);
+    color: #fff;
+    font-family: var(--eco-font-mono);
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+/* ---------- منوی اعلانات ---------- */
+[data-theme="eco-collectible"] .site-notif-menu,
+[data-theme="eco-collectible"] .header-brutal .site-notif-menu {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+    box-shadow: var(--eco-shadow-md);
+}
+
+/* ---------- آواتار و ورود ---------- */
+[data-theme="eco-collectible"] .site-account-avatar,
+[data-theme="eco-collectible"] .header-brutal .site-account-avatar {
+    border: 0;
+    border-radius: 50%;
+    background: var(--eco-clay);
+    color: #fff;
+    font-weight: 800;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-account-btn:hover,
+[data-theme="eco-collectible"] .header-brutal .site-account-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-account-btn:hover .site-account-avatar,
+[data-theme="eco-collectible"] .header-brutal .site-account-btn:hover .site-account-avatar {
+    transform: none;
+    background: var(--eco-clay-deep);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .site-login-btn,
+[data-theme="eco-collectible"] .header-brutal .site-login-btn {
+    min-height: 44px;
+    padding: 0 1.15rem;
+    border: 1px solid var(--eco-clay);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-clay);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-login-btn:hover,
+[data-theme="eco-collectible"] .header-brutal .site-login-btn:hover {
+    background: var(--eco-clay-deep);
+    border-color: var(--eco-clay-deep);
+    transform: translateY(-1px);
+    box-shadow: var(--eco-shadow-sm);
+    filter: none;
+}
+[data-theme="eco-collectible"] .site-login-btn:active,
+[data-theme="eco-collectible"] .header-brutal .site-login-btn:active {
+    transform: translateY(0);
+}
+
+/* ---------- هامبرگر ---------- */
+[data-theme="eco-collectible"] .site-hamburger,
+[data-theme="eco-collectible"] .header-brutal .site-hamburger {
+    width: 44px;
+    height: 44px;
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-surface);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-hamburger:hover,
+[data-theme="eco-collectible"] .header-brutal .site-hamburger:hover {
+    border-color: var(--eco-line-strong);
+    transform: none;
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .site-hamburger:active,
+[data-theme="eco-collectible"] .header-brutal .site-hamburger:active {
+    transform: none;
+}
+[data-theme="eco-collectible"] .site-hamburger span,
+[data-theme="eco-collectible"] .header-brutal .site-hamburger span {
+    inset-inline-start: 12px;
+    width: 20px;
+    height: 2px;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-ink);
+}
+
+/* ================= ۳) منوی موبایل ================= */
+
+[data-theme="eco-collectible"] .site-menu-backdrop,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-backdrop {
+    background: rgb(var(--eco-ink-rgb) / .45);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+[data-theme="eco-collectible"] .site-menu-panel,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-panel {
+    background: var(--eco-canvas-2);
+    border-inline: 0;
+    border-bottom: 0;
+}
+[data-theme="eco-collectible"] .site-menu-link,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link {
+    align-items: center;
+    gap: .9rem;
+    padding: .7rem .9rem;
+    border: 1px solid transparent;
+    border-radius: var(--eco-radius-md);
+    color: var(--eco-ink);
+    font-family: var(--eco-font-body);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-menu-link:hover,
+[data-theme="eco-collectible"] .site-menu-link.is-active,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link:hover,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link.is-active {
+    color: var(--eco-clay-ink);
+    background: var(--eco-clay-soft);
+    border-color: transparent;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-menu-num,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-num {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--eco-clay);
+    font-family: var(--eco-font-mono);
+    font-size: .7rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    opacity: 1;
+}
+[data-theme="eco-collectible"] .site-menu-account-link,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-link {
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .site-menu-account-link:hover,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-link:hover {
+    transform: translateY(-1px);
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .site-menu-account-icon,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-icon {
+    border: 0;
+    border-radius: 50%;
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    font-weight: 800;
+}
+[data-theme="eco-collectible"] .site-menu-account-title,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-title {
+    color: var(--eco-ink);
+}
+[data-theme="eco-collectible"] .site-menu-account-sub,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-sub {
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .site-menu-account-arrow,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-account-arrow {
+    color: var(--eco-ink-3);
+    opacity: 1;
+}
+
+/* ================= ۴) نوار پایین موبایل + شیت جستجو ================= */
+
+[data-theme="eco-collectible"] .mobile-bar-pill {
+    border: var(--eco-border);
+    border-radius: 18px;
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-md);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+[data-theme="eco-collectible"] .mobile-bar-item {
+    border-radius: var(--eco-radius-md);
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .mobile-bar-item:hover { color: var(--eco-clay-ink); }
+[data-theme="eco-collectible"] .mobile-bar-item:active { transform: none; }
+[data-theme="eco-collectible"] .mobile-bar-active {
+    color: var(--eco-clay-ink);
+    background: var(--eco-clay-soft);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .mobile-search-backdrop {
+    background: rgb(var(--eco-ink-rgb) / .4);
+}
+[data-theme="eco-collectible"] .mobile-search-panel {
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-lg);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-lg);
+}
+
+/* ================= ۵) فوتر ================= */
+
+[data-theme="eco-collectible"] .site-footer {
+    background: var(--eco-canvas-2);
+    border-top: 1px solid var(--eco-line);
+}
+/* حذف قاب گرادینتی Double-Bezel — فوتر نواری تخت می‌شود */
+[data-theme="eco-collectible"] .site-footer-shell {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+[data-theme="eco-collectible"] .site-footer-core {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-logo-mark {
+    border-radius: var(--eco-radius-md);
+    background: var(--eco-clay);
+    color: #fff;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-brand-name { color: var(--eco-ink); }
+[data-theme="eco-collectible"] .site-footer-brand-tag,
+[data-theme="eco-collectible"] .site-footer-desc {
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .site-footer-contact li { color: var(--eco-ink-2); }
+[data-theme="eco-collectible"] .site-footer-contact-icon {
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-heading { color: var(--eco-ink); }
+[data-theme="eco-collectible"] .site-footer-heading-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--eco-clay);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-links a { color: var(--eco-ink-2); }
+[data-theme="eco-collectible"] .site-footer-links a::before {
+    background: var(--eco-line-strong);
+}
+[data-theme="eco-collectible"] .site-footer-links a:hover {
+    color: var(--eco-clay-ink);
+}
+[data-theme="eco-collectible"] .site-footer-links a:hover::before {
+    background: var(--eco-clay);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-sub { color: var(--eco-ink-2); }
+[data-theme="eco-collectible"] .site-footer-newsletter-input {
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-surface);
+    color: var(--eco-ink);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-input::placeholder {
+    color: var(--eco-ink-3);
+    opacity: 1;
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-input:focus {
+    border-color: var(--eco-clay);
+    box-shadow: var(--eco-focus-ring);
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-btn {
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--eco-clay);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-clay);
+    color: #fff;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-btn:hover {
+    background: var(--eco-clay-deep);
+    border-color: var(--eco-clay-deep);
+    transform: translateY(-1px);
+    box-shadow: var(--eco-shadow-sm);
+    filter: none;
+}
+[data-theme="eco-collectible"] .site-footer-newsletter-btn:active {
+    transform: translateY(0);
+}
+[data-theme="eco-collectible"] .site-footer-bottom {
+    border-top: 1px solid var(--eco-line);
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .site-footer-badge {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+}
+[data-theme="eco-collectible"] .site-footer-badge:hover {
+    transform: translateY(-1px);
+    border-color: var(--eco-line-strong);
+}
+[data-theme="eco-collectible"] .site-footer-badge-icon {
+    background: var(--eco-sage-soft);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-footer-badge-title { color: var(--eco-ink); }
+[data-theme="eco-collectible"] .site-footer-acc-chevron { color: var(--eco-ink-3); }
+
+/* ---------- شبکه‌های اجتماعی ---------- */
+[data-theme="eco-collectible"] .site-social-btn {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    color: var(--eco-ink-2);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .site-social-btn svg { transition: none; }
+[data-theme="eco-collectible"] .site-social-btn:hover,
+[data-theme="eco-collectible"] .site-social--twitter:hover {
+    transform: translateY(-2px);
+    background: var(--eco-clay);
+    border-color: var(--eco-clay);
+    color: #fff;
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .site-social-btn:active { transform: translateY(0); }
+
+/* ================= ۶) بازگشت‌به‌بالا ================= */
+
+[data-theme="eco-collectible"] .back-to-top {
+    border: var(--eco-border);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .back-to-top:hover {
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-md);
+}
+[data-theme="eco-collectible"] .back-to-top:active {
+    transform: translateY(0);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .back-to-top:focus-visible {
+    outline: 2px solid var(--eco-clay);
+    outline-offset: 2px;
+}
+[data-theme="eco-collectible"] .back-to-top.complete {
+    background: var(--eco-clay);
+    border-color: var(--eco-clay);
+    color: #fff;
+    box-shadow: var(--eco-shadow-sm);
+    animation: none;
+}
+[data-theme="eco-collectible"] .back-to-top-track {
+    stroke: var(--eco-line);
+}
+[data-theme="eco-collectible"] .back-to-top-progress { stroke: var(--eco-clay); }
+[data-theme="eco-collectible"] .back-to-top-arrow { color: var(--eco-clay-ink); }
+[data-theme="eco-collectible"] .back-to-top.complete .back-to-top-arrow { color: #fff; }
+
+/* ================= ۷) حرکتِ کم ================= */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="eco-collectible"] .site-header,
+    [data-theme="eco-collectible"] .site-logo-mark,
+    [data-theme="eco-collectible"] .site-nav-link,
+    [data-theme="eco-collectible"] .site-search-input,
+    [data-theme="eco-collectible"] .site-action-btn,
+    [data-theme="eco-collectible"] .site-hamburger,
+    [data-theme="eco-collectible"] .site-menu-backdrop,
+    [data-theme="eco-collectible"] .site-menu-link,
+    [data-theme="eco-collectible"] .site-menu-account,
+    [data-theme="eco-collectible"] .site-menu-account-link,
+    [data-theme="eco-collectible"] .mobile-bar-pill,
+    [data-theme="eco-collectible"] .mobile-search-panel,
+    [data-theme="eco-collectible"] .site-footer-badge,
+    [data-theme="eco-collectible"] .site-social-btn,
+    [data-theme="eco-collectible"] .site-login-btn,
+    [data-theme="eco-collectible"] .back-to-top {
+        transition: none !important;
+    }
+    [data-theme="eco-collectible"] .site-menu-link,
+    [data-theme="eco-collectible"] .site-menu-account,
+    [data-theme="eco-collectible"] .site-menu-footer {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
