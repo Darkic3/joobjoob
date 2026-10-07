@@ -25,7 +25,8 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::with(['images', 'category', 'brand'])->where('is_active', true);
+        // specificationValues برای تگ متریال کارت (فاز ۳ تم Eco) — با with('specification') داخلی، فقط ۱ کوئری اضافه
+        $query = Product::with(['images', 'category', 'brand', 'specificationValues'])->where('is_active', true);
 
         // ۱. فیلتر دسته‌بندی — شامل محصولات تمام زیرشاخه‌ها نیز می‌شود
         if ($request->filled('category')) {
@@ -121,7 +122,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $request->route('product'))->firstOrFail();
 
-        $product->load(['images', 'category', 'brand', 'reviews']);
+        $product->load(['images', 'category', 'brand', 'reviews', 'specificationValues']);
 
         return view('site.products.partials.quick-view', compact('product'));
     }
@@ -137,7 +138,7 @@ class ProductController extends Controller
 
         $category->load('parent');
 
-        $products = Product::with(['images', 'category', 'brand'])
+        $products = Product::with(['images', 'category', 'brand', 'specificationValues'])
             ->where('is_active', true)
             ->whereIn('product_category_id', $this->categoryIdsWithDescendants([$category->slug]))
             ->paginate(12);

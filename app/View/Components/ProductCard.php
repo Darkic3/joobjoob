@@ -42,6 +42,19 @@ class ProductCard extends Component
     /** @var array{color: string, text: string}|null استایل نشان رتبه (فقط بخش پرفروش‌ترین‌ها) */
     public ?array $rankStyle;
 
+    /** شناسهٔ کلکسیونی نمایشی — «برچسب انبار» تم Eco (مثل #ECO-0042) */
+    public string $collectibleId;
+
+    /** تگ متریال از روی مشخصات (null اگر مشخصات لود نشده یا متریال ندارد) */
+    public ?string $materialTag;
+
+    /**
+     * تگ وضعیت کارت — اولویت: ناموجود → محدود → جدید → تخفیف.
+     *
+     * @var array{label: string, tone: string}|null
+     */
+    public ?array $statusTag;
+
     private const RANK_STYLES = [
         1 => ['color' => 'var(--gold)', 'text' => '#000'],
         2 => ['color' => 'var(--silver)', 'text' => '#000'],
@@ -76,6 +89,11 @@ class ProductCard extends Component
         $this->inWishlist = app(WishlistService::class)->has($product);
 
         $this->rankStyle = $rank ? (self::RANK_STYLES[$rank] ?? ['color' => 'var(--bg-elevated)', 'text' => 'var(--text-secondary)']) : null;
+
+        // پراپرتی‌های نمایشی تم Eco-Collectible (منبع واحد: اکسسورهای مدل)
+        $this->collectibleId = $product->collectible_id;
+        $this->materialTag = $product->material_tag;
+        $this->statusTag = $product->status_tag;
     }
 
     public function render(): View

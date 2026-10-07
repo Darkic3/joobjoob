@@ -264,6 +264,84 @@ class Product extends Model
         return $this->reviews()->count();
     }
 
+    /**
+     * شناسهٔ کلکسیونی نمایشی («برچسب انبار» تم Eco-Collectible) — مثل #ECO-0042.
+     * صرفاً نمایشی و پایدار است؛ جایگزین SKU نیست.
+     */
+    public function getCollectibleIdAttribute(): string
+    {
+        return '#ECO-'.str_pad((string) $this->id, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * تگ متریال نمایشی از روی مشخصات لودشده (بدون کوئری جدید — اگر رابطه
+     * لود نشده باشد null برمی‌گردد تا در فهرست‌ها N+1 نسازد).
+     */
+    public function getMaterialTagAttribute(): ?string
+    {
+        $keywords = ['جنس', 'متریال', 'material', 'fabric', 'پارچه', 'چرم', 'چوب', 'فلز', 'نخ', 'الیاف', 'پنبه', 'کتان', 'پلاستیک', 'cotton', 'leather', 'wood', 'metal', 'polyester'];
+
+        // ۱) مقادیر نوشتاری (text) — مثل «جنس: چرم طبیعی»
+        if ($this->relationLoaded('specificationValues')) {
+            foreach ($this->specificationValues as $row) {
+                $title = $row->specification?->trans('title') ?? '';
+                foreach ($keywords as $keyword) {
+                    if (mb_stripos($title, $keyword) !== false && filled($row->value)) {
+                        return mb_substr(trim((string) $row->value), 0, 40);
+                    }
+                }
+            }
+        }
+
+        // ۲) گروه‌های انتخابی (select) — مثل گروه «جنس» با مقادیر فرزند
+        if ($this->relationLoaded('productSpecifications')) {
+            foreach ($this->productSpecifications as $ps) {
+                if ($ps->value !== null || $ps->parent_id !== null || ! $ps->specification) {
+                    continue;
+                }
+                $title = $ps->specification->trans('title') ?? '';
+                foreach ($keywords as $keyword) {
+                    if (mb_stripos($title, $keyword) !== false) {
+                        $values = $ps->children
+                            ->map(fn ($c) => $c->specification?->trans('title'))
+                            ->filter()->implode('، ');
+                        if (filled($values)) {
+                            return mb_substr($values, 0, 40);
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * تگ وضعیت نمایشی کارت (اولویت: ناموجود → محدود → جدید → تخفیف).
+     *
+     * @return array{label: string, tone: string}|null
+     */
+    public function getStatusTagAttribute(): ?array
+    {
+        if ($this->stock === 0) {
+            return ['label' => __('messages.out_of_stock'), 'tone' => 'danger'];
+        }
+
+        if ($this->stock > 0 && $this->stock <= 5) {
+            return ['label' => __('messages.only_left', ['count' => $this->stock]), 'tone' => 'sand'];
+        }
+
+        if ($this->created_at && $this->created_at->diffInDays(now()) <= 14) {
+            return ['label' => __('messages.new_badge'), 'tone' => 'sage'];
+        }
+
+        if ($this->has_discount && $this->discount_percentage) {
+            return ['label' => $this->discount_percentage.'٪-', 'tone' => 'clay'];
+        }
+
+        return null;
+    }
+
     // ==========================================
     // متدهای کمکی (Helpers)
     // ==========================================

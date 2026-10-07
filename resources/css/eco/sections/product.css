@@ -1,0 +1,518 @@
+/* ===================================================================
+   Eco-Collectible — Product (فاز ۳)
+   -------------------------------------------------------------------
+   کارت محصول (قلب تم)، کارت دسته‌بندی، محتوای quick-view و بنرهای
+   تبلیغاتی. همهٔ قواعد زیر [data-theme="eco-collectible"] اسکوپ شده‌اند؛
+   منطق Blade/PHP و هوک‌های JS دست نمی‌خورد.
+   =================================================================== */
+
+/* ================= ۱) کارت محصول ================= */
+
+[data-theme="eco-collectible"] .eco-pc {
+    display: block;
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+    box-shadow: var(--eco-shadow-xs);
+    overflow: hidden;
+    transition:
+        transform var(--eco-dur-med) var(--eco-ease),
+        box-shadow var(--eco-dur-med) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-pc:hover {
+    transform: translateY(-2px);
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-md);
+}
+
+/* ---------- قاب تصویر ---------- */
+[data-theme="eco-collectible"] .eco-pc-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--eco-canvas-2);
+    border-bottom: 1px solid var(--eco-line);
+}
+/* سایهٔ محو زیر محصول (بیضی نرم ته قاب) */
+[data-theme="eco-collectible"] .eco-pc-media::after {
+    content: "";
+    position: absolute;
+    inset-inline: 18%;
+    bottom: 10px;
+    height: 18px;
+    background: radial-gradient(ellipse at center, rgb(var(--eco-ink-rgb) / .14), transparent 70%);
+    pointer-events: none;
+}
+[data-theme="eco-collectible"] .eco-pc-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--eco-dur-slow) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-pc:hover .eco-pc-img { transform: scale(1.04); }
+[data-theme="eco-collectible"] .eco-pc-img-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--eco-canvas-2);
+}
+[data-theme="eco-collectible"] .eco-pc-img-fallback-inner { text-align: center; }
+[data-theme="eco-collectible"] .eco-pc-img-fallback-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-inline: auto;
+    color: var(--eco-line-strong);
+}
+[data-theme="eco-collectible"] .eco-pc-img-fallback-text {
+    margin-top: .5rem;
+    font-size: 11px;
+    color: var(--eco-ink-3);
+}
+
+/* شناسهٔ کلکسیونی گوشهٔ بالا */
+[data-theme="eco-collectible"] .eco-pc-id {
+    position: absolute;
+    top: .7rem;
+    inset-inline-start: .8rem;
+    z-index: 10;
+    background: rgb(var(--eco-surface-rgb) / .92);
+    padding: .15rem .5rem;
+    border-radius: var(--eco-radius-pill);
+}
+
+/* نشان رتبه */
+[data-theme="eco-collectible"] .eco-pc-rank {
+    position: absolute;
+    top: .7rem;
+    inset-inline-end: .8rem;
+    z-index: 10;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--eco-radius-sm);
+    font-family: var(--eco-font-mono);
+    font-size: .8rem;
+    font-weight: 700;
+    box-shadow: var(--eco-shadow-sm);
+}
+
+/* دکمه‌های عملیات سریع */
+[data-theme="eco-collectible"] .eco-pc-actions {
+    position: absolute;
+    top: .7rem;
+    inset-inline-end: .8rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    opacity: 0;
+    transition: opacity var(--eco-dur-med) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-pc-actions--below-rank { top: 3.2rem; }
+[data-theme="eco-collectible"] .eco-pc:hover .eco-pc-actions,
+[data-theme="eco-collectible"] .eco-pc:focus-within .eco-pc-actions {
+    opacity: 1;
+}
+@media (hover: none) {
+    [data-theme="eco-collectible"] .eco-pc-actions { opacity: 1; }
+}
+[data-theme="eco-collectible"] .eco-pc-action {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    background: rgb(var(--eco-surface-rgb) / .94);
+    color: var(--eco-ink-2);
+    cursor: pointer;
+    box-shadow: var(--eco-shadow-xs);
+    transition:
+        color var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-pc-action:hover {
+    color: var(--eco-ink);
+    border-color: var(--eco-line-strong);
+    transform: translateY(-1px);
+}
+[data-theme="eco-collectible"] .eco-pc-action.wishlist-heart.is-active,
+[data-theme="eco-collectible"] .eco-pc-action.wishlist-heart[data-wishlist-active="1"] {
+    color: var(--eco-danger);
+    border-color: rgb(var(--eco-danger-rgb) / .35);
+    background: rgb(var(--eco-danger-rgb) / .08);
+}
+
+/* لایه ناموجود */
+[data-theme="eco-collectible"] .eco-pc-out {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(var(--eco-ink-rgb) / .45);
+}
+[data-theme="eco-collectible"] .eco-pc-out-label {
+    padding: .5rem 1.1rem;
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    color: var(--eco-ink);
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+/* ---------- بدنه ---------- */
+[data-theme="eco-collectible"] .eco-pc-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+}
+[data-theme="eco-collectible"] .eco-pc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+[data-theme="eco-collectible"] .eco-pc-tags:empty { display: none; }
+[data-theme="eco-collectible"] .eco-pc-title {
+    font-size: .85rem;
+    font-weight: 700;
+    line-height: 1.9;
+    color: var(--eco-ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.2em;
+}
+
+/* امتیاز */
+[data-theme="eco-collectible"] .eco-pc-rating {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+[data-theme="eco-collectible"] .eco-pc-stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--eco-line-strong);
+}
+[data-theme="eco-collectible"] .eco-pc-stars svg { width: .85rem; height: .85rem; }
+[data-theme="eco-collectible"] .eco-pc-stars svg.is-on { color: var(--eco-sand); }
+[data-theme="eco-collectible"] .eco-pc-rating-count {
+    font-size: 11px;
+    color: var(--eco-ink-3);
+    font-family: var(--eco-font-mono);
+}
+
+/* نوار فروش */
+[data-theme="eco-collectible"] .eco-pc-sold-track {
+    width: 100%;
+    height: 6px;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-canvas-2);
+    border: 1px solid var(--eco-line);
+    overflow: hidden;
+}
+[data-theme="eco-collectible"] .eco-pc-sold-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--eco-sage);
+}
+[data-theme="eco-collectible"] .eco-pc-sold-fill.is-hot { background: var(--eco-danger); }
+[data-theme="eco-collectible"] .eco-pc-sold-text {
+    margin-top: .25rem;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-pc-sold-text.is-hot { color: var(--eco-danger); }
+
+/* قیمت */
+[data-theme="eco-collectible"] .eco-pc-price-old {
+    display: block;
+    font-size: .75rem;
+    color: var(--eco-ink-3);
+    text-decoration: line-through;
+}
+[data-theme="eco-collectible"] .eco-pc-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: .4rem;
+}
+[data-theme="eco-collectible"] .eco-pc-price-now {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--eco-clay-ink);
+    letter-spacing: .01em;
+}
+[data-theme="eco-collectible"] .eco-pc-price-unit {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-pc-cart-icon { width: 1rem; height: 1rem; }
+
+/* دکمهٔ ناموجود: حالت خنثی به‌جای تراکوتای کم‌رنگ */
+[data-theme="eco-collectible"] .eco-pc .add-to-cart:disabled {
+    background: transparent;
+    border-color: var(--eco-line);
+    color: var(--eco-ink-3);
+}
+
+/* ================= ۲) کارت دسته‌بندی ================= */
+
+[data-theme="eco-collectible"] .eco-category-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .65rem;
+    width: 168px;
+    padding: 1.1rem 1rem 1rem;
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+    box-shadow: var(--eco-shadow-xs);
+    color: var(--eco-ink);
+    text-decoration: none;
+    transition:
+        transform var(--eco-dur-med) var(--eco-ease),
+        box-shadow var(--eco-dur-med) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-category-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-md);
+}
+[data-theme="eco-collectible"] .eco-category-card:focus-visible {
+    outline: 2px solid var(--eco-clay);
+    outline-offset: 2px;
+}
+[data-theme="eco-collectible"] .eco-category-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--eco-radius-md);
+    background: var(--eco-sand-soft);
+    border: 1px solid rgb(var(--eco-sand-rgb) / .35);
+    overflow: hidden;
+}
+[data-theme="eco-collectible"] .eco-category-emoji {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+[data-theme="eco-collectible"] .eco-category-name {
+    text-align: center;
+    line-height: 1.6;
+    color: var(--eco-ink);
+    font-weight: 800;
+    font-size: .88rem;
+    max-width: 100%;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+[data-theme="eco-collectible"] .eco-category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .6rem;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-canvas-2);
+    border: var(--eco-border);
+    color: var(--eco-ink-2);
+    font-family: var(--eco-font-body);
+    font-size: .68rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+[data-theme="eco-collectible"] .eco-category-chip-num {
+    font-family: var(--eco-font-mono);
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    color: var(--eco-ink);
+}
+[data-theme="eco-collectible"] .eco-category-arrow {
+    position: absolute;
+    inset-inline-end: .6rem;
+    inset-block-end: .6rem;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    opacity: 0;
+    transition: opacity var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-category-card:hover .eco-category-arrow,
+[data-theme="eco-collectible"] .eco-category-card:focus-visible .eco-category-arrow {
+    opacity: 1;
+}
+@media (max-width: 640px) {
+    [data-theme="eco-collectible"] .eco-category-card { width: 152px; }
+    [data-theme="eco-collectible"] .eco-category-icon { width: 56px; height: 56px; }
+    [data-theme="eco-collectible"] .eco-category-emoji { font-size: 1.5rem; }
+}
+
+/* ================= ۳) محتوای quick-view ================= */
+
+[data-theme="eco-collectible"] .eco-quick-view-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem;
+    margin-bottom: .8rem;
+}
+[data-theme="eco-collectible"] .eco-quick-view-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.9;
+    color: var(--eco-ink);
+    margin-bottom: .5rem;
+}
+[data-theme="eco-collectible"] .eco-quick-view-media { background: var(--eco-canvas-2); }
+[data-theme="eco-collectible"] .eco-quick-view-fallback { background: var(--eco-canvas-2); }
+[data-theme="eco-collectible"] .eco-quick-view-fallback-icon { color: var(--eco-line-strong); }
+[data-theme="eco-collectible"] .eco-quick-view-fallback-text { color: var(--eco-ink-3); }
+[data-theme="eco-collectible"] .eco-quick-view-stars { color: var(--eco-sand); }
+[data-theme="eco-collectible"] .eco-quick-view-muted { color: var(--eco-ink-2); }
+[data-theme="eco-collectible"] .eco-quick-view-old {
+    color: var(--eco-ink-3);
+    opacity: 1;
+}
+[data-theme="eco-collectible"] .eco-quick-view-price { color: var(--eco-clay-ink); }
+[data-theme="eco-collectible"] .eco-quick-view-details {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1rem;
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--eco-clay-ink);
+    text-decoration: none;
+}
+[data-theme="eco-collectible"] .eco-quick-view-details:hover { text-decoration: underline; }
+
+/* ================= ۴) بنرهای تبلیغاتی ================= */
+/* نگاشت تن‌ها به پالت Eco (ساختار ۵ سبک حفظ می‌شود، فقط زبان بصری آرام می‌گیرد) */
+
+[data-theme="eco-collectible"] .promo-banner--accent  { --banner-tone: #C27D60; --banner-tone-end: #A9654A; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+[data-theme="eco-collectible"] .promo-banner--gold    { --banner-tone: #D4A373; --banner-tone-end: #B98555; --banner-on: #242422; --banner-title-bright: #7D5631; }
+[data-theme="eco-collectible"] .promo-banner--emerald { --banner-tone: #7A8B7B; --banner-tone-end: #5F6E60; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+[data-theme="eco-collectible"] .promo-banner--rose    { --banner-tone: #A84A38; --banner-tone-end: #86382B; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+[data-theme="eco-collectible"] .promo-banner--blue    { --banner-tone: #7C8DA6; --banner-tone-end: #5F7186; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+[data-theme="eco-collectible"] .promo-banner--orange  { --banner-tone: #C98F5A; --banner-tone-end: #A97844; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+[data-theme="eco-collectible"] .promo-banner--violet  { --banner-tone: #9A8B9C; --banner-tone-end: #7B6E7D; --banner-on: #ffffff; --banner-title-bright: #ffffff; }
+
+[data-theme="eco-collectible"] .promo-banner {
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+}
+/* حذف لایهٔ شیشه‌ای درخشان */
+[data-theme="eco-collectible"] .promo-banner::before { opacity: 0; }
+[data-theme="eco-collectible"] .promo-banner:hover { transform: translateY(-2px); }
+[data-theme="eco-collectible"] .promo-banner:hover .promo-banner-icon { transform: none; }
+[data-theme="eco-collectible"] .promo-banner-icon { border-radius: var(--eco-radius-sm); }
+
+/* سبک گرادیان: گرادیان ملایم تک‌خانواده + سایهٔ محو */
+[data-theme="eco-collectible"] .promo-banner--gradient {
+    background: linear-gradient(150deg, var(--banner-tone) 0%, var(--banner-tone-end) 100%);
+    box-shadow: var(--eco-shadow-sm);
+}
+/* سبک نئومورفیک → سطح تخت با لهجهٔ تن */
+[data-theme="eco-collectible"] .promo-banner--neumorphic {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    box-shadow: var(--eco-shadow-xs);
+    color: var(--eco-ink);
+}
+[data-theme="eco-collectible"] .promo-banner--neumorphic::before { opacity: 0; }
+[data-theme="eco-collectible"] .promo-banner--neumorphic:hover { box-shadow: var(--eco-shadow-sm); }
+[data-theme="eco-collectible"] .promo-banner--neumorphic .promo-banner-icon {
+    background: color-mix(in srgb, var(--banner-tone) 13%, transparent);
+    color: var(--banner-tone);
+}
+[data-theme="eco-collectible"] .promo-banner--neumorphic .promo-banner-title { color: var(--eco-ink); }
+[data-theme="eco-collectible"] .promo-banner--neumorphic .promo-banner-subtitle { color: var(--eco-ink-2); }
+
+/* سبک مینیمال */
+[data-theme="eco-collectible"] .promo-banner--minimal {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .promo-banner--minimal:hover { box-shadow: var(--eco-shadow-xs); }
+
+/* سبک تیره → جوهری */
+[data-theme="eco-collectible"] .promo-banner--dark {
+    background: var(--eco-ink);
+    border-color: var(--eco-ink);
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .promo-banner--dark:hover { box-shadow: var(--eco-shadow-md); }
+
+/* سبک کوپن */
+[data-theme="eco-collectible"] .promo-banner--coupon {
+    background: var(--eco-surface);
+    border: 1px dashed var(--eco-line-strong);
+    box-shadow: none;
+    color: var(--eco-ink);
+}
+
+/* ناوبری و صفحه‌بندی اسلایدر بنرها */
+[data-theme="eco-collectible"] .promo-swiper__nav {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    color: var(--eco-ink-2);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .promo-swiper__nav:hover {
+    color: var(--eco-ink);
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .promo-swiper__pagination .swiper-pagination-bullet {
+    background: var(--eco-line-strong);
+}
+[data-theme="eco-collectible"] .promo-swiper__pagination .swiper-pagination-bullet-active {
+    background: var(--eco-clay);
+}
+
+/* ================= ۵) حرکتِ کم ================= */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="eco-collectible"] .eco-pc,
+    [data-theme="eco-collectible"] .eco-pc-img,
+    [data-theme="eco-collectible"] .eco-pc-action,
+    [data-theme="eco-collectible"] .eco-category-card,
+    [data-theme="eco-collectible"] .promo-banner,
+    [data-theme="eco-collectible"] .promo-banner-icon {
+        transition: none !important;
+    }
+    [data-theme="eco-collectible"] .eco-pc:hover,
+    [data-theme="eco-collectible"] .eco-category-card:hover,
+    [data-theme="eco-collectible"] .promo-banner:hover {
+        transform: none !important;
+    }
+    [data-theme="eco-collectible"] .eco-pc:hover .eco-pc-img { transform: none !important; }
+    [data-theme="eco-collectible"] .eco-pc-actions,
+    [data-theme="eco-collectible"] .eco-category-arrow {
+        opacity: 1 !important;
+    }
+}

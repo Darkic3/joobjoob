@@ -39,7 +39,7 @@ class HomeController extends Controller
 
         // تعداد محصولات هر دسته‌بندی با احتساب کل زیرشاخه‌ها (بدون N+1)
         $this->attachSubtreeProductCounts($categories);        // محصولات پیشنهاد ویژه: تخفیف‌دار با تایمر فعال و در بازه زمانی معتبر
-        $deals = Product::with('images')
+        $deals = Product::with(['images', 'specificationValues'])
             ->where('is_active', true)
             ->where('discount_price', '>', 0)
             ->where(function ($q) {
@@ -66,8 +66,8 @@ class HomeController extends Controller
             ->filter()
             ->min();
         // با تبدیل این بخش‌ها به اسکرول افقی، تعداد بیشتری لازم است تا ریل قابل اسکرول باشد
-        $featured = Product::with('images')->where('is_active', true)->where('is_featured', true)->take(8)->get();
-        $bestSellers = Product::with('images')->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
+        $featured = Product::with(['images', 'specificationValues'])->where('is_active', true)->where('is_featured', true)->take(8)->get();
+        $bestSellers = Product::with(['images', 'specificationValues'])->where('is_active', true)->where('is_best_seller', true)->take(8)->get();
         // نظرات مشتریان برای چرخش (rotator): فقط نظراتی که ادمین نمایش در صفحه اول را فعال کرده
         $reviews = Review::with(['user', 'product'])->approved()->featured()->latest()->take(12)->get();
         $reviewBatches = $reviews->chunk(3);

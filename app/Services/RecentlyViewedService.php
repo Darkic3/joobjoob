@@ -37,7 +37,7 @@ class RecentlyViewedService
             return collect();
         }
 
-        $products = Product::with(['images', 'category', 'brand'])
+        $products = Product::with(['images', 'category', 'brand', 'specificationValues'])
             ->whereIn('id', $ids)
             ->where('is_active', true)
             ->get();

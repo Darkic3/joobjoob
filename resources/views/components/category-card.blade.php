@@ -1,33 +1,30 @@
 {{-- داده‌ها (name/url/count/icon/countLabel) در کلاس CategoryCard آماده می‌شود --}}
-{{-- کارت بروتالیست: کاغذ کرم + بوردر جوهری + سایهٔ هارد + چرخش ریتمیک (پلی‌فول) --}}
-<a href="{{ $url }}" class="category-brutal-card group">
+{{-- کارت دسته‌بندی — تم Eco-Collectible (فاز ۳): سطح تخت، آیکون در قاب ماسه‌ای، شمارندهٔ مونو --}}
+<a href="{{ $url }}" class="eco-category-card group">
 
-    {{-- نوار نئونی بالای کارت (رنگ‌بندی با nth-child در CSS) --}}
-    <span class="category-brutal-tape" aria-hidden="true"></span>
-
-    {{-- بلوک آیکون/تصویر — مربعی با سایهٔ هارد --}}
-    <span class="category-brutal-icon">
+    {{-- بلوک آیکون/تصویر --}}
+    <span class="eco-category-icon">
         @if($category->image)
             <img src="{{ $category->image_url }}" alt="{{ $name }}" class="w-full h-full object-cover" loading="lazy">
         @else
-            <span class="category-brutal-emoji">{{ $icon }}</span>
+            <span class="eco-category-emoji" aria-hidden="true">{{ $icon }}</span>
         @endif
     </span>
 
     {{-- نام دسته‌بندی --}}
-    <span class="category-brutal-name">{{ $name }}</span>
+    <span class="eco-category-name">{{ $name }}</span>
 
     {{-- شمارندهٔ مونو --}}
     @if($count > 0)
-        <span class="category-brutal-chip">
-            <span class="category-brutal-chip-num">{{ $count }}</span>
+        <span class="eco-category-chip">
+            <span class="eco-category-chip-num" data-digit-raw>{{ $count }}</span>
             <span>{{ $countLabel }}</span>
         </span>
     @endif
 
-    {{-- فلش ته کارت، در هاور ظاهر می‌شود --}}
-    <span class="category-brutal-arrow" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    {{-- فلش، در هاور/فوکوس ظاهر می‌شود --}}
+    <span class="eco-category-arrow" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </span>
 
 </a>

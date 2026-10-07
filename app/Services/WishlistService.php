@@ -61,7 +61,7 @@ class WishlistService
             return collect();
         }
 
-        $products = Product::with(['images', 'category'])
+        $products = Product::with(['images', 'category', 'specificationValues'])
             ->whereIn('id', $ids)
             ->get();
 
