@@ -49,6 +49,7 @@ return [
     'public_theme_locked' => env('SITE_PUBLIC_THEME_LOCKED', true),
 
     // تمی که سایت عمومی به آن قفل می‌شود.
-    'public_theme' => env('SITE_PUBLIC_THEME', 'light-neumorphism'),
+    // eco-collectible = تم Modern Eco-Collectible (resources/css/eco). برای بازگشت: light-neumorphism
+    'public_theme' => env('SITE_PUBLIC_THEME', 'eco-collectible'),
 
 ];

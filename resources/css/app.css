@@ -2,6 +2,8 @@
 /* Font loaded via <link> in app.blade.php — removed @import to avoid render-blocking + duplicate download */
 @import './neumorphism.css';
 @import './neumorphism-pro.css';
+/* تم Modern Eco-Collectible — پس از لایه‌های قدیمی تا در تساوی specificity برنده شود */
+@import './eco/index.css';
 
 
 /* استایل‌های اختصاصی Swiper همگی در neumorphism-pro.css (بخش HERO) هستند */

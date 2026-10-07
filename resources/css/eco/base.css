@@ -1,0 +1,45 @@
+/* ===================================================================
+   Eco-Collectible — Base
+   -------------------------------------------------------------------
+   استایل‌های سطح سند (body، انتخاب متن، فوکوس، اسکرول‌بار) فقط برای
+   تم eco-collectible. کامپوننت‌ها در components.css و سکشن‌های هر صفحه
+   در پوشهٔ sections/ قرار می‌گیرند.
+   =================================================================== */
+
+[data-theme="eco-collectible"] body {
+    background: var(--eco-canvas);
+    color: var(--eco-ink);
+    font-family: var(--eco-font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+[data-theme="eco-collectible"] ::selection {
+    background: rgb(var(--eco-clay-rgb) / .22);
+    color: var(--eco-ink);
+}
+
+/* فوکوس کیبورد: حلقهٔ تراکوتای نرم — فقط برای ناوبری کیبورد، نه کلیک */
+[data-theme="eco-collectible"] :focus-visible {
+    outline: 2px solid var(--eco-clay);
+    outline-offset: 2px;
+    border-radius: var(--eco-radius-xs);
+}
+
+/* کلاس مونو سراسری (شناسه‌ها/قیمت‌ها) — هم‌راستا با توکن تایپ */
+[data-theme="eco-collectible"] .mono {
+    font-family: var(--eco-font-mono);
+    font-feature-settings: "zero" 1, "tnum" 1;
+}
+
+/* اسکرول‌بار اجزای داخلی (صفحه خودش اسکرول‌بار مخفی دارد) */
+[data-theme="eco-collectible"] ::-webkit-scrollbar-track { background: var(--eco-canvas); }
+[data-theme="eco-collectible"] ::-webkit-scrollbar-thumb {
+    background: var(--eco-line-strong);
+    border: 2px solid var(--eco-canvas);
+    border-radius: var(--eco-radius-pill);
+}
+
+/* خط افقی پیش‌فرض با رنگ کادر */
+[data-theme="eco-collectible"] hr { border-color: var(--eco-line); }

@@ -25,10 +25,14 @@ class SetTheme
 
         if (! $isAdmin && config('site-features.public_theme_locked', false)) {
             // سایت عمومی: تم قفل‌شده، مستقل از cookie/localStorage کاربر
-            $activeTheme = (string) config('site-features.public_theme', 'light-neumorphism');
-        } else {
-            // پنل ادمین یا سایت بدون قفل: cookie کاربر (fallback به light)
+            $activeTheme = (string) config('site-features.public_theme', 'eco-collectible');
+        } elseif ($isAdmin) {
+            // پنل ادمین: cookie کاربر (fallback به light) — رفتار قبلی دست‌نخورده
             $activeTheme = $request->cookie('site_theme') ?? 'light-neumorphism';
+        } else {
+            // سایت عمومی بدون قفل: cookie کاربر، fallback به تم عمومی پیکربندی‌شده
+            $activeTheme = $request->cookie('site_theme')
+                ?? (string) config('site-features.public_theme', 'eco-collectible');
         }
 
         view()->share('activeTheme', $activeTheme);

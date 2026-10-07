@@ -1,0 +1,129 @@
+/* ===================================================================
+   Eco-Collectible — Design Tokens
+   -------------------------------------------------------------------
+   تنها منبع حقیقت رنگ/فرم/حرکت برای تم «کلکسیونی مدرن و ارگانیک».
+
+   ۱) کانال‌های RGB روی :root تعریف می‌شوند تا یوتیلیتی‌های Tailwind
+      (bg-eco-clay/40 و …) همه‌جا کار کنند.
+   ۲) زیر [data-theme="eco-collectible"] توکن‌های سیستم قدیمی
+      (نئومورفیسم + بروتالیست) به پالت جدید نگاشت می‌شوند تا تمام
+      صفحات — حتی پیش از بازسازی ساختاری‌شان — رنگ تم جدید را بگیرند.
+      این لایهٔ سازگاری در فاز ۸ همراه CSS قدیمی حذف می‌شود.
+   =================================================================== */
+
+:root {
+    /* ---------- کانال‌های خام (برای Tailwind با <alpha-value>) ---------- */
+    --eco-canvas-rgb:   247 245 240;   /* #F7F5F0 بژ ماسه‌ای مات */
+    --eco-canvas-2-rgb: 250 248 245;   /* #FAF8F5 سفید استخوانی */
+    --eco-surface-rgb:  255 255 255;   /* #FFFFFF سفید گرم کارت */
+    --eco-line-rgb:     230 226 216;   /* #E6E2D8 خط کادر */
+    --eco-ink-rgb:      36 36 34;      /* #242422 زغالی خاکی */
+    --eco-ink-2-rgb:    107 104 96;    /* #6B6860 متن ثانویه (AA روی بژ) */
+    --eco-ink-3-rgb:    150 146 136;   /* #969288 متن کم‌اهمیت / placeholder */
+    --eco-sage-rgb:     122 139 123;   /* #7A8B7B سبز سیج */
+    --eco-clay-rgb:     194 125 96;    /* #C27D60 تراکوتا */
+    --eco-sand-rgb:     212 163 115;   /* #D4A373 خاکی گرم */
+    --eco-danger-rgb:   168 74 56;     /* #A84A38 تراکوتای سوخته (خطا/تخفیف) */
+}
+
+[data-theme="eco-collectible"] {
+    /* ---------- پالت ---------- */
+    --eco-canvas:   rgb(var(--eco-canvas-rgb));
+    --eco-canvas-2: rgb(var(--eco-canvas-2-rgb));
+    --eco-surface:  rgb(var(--eco-surface-rgb));
+    --eco-line:     rgb(var(--eco-line-rgb));
+    --eco-line-strong: #D6D0C2;            /* بوردر hover / فوکوس آرام */
+    --eco-ink:      rgb(var(--eco-ink-rgb));
+    --eco-ink-2:    rgb(var(--eco-ink-2-rgb));
+    --eco-ink-3:    rgb(var(--eco-ink-3-rgb));
+    --eco-sage:     rgb(var(--eco-sage-rgb));
+    --eco-clay:     rgb(var(--eco-clay-rgb));
+    --eco-clay-deep: #A9654A;              /* hover دکمهٔ تراکوتا */
+    --eco-sand:     rgb(var(--eco-sand-rgb));
+    --eco-danger:   rgb(var(--eco-danger-rgb));
+
+    /* تینت‌های کم‌رنگ برای پس‌زمینهٔ تگ‌ها (متن روی آن‌ها نسخهٔ تیرهٔ همان رنگ) */
+    --eco-sage-soft:  rgb(var(--eco-sage-rgb) / .14);
+    --eco-sage-ink:   #4F5E50;
+    --eco-clay-soft:  rgb(var(--eco-clay-rgb) / .12);
+    --eco-clay-ink:   #8E4F36;
+    --eco-sand-soft:  rgb(var(--eco-sand-rgb) / .18);
+    --eco-sand-ink:   #7D5631;
+
+    /* ---------- تایپوگرافی ---------- */
+    --eco-font-body:    'Vazirmatn', system-ui, sans-serif;
+    --eco-font-display: 'Estedad', 'Vazirmatn', sans-serif;
+    --eco-font-mono:    'JetBrains Mono', ui-monospace, 'Vazirmatn', monospace;
+    --eco-tracking-mono: .08em;           /* فاصلهٔ حروف شناسه‌های کلکسیونی */
+
+    /* ---------- فرم ---------- */
+    --eco-radius-xs:  6px;
+    --eco-radius-sm:  8px;    /* دکمه‌ها (rounded-lg) */
+    --eco-radius-md:  12px;   /* کارت‌ها (rounded-xl) */
+    --eco-radius-lg:  18px;   /* سکشن‌ها / مدال */
+    --eco-radius-pill: 999px; /* تگ‌های کپسولی */
+    --eco-border:     1px solid var(--eco-line);
+
+    /* سایه‌ها: تخت و بسیار محو — نور طبیعی از بالا */
+    --eco-shadow-xs:  0 1px 2px rgb(var(--eco-ink-rgb) / .04);
+    --eco-shadow-sm:  0 1px 2px rgb(var(--eco-ink-rgb) / .04), 0 4px 12px -6px rgb(var(--eco-ink-rgb) / .08);
+    --eco-shadow-md:  0 2px 4px rgb(var(--eco-ink-rgb) / .03), 0 12px 28px -14px rgb(var(--eco-ink-rgb) / .16);
+    --eco-shadow-lg:  0 24px 48px -24px rgb(var(--eco-ink-rgb) / .22);
+    --eco-focus-ring: 0 0 0 3px rgb(var(--eco-clay-rgb) / .28);
+
+    /* ---------- حرکت (آرام، بدون فنر) ---------- */
+    --eco-ease:     cubic-bezier(.22, .61, .36, 1);
+    --eco-dur-fast: .18s;
+    --eco-dur-med:  .32s;
+    --eco-dur-slow: .6s;
+
+    color-scheme: light;
+
+    /* ==============================================================
+       لایهٔ سازگاری — نگاشت توکن‌های قدیمی به پالت Eco
+       ============================================================== */
+
+    /* نئومورفیسم پایه (neumorphism.css) */
+    --bg:              var(--eco-canvas);
+    --bg-elevated:     var(--eco-surface);
+    --shadow-light:    transparent;                       /* حذف هایلایت نئومورفیک */
+    --shadow-dark:     rgb(var(--eco-ink-rgb) / .07);     /* سایهٔ محو طبیعی */
+    --text-primary:    var(--eco-ink);
+    --text-secondary:  var(--eco-ink-2);
+    --accent:          var(--eco-clay);
+    --accent-contrast: #FFFFFF;
+    --danger:          var(--eco-danger);
+    --success:         var(--eco-sage);
+    --ring-color:      var(--eco-clay);
+    --ring-strength:   .6;
+    --ring-pulse-low:  .35;
+    --ring-pulse-high: .7;
+    --radius-sm:       var(--eco-radius-sm);
+    --radius-md:       var(--eco-radius-md);
+    --radius-lg:       var(--eco-radius-lg);
+    --ease-out:        var(--eco-ease);
+    --ease-spring:     var(--eco-ease);                   /* بدون پرش فنری */
+
+    /* لایهٔ PRO (neumorphism-pro.css) */
+    --gold:     var(--eco-sand);
+    --silver:   #B9B3A6;
+    --bronze:   var(--eco-clay);
+    --urgency:  var(--eco-danger);
+    --live-dot: var(--eco-sage);
+    --trust-1:  var(--eco-sage);
+    --trust-2:  var(--eco-clay);
+    --trust-3:  var(--eco-sand);
+    --trust-4:  var(--eco-ink-2);
+
+    /* توکن‌های بروتالیست (هیرو/هدر/دسته‌ها) */
+    --b-paper:  var(--eco-canvas);
+    --b-ink:    var(--eco-ink);
+    --b-lemon:  var(--eco-sand);
+    --b-blue:   var(--eco-clay);
+    --b-pink:   var(--eco-sage);
+    --b-field:  var(--eco-surface);
+    --b-dot:    rgb(var(--eco-ink-rgb) / .05);
+    --b-line:   1px;
+    --b-shadow: var(--eco-shadow-sm);
+    --b-font-display: var(--eco-font-display);
+}

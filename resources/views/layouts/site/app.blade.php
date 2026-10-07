@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}"
-      data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
+      data-theme="{{ $activeTheme ?? 'eco-collectible' }}">
 
 <head>
     {{-- کلاس js: حالت «مخفی» هیرو فقط وقتی JS فعال است اعمال می‌شود؛ اگر JS یا باندل

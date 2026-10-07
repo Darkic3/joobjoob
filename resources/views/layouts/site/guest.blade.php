@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ $direction }}" data-digits="{{ $digitFamily }}"
-      data-theme="{{ $activeTheme ?? 'light-neumorphism' }}">
+      data-theme="{{ $activeTheme ?? 'eco-collectible' }}">
 
 <head>
     <script>document.documentElement.classList.add('js');</script>
