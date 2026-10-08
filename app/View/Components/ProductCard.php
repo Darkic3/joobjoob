@@ -39,8 +39,11 @@ class ProductCard extends Component
     /** آیا محصول الان در علاقه‌مندی‌هاست (برای حالت اولیهٔ قلب) */
     public bool $inWishlist;
 
-    /** @var array{color: string, text: string}|null استایل نشان رتبه (فقط بخش پرفروش‌ترین‌ها) */
-    public ?array $rankStyle;
+    /** برچسب رتبهٔ کلکسیونی (مثل N°01) — فقط بخش پرفروش‌ترین‌ها */
+    public ?string $rankLabel;
+
+    /** تن نشان رتبه: gold | silver | bronze | plain */
+    public ?string $rankTone;
 
     /** شناسهٔ کلکسیونی نمایشی — «برچسب انبار» تم Eco (مثل #ECO-0042) */
     public string $collectibleId;
@@ -55,11 +58,15 @@ class ProductCard extends Component
      */
     public ?array $statusTag;
 
-    private const RANK_STYLES = [
-        1 => ['color' => 'var(--gold)', 'text' => '#000'],
-        2 => ['color' => 'var(--silver)', 'text' => '#000'],
-        3 => ['color' => 'var(--bronze)', 'text' => '#fff'],
-    ];
+    /**
+     * تگ وضعیتی که در ردیف تگ‌های کارت نمایش داده می‌شود. تخفیف کنار قیمت
+     * نمایش داده می‌شود، پس این‌جا تکرار نمی‌شود.
+     *
+     * @var array{label: string, tone: string}|null
+     */
+    public ?array $cardStatusTag;
+
+    private const RANK_TONES = [1 => 'gold', 2 => 'silver', 3 => 'bronze'];
 
     public function __construct(
         public Product $product,
@@ -88,12 +95,15 @@ class ProductCard extends Component
 
         $this->inWishlist = app(WishlistService::class)->has($product);
 
-        $this->rankStyle = $rank ? (self::RANK_STYLES[$rank] ?? ['color' => 'var(--bg-elevated)', 'text' => 'var(--text-secondary)']) : null;
+        $this->rankLabel = $rank ? 'N°'.str_pad((string) $rank, 2, '0', STR_PAD_LEFT) : null;
+        $this->rankTone = $rank ? (self::RANK_TONES[$rank] ?? 'plain') : null;
 
         // پراپرتی‌های نمایشی تم Eco-Collectible (منبع واحد: اکسسورهای مدل)
         $this->collectibleId = $product->collectible_id;
         $this->materialTag = $product->material_tag;
         $this->statusTag = $product->status_tag;
+        // تخفیف کنار قیمت و «ناموجود» روی تصویر نمایش داده می‌شوند → در ردیف تگ‌ها تکرار نمی‌شوند
+        $this->cardStatusTag = in_array($this->statusTag['tone'] ?? null, ['clay', 'danger'], true) ? null : $this->statusTag;
     }
 
     public function render(): View

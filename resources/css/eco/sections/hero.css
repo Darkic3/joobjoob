@@ -1,9 +1,11 @@
 /* ===================================================================
-   Eco-Collectible — Hero (فاز ۴، مرحله ۱)
+   Eco-Collectible — Hero
    -------------------------------------------------------------------
-   هیروی تمام‌عرض تک‌اسلاید: بوم بژ با نقطه‌چین محو، تیتر Estedad،
-   هایلایت ماژیک تراکوتا، قاب تصویر تخت با مُهر دایره‌ای، نوار متحرک
-   جوهری آرام. کلاس hero-minimal برای سازگاری تست‌ها حفظ شده است.
+   هیروی تمام‌عرض تک‌اسلاید: پس‌زمینهٔ چندلایه (هاله‌های ماسه‌ای/
+   تراکوتا + نقطه‌چین + حلقهٔ مهر)، تیتر Estedad با هایلایت نواری،
+   CTA دوتایی، ردیف اطمینان، قاب تصویر با زیرهٔ کاغذی + مُهر + کارت
+   نمونهٔ شناور (امضای «برچسب انبار»)، نوار متحرک جوهری با لبه‌های محو.
+   کلاس hero-minimal برای سازگاری تست‌ها حفظ شده است.
    =================================================================== */
 
 [data-theme="eco-collectible"] .eco-hero {
@@ -19,14 +21,57 @@
     border-bottom: 1px solid var(--eco-line);
     overflow: hidden;
 }
-/* نقطه‌چین بسیار محو — بافت کاغذی */
-[data-theme="eco-collectible"] .eco-hero::before {
+
+/* ---------- پس‌زمینهٔ چندلایه ---------- */
+[data-theme="eco-collectible"] .eco-hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+/* نقطه‌چین محو — بافت کاغذی */
+[data-theme="eco-collectible"] .eco-hero-bg::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgb(var(--eco-ink-rgb) / .055) 1px, transparent 1.2px);
-    background-size: 22px 22px;
-    pointer-events: none;
+    background-image: radial-gradient(rgb(var(--eco-ink-rgb) / .05) 1px, transparent 1.2px);
+    background-size: 24px 24px;
+}
+/* هاله‌های رنگی بسیار ملایم */
+[data-theme="eco-collectible"] .eco-hero-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(10px);
+}
+[data-theme="eco-collectible"] .eco-hero-glow--sand {
+    width: min(560px, 60vw);
+    height: min(560px, 60vw);
+    inset-inline-end: -8%;
+    top: -32%;
+    background: radial-gradient(circle at center, rgb(var(--eco-sand-rgb) / .16), transparent 68%);
+}
+[data-theme="eco-collectible"] .eco-hero-glow--clay {
+    width: min(620px, 66vw);
+    height: min(620px, 66vw);
+    inset-inline-start: -12%;
+    bottom: -46%;
+    background: radial-gradient(circle at center, rgb(var(--eco-clay-rgb) / .12), transparent 68%);
+}
+/* حلقهٔ مهر تزئینی — گوشهٔ بالا */
+[data-theme="eco-collectible"] .eco-hero-ring {
+    position: absolute;
+    width: min(460px, 48vw);
+    height: min(460px, 48vw);
+    inset-inline-start: -9%;
+    top: -38%;
+    border: 1px solid rgb(var(--eco-ink-rgb) / .10);
+    border-radius: 50%;
+}
+[data-theme="eco-collectible"] .eco-hero-ring::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px dashed rgb(var(--eco-ink-rgb) / .10);
+    border-radius: 50%;
 }
 
 /* ---------- محفظهٔ محتوا ---------- */
@@ -34,12 +79,12 @@
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
     align-items: center;
-    gap: clamp(2rem, 5vw, 4.5rem);
+    gap: clamp(2.5rem, 5vw, 5rem);
     max-width: 1280px;
     margin-inline: auto;
-    padding: clamp(2.75rem, 6vw, 4.75rem) clamp(1.25rem, 4vw, 2.5rem) clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(3rem, 6.5vw, 5.25rem) clamp(1.25rem, 4vw, 2.5rem) clamp(3rem, 6vw, 4.75rem);
 }
 [data-theme="eco-collectible"] .eco-hero-shell--solo {
     grid-template-columns: 1fr;
@@ -50,18 +95,27 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.1rem;
+    gap: 1.15rem;
     min-width: 0;
 }
 [data-theme="eco-collectible"] .eco-hero-shell--solo .eco-hero-copy { align-items: center; }
 
+/* ردیف کیکر + بج */
+[data-theme="eco-collectible"] .eco-hero-toprow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .55rem;
+}
+
 /* ---------- کیکر مونو ---------- */
 [data-theme="eco-collectible"] .eco-hero-kicker {
     display: inline-block;
-    padding: .3rem .75rem;
+    padding: .32rem .8rem;
     border-radius: var(--eco-radius-pill);
-    background: var(--eco-sand-soft);
-    border: 1px solid rgb(var(--eco-sand-rgb) / .35);
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    box-shadow: var(--eco-shadow-xs);
     color: var(--eco-sand-ink);
     font-family: var(--eco-font-mono);
     font-size: .68rem;
@@ -73,17 +127,21 @@
 [data-theme="eco-collectible"] .eco-hero-title {
     font-family: var(--eco-font-display);
     font-weight: 700;
-    font-size: clamp(2rem, 4.5vw + .9rem, 3.6rem);
-    line-height: 1.35;
+    font-size: clamp(2.2rem, 5vw + 1rem, 4rem);
+    line-height: 1.32;
     color: var(--eco-ink);
     max-width: 20ch;
+    text-wrap: balance;
 }
 [data-theme="eco-collectible"] .eco-hero-shell--solo .eco-hero-title { max-width: 28ch; }
-/* <span> ادمین = هایلایت ماژیک تراکوتای محو */
+/* <span> ادمین = هایلایت نواری تراکوتای محو */
 [data-theme="eco-collectible"] .eco-hero-title span {
-    color: var(--eco-ink);
-    background: linear-gradient(transparent 60%, var(--eco-clay-soft) 60%, var(--eco-clay-soft) 94%, transparent 94%);
-    padding-inline: .1em;
+    color: var(--eco-clay-ink);
+    background: var(--eco-clay-soft);
+    border-radius: .35em;
+    padding: 0 .18em .06em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 [data-theme="eco-collectible"] .eco-hero-desc {
     font-size: .95rem;
@@ -91,19 +149,58 @@
     color: var(--eco-ink-2);
     max-width: 44ch;
 }
+
+/* ---------- اکشن‌ها ---------- */
 [data-theme="eco-collectible"] .eco-hero-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
-    margin-top: .3rem;
+    gap: .8rem;
+    margin-top: .35rem;
+}
+[data-theme="eco-collectible"] .eco-hero-cta svg {
+    transition: transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-hero-cta:hover svg { transform: translateX(-3px); }
+[dir="ltr"] [data-theme="eco-collectible"] .eco-hero-cta:hover svg { transform: translateX(3px); }
+
+/* ---------- ردیف اطمینان ---------- */
+[data-theme="eco-collectible"] .eco-hero-ticks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.2rem;
+    margin: .35rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+[data-theme="eco-collectible"] .eco-hero-ticks li {
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-hero-ticks svg {
+    color: var(--eco-sage);
+    flex-shrink: 0;
 }
 
-/* ---------- تصویر: قاب تخت با سایهٔ محو ---------- */
+/* ---------- مدیا: زیرهٔ کاغذی + قاب + مُهر + کارت نمونه ---------- */
 [data-theme="eco-collectible"] .eco-hero-media {
     position: relative;
     width: 100%;
-    max-width: 520px;
+    max-width: 540px;
+    justify-self: end;
+}
+/* زیرهٔ کاغذی ماسه‌ای پشت قاب */
+[data-theme="eco-collectible"] .eco-hero-mat {
+    position: absolute;
+    inset: 0;
+    transform: translate(14px, 16px);
+    border-radius: var(--eco-radius-lg);
+    background: var(--eco-sand-soft);
+    border: 1px solid rgb(var(--eco-sand-rgb) / .4);
 }
 [data-theme="eco-collectible"] .eco-hero-media img {
     position: relative;
@@ -117,29 +214,84 @@
     border: var(--eco-border);
     border-radius: var(--eco-radius-lg);
     box-shadow: var(--eco-shadow-md);
+    animation: ecoHeroSettle 1.4s var(--eco-ease) both;
+}
+@keyframes ecoHeroSettle {
+    from { transform: scale(1.07); }
+    to { transform: scale(1); }
 }
 
 /* مُهر گوشهٔ تصویر */
 [data-theme="eco-collectible"] .eco-hero-stamp {
     position: absolute;
     z-index: 2;
-    inset-block-end: -22px;
-    inset-inline-start: -14px;
+    inset-block-end: -24px;
+    inset-inline-start: -16px;
     display: grid;
     place-items: center;
-    width: 88px;
-    height: 88px;
-    padding: .5rem;
+    width: 92px;
+    height: 92px;
+    padding: .55rem;
     border-radius: 50%;
     background: var(--eco-clay);
     border: 1px solid var(--eco-clay-deep);
+    outline: 1.5px dashed rgb(255 255 255 / .55);
+    outline-offset: -7px;
     color: #fff;
     font-family: var(--eco-font-display);
     font-weight: 700;
     font-size: .74rem;
-    line-height: 1.5;
+    line-height: 1.55;
     text-align: center;
-    box-shadow: var(--eco-shadow-sm);
+    box-shadow: var(--eco-shadow-md);
+}
+
+/* کارت نمونهٔ شناور — تگ کاغذی آرشیو */
+[data-theme="eco-collectible"] .eco-hero-specimen {
+    position: absolute;
+    z-index: 3;
+    inset-block-end: 34px;
+    inset-inline-end: -20px;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .6rem .9rem;
+    background: rgb(var(--eco-surface-rgb) / .96);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    box-shadow: var(--eco-shadow-md);
+    animation: ecoHeroFloat 7s ease-in-out 1.2s infinite;
+}
+[data-theme="eco-collectible"] .eco-hero-specimen-hole {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--eco-canvas);
+    box-shadow: inset 0 0 0 1.5px rgb(var(--eco-ink-rgb) / .22);
+}
+[data-theme="eco-collectible"] .eco-hero-specimen-id {
+    font-family: var(--eco-font-mono);
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    color: var(--eco-ink-2);
+    white-space: nowrap;
+}
+[data-theme="eco-collectible"] .eco-hero-specimen-sep {
+    width: 1px;
+    align-self: stretch;
+    background: repeating-linear-gradient(to bottom, var(--eco-line-strong) 0 3px, transparent 3px 6px);
+}
+[data-theme="eco-collectible"] .eco-hero-specimen-text {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--eco-clay-ink);
+    white-space: nowrap;
+}
+@keyframes ecoHeroFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
 }
 
 /* ---------- نوار متحرک ---------- */
@@ -147,13 +299,17 @@
     position: relative;
     z-index: 1;
     background: var(--eco-ink);
+    border-top: 2px solid var(--eco-sand);
     color: var(--eco-canvas);
     overflow: hidden;
+    /* محو لبه‌ها */
+    -webkit-mask-image: linear-gradient(to left, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to left, transparent, #000 6%, #000 94%, transparent);
 }
 [data-theme="eco-collectible"] .eco-hero-marquee-track {
     display: flex;
     width: max-content;
-    animation: ecoHeroMarquee 42s linear infinite;
+    animation: ecoHeroMarquee 48s linear infinite;
 }
 [dir="rtl"] [data-theme="eco-collectible"] .eco-hero-marquee-track,
 [data-theme="eco-collectible"] [dir="rtl"] .eco-hero-marquee-track {
@@ -165,8 +321,8 @@
 [data-theme="eco-collectible"] .eco-hero-marquee-group {
     display: flex;
     align-items: center;
-    gap: 2.25rem;
-    padding: .7rem 1.125rem;
+    gap: 2.5rem;
+    padding: .8rem 1.25rem;
     white-space: nowrap;
 }
 [data-theme="eco-collectible"] .eco-hero-marquee-item {
@@ -186,47 +342,69 @@
     from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: translateY(0); }
 }
-[data-theme="eco-collectible"] .eco-hero-kicker,
+[data-theme="eco-collectible"] .eco-hero-toprow,
 [data-theme="eco-collectible"] .eco-hero-title,
 [data-theme="eco-collectible"] .eco-hero-desc,
 [data-theme="eco-collectible"] .eco-hero-actions,
+[data-theme="eco-collectible"] .eco-hero-ticks,
 [data-theme="eco-collectible"] .eco-hero-media {
     animation: ecoHeroRise var(--eco-dur-slow) var(--eco-ease) both;
 }
 [data-theme="eco-collectible"] .eco-hero-title { animation-delay: .08s; }
 [data-theme="eco-collectible"] .eco-hero-desc { animation-delay: .16s; }
 [data-theme="eco-collectible"] .eco-hero-actions { animation-delay: .24s; }
+[data-theme="eco-collectible"] .eco-hero-ticks { animation-delay: .3s; }
 [data-theme="eco-collectible"] .eco-hero-media { animation-delay: .15s; }
 
 /* ---------- ریسپانسیو ---------- */
 @media (max-width: 1023px) {
     [data-theme="eco-collectible"] .eco-hero-shell {
         grid-template-columns: 1fr;
-        gap: 2.5rem;
-        padding-block: clamp(2.25rem, 7vw, 3.5rem);
+        gap: 3rem;
+        padding-block: clamp(2.5rem, 7vw, 3.75rem);
     }
     [data-theme="eco-collectible"] .eco-hero-copy { align-items: center; text-align: center; }
-    [data-theme="eco-collectible"] .eco-hero-title { max-width: none; font-size: clamp(1.8rem, 7vw, 2.6rem); }
+    [data-theme="eco-collectible"] .eco-hero-toprow { justify-content: center; }
+    [data-theme="eco-collectible"] .eco-hero-actions { justify-content: center; }
+    [data-theme="eco-collectible"] .eco-hero-ticks { justify-content: center; }
+    [data-theme="eco-collectible"] .eco-hero-title { max-width: none; font-size: clamp(1.9rem, 7.4vw, 2.8rem); }
     [data-theme="eco-collectible"] .eco-hero-desc { max-width: 52ch; }
-    [data-theme="eco-collectible"] .eco-hero-media { max-width: 440px; margin-inline: auto; }
+    [data-theme="eco-collectible"] .eco-hero-media {
+        max-width: 480px;
+        margin-inline: auto;
+        justify-self: center;
+    }
+    [data-theme="eco-collectible"] .eco-hero-ring { opacity: .6; }
 }
 @media (max-width: 640px) {
     [data-theme="eco-collectible"] .eco-hero-stamp {
-        width: 70px;
-        height: 70px;
+        width: 72px;
+        height: 72px;
         font-size: .62rem;
         inset-inline-start: -6px;
         inset-block-end: -18px;
     }
+    [data-theme="eco-collectible"] .eco-hero-specimen {
+        inset-inline-end: 6px;
+        inset-block-end: 14px;
+        padding: .45rem .65rem;
+        gap: .4rem;
+    }
+    [data-theme="eco-collectible"] .eco-hero-specimen-text { font-size: .64rem; }
+    [data-theme="eco-collectible"] .eco-hero-mat { transform: translate(9px, 11px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    [data-theme="eco-collectible"] .eco-hero-kicker,
+    [data-theme="eco-collectible"] .eco-hero-toprow,
     [data-theme="eco-collectible"] .eco-hero-title,
     [data-theme="eco-collectible"] .eco-hero-desc,
     [data-theme="eco-collectible"] .eco-hero-actions,
-    [data-theme="eco-collectible"] .eco-hero-media {
+    [data-theme="eco-collectible"] .eco-hero-ticks,
+    [data-theme="eco-collectible"] .eco-hero-media,
+    [data-theme="eco-collectible"] .eco-hero-media img {
         animation: none;
     }
+    [data-theme="eco-collectible"] .eco-hero-specimen { animation: none; }
     [data-theme="eco-collectible"] .eco-hero-marquee-track { animation: none; }
+    [data-theme="eco-collectible"] .eco-hero-cta:hover svg { transform: none; }
 }
