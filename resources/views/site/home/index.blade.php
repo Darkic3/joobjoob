@@ -14,27 +14,26 @@
     {{-- ۱. هیرو مینیمال (تک‌اسلاید) --}}
     @include('site.home.hero', ['heroSlide' => $heroSlide])
 
-    {{-- ۲. دسته‌بندی‌ها — Playful Brutalism × Neo-Tokyo Minimal --}}
+    {{-- ۲. دسته‌بندی‌ها — تم Eco-Collectible --}}
     @if($categories->isNotEmpty())
-        <section class="categories-brutal reveal-on-scroll mt-12 mb-10">
-            <header class="categories-brutal-head">
-                <div class="categories-brutal-head-main">
-                    <span class="categories-brutal-coords" aria-hidden="true">SOCK://SHOP — N°02</span>
-                    <div class="categories-brutal-kicker">
-                        <span class="categories-brutal-kicker-dot" aria-hidden="true"></span>
+        <section class="eco-categories reveal-on-scroll mt-12 mb-10">
+            <header class="eco-section-head">
+                <div class="eco-section-head-main">
+                    <div class="eco-section-kicker">
+                        <span class="eco-section-kicker-dot" aria-hidden="true"></span>
                         <span>{{ __('messages.categories') }}</span>
-                        <span class="categories-brutal-kicker-num" aria-hidden="true">/ {{ $categories->count() }}</span>
+                        <span class="eco-section-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $categories->count() }}</span>
                     </div>
-                    <h2 class="categories-brutal-title">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
+                    <h2 class="eco-section-title">{{ settingOverride('home_categories_title', __('messages.categories')) }}</h2>
                 </div>
-                <a href="{{ localizedRoute('products.index') }}" class="categories-brutal-link">
+                <a href="{{ localizedRoute('products.index') }}" class="eco-section-link">
                     <span>{{ settingOverride('home_view_all', __('messages.view_all')) }}</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
             </header>
 
-            {{-- کالکشن کارت‌ها: چیدمان ریتمیک با چرخش متناوب، ورود پله‌ای --}}
-            <div class="categories-brutal-grid" data-stagger>
+            {{-- کالکشن کارت‌ها با ورود پله‌ای --}}
+            <div class="eco-categories-grid" data-stagger>
                 @foreach($categories as $cat)
                     <x-category-card :category="$cat"/>
                 @endforeach

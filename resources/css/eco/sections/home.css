@@ -1,0 +1,93 @@
+/* ===================================================================
+   Eco-Collectible — Home sections (فاز ۴)
+   -------------------------------------------------------------------
+   الگوی مشترک سربرگ سکشن‌های صفحهٔ اصلی + سکشن دسته‌بندی‌ها.
+   (مراحل بعدی فاز ۴ — پیشنهاد ویژه، ویژه‌ها، اعتماد، بلاگ — به همین
+   فایل اضافه می‌شوند و از همین الگوی سربرگ استفاده می‌کنند.)
+   =================================================================== */
+
+/* ================= سربرگ مشترک سکشن‌ها ================= */
+
+[data-theme="eco-collectible"] .eco-section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+[data-theme="eco-collectible"] .eco-section-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    min-width: 0;
+}
+[data-theme="eco-collectible"] .eco-section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    align-self: flex-start;
+    padding: .28rem .75rem;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-sand-soft);
+    border: 1px solid rgb(var(--eco-sand-rgb) / .35);
+    color: var(--eco-sand-ink);
+    font-family: var(--eco-font-mono);
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+}
+[data-theme="eco-collectible"] .eco-section-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--eco-clay);
+    flex-shrink: 0;
+}
+[data-theme="eco-collectible"] .eco-section-kicker-num { opacity: .75; }
+[data-theme="eco-collectible"] .eco-section-title {
+    color: var(--eco-ink);
+    font-family: var(--eco-font-display);
+    font-weight: 700;
+    font-size: clamp(1.35rem, 1vw + 1.05rem, 1.8rem);
+    line-height: 1.4;
+}
+[data-theme="eco-collectible"] .eco-section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem 1rem;
+    border: var(--eco-border);
+    border-width: 1px;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-surface);
+    color: var(--eco-ink-2);
+    font-size: .76rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-section-link:hover {
+    color: var(--eco-ink);
+    border-color: var(--eco-line-strong);
+    box-shadow: var(--eco-shadow-xs);
+    transform: translateY(-1px);
+}
+
+/* ================= گرید دسته‌بندی‌ها ================= */
+
+[data-theme="eco-collectible"] .eco-categories-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(1rem, 2.2vw, 1.6rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="eco-collectible"] .eco-section-link { transition: none; }
+    [data-theme="eco-collectible"] .eco-section-link:hover { transform: none; }
+}
