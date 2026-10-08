@@ -32,7 +32,7 @@ class CategoryCard extends Component
         'heart-outline' => '💄',
     ];
 
-    public function __construct(public ProductCategory $category)
+    public function __construct(public ProductCategory $category, public ?int $index = null)
     {
         $this->name = $category->trans('name') ?: __('messages.categories');
         $this->url = localizedRoute('products.index', ['category' => $category->slug]);

@@ -542,22 +542,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: .65rem;
-    width: 168px;
-    padding: 1.1rem 1rem 1rem;
+    gap: .7rem;
+    width: 184px;
+    padding: 1.5rem 1rem 1.2rem;
     background: var(--eco-surface);
     border: var(--eco-border);
     border-radius: var(--eco-radius-md);
     box-shadow: var(--eco-shadow-xs);
     color: var(--eco-ink);
     text-decoration: none;
+    overflow: hidden;
     transition:
         transform var(--eco-dur-med) var(--eco-ease),
         box-shadow var(--eco-dur-med) var(--eco-ease),
         border-color var(--eco-dur-fast) var(--eco-ease);
 }
 [data-theme="eco-collectible"] .eco-category-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border-color: var(--eco-line-strong);
     box-shadow: var(--eco-shadow-md);
 }
@@ -565,26 +566,75 @@
     outline: 2px solid var(--eco-clay);
     outline-offset: 2px;
 }
+/* شمارهٔ کلکسیونی کارت */
+[data-theme="eco-collectible"] .eco-category-num {
+    position: absolute;
+    top: .7rem;
+    inset-inline-start: .9rem;
+    font-family: var(--eco-font-mono);
+    font-size: .62rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    color: var(--eco-ink-3);
+}
+/* مُهر دایره‌ای دورنگ */
 [data-theme="eco-collectible"] .eco-category-icon {
     display: grid;
     place-items: center;
-    width: 64px;
-    height: 64px;
-    border-radius: var(--eco-radius-md);
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
     background: var(--eco-sand-soft);
-    border: 1px solid rgb(var(--eco-sand-rgb) / .35);
+    border: 1px solid rgb(var(--eco-sand-rgb) / .45);
+    outline: 1.5px dashed rgb(var(--eco-sand-rgb) / .5);
+    outline-offset: 4px;
     overflow: hidden;
+    transition:
+        transform var(--eco-dur-med) var(--eco-ease),
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        outline-color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-category-icon img {
+    transition: transform var(--eco-dur-slow) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-category-card:hover .eco-category-icon img {
+    transform: scale(1.1);
+}
+[data-theme="eco-collectible"] .eco-category-card:hover .eco-category-icon {
+    transform: scale(1.04);
+}
+/* ریتم رنگی ملایم — چرخهٔ ۴تایی ماسه‌ای/سیج/تراکوتا/خنثی */
+[data-theme="eco-collectible"] .eco-categories-grid > :nth-child(4n+2) .eco-category-icon {
+    background: var(--eco-sage-soft);
+    border-color: rgb(var(--eco-sage-rgb) / .45);
+    outline-color: rgb(var(--eco-sage-rgb) / .5);
+}
+[data-theme="eco-collectible"] .eco-categories-grid > :nth-child(4n+3) .eco-category-icon {
+    background: var(--eco-clay-soft);
+    border-color: rgb(var(--eco-clay-rgb) / .45);
+    outline-color: rgb(var(--eco-clay-rgb) / .5);
+}
+[data-theme="eco-collectible"] .eco-categories-grid > :nth-child(4n+4) .eco-category-icon {
+    background: var(--eco-canvas-2);
+    border-color: var(--eco-line-strong);
+    outline-color: var(--eco-line-strong);
 }
 [data-theme="eco-collectible"] .eco-category-emoji {
-    font-size: 1.75rem;
+    font-size: 2rem;
     line-height: 1;
+    transition: transform var(--eco-dur-med) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-category-card:hover .eco-category-emoji {
+    transform: scale(1.1);
 }
 [data-theme="eco-collectible"] .eco-category-name {
     text-align: center;
-    line-height: 1.6;
+    line-height: 1.7;
     color: var(--eco-ink);
-    font-weight: 800;
-    font-size: .88rem;
+    font-family: var(--eco-font-display);
+    font-weight: 700;
+    font-size: .92rem;
     max-width: 100%;
     overflow: hidden;
     display: -webkit-box;
@@ -595,7 +645,7 @@
     display: inline-flex;
     align-items: center;
     gap: .35rem;
-    padding: .2rem .6rem;
+    padding: .2rem .65rem;
     border-radius: var(--eco-radius-pill);
     background: var(--eco-canvas-2);
     border: var(--eco-border);
@@ -605,6 +655,13 @@
     font-weight: 600;
     line-height: 1.6;
 }
+[data-theme="eco-collectible"] .eco-category-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--eco-clay);
+    flex-shrink: 0;
+}
 [data-theme="eco-collectible"] .eco-category-chip-num {
     font-family: var(--eco-font-mono);
     font-weight: 500;
@@ -613,26 +670,42 @@
 }
 [data-theme="eco-collectible"] .eco-category-arrow {
     position: absolute;
-    inset-inline-end: .6rem;
-    inset-block-end: .6rem;
-    width: 26px;
-    height: 26px;
+    inset-inline-end: .65rem;
+    inset-block-end: .65rem;
+    width: 28px;
+    height: 28px;
     display: grid;
     place-items: center;
     border-radius: var(--eco-radius-sm);
     background: var(--eco-clay-soft);
     color: var(--eco-clay-ink);
     opacity: 0;
-    transition: opacity var(--eco-dur-fast) var(--eco-ease);
+    transform: translateX(4px);
+    transition:
+        opacity var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-med) var(--eco-ease),
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease);
 }
+[dir="ltr"] [data-theme="eco-collectible"] .eco-category-arrow { transform: translateX(-4px); }
 [data-theme="eco-collectible"] .eco-category-card:hover .eco-category-arrow,
 [data-theme="eco-collectible"] .eco-category-card:focus-visible .eco-category-arrow {
     opacity: 1;
+    transform: translateX(0);
+    background: var(--eco-clay);
+    color: #fff;
 }
 @media (max-width: 640px) {
-    [data-theme="eco-collectible"] .eco-category-card { width: 152px; }
-    [data-theme="eco-collectible"] .eco-category-icon { width: 56px; height: 56px; }
-    [data-theme="eco-collectible"] .eco-category-emoji { font-size: 1.5rem; }
+    [data-theme="eco-collectible"] .eco-category-card { width: 160px; padding-top: 1.3rem; }
+    [data-theme="eco-collectible"] .eco-category-icon { width: 66px; height: 66px; }
+    [data-theme="eco-collectible"] .eco-category-emoji { font-size: 1.7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="eco-collectible"] .eco-category-card:hover { transform: none; }
+    [data-theme="eco-collectible"] .eco-category-card:hover .eco-category-icon,
+    [data-theme="eco-collectible"] .eco-category-card:hover .eco-category-icon img,
+    [data-theme="eco-collectible"] .eco-category-card:hover .eco-category-emoji { transform: none; }
+    [data-theme="eco-collectible"] .eco-category-arrow { transform: none; }
 }
 
 /* ================= ۳) محتوای quick-view ================= */

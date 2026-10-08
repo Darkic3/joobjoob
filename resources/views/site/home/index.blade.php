@@ -35,7 +35,7 @@
             {{-- کالکشن کارت‌ها با ورود پله‌ای --}}
             <div class="eco-categories-grid" data-stagger>
                 @foreach($categories as $cat)
-                    <x-category-card :category="$cat"/>
+                    <x-category-card :category="$cat" :index="$loop->iteration"/>
                 @endforeach
             </div>
         </section>
