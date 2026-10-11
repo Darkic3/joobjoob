@@ -87,7 +87,291 @@
     gap: clamp(1rem, 2.2vw, 1.6rem);
 }
 
+/* ================= پیشنهاد ویژه — «سری محدود» =================
+   جایگزین آتش/ember/گلو: پنل تخت با لهجهٔ کلی، هالهٔ محو ثابت،
+   تایمر چیپ‌های مونو. هیچ انیمیشن دائمی ندارد (فقط ورود آرام).
+   ============================================================ */
+
+[data-theme="eco-collectible"] .eco-deals { margin-block: 3rem; }
+[data-theme="eco-collectible"] .eco-deals-panel {
+    position: relative;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-lg);
+    box-shadow: var(--eco-shadow-sm);
+    overflow: hidden;
+}
+/* هالهٔ ماسه‌ای/کلیِ ثابت در گوشه — تزئین، نه حرکت */
+[data-theme="eco-collectible"] .eco-deals-panel::before {
+    content: "";
+    position: absolute;
+    top: -140px;
+    inset-inline-end: -110px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgb(var(--eco-clay-rgb) / .10), transparent 68%);
+    pointer-events: none;
+}
+[data-theme="eco-collectible"] .eco-deals-head {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+[data-theme="eco-collectible"] .eco-deals-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+    min-width: 0;
+}
+[data-theme="eco-collectible"] .eco-deals-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    align-self: flex-start;
+    padding: .28rem .75rem;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-clay-soft);
+    border: 1px solid rgb(var(--eco-clay-rgb) / .3);
+    color: var(--eco-clay-ink);
+    font-family: var(--eco-font-mono);
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+}
+[data-theme="eco-collectible"] .eco-deals-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--eco-clay);
+    flex-shrink: 0;
+}
+[data-theme="eco-collectible"] .eco-deals-kicker-num { opacity: .75; }
+[data-theme="eco-collectible"] .eco-deals-title {
+    font-family: var(--eco-font-display);
+    font-weight: 700;
+    font-size: clamp(1.35rem, 1vw + 1.05rem, 1.8rem);
+    line-height: 1.4;
+    color: var(--eco-ink);
+}
+[data-theme="eco-collectible"] .eco-deals-sub {
+    font-size: .82rem;
+    color: var(--eco-ink-2);
+}
+/* تایمر: چیپ‌های مونو روی سطح */
+[data-theme="eco-collectible"] .eco-deals-timer {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+}
+[data-theme="eco-collectible"] .eco-deals-timer-label {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-deals-panel .cd-chip {
+    padding: .45rem .55rem;
+    min-width: 50px;
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-canvas-2);
+    border: 1px solid var(--eco-line);
+    color: var(--eco-clay-ink);
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: none;
+}
+[data-theme="eco-collectible"] .eco-deals-panel .cd-label {
+    font-family: var(--eco-font-mono);
+    font-size: .56rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    text-transform: none;
+    color: var(--eco-ink-3);
+}
+[data-theme="eco-collectible"] .eco-deals-panel .cd-sep {
+    color: var(--eco-line-strong);
+    opacity: 1;
+    padding-bottom: 16px;
+}
+[data-theme="eco-collectible"] .eco-deals-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+@media (min-width: 768px) {
+    [data-theme="eco-collectible"] .eco-deals-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* ================= ریل محصولات (ویژه / پرفروش‌ترین) =================
+   رفتار اسکرول افقی (درگ/فلش/navبردار/نوار پیشرفت) از لایهٔ
+   قدیمی حفظ شده؛ اینجا فقط پوسته و ریتم بصری Eco است.
+   ============================================================ */
+
+[data-theme="eco-collectible"] .eco-rail { margin-block: 3rem; }
+[data-theme="eco-collectible"] .eco-rail-shell {
+    --eco-rail-accent: var(--eco-clay);
+    --eco-rail-soft: var(--eco-clay-soft);
+    --eco-rail-tint: rgb(var(--eco-clay-rgb) / .3);
+    position: relative;
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-lg);
+    box-shadow: var(--eco-shadow-sm);
+}
+/* پرفروش‌ترین‌ها: لهجهٔ سیج به‌جای کلی */
+[data-theme="eco-collectible"] .eco-rail--sage .eco-rail-shell {
+    --eco-rail-accent: var(--eco-sage);
+    --eco-rail-soft: var(--eco-sage-soft);
+    --eco-rail-tint: rgb(var(--eco-sage-rgb) / .3);
+}
+
+/* سربرگ ریل */
+[data-theme="eco-collectible"] .eco-rail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+[data-theme="eco-collectible"] .eco-rail-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+    min-width: 0;
+}
+[data-theme="eco-collectible"] .eco-rail-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    align-self: flex-start;
+    padding: .28rem .75rem;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-rail-soft);
+    border: 1px solid var(--eco-rail-tint);
+    color: var(--eco-ink);
+    font-family: var(--eco-font-mono);
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+}
+[data-theme="eco-collectible"] .eco-rail-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--eco-rail-accent);
+    flex-shrink: 0;
+}
+[data-theme="eco-collectible"] .eco-rail-kicker-num { opacity: .6; }
+[data-theme="eco-collectible"] .eco-rail-title {
+    font-family: var(--eco-font-display);
+    font-weight: 700;
+    font-size: clamp(1.35rem, 1vw + 1.05rem, 1.8rem);
+    line-height: 1.4;
+    color: var(--eco-ink);
+}
+[data-theme="eco-collectible"] .eco-rail-sub {
+    font-size: .82rem;
+    color: var(--eco-ink-2);
+}
+/* ناوبری */
+[data-theme="eco-collectible"] .eco-rail-nav {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+}
+[data-theme="eco-collectible"] .eco-rail-arrows {
+    display: flex;
+    gap: .4rem;
+}
+[data-theme="eco-collectible"] .eco-rail-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-sm);
+    background: var(--eco-surface);
+    color: var(--eco-ink-2);
+    cursor: pointer;
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease),
+        opacity var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .eco-rail-btn svg {
+    display: block;
+    transition: transform var(--eco-dur-fast) var(--eco-ease);
+}
+[dir="rtl"] [data-theme="eco-collectible"] .eco-rail-btn svg { transform: rotate(180deg); }
+[data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) {
+    color: #fff;
+    background: var(--eco-rail-accent);
+    border-color: var(--eco-rail-accent);
+    transform: translateY(-1px);
+}
+[data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) svg { transform: scale(1.12); }
+[dir="rtl"] [data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) svg { transform: rotate(180deg) scale(1.12); }
+[data-theme="eco-collectible"] .eco-rail-btn:active:not(:disabled) { transform: translateY(0); }
+[data-theme="eco-collectible"] .eco-rail-btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+[data-theme="eco-collectible"] .eco-rail-btn:focus-visible {
+    outline: 2px solid var(--eco-rail-accent);
+    outline-offset: 2px;
+}
+
+/* ریل — ارث‌بری رفتار از لایهٔ قدیمی، ظاهر تخت */
+[data-theme="eco-collectible"] .eco-rail-rail { padding-block: .25rem .75rem; }
+[data-theme="eco-collectible"] .eco-rail-item { flex-basis: 248px; }
+@media (max-width: 640px) {
+    [data-theme="eco-collectible"] .eco-rail-item { flex-basis: 208px; }
+}
+/* محو لبه‌ها — هم‌رنگ پوستهٔ تخت */
+[data-theme="eco-collectible"] .hscroll-edge-fade {
+    background: var(--eco-surface);
+    width: 48px;
+}
+/* نوار پیشرفت — تخت، لهجهٔ بخش */
+[data-theme="eco-collectible"] .eco-rail-progress-wrap {
+    background: var(--eco-canvas-2);
+    border: 1px solid var(--eco-line);
+    margin-inline: 0;
+    height: 4px;
+    border-radius: var(--eco-radius-pill);
+}
+[data-theme="eco-collectible"] .eco-rail-progress {
+    background: var(--eco-rail-accent);
+}
+/* قاب نازک رتبهٔ اول — بدون پالس، بدون گلو */
+[data-theme="eco-collectible"] .eco-rail-top {
+    border-radius: calc(var(--eco-radius-md) + 4px);
+    padding: 3px;
+    background: var(--eco-sand-soft);
+    border: 1px solid rgb(var(--eco-sand-rgb) / .45);
+    animation: none;
+    filter: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
     [data-theme="eco-collectible"] .eco-section-link { transition: none; }
     [data-theme="eco-collectible"] .eco-section-link:hover { transform: none; }
+    [data-theme="eco-collectible"] .eco-rail-btn,
+    [data-theme="eco-collectible"] .eco-rail-btn svg { transition: none; }
+    [data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) { transform: none; }
+    [dir="rtl"] [data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) svg { transform: rotate(180deg); }
 }

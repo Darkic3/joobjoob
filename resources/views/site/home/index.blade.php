@@ -41,43 +41,33 @@
         </section>
     @endif
 
-    {{-- ۳. پیشنهادهای داغ با تایمر --}}
+    {{-- ۳. پیشنهادهای ویژه — «سری محدود» با تایمر آرام (بدون آتش/ember) --}}
     @if($deals->isNotEmpty())
-        <section id="deals" class="reveal-on-scroll py-6">
-            <div class="deals-shell relative overflow-hidden p-5 md:p-8">
-                {{-- هالهٔ آتش --}}
-                <div class="deals-glow" aria-hidden="true"></div>
+        <section id="deals" class="eco-deals reveal-on-scroll">
+            <div class="eco-deals-panel">
 
-                {{-- ذرات آتش بالارونده --}}
-                <div class="deals-embers" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span><span></span>
+                <div class="eco-deals-head">
+                    <div class="eco-deals-head-main">
+                        <span class="eco-deals-kicker">
+                            <span class="eco-deals-kicker-dot" aria-hidden="true"></span>
+                            <span>{{ __('messages.special_offers') }}</span>
+                            <span class="eco-deals-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $deals->count() }}</span>
+                        </span>
+                        <h2 class="eco-deals-title">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
+                        <p class="eco-deals-sub">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
+                    </div>
+
+                    {{-- تایمر پایان سری — چیپ‌های مونو، آرام --}}
+                    <div class="eco-deals-timer">
+                        <span class="eco-deals-timer-label">{{ __('messages.deal_ends_in') }}</span>
+                        <x-countdown-timer :ends-at="$dealEndsAt" id="deal-cd"/>
+                    </div>
                 </div>
 
-                <div class="relative z-10">
-                    <div class="flex flex-wrap items-center justify-between gap-5 mb-8">
-                        <div class="flex items-center gap-3.5">
-                            <span class="deals-flame" aria-hidden="true">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3.5-2.3-5.5-3.7-7.3-.5-.7-1.2-.2-1 .6.2.9.3 1.7-.1 2.5-.7-.6-1.5-1.6-1.9-3C11.5 5.3 12 3.5 12 2c-1.8 1.4-3 3.4-3.4 5.3C8.2 9.4 9 11 10 12.5 8.5 12 7 10.8 7 8.5 5.4 10.7 5 13 5 15.5 5 19.2 7.6 22 12 22z"/></svg>
-                            </span>
-                            <div>
-                                <h2 class="deals-title font-black text-xl leading-tight">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
-                                <p class="text-xs mt-1" style="color: var(--text-secondary);">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3">
-                            <span class="text-[11px] font-bold hidden sm:block" style="color: var(--text-secondary);">
-                                {{ __('messages.deal_ends_in') }}
-                            </span>
-                            <x-countdown-timer :ends-at="$dealEndsAt" id="deal-cd"/>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5" data-stagger>
-                        @foreach($deals as $product)
-                            <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
-                        @endforeach
-                    </div>
+                <div class="eco-deals-grid" data-stagger>
+                    @foreach($deals as $product)
+                        <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
+                    @endforeach
                 </div>
             </div>
         </section>
@@ -91,50 +81,46 @@
 
     {{-- ۵. محصولات ویژه --}}
     @if($featured->isNotEmpty())
-        <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--featured p-5 pb-8 md:p-7 md:pb-10">
-                {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
-                <div class="section-shell-fade" aria-hidden="true"></div>
-                {{-- اسکرول افقی حرفه‌ای: درگ با اینرسی + فلش‌های اسنپ‌به‌کارت؛ data-hscroll-cards="2" تعداد کارت در هر کلیک --}}
-                <div class="relative z-10" data-hscroll>
-                        <div class="section-head mb-7">                        <div class="section-head-main">
-                            <span class="section-icon" aria-hidden="true">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.4L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.6z"/></svg>
-                            </span>
-                            <div>
-                                <h2 class="section-title">{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</h2>
-                                <p class="section-subtitle">{{ __('messages.featured_subtitle') }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-2" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
-                                <button type="button" class="hscroll-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-                                </button>
-                                <button type="button" class="hscroll-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-                                </button>
-                            </div>
-                            <a href="{{ localizedRoute('products.index') }}" class="section-link">
-                                {{ settingOverride('home_view_all', __('messages.view_all')) }}
-                            </a>
-                        </div>
+        <section class="eco-rail reveal-on-scroll">
+            <div class="eco-rail-shell" data-hscroll>
+                <header class="eco-rail-head">
+                    <div class="eco-rail-head-main">
+                        <span class="eco-rail-kicker">
+                            <span class="eco-rail-kicker-dot" aria-hidden="true"></span>
+                            <span>{{ settingOverride('home_featured_title', __('messages.featured_products')) }}</span>
+                            <span class="eco-rail-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $featured->count() }}</span>
+                        </span>
+                        <h2 class="eco-rail-title">{{ __('messages.featured_products') }}</h2>
+                        <p class="eco-rail-sub">{{ __('messages.featured_subtitle') }}</p>
                     </div>
 
-                    <div class="hscroll-wrap">
-                        <div class="hscroll-rail">
-                            @foreach($featured as $product)
-                                <div class="hscroll-item">
-                                    <x-product-card :product="$product" />
-                                </div>
-                            @endforeach
+                    <div class="eco-rail-nav">
+                        <div class="eco-rail-arrows" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
+                            <button type="button" class="eco-rail-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+                            <button type="button" class="eco-rail-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                            </button>
                         </div>
-                        {{-- محو دائمی لبه‌ها — زیر بج‌های رتبه (z پایین‌تر)، بالای کارت‌ها --}}
-                        <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
-                        <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
-                        {{-- نوار پیشرفت اسکرول --}}
-                        <div class="hscroll-progress-wrap" aria-hidden="true"><div class="hscroll-progress"></div></div>
+                        <a href="{{ localizedRoute('products.index') }}" class="eco-section-link">
+                            <span>{{ settingOverride('home_view_all', __('messages.view_all')) }}</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
                     </div>
+                </header>
+
+                <div class="hscroll-wrap eco-rail-wrap">
+                    <div class="hscroll-rail eco-rail-rail">
+                        @foreach($featured as $product)
+                            <div class="hscroll-item eco-rail-item">
+                                <x-product-card :product="$product" />
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
+                    <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
+                    <div class="hscroll-progress-wrap eco-rail-progress-wrap" aria-hidden="true"><div class="hscroll-progress eco-rail-progress"></div></div>
                 </div>
             </div>
         </section>
@@ -142,57 +128,53 @@
 
     {{-- ۶. پرفروش‌ترین‌ها --}}
     @if($bestSellers->isNotEmpty())
-        <section class="reveal-on-scroll py-6">
-            <div class="section-shell section-shell--bestsellers p-5 pb-8 md:p-7 md:pb-10">
-                {{-- محو نرم لبهٔ پایین باکس — لبهٔ سخت/مربعی را گرادیانت‌وار محو می‌کند --}}
-                <div class="section-shell-fade" aria-hidden="true"></div>
-                {{-- اسکرول افقی حرفه‌ای: درگ با اینرسی + فلش‌های اسنپ‌به‌کارت؛ data-hscroll-cards="2" تعداد کارت در هر کلیک --}}
-                <div class="relative z-10" data-hscroll>
-                        <div class="section-head mb-7">                        <div class="section-head-main">
-                            <span class="section-icon" aria-hidden="true">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/></svg>
-                            </span>
-                            <div>
-                                <h2 class="section-title">{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</h2>
-                                <p class="section-subtitle">{{ __('messages.best_sellers_subtitle') }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-2" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
-                                <button type="button" class="hscroll-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-                                </button>
-                                <button type="button" class="hscroll-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-                                </button>
-                            </div>
-                            <a href="{{ localizedRoute('products.index') }}" class="section-link">
-                                {{ settingOverride('home_view_all', __('messages.view_all')) }}
-                            </a>
-                        </div>
+        <section class="eco-rail eco-rail--sage reveal-on-scroll">
+            <div class="eco-rail-shell" data-hscroll>
+                <header class="eco-rail-head">
+                    <div class="eco-rail-head-main">
+                        <span class="eco-rail-kicker">
+                            <span class="eco-rail-kicker-dot" aria-hidden="true"></span>
+                            <span>{{ settingOverride('home_best_sellers_title', __('messages.best_sellers')) }}</span>
+                            <span class="eco-rail-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $bestSellers->count() }}</span>
+                        </span>
+                        <h2 class="eco-rail-title">{{ __('messages.best_sellers') }}</h2>
+                        <p class="eco-rail-sub">{{ __('messages.best_sellers_subtitle') }}</p>
                     </div>
 
-                    <div class="hscroll-wrap">
-                        <div class="hscroll-rail">
-                            @foreach($bestSellers as $index => $product)
-                                <div class="hscroll-item">
-                                    @if($index === 0)
-                                        {{-- سکوی طلایی برای رتبهٔ اول --}}
-                                        <div class="podium-wrap h-full">
-                                            <x-product-card :product="$product" :rank="$index + 1" />
-                                        </div>
-                                    @else
-                                        <x-product-card :product="$product" :rank="$index + 1" />
-                                    @endif
-                                </div>
-                            @endforeach
+                    <div class="eco-rail-nav">
+                        <div class="eco-rail-arrows" role="group" aria-label="{{ __('messages.product_carousel_nav') }}">
+                            <button type="button" class="eco-rail-btn" data-hscroll-prev aria-label="{{ __('messages.scroll_prev') }}">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+                            <button type="button" class="eco-rail-btn" data-hscroll-next aria-label="{{ __('messages.scroll_next') }}">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                            </button>
                         </div>
-                        {{-- محو دائمی لبه‌ها — زیر بج‌های رتبه (z پایین‌تر)، بالای کارت‌ها --}}
-                        <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
-                        <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
-                        {{-- نوار پیشرفت اسکرول --}}
-                        <div class="hscroll-progress-wrap" aria-hidden="true"><div class="hscroll-progress"></div></div>
+                        <a href="{{ localizedRoute('products.index') }}" class="eco-section-link">
+                            <span>{{ settingOverride('home_view_all', __('messages.view_all')) }}</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
                     </div>
+                </header>
+
+                <div class="hscroll-wrap eco-rail-wrap">
+                    <div class="hscroll-rail eco-rail-rail">
+                        @foreach($bestSellers as $index => $product)
+                            <div class="hscroll-item eco-rail-item">
+                                @if($index === 0)
+                                    {{-- قاب نازک ماسه‌ای برای رتبهٔ اول (بدون پالس و گلو) --}}
+                                    <div class="eco-rail-top h-full">
+                                        <x-product-card :product="$product" :rank="$index + 1" />
+                                    </div>
+                                @else
+                                    <x-product-card :product="$product" :rank="$index + 1" />
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="hscroll-edge-fade hscroll-edge-fade--start" aria-hidden="true"></div>
+                    <div class="hscroll-edge-fade hscroll-edge-fade--end" aria-hidden="true"></div>
+                    <div class="hscroll-progress-wrap eco-rail-progress-wrap" aria-hidden="true"><div class="hscroll-progress eco-rail-progress"></div></div>
                 </div>
             </div>
         </section>
