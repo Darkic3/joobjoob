@@ -78,11 +78,11 @@
 
                         {{-- متر موجودی سری: میانگین فروش + سقف تخفیف --}}
                         <div class="eco-deals-stock">
-                            <div class="eco-deals-stock-track" role="progressbar"
-                                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $dealsAvgSold }}"
-                                 aria-label="{{ $dealsAvgSold }}٪ {{ __('messages.sold_percent') }}">
-                                <span class="eco-deals-stock-fill" style="--sold: {{ $dealsAvgSold / 100 }};"></span>
-                            </div>
+{{--                            <div class="eco-deals-stock-track" role="progressbar"--}}
+{{--                                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $dealsAvgSold }}"--}}
+{{--                                 aria-label="{{ $dealsAvgSold }}٪ {{ __('messages.sold_percent') }}">--}}
+{{--                                <span class="eco-deals-stock-fill" style="--sold: {{ $dealsAvgSold / 100 }};"></span>--}}
+{{--                            </div>--}}
                             <p class="eco-deals-stock-text">
                                 <span class="mono" dir="ltr">{{ $dealsAvgSold }}٪</span>
                                 {{ __('messages.sold_percent') }}

@@ -19,6 +19,7 @@ class Product extends Model
         'sku', 'price', 'discount_price', 'final_price', 'stock', 'weight',
         'is_active', 'is_featured', 'is_best_seller', 'deal_ends_at',
         'timer_active', 'start_timer', 'end_timer',
+        'source_url', 'source_price', 'last_crawled_at', 'is_crawled',
     ];
 
     protected $casts = [

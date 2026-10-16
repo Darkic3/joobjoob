@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CkeditorController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\CrawlManagerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\HeroSlideSearchController;
@@ -47,6 +48,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('promo-banners', PromoBannerController::class)->except('show');
         Route::resource('products', ProductController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
+
+        // ========== مدیریت کرالر آپتیمیست ==========
+        Route::get('crawl', [CrawlManagerController::class, 'index'])->name('crawl.index');
+        Route::post('crawl/run', [CrawlManagerController::class, 'run'])->name('crawl.run');
+        Route::get('crawl/{crawlLog}', [CrawlManagerController::class, 'show'])->name('crawl.show');
+        Route::delete('crawl/{crawlLog}', [CrawlManagerController::class, 'destroy'])->name('crawl.destroy');
         Route::resource('product-categories', ProductCategoryController::class)->except('show');
         Route::resource('brands', BrandController::class);
         Route::resource('specifications', SpecificationController::class);

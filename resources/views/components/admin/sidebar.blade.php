@@ -121,6 +121,17 @@
             </a>
         @endif
 
+        @if($can('admin.crawl.index'))
+            {{-- کرالر آپتیمیست --}}
+            <a href="{{ route('admin.crawl.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.crawl.*') ? 'sidebar-link-active' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">{{ __('admin.sidebar.crawler') }}</span>
+            </a>
+        @endif
+
         @if($showBlog)
             {{-- وبلاگ — گروه دارای زیرمنو (مقالات / دسته‌بندی‌ها) --}}
             <div x-data="{ open: {{ $blogOpen ? 'true' : 'false' }} }" @sidebar-closed.window="open = false">
