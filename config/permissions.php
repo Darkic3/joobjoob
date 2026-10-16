@@ -242,5 +242,16 @@ return [
                 'product-history' => 'permissions.access.audit_logs.show',
             ],
         ],
+
+        'crawl' => [
+            'title' => 'permissions.groups.crawl',
+            'access' => [
+                'index' => 'permissions.access.crawl.index',
+                'status' => 'permissions.access.crawl.index',
+                'show' => 'permissions.access.crawl.index',
+                'run' => 'permissions.access.crawl.run',
+                'destroy' => 'permissions.access.crawl.delete',
+            ],
+        ],
     ],
 ];

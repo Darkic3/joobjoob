@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // ========== مدیریت کرالر آپتیمیست ==========
         Route::get('crawl', [CrawlManagerController::class, 'index'])->name('crawl.index');
         Route::post('crawl/run', [CrawlManagerController::class, 'run'])->name('crawl.run');
+        Route::get('crawl/status', [CrawlManagerController::class, 'status'])->name('crawl.status');
         Route::get('crawl/{crawlLog}', [CrawlManagerController::class, 'show'])->name('crawl.show');
         Route::delete('crawl/{crawlLog}', [CrawlManagerController::class, 'destroy'])->name('crawl.destroy');
         Route::resource('product-categories', ProductCategoryController::class)->except('show');

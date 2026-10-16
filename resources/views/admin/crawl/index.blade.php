@@ -18,17 +18,33 @@
                 {{ __('admin.common.refresh') }}
             </a>
 
-            <form action="{{ route('admin.crawl.run') }}" method="POST" class="flex flex-col sm:flex-row gap-3 items-end">
-                @csrf
-                <div class="flex gap-2">
-                    <input type="number" name="limit" placeholder="{{ __('admin.crawl.limit_placeholder') }}" min="1" max="1000" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-48">
-                    <input type="text" name="pages" placeholder="{{ __('admin.crawl.pages_placeholder') }}" value="1-88" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-40">
+            <div class="flex flex-col sm:flex-row gap-3 items-end w-full">
+                <div class="flex gap-2 flex-1">
+                    <input type="number" name="limit" id="crawl-limit" placeholder="{{ __('admin.crawl.limit_placeholder') }}" min="1" max="1000" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-48">
+                    <input type="text" name="pages" id="crawl-pages" placeholder="{{ __('admin.crawl.pages_placeholder') }}" value="1-88" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-40">
                 </div>
-                <button type="submit" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium shadow-sm transition-colors flex items-center gap-2">
+                <button type="button" id="crawl-run-btn" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium shadow-sm transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     {{ __('admin.crawl.run_now') }}
                 </button>
-            </form>
+            </div>
+
+            {{-- Live crawl status widget --}}
+            <div id="crawl-error" class="hidden mt-4 rounded-xl p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-sm text-red-700 dark:text-red-300"></div>
+            <div id="crawl-live-status" class="hidden mt-4 rounded-xl p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-blue-800 dark:text-blue-200">{{ __('admin.crawl.running') }}</span>
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400" id="crawl-status-pages">0 / 0</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
+                    <div id="crawl-progress-bar" class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center gap-3 text-sm">
+                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">✓ <span id="crawl-success-count">0</span> {{ __('admin.crawl.products_imported') }}</span>
+                    <span class="text-rose-600 dark:text-rose-400 font-medium">✗ <span id="crawl-fail-count">0</span> {{ __('admin.crawl.products_failed') }}</span>
+                    <span class="text-gray-500 dark:text-gray-400" id="crawl-current-product"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -214,12 +230,115 @@
 
 @push('scripts')
 <script>
-    // Handle crawl run button state
-    document.querySelector('form[action="{{ route("admin.crawl.run") }}"]').addEventListener('submit', function() {
-        const btn = this.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> در حال انجام...';
-        btn.disabled = true;
-    });
+    // Crawl runs in a background process; this polls live progress without page refresh.
+    (function () {
+        const btn = document.getElementById('crawl-run-btn');
+        const liveStatus = document.getElementById('crawl-live-status');
+        const progressBar = document.getElementById('crawl-progress-bar');
+        const statusPages = document.getElementById('crawl-status-pages');
+        const successCount = document.getElementById('crawl-success-count');
+        const failCount = document.getElementById('crawl-fail-count');
+        const currentProduct = document.getElementById('crawl-current-product');
+        const errorBox = document.getElementById('crawl-error');
+        const runLabel = `{{ __('admin.crawl.run_now') }}`;
+        const runningLabel = `{{ __('admin.crawl.running') }}`;
+
+        let pollingInterval = null;
+        let activeLogId = null;
+        let emptyPolls = 0;
+
+        function setButtonBusy(busy) {
+            btn.disabled = busy;
+            btn.innerHTML = busy
+                ? '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> ' + runningLabel
+                : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> ' + runLabel;
+        }
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+        }
+
+        function pollStatus() {
+            const url = activeLogId
+                ? `{{ route('admin.crawl.status') }}?log_id=${activeLogId}`
+                : `{{ route('admin.crawl.status') }}`;
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => {
+                    liveStatus.classList.remove('hidden');
+
+                    const pct = data.total_pages > 0
+                        ? Math.round((data.current_page / data.total_pages) * 100)
+                        : 0;
+                    progressBar.style.width = pct + '%';
+                    statusPages.textContent = data.current_page + ' / ' + data.total_pages;
+                    successCount.textContent = data.log ? data.log.products_imported : data.success;
+                    failCount.textContent = data.log ? data.log.products_failed : data.failed;
+
+                    if (data.current_name) {
+                        currentProduct.textContent = 'در حال پردازش: ' + data.current_name;
+                        currentProduct.classList.remove('hidden');
+                    } else {
+                        currentProduct.classList.add('hidden');
+                    }
+
+                    const finished = data.log && data.log.status !== 'running';
+                    if (finished || (!data.is_running && emptyPolls++ > 3)) {
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                        setButtonBusy(false);
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                })
+                .catch(() => { /* keep polling on transient errors */ });
+        }
+
+        btn.addEventListener('click', function () {
+            errorBox.classList.add('hidden');
+            const limit = document.getElementById('crawl-limit').value;
+            const pages = document.getElementById('crawl-pages').value || '1-88';
+
+            const formData = new FormData();
+            formData.append('pages', pages);
+            if (limit) formData.append('limit', limit);
+
+            setButtonBusy(true);
+            liveStatus.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            statusPages.textContent = '0 / 0';
+            successCount.textContent = '0';
+            failCount.textContent = '0';
+
+            fetch(`{{ route('admin.crawl.run') }}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+                .then(async r => {
+                    const data = await r.json().catch(() => ({}));
+                    if (!r.ok || !data.success) throw new Error(data.message || 'خطای نامشخص');
+                    return data;
+                })
+                .then(data => {
+                    activeLogId = data.log_id;
+                    emptyPolls = 0;
+                    if (!pollingInterval) {
+                        pollingInterval = setInterval(pollStatus, 2000);
+                        pollStatus();
+                    }
+                })
+                .catch(err => {
+                    setButtonBusy(false);
+                    liveStatus.classList.add('hidden');
+                    showError(err.message);
+                });
+        });
+    })();
 </script>
 @endpush

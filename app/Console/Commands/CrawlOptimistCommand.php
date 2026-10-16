@@ -9,6 +9,7 @@ use App\Services\ProductService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use DOMDocument;
 use DOMXPath;
 use Carbon\Carbon;
@@ -18,7 +19,8 @@ class CrawlOptimistCommand extends Command
     protected $signature = 'products:crawl
                             {--limit=10 : Maximum number of products to crawl}
                             {--dry-run : Validate only, do not save to database}
-                            {--pages=1-88 : Page range to crawl (e.g. 1-5 or 1-88)}';
+                            {--pages=1-88 : Page range to crawl (e.g. 1-5 or 1-88)}
+                            {--log-id= : Update an existing CrawlLog row instead of creating a new one}';
 
     protected $description = 'Crawl optimist.style socks category and import products to database';
 
@@ -49,9 +51,15 @@ class CrawlOptimistCommand extends Command
 
     public function handle(): int
     {
+        // Background runs can take a long time — never let PHP kill the process.
+        set_time_limit(0);
+
         $limit = (int) $this->option('limit');
         $dryRun = (bool) $this->option('dry-run');
         $pages = $this->parsePages($this->option('pages'));
+        $logId = $this->option('log-id') ? (int) $this->option('log-id') : null;
+
+        $log = $logId ? CrawlLog::find($logId) : null;
 
         $this->info('🕷 Optimist Socks Crawler');
         $this->info('Limit: ' . ($limit ?: 'unlimited') . ' | Pages: ' . $pages[0] . '–' . end($pages) . ' | Mode: ' . ($dryRun ? 'DRY RUN' : 'LIVE'));
@@ -93,13 +101,24 @@ class CrawlOptimistCommand extends Command
 
                     if ($productData === null) {
                         $this->failCount++;
+                        $this->errors[] = [
+                            'url' => $productUrl,
+                            'message' => 'Product data could not be extracted (no name/price found)',
+                        ];
                         $this->warn("      ⏭ Skipped (no data)");
+                        $this->pushLiveStatus($page, count($pages), $productUrl, null);
                         continue;
                     }
 
                     // Only import in-stock products
                     if (!$productData['in_stock']) {
+                        $this->failCount++;
+                        $this->errors[] = [
+                            'url' => $productUrl,
+                            'message' => 'Product is out of stock',
+                        ];
                         $this->warn("      ⏭ Skipped (out of stock)");
+                        $this->pushLiveStatus($page, count($pages), $productUrl, $productData['name']);
                         continue;
                     }
 
@@ -110,6 +129,11 @@ class CrawlOptimistCommand extends Command
                     $this->successCount++;
                     $this->info("      ✓ Imported: " . $productData['name']);
 
+                    // Update live status for monitoring (success AND skipped/failed)
+                    if (!$dryRun) {
+                        $this->pushLiveStatus($page, count($pages), $productUrl, $productData['name']);
+                    }
+
                     // Rate limiting — be polite to the source site
                     sleep(1);
                 } catch (\Throwable $e) {
@@ -119,6 +143,7 @@ class CrawlOptimistCommand extends Command
                         'message' => $e->getMessage(),
                     ];
                     $this->error("      ✗ Error: " . $e->getMessage());
+                    $this->pushLiveStatus($page, count($pages), $productUrl, null);
                 }
             }
         }
@@ -131,19 +156,29 @@ class CrawlOptimistCommand extends Command
             $status = $this->failCount > 0 && $this->successCount === 0 ? 'failed'
                 : ($this->failCount > 0 ? 'partial' : 'success');
 
-            CrawlLog::create([
+            $logData = [
                 'status' => $status,
-                'started_at' => $startedAt,
                 'finished_at' => $finishedAt,
                 'duration_seconds' => $duration,
-                'user_id' => auth()->check() ? auth()->id() : null,
-                'limit' => $limit > 0 ? $limit : null,
                 'pages_crawled' => count($pages),
                 'products_found' => $totalFound,
                 'products_imported' => $this->successCount,
                 'products_failed' => $this->failCount,
-                'error_message' => $this->failCount > 0 && $this->successCount === 0 ? implode("\n", array_column($this->errors, 'message')) : null,
-            ]);
+                'error_message' => !empty($this->errors) ? implode("\n", array_slice(array_column($this->errors, 'message'), 0, 50)) : null,
+            ];
+
+            if ($log) {
+                $log->update($logData);
+            } else {
+                CrawlLog::create(array_merge($logData, [
+                    'started_at' => $startedAt,
+                    'limit' => $limit > 0 ? $limit : null,
+                    'user_id' => auth()->check() ? auth()->id() : null,
+                ]));
+            }
+
+            // Clear live status
+            Cache::forget('crawl_live_status');
         }
 
         $this->printSummary($dryRun);
@@ -435,21 +470,38 @@ class CrawlOptimistCommand extends Command
     {
         $slug = $data['slug'];
 
+        // Map crawler data keys to database column names
+        $productData = [
+            'product_category_id' => $data['category_id'] ?? $this->defaultCategory->id,
+            'brand_id'            => $data['brand_id'] ?? null,
+            'name'                => ['fa' => $data['name'], 'en' => $data['name']],
+            'slug'                => $slug,
+            'short_description'   => $data['short_description'] ? ['fa' => $data['short_description'], 'en' => $data['short_description']] : null,
+            'description'         => $data['description'] ? ['fa' => $data['description'], 'en' => $data['description']] : null,
+            'sku'                 => $data['sku'],
+            'price'               => $data['price'] ?? 0,
+            'discount_price'      => $data['discount_price'],
+            'final_price'         => $data['price'] ?? 0,
+            'stock'               => $data['stock'] ?? 0,
+            'weight'              => $data['weight'],
+            'is_active'           => $data['is_active'] ?? true,
+            'is_featured'         => $data['is_featured'] ?? false,
+            'is_best_seller'      => $data['is_best_seller'] ?? false,
+            'source_url'          => $data['source_url'],
+            'source_price'        => $data['source_price'],
+            'last_crawled_at'     => now(),
+            'is_crawled'          => true,
+        ];
+
         // Check for existing (including soft-deleted) to restore + update instead of duplicate insert
         $existing = Product::withTrashed()->where('slug', $slug)->first();
 
         if ($existing) {
             $existing->restore();
-            $existing->update(array_merge($data, [
-                'last_crawled_at' => now(),
-                'is_crawled' => true,
-            ]));
+            $existing->update($productData);
             $product = $existing;
         } else {
-            $product = Product::create(array_merge($data, [
-                'last_crawled_at' => now(),
-                'is_crawled' => true,
-            ]));
+            $product = Product::create($productData);
         }
 
         // Download and set main image
@@ -467,7 +519,7 @@ class CrawlOptimistCommand extends Command
     private function downloadImage(string $url, string $slug): ?string
     {
         try {
-            $response = Http::timeout(30)->withoutVerifying()->withHeaders([
+            $response = Http::timeout(15)->withoutVerifying()->withHeaders([
                 'User-Agent' => self::USER_AGENT,
             ])->get($url);
 
@@ -501,26 +553,36 @@ class CrawlOptimistCommand extends Command
     }
 
     /**
-     * Fetch HTML from a URL with proper headers.
+     * Fetch HTML from a URL with proper headers and retry logic.
      */
-    private function fetchHtml(string $url): ?string
+    private function fetchHtml(string $url, int $retries = 1): ?string
     {
-        try {
-            $response = Http::withHeaders([
-                'User-Agent' => self::USER_AGENT,
-                'Accept' => 'text/html,application/xhtml+xml',
-                'Accept-Language' => 'fa-IR,fa;q=0.9,en;q=0.8',
-            ])->withoutVerifying()->timeout(30)->get($url);
+        $lastError = null;
 
-            if (!$response->successful()) {
-                return null;
+        for ($i = 0; $i <= $retries; $i++) {
+            try {
+                $response = Http::withHeaders([
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'text/html,application/xhtml+xml',
+                    'Accept-Language' => 'fa-IR,fa;q=0.9,en;q=0.8',
+                ])->withoutVerifying()->timeout(20)->get($url);
+
+                if ($response->successful()) {
+                    return $response->body();
+                }
+
+                $lastError = "HTTP {$response->status()}";
+            } catch (\Throwable $e) {
+                $lastError = $e->getMessage();
             }
 
-            return $response->body();
-        } catch (\Throwable $e) {
-            $this->warn("      ⚠ Fetch failed: " . $e->getMessage());
-            return null;
+            if ($i < $retries) {
+                sleep(2); // Wait before retry
+            }
         }
+
+        $this->warn("      ⚠ Fetch failed after " . ($retries + 1) . " attempts: $lastError");
+        return null;
     }
 
     /**
@@ -546,6 +608,25 @@ class CrawlOptimistCommand extends Command
     {
         $path = parse_url($url, PHP_URL_PATH);
         return preg_match('#^/product/.+$#i', $path) === 1;
+    }
+
+    /**
+     * Push current progress to cache so the admin panel can poll it live.
+     */
+    private function pushLiveStatus(int $currentPage, int $totalPages, ?string $url, ?string $name): void
+    {
+        try {
+            Cache::put('crawl_live_status', [
+                'success' => $this->successCount,
+                'failed' => $this->failCount,
+                'current' => $url,
+                'current_name' => $name,
+                'total_pages' => $totalPages,
+                'current_page' => $currentPage,
+            ], 3600);
+        } catch (\Throwable) {
+            // Live status is best-effort — never break the crawl over it.
+        }
     }
 
     /**
