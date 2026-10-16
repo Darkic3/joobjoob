@@ -116,7 +116,8 @@
                                     @endif
                                     @if(auth()->user()->canAccess('admin.product-categories.destroy'))
                                         <form action="{{ route('admin.product-categories.destroy', $category) }}" method="POST" class="delete-form"
-                                              onsubmit="return confirm('{{ __('admin.product_categories.delete_confirm', ['name' => $category->trans('name')]) }}')">
+                                              data-swal-confirm data-swal-danger="1"
+                                              data-swal-title="{{ __('admin.product_categories.delete_confirm', ['name' => $category->trans('name')]) }}">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="{{ __('admin.common.delete') }}">

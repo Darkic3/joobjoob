@@ -20,7 +20,9 @@
         <link rel="preload" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
     @endif
-    @vite(['resources/css/app.css', 'resources/js/ui-effects.js', 'resources/js/app.js', 'resources/js/card-format.js', 'resources/js/only-digits.js'])
+    {{-- SweetAlert2 محلی (تأیید حذف، خطاها و ...) + تم یکپارچهٔ SwalUI --}}
+    <script src="{{ asset('assets/admin/js/sweetalert2.all.min.js') }}"></script>
+    @vite(['resources/css/app.css', 'resources/css/swal.css', 'resources/js/ui-effects.js', 'resources/js/app.js', 'resources/js/card-format.js', 'resources/js/only-digits.js', 'resources/js/swal-ui.js'])
     @stack('styles')
 </head>
 
@@ -90,6 +92,7 @@
 <x-toast/>
 
 {{--@include('layouts.site._partials.scripts')--}}
+<x-swal-ui />
 @stack('scripts')
 </body>
 </html>

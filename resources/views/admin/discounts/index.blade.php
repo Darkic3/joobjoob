@@ -109,7 +109,9 @@
                                             </a>
                                         @endif
                                         @if(auth()->user()->canAccess('admin.discounts.edit'))
-                                            <form action="{{ route('admin.discounts.destroy', $discount) }}" method="POST" class="inline" onsubmit="return confirm('آیا از حذف این کد تخفیف مطمئن هستید؟')">
+                                            <form action="{{ route('admin.discounts.destroy', $discount) }}" method="POST" class="inline"
+                                                  data-swal-confirm data-swal-danger="1"
+                                                  data-swal-title="{{ __('admin.common.discount_delete_confirm') }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500" title="حذف">

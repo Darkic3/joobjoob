@@ -185,9 +185,11 @@
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $crawl->created_at->format('Y/m/d H:i') }}</td>
                             <td class="px-6 py-4 text-right">
                                 <a href="{{ route('admin.crawl.show', $crawl->id) }}" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">{{ __('admin.common.view') }}</a>
-                                <form action="{{ route('admin.crawl.destroy', $crawl->id) }}" method="POST" class="inline-block">
+                                <form action="{{ route('admin.crawl.destroy', $crawl->id) }}" method="POST" class="inline-block"
+                                      data-swal-confirm data-swal-danger="1"
+                                      data-swal-title="{{ __('admin.crawl.delete_confirm') }}">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="text-sm text-red-600 dark:text-red-400 hover:underline" onclick="return confirm('{{ __('admin.crawl.delete_confirm') }}')">
+                                    <button type="submit" class="text-sm text-red-600 dark:text-red-400 hover:underline">
                                         {{ __('admin.common.delete') }}
                                     </button>
                                 </form>

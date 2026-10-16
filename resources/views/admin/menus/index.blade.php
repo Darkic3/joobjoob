@@ -361,7 +361,6 @@
 @push('scripts')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
@@ -386,29 +385,25 @@
             // حذف با SweetAlert2
             $(document).on('click', '.delete-menu', function () {
                 const id = $(this).data('id');
-                Swal.fire({
+                SwalUI.confirm({
                     title: @json(__('admin.common.delete_confirm_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     text: @json(__('admin.common.delete_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                }).then((result) => {
-                    if (result.isConfirmed) {
+                    danger: true,
+                    confirmText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                }).then((confirmed) => {
+                    if (confirmed) {
                         $.ajax({
                             url: `/admin/menu/${id}`,
                             type: 'DELETE',
                             data: {_token: "{{ csrf_token() }}"},
                             success: function () {
-                                Swal.fire(@json(__('admin.common.deleted'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), '', 'success');
+                                SwalUI.toast.success(@json(__('admin.common.deleted'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                                 $(`li[data-id="${id}"]`).fadeOut(400, function () {
                                     $(this).remove();
                                 });
                             },
                             error: function () {
-                                Swal.fire(@json(__('admin.common.error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), @json(__('admin.common.system_item_protected'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'error');
+                                SwalUI.error(@json(__('admin.common.error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), @json(__('admin.common.system_item_protected'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                             }
                         });
                     }
@@ -427,18 +422,13 @@
             });
 
             // ذخیره خودکار ترتیب
-            const Toast = Swal.mixin({
-                toast: true, position: 'bottom-start',
-                showConfirmButton: false, timer: 1500
-            });
-
             $('#nestable').on('change', function () {
                 const data = $('#nestable').nestable('serialize');
                 $.post("{{ route('admin.menu.updateOrder') }}", {
                     _token: "{{ csrf_token() }}",
                     nestable_output: JSON.stringify(data)
                 }, function () {
-                    Toast.fire({icon: 'success', title: @json(__('admin.common.order_saved'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)});
+                    SwalUI.toast.success(@json(__('admin.common.order_saved'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), null, { position: 'bottom-end', timer: 1500 });
                 });
             });
         });

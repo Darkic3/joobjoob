@@ -36,15 +36,13 @@
         };
 
         window.confirmFaqDelete = function(faqId, dataId) {
-            Swal.fire({
-                icon: 'warning',
+            SwalUI.confirm({
+                title: @json(__('admin.common.delete_faq_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 text: @json(__('admin.common.delete_faq_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                showCancelButton: true,
-                confirmButtonText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                reverseButtons: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
+                danger: true,
+                confirmText: @json(__('admin.common.delete_yes'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            }).then((confirmed) => {
+                if (confirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = `/admin/faqs/${faqId}`;

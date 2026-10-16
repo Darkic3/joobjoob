@@ -89,7 +89,8 @@ class HeroSlideFormTest extends TestCase
         $html = $this->withSession(['errors' => $bag])
             ->get(route('admin.hero-slides.index'))->assertOk()->getContent();
 
-        $this->assertStringContainsString('Swal.fire', $html);
+        $this->assertStringContainsString('SwalUI.errors', $html);
+        $this->assertStringContainsString('sweetalert2', $html);
         $this->assertStringContainsString('خطا در ذخیره‌سازی', $html);
         $this->assertStringContainsString('عنوان فارسی الزامی است.', $html);
         $this->assertStringContainsString('حجم تصویر نباید بیشتر از ۲۰ مگابایت باشد.', $html);

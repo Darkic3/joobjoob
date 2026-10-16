@@ -243,4 +243,29 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')
             ->with('success', __('admin.products.deleted'));
     }
+
+    /**
+     * عملیات جمعی روی محصولات (مثل حذف انتخاب شده‌ها).
+     */
+    public function bulkAction(Request $request)
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:delete',
+            'ids' => 'required|array',
+            'ids.*' => 'exists:products,id',
+        ]);
+
+        $ids = $validated['ids'];
+        $count = count($ids);
+
+        foreach ($ids as $id) {
+            $product = Product::find($id);
+            if ($product) {
+                $this->productService->destroy($product);
+            }
+        }
+
+        return redirect()->route('admin.products.index')
+            ->with('success', __('admin.products.deleted_count', ['count' => $count]));
+    }
 }

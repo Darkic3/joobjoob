@@ -1,0 +1,657 @@
+/* ==========================================================================
+   SwalUI — تم زیبا و یکپارچهٔ دیالوگ‌ها (SweetAlert2)
+   مشترک بین پنل ادمین و سایت.
+   دو لایه دارد:
+     ۱) کلاس‌های .swal-ui-*  → رابط برنامه‌نویسی جدید (window.SwalUI)
+     ۲) کلاس‌های .swal2-*   → دیالوگ‌های قدیمی که مستقیم Swal.fire صدا زده‌اند
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   ۱) توکن‌های رنگ و اندازه
+   -------------------------------------------------------------------------- */
+:root {
+    --sw-radius: 22px;
+    --sw-radius-sm: 16px;
+    --sw-pad-x: 2.1rem;
+
+    --sw-primary-1: #818cf8;
+    --sw-primary-2: #4f46e5;
+    --sw-primary-soft: #eef2ff;
+
+    --sw-danger-1: #fb7185;
+    --sw-danger-2: #e11d48;
+    --sw-danger-soft: #fff1f2;
+
+    --sw-success-1: #34d399;
+    --sw-success-2: #059669;
+    --sw-success-soft: #ecfdf5;
+
+    --sw-warning-1: #fbbf24;
+    --sw-warning-2: #d97706;
+    --sw-warning-soft: #fffbeb;
+
+    --sw-info-1: #60a5fa;
+    --sw-info-2: #2563eb;
+    --sw-info-soft: #eff6ff;
+
+    --sw-surface: #ffffff;
+    --sw-surface-2: #f8fafc;
+    --sw-border: #e8ebf1;
+    --sw-title: #0f172a;
+    --sw-body: #64748b;
+    --sw-shadow: 0 34px 70px -28px rgb(15 23 42 / 0.42), 0 10px 24px -16px rgb(15 23 42 / 0.24);
+    --sw-backdrop: rgb(15 23 42 / 0.55);
+}
+
+.dark,
+[data-bs-theme='dark'] {
+    --sw-surface: #141a25;
+    --sw-surface-2: #1b2333;
+    --sw-border: #2a3446;
+    --sw-title: #f8fafc;
+    --sw-body: #94a3b8;
+    --sw-shadow: 0 34px 70px -24px rgb(0 0 0 / 0.72), 0 10px 24px -16px rgb(0 0 0 / 0.5);
+    --sw-backdrop: rgb(2 6 16 / 0.68);
+
+    --sw-primary-soft: rgb(99 102 241 / 0.16);
+    --sw-danger-soft: rgb(244 63 94 / 0.16);
+    --sw-success-soft: rgb(16 185 129 / 0.16);
+    --sw-warning-soft: rgb(245 158 11 / 0.16);
+    --sw-info-soft: rgb(59 130 246 / 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   ۲) پس‌زمینه (بک‌دراپ)
+   -------------------------------------------------------------------------- */
+.swal2-container.swal2-backdrop-show {
+    background: var(--sw-backdrop);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    animation: sw-ui-backdrop-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes sw-ui-backdrop-in {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to   { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   ۳) پاپ‌آپ — کارت شیشه‌ای با نوار رنگی بالا
+   -------------------------------------------------------------------------- */
+.swal2-container .swal2-popup,
+.swal2-container .swal-ui-popup {
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 20rem;
+    max-width: min(92vw, 30rem);
+    margin: 1.25rem auto;
+    padding: 2.4rem var(--sw-pad-x) 1.9rem;
+    border: 1px solid var(--sw-border);
+    border-radius: var(--sw-radius);
+    background: var(--sw-surface);
+    color: var(--sw-body);
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    box-shadow: var(--sw-shadow);
+}
+
+/* نوار رنگی باریک بالای کارت — هویت بصری هر نوع پیام */
+.swal2-container .swal2-popup::before,
+.swal2-container .swal-ui-popup::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--sw-primary-1), var(--sw-primary-2));
+}
+
+.swal2-container .swal-ui-popup--danger::before { background: linear-gradient(90deg, var(--sw-danger-1), var(--sw-danger-2)); }
+.swal2-container .swal-ui-popup--success::before { background: linear-gradient(90deg, var(--sw-success-1), var(--sw-success-2)); }
+.swal2-container .swal-ui-popup--warning::before { background: linear-gradient(90deg, var(--sw-warning-1), var(--sw-warning-2)); }
+.swal2-container .swal-ui-popup--info::before    { background: linear-gradient(90deg, var(--sw-info-1), var(--sw-info-2)); }
+.swal2-container .swal-ui-popup--primary::before { background: linear-gradient(90deg, var(--sw-primary-1), var(--sw-primary-2)); }
+
+/* --------------------------------------------------------------------------
+   ۴) انیمیشن ورود/خروج — فنری نرم (spring)
+   -------------------------------------------------------------------------- */
+.swal2-container .swal2-popup.swal2-show {
+    animation: sw-ui-pop-in 0.42s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+}
+
+@keyframes sw-ui-pop-in {
+    0%   { opacity: 0; transform: translateY(22px) scale(0.92); }
+    55%  { opacity: 1; transform: translateY(-6px) scale(1.014); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.swal2-container .swal2-popup.swal2-hide {
+    animation: sw-ui-pop-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes sw-ui-pop-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(10px) scale(0.95); }
+}
+
+/* آیکون با کمی تأخیر وارد شود (waterfall) */
+.swal2-container .swal2-popup.swal2-show .swal2-icon {
+    animation: sw-ui-icon-in 0.5s cubic-bezier(0.22, 1.4, 0.36, 1) 0.06s both;
+}
+
+@keyframes sw-ui-icon-in {
+    0%   { opacity: 0; transform: scale(0.5); }
+    60%  { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   ۵) آیکون — نشان نرم با هالهٔ رنگی
+   -------------------------------------------------------------------------- */
+
+/* ۵-الف) خنثی‌سازی رنگ‌های پیش‌فرض SweetAlert2 روی آیکون‌های خودمان.
+   این‌ها عمداً قبل از بلوک‌های «لحن» می‌آیند تا رنگ نهایی ما برنده شود. */
+.swal2-container .swal2-icon.swal2-success,
+.swal2-container .swal2-icon.swal2-error,
+.swal2-container .swal2-icon.swal2-warning,
+.swal2-container .swal2-icon.swal2-info,
+.swal2-container .swal2-icon.swal2-question {
+    border-width: 0;
+}
+
+.swal2-container .swal2-icon.swal2-success .swal2-success-ring,
+.swal2-container .swal2-icon.swal2-success [class^='swal2-success-line'],
+.swal2-container .swal2-icon.swal2-error [class^='swal2-x-mark'],
+.swal2-container .swal2-icon.swal2-error [class^='swal2-x-mark-line'],
+.swal2-container .swal2-icon.swal2-warning [class^='swal2-warning-line'],
+.swal2-container .swal2-icon.swal2-question [class^='swal2-question-line'] {
+    display: none;
+}
+
+/* ۵-ب) ساختار مشترک نشان */
+.swal2-container .swal2-icon,
+.swal2-container .swal-ui-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: 5.25rem;
+    height: 5.25rem;
+    margin: 0 auto 1.35rem;
+    border: none;
+    border-radius: 1.75rem;
+    background: var(--sw-primary-soft);
+    color: var(--sw-primary-2);
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 0.7),
+        0 10px 30px -12px rgb(79 70 229 / 0.55);
+}
+
+/* هالهٔ نرم پشت آیکون */
+.swal2-container .swal2-icon::after,
+.swal2-container .swal-ui-icon::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0.1;
+    filter: blur(14px);
+    z-index: -1;
+}
+
+/* ۵-پ) رنگ‌ها بر اساس «لحن» — specificity بالاتر از استایل پیش‌فرض SweetAlert2 */
+.swal2-container .swal2-icon.swal-ui-icon--danger,
+.swal2-container .swal-ui-icon--danger {
+    background: var(--sw-danger-soft);
+    color: var(--sw-danger-2);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), 0 10px 30px -12px rgb(225 29 72 / 0.5);
+}
+
+.swal2-container .swal2-icon.swal-ui-icon--success,
+.swal2-container .swal-ui-icon--success {
+    background: var(--sw-success-soft);
+    color: var(--sw-success-2);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), 0 10px 30px -12px rgb(5 150 105 / 0.5);
+}
+
+.swal2-container .swal2-icon.swal-ui-icon--warning,
+.swal2-container .swal-ui-icon--warning {
+    background: var(--sw-warning-soft);
+    color: var(--sw-warning-2);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), 0 10px 30px -12px rgb(217 119 6 / 0.5);
+}
+
+.swal2-container .swal2-icon.swal-ui-icon--info,
+.swal2-container .swal-ui-icon--info {
+    background: var(--sw-info-soft);
+    color: var(--sw-info-2);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), 0 10px 30px -12px rgb(37 99 235 / 0.5);
+}
+
+/* حلقهٔ ضربان‌دار برای هشدارها — حس «توجه کن» */
+.swal2-container .swal2-icon.swal-ui-icon--warning::before,
+.swal2-container .swal2-icon.swal-ui-icon--danger::before,
+.swal2-container .swal-ui-icon--warning::before,
+.swal2-container .swal-ui-icon--danger::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 2px currentColor;
+    opacity: 0.22;
+    animation: sw-ui-pulse 2.4s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes sw-ui-pulse {
+    0%   { transform: scale(1);    opacity: 0.28; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { transform: scale(1.28); opacity: 0; }
+}
+
+.swal2-container .swal2-icon .swal2-icon-content,
+.swal2-container .swal-ui-icon .swal2-icon-content,
+.swal2-container .swal2-icon > div:not([class^='swal2-']) {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+}
+
+.swal2-container .swal-ui-icon svg {
+    width: 2.7rem;
+    height: 2.7rem;
+    display: block;
+}
+
+/* دیالوگ‌های قدیمی که مستقیم Swal.fire صدا می‌زنند (بدون iconHtml) */
+.swal2-container .swal2-icon.swal2-success [class^='swal2-success-line'] { background-color: var(--sw-success-2); }
+.swal2-container .swal2-icon.swal2-success .swal2-success-ring { border-color: var(--sw-success-1); }
+.swal2-container .swal2-icon.swal2-error [class^='swal2-x-mark'] { background-color: var(--sw-danger-2); }
+.swal2-container .swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background-color: var(--sw-danger-2); }
+
+/* --------------------------------------------------------------------------
+   ۶) عنوان و متن
+   -------------------------------------------------------------------------- */
+.swal2-container .swal2-title,
+.swal2-container .swal-ui-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.28rem;
+    font-weight: 800;
+    line-height: 1.75;
+    color: var(--sw-title);
+    letter-spacing: -0.01em;
+}
+
+.swal2-container .swal2-html-container,
+.swal2-container .swal-ui-text {
+    margin: 0.65rem 0 0;
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 2.1;
+    color: var(--sw-body);
+    overflow-y: visible;
+    max-width: 100%;
+}
+
+.swal2-container .swal-ui-text strong { color: var(--sw-title); font-weight: 700; }
+.swal2-container .swal-ui-text ul { margin: 0.5rem 0 0; padding: 0; list-style: none; text-align: center; }
+.swal2-container .swal-ui-text li { margin-bottom: 0.4rem; }
+
+/* --------------------------------------------------------------------------
+   ۷) دکمه‌ها — قرصی‌شکل با گرادیان و براقیت
+   -------------------------------------------------------------------------- */
+.swal2-container .swal2-actions,
+.swal2-container .swal-ui-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin: 1.7rem 0 0;
+    padding: 0;
+}
+
+.swal2-container .swal2-actions button,
+.swal2-container .swal-ui-btn {
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    min-width: 8.5rem;
+    height: 3rem;
+    margin: 0 !important;
+    padding: 0 1.6rem !important;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease, background-color 0.18s ease;
+}
+
+/* براقیتی که با هاور روی دکمه می‌لغزد */
+.swal2-container .swal-ui-btn::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: -60%;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: skewX(-18deg);
+    transition: inset-inline-start 0.55s ease;
+    pointer-events: none;
+}
+
+.swal2-container .swal-ui-btn:hover::after { inset-inline-start: 120%; }
+
+.swal2-container .swal-ui-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+}
+
+.swal2-container .swal-ui-btn:active { transform: translateY(0) scale(0.98); }
+
+.swal2-container .swal-ui-btn:focus-visible {
+    outline: 3px solid rgb(99 102 241 / 0.45);
+    outline-offset: 3px;
+}
+
+/* دکمهٔ اصلی (لحن‌ها) */
+.swal2-container .swal-ui-btn--primary,
+.swal2-container .swal2-confirm {
+    background: linear-gradient(135deg, var(--sw-primary-1), var(--sw-primary-2)) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 26px -12px rgb(79 70 229 / 0.75) !important;
+}
+
+.swal2-container .swal-ui-btn--danger {
+    background: linear-gradient(135deg, var(--sw-danger-1), var(--sw-danger-2)) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 26px -12px rgb(225 29 72 / 0.75) !important;
+}
+
+.swal2-container .swal-ui-btn--success {
+    background: linear-gradient(135deg, var(--sw-success-1), var(--sw-success-2)) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 26px -12px rgb(5 150 105 / 0.75) !important;
+}
+
+.swal2-container .swal-ui-btn--warning {
+    background: linear-gradient(135deg, var(--sw-warning-1), var(--sw-warning-2)) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 26px -12px rgb(217 119 6 / 0.75) !important;
+}
+
+.swal2-container .swal-ui-btn--info {
+    background: linear-gradient(135deg, var(--sw-info-1), var(--sw-info-2)) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 26px -12px rgb(37 99 235 / 0.75) !important;
+}
+
+/* سازگاری با کلاس قدیمیِ خطر */
+.swal2-container .swal2-confirm.fb-swal-danger {
+    background: linear-gradient(135deg, var(--sw-danger-1), var(--sw-danger-2)) !important;
+    box-shadow: 0 12px 26px -12px rgb(225 29 72 / 0.75) !important;
+}
+
+/* دکمهٔ انصراف — شیشه‌ای ملایم */
+.swal2-container .swal-ui-btn--ghost,
+.swal2-container .swal2-cancel {
+    background: transparent !important;
+    color: var(--sw-body) !important;
+    border-color: var(--sw-border) !important;
+    box-shadow: inset 0 1px 2px rgb(15 23 42 / 0.04) !important;
+}
+
+.swal2-container .swal-ui-btn--ghost:hover,
+.swal2-container .swal2-cancel:hover {
+    background: var(--sw-surface-2) !important;
+    color: var(--sw-title) !important;
+    border-color: color-mix(in srgb, var(--sw-title) 22%, transparent) !important;
+    box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   ۸) راست‌به‌چپ
+   -------------------------------------------------------------------------- */
+[dir='rtl'] .swal2-container .swal2-popup,
+[dir='rtl'] .swal2-container .swal-ui-popup {
+    direction: rtl;
+}
+
+[dir='rtl'] .swal2-container .swal2-title,
+[dir='rtl'] .swal2-container .swal-ui-title,
+[dir='rtl'] .swal2-container .swal2-html-container,
+[dir='rtl'] .swal2-container .swal-ui-text {
+    text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   ۹) Toast — پیام‌های گذرا (کارت جمع‌وجور گوشهٔ صفحه، خودکار-محو)
+   پیاده‌سازی مستقل از SweetAlert2 تا چیدمان کاملاً تحت کنترل باشد
+   و هیچ قفلی روی تعامل صفحه ایجاد نشود.
+   -------------------------------------------------------------------------- */
+
+.swal-ui-toasts {
+    position: fixed;
+    z-index: 1090;
+    top: 1rem;
+    inset-inline-end: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: min(23rem, calc(100vw - 2rem));
+    pointer-events: none;
+}
+
+.swal-ui-toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    overflow: hidden;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid var(--sw-border);
+    border-radius: 1rem;
+    background: var(--sw-surface);
+    color: var(--sw-body);
+    box-shadow: 0 18px 40px -18px rgb(15 23 42 / 0.45);
+    pointer-events: auto;
+    animation: sw-ui-toast-in 0.38s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+}
+
+.swal-ui-toast--leaving {
+    animation: sw-ui-toast-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes sw-ui-toast-in {
+    0%   { opacity: 0; transform: translateY(-14px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sw-ui-toast-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-10px) scale(0.96); }
+}
+
+.swal-ui-toast__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.75rem;
+    background: var(--toast-soft);
+    color: var(--toast-color);
+}
+
+.swal-ui-toast__icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: block;
+}
+
+.swal-ui-toast__body {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-top: 0.1rem;
+}
+
+.swal-ui-toast__title {
+    display: block;
+    font-size: 0.93rem;
+    font-weight: 700;
+    line-height: 1.7;
+    color: var(--sw-title);
+    word-break: break-word;
+}
+
+.swal-ui-toast__text {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.83rem;
+    line-height: 1.8;
+    word-break: break-word;
+}
+
+.swal-ui-toast__text:empty { display: none; }
+
+.swal-ui-toast__close {
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.15rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--sw-body);
+    font-size: 1.35rem;
+    line-height: 1;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.swal-ui-toast__close:hover {
+    opacity: 1;
+    background: var(--sw-surface-2);
+}
+
+/* نوار زمان‌سنج روی لبهٔ پایین کارت */
+.swal-ui-toast__bar {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    height: 3px;
+    width: 100%;
+    transform-origin: inline-start;
+    background: var(--toast-color);
+    opacity: 0.35;
+    animation: sw-ui-toast-bar linear forwards;
+}
+
+@keyframes sw-ui-toast-bar {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+/* لحن‌ها */
+.swal-ui-toast {
+    --toast-color: var(--sw-primary-2);
+    --toast-soft: var(--sw-primary-soft);
+}
+
+.swal-ui-toast--danger  { --toast-color: var(--sw-danger-2);  --toast-soft: var(--sw-danger-soft); }
+.swal-ui-toast--success { --toast-color: var(--sw-success-2); --toast-soft: var(--sw-success-soft); }
+.swal-ui-toast--warning { --toast-color: var(--sw-warning-2); --toast-soft: var(--sw-warning-soft); }
+.swal-ui-toast--info    { --toast-color: var(--sw-info-2);    --toast-soft: var(--sw-info-soft); }
+
+@media (max-width: 30rem) {
+    .swal-ui-toasts {
+        inset-inline: 0.75rem;
+        width: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .swal-ui-toast,
+    .swal-ui-toast--leaving,
+    .swal-ui-toast__bar { animation: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+   ۱۰) حالت «loading» و پیشرفت
+   -------------------------------------------------------------------------- */
+.swal2-container .swal-ui-loader {
+    border-width: 3px;
+    border-radius: 50%;
+    margin: 2rem auto;
+    animation: sw-ui-spin 0.9s linear infinite;
+}
+
+@keyframes sw-ui-spin {
+    to { transform: rotate(360deg); }
+}
+
+.swal2-progress-bar {
+    background: linear-gradient(90deg, var(--sw-primary-1), var(--sw-primary-2)) !important;
+}
+
+/* --------------------------------------------------------------------------
+   ۱۱) موبایل
+   -------------------------------------------------------------------------- */
+@media (max-width: 30rem) {
+    .swal2-container .swal2-popup,
+    .swal2-container .swal-ui-popup {
+        --sw-pad-x: 1.35rem;
+        padding: 1.9rem 1.35rem 1.5rem;
+        border-radius: 18px;
+    }
+
+    .swal2-container .swal2-icon,
+    .swal2-container .swal-ui-icon {
+        width: 4.4rem;
+        height: 4.4rem;
+        border-radius: 1.5rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .swal2-container .swal-ui-icon svg { width: 2.2rem; height: 2.2rem; }
+
+    .swal2-container .swal2-title,
+    .swal2-container .swal-ui-title { font-size: 1.1rem; }
+
+    .swal2-container .swal2-html-container,
+    .swal2-container .swal-ui-text { font-size: 0.9rem; line-height: 1.95; }
+
+    .swal2-container .swal2-actions,
+    .swal2-container .swal-ui-actions { flex-direction: column-reverse; }
+
+    .swal2-container .swal2-actions button,
+    .swal2-container .swal-ui-btn { width: 100%; min-width: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   ۱۲) احترام به تنظیم «کاهش حرکت» کاربر
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .swal2-container .swal2-popup,
+    .swal2-container .swal-ui-popup,
+    .swal2-container .swal2-icon,
+    .swal2-container .swal-ui-icon::before,
+    .swal2-container .swal-ui-loader {
+        animation: none !important;
+    }
+
+    .swal2-container .swal-ui-btn { transition: none; }
+    .swal2-container .swal-ui-btn:hover { transform: none; }
+}

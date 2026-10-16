@@ -69,7 +69,7 @@
                 <div class="flex items-center gap-3 text-[11px]" style="color: var(--text-secondary);"><span dir="ltr">{{ $address->receiptor_full_name }}</span><span>|</span><span dir="ltr">{{ $address->receiptor_full_name }}</span></div>
                 <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);">
                     <button @click="editAddress({{ json_encode($address) }})" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);">ویرایش</button>
-                    <form action="{{ route('dashboard.addresses.delete', $address->id) }}" method="POST" onsubmit="return confirm('آیا مطمئن هستید؟')">@csrf @method('DELETE')<button type="submit" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger);">حذف</button></form>
+                    <form action="{{ route('dashboard.addresses.delete', $address->id) }}" method="POST" data-swal-confirm data-swal-danger="1" data-swal-title="آیا از حذف این آدرس مطمئن هستید؟">@csrf @method('DELETE')<button type="submit" class="text-[11px] font-bold px-3 py-1.5 rounded-lg" style="background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger);">حذف</button></form>
                 </div>
             </div>
             @endforeach

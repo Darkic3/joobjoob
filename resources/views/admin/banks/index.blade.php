@@ -87,7 +87,9 @@
                                         </a>
                                     @endif
                                     @if(auth()->user()->canAccess('admin.banks.destroy'))
-                                        <form action="{{ route('admin.banks.destroy', $bank->id) }}" method="POST" class="delete-form" onsubmit="return confirm('{{ __('admin.banks.confirm_delete') }}')">
+                                        <form action="{{ route('admin.banks.destroy', $bank->id) }}" method="POST" class="delete-form"
+                                              data-swal-confirm data-swal-danger="1"
+                                              data-swal-title="{{ __('admin.banks.confirm_delete') }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10" title="{{ __('admin.banks.delete') }}">

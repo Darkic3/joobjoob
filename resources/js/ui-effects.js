@@ -784,32 +784,29 @@ document.addEventListener('DOMContentLoaded', function () {
             .finally(function () { btn.disabled = false; });
     }
 
-    // تایید حذف با swal
+    // تایید حذف با SwalUI
     function showRemoveWishlistConfirm(btn) {
-        // ساخت أوپن إیجة محلی (از swal یا fall-back به confirm ساده)
         var title = btn.getAttribute('data-wishlist-title-confirm') || '';
         var text = btn.getAttribute('data-wishlist-text-confirm') || '';
+        var confirmLabel = btn.getAttribute('data-wishlist-confirm-label') || 'بله، حذف کن';
+        var cancelLabel = btn.getAttribute('data-wishlist-cancel-label') || 'انصراف';
 
-        if (typeof swal === 'function') {
-            swal({
+        if (window.SwalUI && typeof window.SwalUI.confirm === 'function') {
+            window.SwalUI.confirm({
                 title: title,
                 text: text,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: btn.getAttribute('data-wishlist-confirm-label') || 'はい，削除',
-                cancelButtonText: btn.getAttribute('data-wishlist-cancel-label') || 'キャンセル',
-            }).then(function (result) {
-                if (result.value !== false && result.dismiss !== 'cancel') {
-                    confirmRemoveWishlist(btn);
-                }
+                danger: true,
+                confirmText: confirmLabel,
+                cancelText: cancelLabel,
+            }).then(function (confirmed) {
+                if (confirmed) confirmRemoveWishlist(btn);
             });
-        } else {
-            // فیل‌بک ساده: confirm نativa
-            if (confirm(title + '\n\n' + text)) {
-                confirmRemoveWishlist(btn);
-            }
+            return;
+        }
+
+        // فیل‌بک در صورت نبود SwalUI
+        if (window.confirm(title + '\n\n' + text)) {
+            confirmRemoveWishlist(btn);
         }
     }
 

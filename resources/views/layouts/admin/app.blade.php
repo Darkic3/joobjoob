@@ -38,7 +38,7 @@
     {{-- SweetAlert2 — محلی (برای سوال‌های تأیید، خطاهای فرم و ...) --}}
     <script src="{{ asset('assets/admin/js/sweetalert2.all.min.js') }}"></script>
 
-    @vite(['resources/css/app-admin.css', 'resources/js/app-admin.js', 'resources/js/card-format.js'])
+    @vite(['resources/css/app-admin.css', 'resources/css/swal.css', 'resources/js/app-admin.js', 'resources/js/card-format.js', 'resources/js/swal-ui.js'])
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50">
@@ -68,6 +68,7 @@
 <x-admin.image-cropper />
 
 @stack('modals')
+<x-swal-ui />
 <x-admin.scripts/>
 
 <script>

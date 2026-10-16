@@ -21,13 +21,18 @@
         </div>
         <div class="flex items-center gap-2">
             @if($tablesReady && $errorLogs->where('is_resolved', false)->count() > 0)
-                <form action="{{ route('admin.monitoring.errors.bulk-resolve') }}" method="POST" class="inline" onsubmit="return confirm('آیا همه خطاهای حل‌نشده علامت‌گذاری شوند؟')">
+                <form action="{{ route('admin.monitoring.errors.bulk-resolve') }}" method="POST" class="inline"
+                          data-swal-confirm data-swal-danger="1"
+                          data-swal-icon="warning"
+                          data-swal-title="{{ __('admin.common.bulk_resolve_confirm') }}">
                     @csrf
                     <input type="hidden" name="note" value="حل دسته‌ای">
                     <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl transition-all">{{ __('admin.monitoring.bulk_resolve') }}</button>
                 </form>
             @endif
-            <form action="{{ route('admin.monitoring.errors.delete-resolved') }}" method="POST" class="inline" onsubmit="return confirm('خطاهای حل‌شده قدیمی (بیش از ۳۰ روز) حذف شوند؟')">
+            <form action="{{ route('admin.monitoring.errors.delete-resolved') }}" method="POST" class="inline"
+                  data-swal-confirm data-swal-danger="1"
+                  data-swal-title="{{ __('admin.common.delete_resolved_confirm') }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-all">{{ __('admin.monitoring.delete_resolved') }}</button>

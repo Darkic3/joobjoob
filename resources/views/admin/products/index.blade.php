@@ -1,4 +1,4 @@
-@extends('layouts.admin.app')
+﻿@extends('layouts.admin.app')
 
 
 @section('content')
@@ -197,6 +197,9 @@
                 <table class="w-full text-start">
                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                     <tr>
+                        <th class="px-6 py-4 text-center">
+                            <input type="checkbox" id="select-all-products" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        </th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.products.title') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.common.category') }}</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('admin.common.status') }}</th>
@@ -207,7 +210,11 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($products as $product)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150 product-row">
+                            <td class="px-6 py-4 text-center">
+                                {{-- با form="bulk-action-form" به فرم عملیات جمعی وصل است، با اینکه بیرون از آن رندر می‌شود --}}
+                                <input type="checkbox" name="ids[]" value="{{ $product->id }}" form="bulk-action-form" class="product-checkbox w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-12 w-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 bg-gray-100 dark:bg-gray-700">
@@ -277,7 +284,14 @@
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                                         </button>
                                         <div x-show="open" @click.outside="open = false" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute end-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-10">
-                                            <form action="{{ route('admin.products.destroy', $product) }}" method="POST" onsubmit="return confirm('{{ __('admin.products.delete_confirm') }}')">
+                                            {{-- تأیید حذف با SwalUI (بدون confirm بومی) --}}
+                                            <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
+                                                  data-swal-confirm
+                                                  data-swal-danger="1"
+                                                  data-swal-title="{{ __('admin.products.delete_confirm') }}"
+                                                  data-swal-text="{{ __('admin.products.delete_named', ['name' => $product->trans('name') ?? '#' . $product->id]) }}"
+                                                  data-swal-confirm-text="{{ __('admin.products.delete_btn') }}"
+                                                  data-swal-cancel="{{ __('admin.common.cancel') }}">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="w-full text-start block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10">{{ __('admin.products.delete_btn') }}</button>
                                             </form>
@@ -317,6 +331,34 @@
                 </table>
             </div>
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+                {{-- نوار عملیات جمعی --}}
+                <div id="bulk-action-bar" class="hidden flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold text-amber-800 dark:text-amber-200" id="bulk-selected-count">0</span>
+                        <span class="text-sm text-amber-600 dark:text-amber-400">{{ __('admin.products.selected_count') }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        {{-- تأیید حذف گروهی با SwalUI؛ تعداد انتخاب‌شده‌ها به‌صورت زنده در :count می‌نشیند --}}
+                        <form action="{{ route('admin.products.bulk-action') }}" method="POST" id="bulk-action-form"
+                              data-swal-confirm
+                              data-swal-danger="1"
+                              data-swal-count=".product-checkbox"
+                              data-swal-title="{{ __('admin.products.delete_selected_confirm', ['count' => ':count']) }}"
+                              data-swal-text="{{ __('admin.products.delete_selected_confirm_text', ['count' => ':count']) }}"
+                              data-swal-confirm-text="{{ __('admin.products.bulk_delete_button', ['count' => ':count']) }}"
+                              data-swal-cancel="{{ __('admin.common.cancel') }}">
+                            @csrf
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <span id="bulk-delete-text">{{ __('admin.products.bulk_delete') }}</span>
+                            </button>
+                        </form>
+                        <button type="button" onclick="clearSelection()" class="px-3 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-800 rounded-lg transition-colors">
+                            {{ __('admin.common.cancel') }}
+                        </button>
+                    </div>
+                </div>
                 {{ $products->links() }}
             </div>
         </div>
@@ -343,6 +385,57 @@
                 if (searchInput) setTimeout(function () { searchInput.focus(); }, 250);
             }
         });
+
+        // ===== Bulk actions =====
+        const selectAll = document.getElementById('select-all-products');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkBar = document.getElementById('bulk-action-bar');
+        const selectedCountEl = document.getElementById('bulk-selected-count');
+        const bulkForm = document.getElementById('bulk-action-form');
+
+        function updateSelectAll() {
+            if (!selectAll) return;
+            const total = checkboxes.length;
+            const checked = document.querySelectorAll('.product-checkbox:checked').length;
+            selectAll.checked = total > 0 && total === checked;
+            selectAll.indeterminate = total > 0 && checked > 0 && checked < total;
+        }
+
+        function updateBulkBar() {
+            const checked = document.querySelectorAll('.product-checkbox:checked').length;
+            if (bulkBar && selectedCountEl) {
+                if (checked > 0) {
+                    bulkBar.classList.remove('hidden');
+                    selectedCountEl.textContent = checked;
+                } else {
+                    bulkBar.classList.add('hidden');
+                }
+            }
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => (cb.checked = this.checked));
+                updateBulkBar();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                updateSelectAll();
+                updateBulkBar();
+            });
+        });
+
+        // Initialize states
+        updateSelectAll();
+        updateBulkBar();
     });
+
+    function clearSelection() {
+        document.querySelectorAll('.product-checkbox').forEach(cb => (cb.checked = false));
+        document.getElementById('select-all-products')?.dispatchEvent(new Event('change'));
+        document.getElementById('bulk-action-bar')?.classList.add('hidden');
+    }
 </script>
 @endpush

@@ -7,11 +7,13 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/app-admin.css',
+                'resources/css/swal.css',
                 'resources/js/ui-effects.js',
                 'resources/js/app.js',
                 'resources/js/app-admin.js',
                 'resources/js/card-format.js',
                 'resources/js/only-digits.js',
+                'resources/js/swal-ui.js',
             ],
             refresh: true,
         }),

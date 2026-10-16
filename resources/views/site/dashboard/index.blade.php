@@ -111,7 +111,8 @@
                      style="background: color-mix(in srgb, var(--success) 7%, transparent); border: 1px solid color-mix(in srgb, var(--success) 18%, transparent);">
                     <span class="text-sm font-bold truncate min-w-0" style="color: var(--text-primary);" dir="ltr">{{ auth()->user()->email }}</span>
                     <form action="{{ route('dashboard.email.destroy') }}" method="POST" class="shrink-0"
-                          onsubmit="return confirm('ایمیل شما حذف شود؟')">
+                          data-swal-confirm data-swal-danger="1"
+                          data-swal-title="ایمیل شما حذف شود؟">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="email-delete-btn">

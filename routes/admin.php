@@ -49,6 +49,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         // show عمداً حذف شده — کنترلر متد show ندارد و درخت کانفیگ کلید show ندارد (تله 403)
 
+        // عملیات جمعی محصولات
+        Route::post('products/bulk-action', [ProductController::class, 'bulkAction'])->name('products.bulk-action');
+
         // ========== مدیریت کرالر آپتیمیست ==========
         Route::get('crawl', [CrawlManagerController::class, 'index'])->name('crawl.index');
         Route::post('crawl/run', [CrawlManagerController::class, 'run'])->name('crawl.run');

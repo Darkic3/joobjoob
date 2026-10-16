@@ -41,7 +41,8 @@
                 @endif
                 @if(auth()->user()->canAccess('admin.reviews.destroy'))
                     <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" class="delete-form inline-flex"
-                          onsubmit="return confirm('{{ __('admin.common.confirm_delete') }}')">
+                          data-swal-confirm data-swal-danger="1"
+                          data-swal-title="{{ __('admin.common.confirm_delete') }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
@@ -247,12 +248,12 @@
                     if (data.success) {
                         location.reload();
                     } else {
-                        alert(data.message || 'خطا در تغییر وضعیت');
+                        SwalUI.error(data.message || @json(__('admin.common.status_change_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                     }
                 })
                 .catch(function(err) {
                     console.error(err);
-                    alert('خطا در ارتباط با سرور');
+                    SwalUI.error(@json(__('admin.common.server_communication_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                 });
             }
 
@@ -284,14 +285,14 @@
                     if (data.success) {
                         location.reload();
                     } else {
-                        alert(data.message || 'خطا در ارسال پاسخ');
+SwalUI.error(data.message || @json(__('admin.common.reply_send_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                         btn.disabled = false;
-                        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> ارسال پاسخ';
+                        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> ارسال پاسخ';
                     }
                 })
                 .catch(function(err) {
                     console.error(err);
-                    alert('خطا در ارتباط با سرور');
+                    SwalUI.error(@json(__('admin.common.server_communication_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                     btn.disabled = false;
                     btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> ارسال پاسخ';
                 });

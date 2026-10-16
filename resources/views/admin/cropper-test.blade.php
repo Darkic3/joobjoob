@@ -66,6 +66,9 @@
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script src="{{ asset('assets/admin/js/sweetalert2.all.min.js') }}"></script>
+@vite(['resources/css/swal.css', 'resources/js/swal-ui.js'])
+<x-swal-ui />
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const fileInput = document.getElementById('image');
@@ -135,7 +138,7 @@
                 cropper.destroy();
 
                 console.log('عکس با موفقیت کراپ شد و آماده ارسال است.');
-                alert('عکس کراپ شد! پیش‌نمایش در پایین صفحه اضافه شد.');
+                SwalUI.success('عکس کراپ شد!', 'پیش‌نمایش در پایین صفحه اضافه شد.');
 
                 // ۴. آبجکت URL می‌سازیم و در پیش‌نمایش نمایش می‌دهیم
                 if (previewImage.src) { // <-- جدید
@@ -150,11 +153,11 @@
         mainForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (croppedImageBlob) {
-                alert('فرم آماده ارسال است (همراه با عکس کراپ شده).');
+                SwalUI.info('فرم آماده ارسال است (همراه با عکس کراپ شده).');
             } else if (fileInput.files.length > 0) {
-                alert('لطفاً عکس را انتخاب و سپس برش دهید.');
+                SwalUI.warning('لطفاً عکس را انتخاب و سپس برش دهید.');
             } else {
-                alert('لطفاً یک عکس انتخاب کنید.');
+                SwalUI.warning('لطفاً یک عکس انتخاب کنید.');
             }
         });
     });

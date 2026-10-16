@@ -176,13 +176,13 @@
                                 msg = data.error;
                             }
 
-                            alert(msg);
+                            SwalUI.error(msg);
                             element.style.borderColor = 'red';
                         } else if (error.request) {
-                            alert(@json(__('admin.common.no_connection'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                            SwalUI.error(@json(__('admin.common.no_connection'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                             console.log('Request object:', error.request);
                         } else {
-                            alert(@json(__('admin.common.request_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + error.message);
+                            SwalUI.error(@json(__('admin.common.request_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) + error.message);
                         }
                     })
                     .finally(() => {

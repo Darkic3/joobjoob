@@ -1,13 +1,13 @@
 <script type="text/javascript">
     function confirmIndex(url) {
-        Swal.fire({
-            icon: 'warning',
+        SwalUI.confirm({
+            title: @json(__('admin.common.delete_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             text: @json(__('admin.common.index_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-            showCancelButton: true,
-            confirmButtonText: @json(__('admin.common.confirm_continue'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-            cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-        }).then((result) => {
-            if (result.isConfirmed) {
+            icon: 'warning',
+            danger: true,
+            confirmText: @json(__('admin.common.confirm_continue'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        }).then((confirmed) => {
+            if (confirmed) {
                 location.href = url;
             }
         });

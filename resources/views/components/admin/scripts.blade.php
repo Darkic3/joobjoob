@@ -64,45 +64,14 @@
             });
         }
 
-        document.addEventListener('submit', function (e) {
-            var form = e.target.closest('.delete-form');
-            if (form && typeof Swal !== 'undefined') {
-                e.preventDefault();
-                Swal.fire({
-                    title: @json(__('admin.common.delete_confirm_title'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    text: @json(__('admin.common.delete_confirm_text'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    icon: 'warning',
-                    showCancelButton: true,
-                    customClass: { confirmButton: 'fb-swal-danger' },
-                    confirmButtonText: @json(__('admin.common.delete_confirm_button'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    cancelButtonText: @json(__('admin.common.cancel'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                }).then(function (result) {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            }
-        });
-
-        {{-- خطاهای اعتبارسنجی (پس از ریدایرکت بک) — نمایش به‌صورت swal --}}
+        {{-- خطاهای اعتبارسنجی (پس از ریدایرکت بک) — نمایش به‌صورت دیالوگ زیبای SwalUI --}}
         @if($errors->any())
-            var escHtml = function (s) {
-                return String(s).replace(/[&<>"']/g, function (c) {
-                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            <script>
+                window.addEventListener('load', function () {
+                    if (!window.SwalUI) return;
+                    window.SwalUI.errors(@json(__('admin.common.save_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), @json($errors->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                 });
-            };
-            var errorMessages = @json($errors->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            if (typeof Swal !== 'undefined' && errorMessages.length > 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: @json(__('admin.common.save_error'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    // لیست خطاها وسط‌چین — بدون بولت، با فاصلهٔ راحت
-                    html: '<ul class="mb-0" style="list-style:none; padding:0; text-align:center;">' + errorMessages.map(function (m) {
-                        return '<li class="mb-2 last:mb-0">' + escHtml(m) + '</li>';
-                    }).join('') + '</ul>',
-                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                });
-            }
+            </script>
         @endif
     });
 </script>

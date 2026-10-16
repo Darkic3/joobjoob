@@ -174,12 +174,8 @@
                         if (!file) return;
 
                         if (file.size > MAX_SIZE) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: '{{ __('admin.settings.file_too_large') }}',
-                                text: '{{ __('admin.settings.video_size_limit') }}',
-                                confirmButtonText: '{{ __('admin.settings.got_it') }}',
-                                confirmButtonColor: '#dc3545'
+                            SwalUI.error('{{ __('admin.settings.file_too_large') }}', '{{ __('admin.settings.video_size_limit') }}', {
+                                confirmText: '{{ __('admin.settings.got_it') }}'
                             });
                             this.value = '';
                             const displayElement = document.getElementById('name_' + this.id);

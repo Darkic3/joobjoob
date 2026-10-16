@@ -61,6 +61,9 @@ class AdminMessagesLocalizationTest extends TestCase
             'admin.common.index_confirm_text', 'admin.common.delete_faq_title',
             'admin.common.delete_faq_text', 'admin.common.upload_failed',
             'admin.common.invalid_file', 'admin.common.crop_cancelled',
+            'admin.common.discount_delete_confirm', 'admin.common.bulk_resolve_confirm',
+            'admin.common.delete_resolved_confirm', 'admin.common.status_change_error',
+            'admin.common.server_communication_error', 'admin.common.reply_send_error',
         ];
 
         foreach (['fa', 'en', 'ar', 'tr'] as $locale) {
@@ -71,6 +74,57 @@ class AdminMessagesLocalizationTest extends TestCase
 
                 $this->assertNotSame($key, $value, "[{$locale}] کلید خام برگشت داده شد: {$key}");
                 $this->assertNotEmpty($value, "[{$locale}] مقدار خالی برای: {$key}");
+            }
+        }
+    }
+
+    public function test_swal_ui_shared_keys_resolve_in_all_languages(): void
+    {
+        // رشته‌های مشترک دیالوگ‌ها (window.SwalUI_I18N) باید در هر ۴ زبان کامل باشند
+        $keys = [
+            'confirm_title', 'confirm_text', 'confirm_button',
+            'delete_title', 'delete_text', 'delete_button',
+            'delete_many_title', 'delete_many_text',
+            'cancel', 'ok', 'close',
+            'success_title', 'error_title', 'warning_title', 'info_title',
+        ];
+
+        foreach (['fa', 'en', 'ar', 'tr'] as $locale) {
+            app()->setLocale($locale);
+
+            $strings = trans('swal');
+
+            $this->assertIsArray($strings, "[{$locale}] فایل swal.php بارگذاری نشد.");
+
+            foreach ($keys as $key) {
+                $value = $strings[$key] ?? null;
+
+                $this->assertIsString($value, "[{$locale}] کلید swal.{$key} وجود ندارد.");
+                $this->assertNotSame("swal.{$key}", $value, "[{$locale}] کلید خام برگشت داده شد: swal.{$key}");
+                $this->assertNotEmpty($value, "[{$locale}] مقدار خالی برای: swal.{$key}");
+            }
+        }
+    }
+
+    public function test_bulk_product_action_keys_resolve_in_all_languages(): void
+    {
+        $keys = [
+            'admin.products.delete_named',
+            'admin.products.delete_selected_confirm',
+            'admin.products.delete_selected_confirm_text',
+            'admin.products.bulk_delete_button',
+            'admin.products.deleted_count',
+        ];
+
+        foreach (['fa', 'en', 'ar', 'tr'] as $locale) {
+            app()->setLocale($locale);
+
+            foreach ($keys as $key) {
+                $value = __($key, ['count' => 3, 'name' => 'X']);
+
+                $this->assertNotSame($key, $value, "[{$locale}] کلید خام برگشت داده شد: {$key}");
+                $this->assertNotEmpty($value, "[{$locale}] مقدار خالی برای: {$key}");
+                $this->assertStringNotContainsString(':count', $value, "[{$locale}] جایگزینی :count انجام نشد: {$key}");
             }
         }
     }

@@ -1,4 +1,4 @@
-@extends('layouts.admin.app')
+﻿@extends('layouts.admin.app')
 
 @section('tab-name', __('admin.reviews.tab'))
 
@@ -468,17 +468,7 @@
                     if (data.success) {
                         closeReplyModal();
                         // Show success toast
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                title: '{{ __("admin.reviews.reply_sent") }}',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                                customClass: { popup: 'swal2-rtl' },
-                            });
-                        } else {
-                            alert('{{ __("admin.reviews.reply_sent") }}');
-                        }
+                        SwalUI.toast.success('{{ __("admin.reviews.reply_sent") }}');
                     } else {
                         errorEl.textContent = data.message || '{{ __("admin.common.request_error") }}';
                         errorEl.classList.remove('hidden');
@@ -524,7 +514,7 @@
                 })
                 .catch(function(err) {
                     console.error(err);
-                    alert('{{ __("admin.common.request_error") }}');
+                    SwalUI.error('{{ __("admin.common.request_error") }}');
                 })
                 .finally(function() {
                     button.disabled = false;
@@ -567,7 +557,7 @@
                 })
                 .catch(function(err) {
                     console.error(err);
-                    alert('{{ __("admin.common.request_error") }}');
+                    SwalUI.error('{{ __("admin.common.request_error") }}');
                 })
                 .finally(function() {
                     element.disabled = false;

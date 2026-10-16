@@ -129,28 +129,14 @@
 
         // فایل انتخابی تصویر نیست — خطا و حذف انتخاب
         if (!file.type.startsWith('image/')) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: @json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    text: file.name,
-                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                });
-            }
+            SwalUI.error(@json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), file.name);
             input.value = '';
             return;
         }
 
         // حجم بیش از حد مجاز — خطا و حذف انتخاب
         if (st.maxSize && file.size > st.maxSize) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: @json(__('admin.common.file_too_large'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    text: file.name,
-                    confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                });
-            }
+            SwalUI.error(@json(__('admin.common.file_too_large'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), file.name);
             input.value = '';
             return;
         }
@@ -272,13 +258,8 @@
         const file = event.dataTransfer.files && event.dataTransfer.files[0];
         if (!file) return;
 
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                icon: 'error',
-                title: @json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                text: file.name,
-                confirmButtonText: @json(__('admin.common.ok'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-            });
+        if (!file.type.startsWith('image/')) {
+            SwalUI.error(@json(__('admin.common.not_an_image'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), file.name);
         }
     }
 </script>
