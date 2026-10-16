@@ -17,19 +17,17 @@
 
         {{-- ستون ۱: شبکه‌های اجتماعی (فقط اگر از تنظیمات پر شده باشند) --}}
         @if($hasSocials)
-            <div class="neu-flat-lg relative overflow-hidden flex flex-col justify-center">
-                <div aria-hidden="true"
-                     style="position: absolute; inset-inline-start: -40px; top: -40px; width: 160px; height: 160px; border-radius: 999px;
-                            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%); pointer-events: none;"></div>
+            <div class="eco-card eco-social-card relative overflow-hidden flex flex-col justify-center">
+                <div aria-hidden="true" class="eco-social-halo"></div>
                 <div class="relative p-8 md:p-9">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-11 h-11 rounded-2xl grid place-items-center shrink-0"
-                             style="background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)); color: var(--accent);">
+                        <div class="w-11 h-11 rounded-xl grid place-items-center shrink-0"
+                              style="background: var(--eco-clay-soft); color: var(--eco-clay-ink);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-extrabold text-lg leading-snug">{{ __('messages.join_section_title') }}</h3>
-                            <p class="text-xs mt-1" style="color: var(--text-secondary);">{{ __('messages.join_section_desc') }}</p>
+                            <h3 class="font-extrabold text-lg leading-snug" style="color:var(--eco-ink);">{{ __('messages.join_section_title') }}</h3>
+                            <p class="text-xs mt-1" style="color: var(--eco-ink-2);">{{ __('messages.join_section_desc') }}</p>
                         </div>
                     </div>
                     <x-social-links />
@@ -38,14 +36,10 @@
         @endif
 
         {{-- ستون ۲: باکس ثبت‌نام + کد تخفیف ۱۰٪ (فقط مهمان‌ها) --}}
-        <div class="neu-flat-lg relative overflow-hidden {{ $hasSocials ? '' : 'lg:col-span-2' }}">
-            {{-- هالهٔ تزئینی پس‌زمینه --}}
-            <div aria-hidden="true"
-                 style="position: absolute; inset-inline-end: -50px; top: -50px; width: 180px; height: 180px; border-radius: 999px;
-                        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%); pointer-events: none;"></div>
-            <div aria-hidden="true"
-                 style="position: absolute; inset-inline-start: -40px; bottom: -40px; width: 140px; height: 140px; border-radius: 999px;
-                        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%); pointer-events: none;"></div>
+        <div class="eco-card eco-register-card relative overflow-hidden {{ $hasSocials ? '' : 'lg:col-span-2' }}">
+            {{-- هاله‌های تزئینی پس‌زمینه (ثابت، بدون انیمیشن) --}}
+            <div aria-hidden="true" class="eco-register-halo eco-register-halo--end"></div>
+            <div aria-hidden="true" class="eco-register-halo eco-register-halo--start"></div>
 
             {{-- محتوای کارت ثبت‌نام — در حالت تمام‌عرض هم فرم کشیده نمی‌شود (max-w-xl) --}}
             <div class="relative w-full max-w-xl mx-auto p-8 md:p-9">
@@ -53,20 +47,16 @@
                     {{-- هدر با آیکون و بج گرادیانی تخفیف --}}
                     <div class="flex items-start justify-between gap-3 mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-2xl grid place-items-center shrink-0"
-                                 style="background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)); color: var(--accent);">
+                            <div class="w-11 h-11 rounded-xl grid place-items-center shrink-0"
+                                 style="background: var(--eco-clay-soft); color: var(--eco-clay-ink);">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                             </div>
                             <div>
-                                <h3 class="font-extrabold text-lg leading-snug">{{ __('messages.register_title') }}</h3>
-                                <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--text-secondary);">{{ __('messages.register_desc') }}</p>
+                                <h3 class="font-extrabold text-lg leading-snug" style="color:var(--eco-ink);">{{ __('messages.register_title') }}</h3>
+                                <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--eco-ink-2);">{{ __('messages.register_desc') }}</p>
                             </div>
                         </div>
-                        <span class="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black text-white"
-                              style="background: linear-gradient(135deg, var(--accent), var(--gold)); box-shadow: 0 4px 14px color-mix(in srgb, var(--gold) 45%, transparent);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-                            ۱۰٪
-                        </span>
+                        <span class="eco-tag eco-tag--sand shrink-0" dir="ltr">۱۰٪</span>
                     </div>
 
                     {{-- فرم ثبت‌نام — فیلدها زیرِ هم، تمام‌عرض؛ ارورِ هر فیلد زیر خودش؛ عددی فقط (only-digits.js سراسری) --}}
@@ -80,17 +70,17 @@
                                    x-on:input="resetServerErrors()"
                                    x-on:blur="mobileBlurred = true"
                                    placeholder="{{ __('messages.register_mobile_ph') }}"
-                                   class="neu-input py-3 text-sm"
-                                   :style="isMobileInvalid() ? errorStyle : ''"
+                                   class="eco-input py-3 text-sm"
+                                   :class="isMobileInvalid() ? 'is-invalid' : ''"
                                    required dir="ltr" inputmode="tel" autocomplete="tel" maxlength="13">
-                            <span class="form-error block mt-1" x-show="isMobileInvalid()" x-text="mobileMessage()"></span>
+                            <span class="block mt-1 text-xs font-bold" style="color:var(--eco-danger);" x-show="isMobileInvalid()" x-text="mobileMessage()"></span>
 
                             {{-- اگر شماره قبلاً ثبت شده، به‌جای ثبت‌نام تکراری مسیر ورود را پیشنهاد بده --}}
                             <template x-if="mobileRegistered">
                                 <span class="block mt-2 text-[11px] font-bold">
                                     <a href="{{ localizedRoute('login') }}"
                                        class="inline-flex items-center gap-1 transition-opacity hover:opacity-70"
-                                       style="color: var(--accent);">
+                                       style="color: var(--eco-clay-ink);">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H7m0 0 4-4m-4 4 4 4"/><path d="M11 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg>
                                         {{ __('messages.login') }}
                                     </a>
@@ -105,24 +95,25 @@
                                    x-on:input="resetServerErrors()"
                                    x-on:blur="nameBlurred = true"
                                    placeholder="{{ __('messages.register_name_ph') }}"
-                                   class="neu-input py-3 text-sm"
-                                   :style="isNameInvalid() ? errorStyle : ''"
+                                   class="eco-input py-3 text-sm"
+                                   :class="isNameInvalid() ? 'is-invalid' : ''"
                                    required autocomplete="name" maxlength="120">
-                            <span class="form-error block mt-1" x-show="isNameInvalid()" x-text="nameMessage()"></span>
+                            <span class="block mt-1 text-xs font-bold" style="color:var(--eco-danger);" x-show="isNameInvalid()" x-text="nameMessage()"></span>
                         </div>
 
                         {{-- خطای عمومی (پیامک / شبکه / محدودیت تلاش) --}}
                         <template x-if="serverError">
-                            <div class="flex items-center gap-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 px-4 py-2.5 text-sm text-rose-700 dark:text-rose-300">
+                            <div class="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm"
+                                 style="background: rgb(var(--eco-danger-rgb) / .08); border: 1px solid rgb(var(--eco-danger-rgb) / .3); color: var(--eco-danger);">
                                 <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
                                 <span x-text="serverError"></span>
                             </div>
                         </template>
 
                         <button type="submit" x-on:click="submit()"
-                                class="neu-btn neu-btn-primary w-full px-6 py-3.5 text-sm font-bold tracking-wide"
+                                class="eco-btn eco-btn--clay eco-btn--block px-6 py-3.5 text-sm font-bold tracking-wide"
                                 :disabled="loading"
-                                x-bind:class="loading ? 'opacity-70 cursor-not-allowed' : ''">
+                                :class="loading ? 'is-loading' : ''">
                             <template x-if="loading">
                                 <svg class="inline-block me-1.5 -mt-0.5 animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" opacity="0.75"/></svg>
                             </template>
@@ -134,16 +125,16 @@
                     </form>
 
                     {{-- متن قوانین --}}
-                    <p class="text-[11px] text-center mt-4 leading-relaxed" style="color: var(--text-secondary);">
+                    <p class="text-[11px] text-center mt-4 leading-relaxed" style="color: var(--eco-ink-2);">
                         {{ __('messages.register_agree') }}
                     </p>
                 @else
                     {{-- TODO: وقتی سیستم کاربری و کدهای تخفیف راه افتاد، کدهای واقعی کاربر اینجا نمایش داده شود --}}
-                    <span class="section-icon mb-4" aria-hidden="true">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span class="eco-tag eco-tag--sage mb-4" aria-hidden="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                     </span>
-                    <h3 class="font-extrabold text-lg mb-2">{{ __('messages.already_member_title') }}</h3>
-                    <p class="text-xs" style="color: var(--text-secondary);">{{ __('messages.already_member_desc') }}</p>
+                    <h3 class="font-extrabold text-lg mb-2" style="color:var(--eco-ink);">{{ __('messages.already_member_title') }}</h3>
+                    <p class="text-xs" style="color: var(--eco-ink-2);">{{ __('messages.already_member_desc') }}</p>
                 @endguest                </div>
         </div>
     </div>
@@ -166,8 +157,8 @@ function registerForm() {
         // شماره قبلاً ثبت‌شده → پیشنهاد ورود به‌جای ثبت‌نام تکراری
         mobileRegistered: false,
 
-        // حلقهٔ قرمز خطا — هم‌خانواده با صفحات ورود (inset + ring از var(--danger))
-        errorStyle: 'box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px color-mix(in srgb, var(--danger) 45%, transparent);',
+        // حلقهٔ خطا — هم‌خانواده با تم Eco (بوردر + رینگ تراکوتا؛ نگه‌داشته برای سازگاری)
+        errorStyle: 'border-color: var(--eco-danger); box-shadow: var(--eco-focus-ring);',
 
         // پیام خطای فیلد موبایل (اولویت: خطای سرور ← خالی ← نامعتبر)
         mobileMessage() {

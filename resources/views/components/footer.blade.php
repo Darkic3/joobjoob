@@ -1,8 +1,8 @@
-<footer class="site-footer">
-    {{-- شل بیرونی: قاب گرادینتی با خط مویی و شعاع بزرگ (Double-Bezel لایهٔ ۱) --}}
+<footer class="site-footer eco-footer">
+    {{-- فوتر Eco: نواری تخت با بوردر ۱px (استایل در eco/sections/shell.css) — منطق آکاردئون و خبرنامه دست‌نخورده --}}
     <div class="site-footer-shell">
-        {{-- کور داخلی: محتوای اصلی (Double-Bezel لایهٔ ۲) --}}
-        <div class="site-footer-core">
+        {{-- کور داخلی: محتوای اصلی --}}
+        <div class="site-footer-core max-w-7xl mx-auto">
             <div class="site-footer-grid">
 
                 {{-- ستون برند — عریض‌تر با اسپیس لوکس --}}
@@ -124,14 +124,14 @@
                     <div class="site-footer-acc-body" id="footer-acc-newsletter">
                         <div class="site-footer-acc-inner">
                             <p class="site-footer-newsletter-sub">{{ __('messages.newsletter_subtitle') }}</p>
-                            <form class="site-footer-newsletter" x-data="newsletterForm()" x-on:submit.prevent>
+                            <form class="site-footer-newsletter eco-footer-newsletter" x-data="newsletterForm()" x-on:submit.prevent>
                                 <input type="email" name="email" required
                                        x-model="email"
                                        x-show="!success"
                                        placeholder="{{ settingOverride('newsletter_placeholder', __('messages.newsletter_email_placeholder')) }}"
-                                       class="site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}"
+                                       class="eco-input site-footer-newsletter-input" aria-label="{{ __('messages.newsletter') }}"
                                        dir="ltr">
-                                <button type="submit" class="site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}"
+                                <button type="submit" class="eco-btn eco-btn--clay site-footer-newsletter-btn" aria-label="{{ __('messages.newsletter') }}"
                                         x-show="!success"
                                         x-on:click="submit()" :disabled="loading">
                                     <template x-if="loading">
@@ -143,7 +143,7 @@
                                 </button>
                                 <template x-if="message">
                                     <span class="text-xs font-bold mt-1 block"
-                                          :class="success ? 'text-emerald-500' : 'text-rose-500'"
+                                          :style="success ? 'color: var(--eco-sage-ink)' : 'color: var(--eco-danger)'"
                                           x-text="message"></span>
                                 </template>
                             </form>

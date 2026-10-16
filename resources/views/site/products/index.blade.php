@@ -9,9 +9,9 @@
     {{-- ═══ هدر صفحه ═══ --}}
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-extrabold text-gray-900 mb-1">{{ __('messages.products') }}</h1>
-            <p class="text-sm text-gray-500">
-                <span class="font-bold text-indigo-600">{{ number_format($products->total()) }}</span>
+            <h1 class="text-2xl font-extrabold text-eco-ink mb-1">{{ __('messages.products') }}</h1>
+            <p class="text-sm text-eco-ink-2">
+                <span class="font-bold text-eco-clay">{{ number_format($products->total()) }}</span>
                 {{ __('messages.products') }}
                 @if (!empty($filters['q']))
                     — «{{ $filters['q'] }}»
@@ -19,7 +19,7 @@
             </p>
         </div>
         <button type="button" onclick="document.getElementById('filters-panel').classList.toggle('hidden-mobile')"
-            class="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl shadow-sm border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            class="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-eco-surface rounded-xl shadow-sm border border-eco-line text-sm font-medium text-eco-ink-2 hover:bg-eco-canvas-2 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
@@ -31,22 +31,22 @@
     <div class="grid lg:grid-cols-4 gap-8">
         {{-- ═══ سایدبار فیلتر ═══ --}}
         <aside id="filters-panel" class="hidden-mobile lg:block h-fit lg:sticky lg:top-24">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="bg-eco-surface rounded-2xl shadow-sm border border-eco-line p-5">
 
                 {{-- هدر فیلتر --}}
-                <div class="flex items-center justify-between mb-5 pb-4 border-b border-gray-100">
+                <div class="flex items-center justify-between mb-5 pb-4 border-b border-eco-line">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        <div class="w-8 h-8 rounded-lg bg-eco-clay/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-eco-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
                             </svg>
                         </div>
-                        <h3 class="font-bold text-sm text-gray-900">{{ __('messages.filter') }}</h3>
+                        <h3 class="font-bold text-sm text-eco-ink">{{ __('messages.filter') }}</h3>
                     </div>
                     <a href="{{ localizedRoute('products.index') }}"
-                        class="text-xs font-medium text-red-500 hover:text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                        class="text-xs font-medium text-eco-danger hover:text-eco-danger px-3 py-1.5 rounded-lg hover:bg-eco-danger/10 transition-colors">
                         {{ __('messages.reset') }}
                     </a>
                 </div>
@@ -58,12 +58,12 @@
 
                     {{-- ─── جستجو ─── --}}
                     <div class="mb-5">
-                        <label class="block text-xs font-semibold text-gray-600 mb-2">{{ __('messages.search') }}</label>
+                        <label class="block text-xs font-semibold text-eco-ink-2 mb-2">{{ __('messages.search') }}</label>
                         <div class="relative">
                             <input type="text" name="q" value="{{ $filters['q'] ?? '' }}"
                                 placeholder="{{ __('messages.search_placeholder') }}"
-                                class="w-full ps-10 pe-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
-                            <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+                                class="w-full ps-10 pe-4 py-2.5 text-sm bg-eco-canvas-2 border border-eco-line rounded-xl focus:ring-2 focus:ring-eco-clay focus:border-eco-clay outline-none transition-all">
+                            <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-eco-ink-3" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <circle cx="11" cy="11" r="8" />
                                 <path stroke-linecap="round" d="m21 21-4.35-4.35" />
@@ -74,17 +74,17 @@
                     {{-- ─── دسته‌بندی ─── --}}
                     <div class="mb-5">
                         <label
-                            class="block text-xs font-semibold text-gray-600 mb-2">{{ __('messages.categories') }}</label>
+                            class="block text-xs font-semibold text-eco-ink-2 mb-2">{{ __('messages.categories') }}</label>
                         <div class="space-y-1 max-h-44 overflow-y-auto custom-scrollbar pe-1">
                             @foreach ($categories as $cat)
                                 <label
-                                    class="flex items-center gap-2.5 cursor-pointer group px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                    class="flex items-center gap-2.5 cursor-pointer group px-2 py-2 rounded-lg hover:bg-eco-canvas-2 transition-colors">
                                     <input type="checkbox" name="category[]" value="{{ $cat->slug }}"
                                         {{ in_array($cat->slug, $selectedCategories, true) ? 'checked' : '' }}
-                                        class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                        class="w-4 h-4 rounded border-eco-line text-eco-clay focus:ring-eco-clay">
                                     <span
-                                        class="text-sm text-gray-700 group-hover:text-indigo-600 transition-colors">{{ $cat->trans('name') }}</span>
-                                    <span class="text-[11px] text-gray-400 ms-auto bg-gray-100 px-2 py-0.5 rounded-full">
+                                        class="text-sm text-eco-ink-2 group-hover:text-eco-clay transition-colors">{{ $cat->trans('name') }}</span>
+                                    <span class="text-[11px] text-eco-ink-3 ms-auto bg-eco-canvas-2 px-2 py-0.5 rounded-full">
                                         {{ $cat->products_count }}
                                     </span>
                                 </label>
@@ -94,12 +94,12 @@
 
                     {{-- ─── قیمت ─── --}}
                     <div class="mb-5">
-                        <label class="block text-xs font-semibold text-gray-600 mb-2">{{ __('messages.price') }}
+                        <label class="block text-xs font-semibold text-eco-ink-2 mb-2">{{ __('messages.price') }}
                             (تومان)</label>
-                        <div class="space-y-2 p-3 rounded-2xl bg-gray-50/70 border border-gray-100">
+                        <div class="space-y-2 p-3 rounded-2xl bg-eco-canvas-2/70 border border-eco-line">
                             <div class="flex items-center gap-2">
                                 <label for="filter-min-price-display"
-                                    class="shrink-0 text-xs font-semibold text-gray-600">حداقل</label>
+                                    class="shrink-0 text-xs font-semibold text-eco-ink-2">حداقل</label>
                                 <div class="relative flex-1 min-w-0">
                                     {{-- عدد خام بدون فرمت برای بک‌اند --}}
                                     <input type="hidden" name="min_price" id="filter-min-price"
@@ -107,15 +107,15 @@
                                     {{-- نمایش فرمت‌شده (۳ رقم ۳ رقم با ,) فقط برای کاربر --}}
                                     <input type="text" inputmode="numeric" id="filter-min-price-display" placeholder="0"
                                         autocomplete="off"
-                                        class="w-full min-w-0 pe-11 ps-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-start mono"
+                                        class="w-full min-w-0 pe-11 ps-3 py-2 text-sm bg-eco-surface border border-eco-line rounded-xl focus:ring-2 focus:ring-eco-clay focus:border-eco-clay outline-none transition-all text-start mono"
                                         dir="ltr">
                                     <span
-                                        class="absolute end-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400 pointer-events-none">تومان</span>
+                                        class="absolute end-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-eco-ink-3 pointer-events-none">تومان</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <label for="filter-max-price-display"
-                                    class="shrink-0 text-xs font-semibold text-gray-600">حداکثر</label>
+                                    class="shrink-0 text-xs font-semibold text-eco-ink-2">حداکثر</label>
                                 <div class="relative flex-1 min-w-0">
                                     {{-- عدد خام بدون فرمت برای بک‌اند --}}
                                     <input type="hidden" name="max_price" id="filter-max-price"
@@ -123,10 +123,10 @@
                                     {{-- نمایش فرمت‌شده (۳ رقم ۳ رقم با ,) فقط برای کاربر --}}
                                     <input type="text" inputmode="numeric" id="filter-max-price-display" placeholder="0"
                                         autocomplete="off"
-                                        class="w-full min-w-0 pe-11 ps-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-start mono"
+                                        class="w-full min-w-0 pe-11 ps-3 py-2 text-sm bg-eco-surface border border-eco-line rounded-xl focus:ring-2 focus:ring-eco-clay focus:border-eco-clay outline-none transition-all text-start mono"
                                         dir="ltr">
                                     <span
-                                        class="absolute end-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400 pointer-events-none">تومان</span>
+                                        class="absolute end-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-eco-ink-3 pointer-events-none">تومان</span>
                                 </div>
                             </div>
                         </div>
@@ -134,13 +134,13 @@
 
                     {{-- ─── برند ─── --}}
                     <div class="mb-5">
-                        <label class="block text-xs font-semibold text-gray-600 mb-2">{{ __('messages.brand') }}</label>
+                        <label class="block text-xs font-semibold text-eco-ink-2 mb-2">{{ __('messages.brand') }}</label>
                         <div class="flex flex-wrap gap-2">
                             <label class="cursor-pointer">
                                 <input type="radio" name="brand" value="" class="hidden"
                                     {{ !$selectedBrand ? 'checked' : '' }}>
                                 <span
-                                    class="inline-block px-3 py-1.5 text-[11px] font-medium rounded-full border transition-all {{ !$selectedBrand ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-indigo-300' }}">
+                                    class="inline-block px-3 py-1.5 text-[11px] font-medium rounded-full border transition-all {{ !$selectedBrand ? 'bg-eco-clay text-white border-eco-clay' : 'bg-eco-canvas-2 text-eco-ink-2 border-eco-line hover:border-eco-clay' }}">
                                     {{ __('messages.all') }}
                                 </span>
                             </label>
@@ -149,7 +149,7 @@
                                     <input type="radio" name="brand" value="{{ $brand->url }}" class="hidden"
                                         {{ $selectedBrand === $brand->url ? 'checked' : '' }}>
                                     <span
-                                        class="inline-block px-3 py-1.5 text-[11px] font-medium rounded-full border transition-all {{ $selectedBrand === $brand->url ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-indigo-300' }}">
+                                        class="inline-block px-3 py-1.5 text-[11px] font-medium rounded-full border transition-all {{ $selectedBrand === $brand->url ? 'bg-eco-clay text-white border-eco-clay' : 'bg-eco-canvas-2 text-eco-ink-2 border-eco-line hover:border-eco-clay' }}">
                                         {{ $brand->trans('title') }}
                                     </span>
                                 </label>
@@ -159,7 +159,7 @@
 
                     {{-- دکمه اعمال --}}
                     <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98] transition-all duration-200">
+                        class="eco-btn eco-btn--clay eco-btn--block w-full py-3 text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -188,21 +188,21 @@
 
                     <input type="hidden" name="sort" id="sort-input" value="{{ $selectedSort }}">
 
-                    <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                    <div class="flex items-center gap-1 p-1 bg-eco-canvas-2 rounded-xl">
                         <button type="button" data-sort="default"
-                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'default' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'default' ? 'bg-eco-surface text-eco-clay shadow-sm' : 'text-eco-ink-2 hover:text-eco-ink-2' }}">
                             {{ __('messages.relevance') }}
                         </button>
                         <button type="button" data-sort="price_asc"
-                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'price_asc' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'price_asc' ? 'bg-eco-surface text-eco-clay shadow-sm' : 'text-eco-ink-2 hover:text-eco-ink-2' }}">
                             {{ __('messages.price') }} ↑
                         </button>
                         <button type="button" data-sort="price_desc"
-                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'price_desc' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'price_desc' ? 'bg-eco-surface text-eco-clay shadow-sm' : 'text-eco-ink-2 hover:text-eco-ink-2' }}">
                             {{ __('messages.price') }} ↓
                         </button>
                         <button type="button" data-sort="newest"
-                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'newest' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                            class="sort-btn px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all {{ $selectedSort === 'newest' ? 'bg-eco-surface text-eco-clay shadow-sm' : 'text-eco-ink-2 hover:text-eco-ink-2' }}">
                             {{ __('messages.newest') }}
                         </button>
                     </div>
@@ -215,15 +215,15 @@
                     <x-product-card :product="$product" />
                 @empty
                     <div class="col-span-full text-center py-20">
-                        <div class="w-16 h-16 mx-auto rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-eco-canvas-2 flex items-center justify-center mb-4">
+                            <svg class="w-7 h-7 text-eco-ink-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                             </svg>
                         </div>
-                        <p class="font-bold text-sm text-gray-900 mb-1">{{ __('messages.no_products_found') }}</p>
-                        <p class="text-sm text-gray-500">{{ __('messages.cart_empty_desc') }}</p>
+                        <p class="font-bold text-sm text-eco-ink mb-1">{{ __('messages.no_products_found') }}</p>
+                        <p class="text-sm text-eco-ink-2">{{ __('messages.cart_empty_desc') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -234,7 +234,7 @@
                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
                         {{-- قبلی --}}
                         @if ($products->onFirstPage())
-                            <span class="w-10 h-10 flex items-center justify-center text-gray-300 cursor-not-allowed">
+                            <span class="w-10 h-10 flex items-center justify-center text-eco-ink-3 cursor-not-allowed">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -243,7 +243,7 @@
                             </span>
                         @else
                             <a href="{{ $products->previousPageUrl() }}"
-                                class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                                class="w-10 h-10 flex items-center justify-center text-eco-ink-2 hover:text-eco-clay hover:bg-eco-clay/10 rounded-xl transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -276,27 +276,27 @@
 
                         @foreach ($pages as $page)
                             @if ($page === '...')
-                                <span class="w-10 h-10 flex items-center justify-center text-gray-400">…</span>
+                                <span class="w-10 h-10 flex items-center justify-center text-eco-ink-3">…</span>
                             @elseif($page == $currentPage)
                                 <span
-                                    class="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-sm">{{ $page }}</span>
+                                    class="w-10 h-10 flex items-center justify-center bg-eco-clay text-white text-sm font-bold rounded-xl shadow-eco-xs">{{ $page }}</span>
                             @else
                                 <a href="{{ $products->url($page) }}"
-                                    class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 text-sm font-medium rounded-xl transition-all">{{ $page }}</a>
+                                    class="w-10 h-10 flex items-center justify-center text-eco-ink-2 hover:text-eco-clay hover:bg-eco-clay/10 text-sm font-medium rounded-xl transition-all">{{ $page }}</a>
                             @endif
                         @endforeach
 
                         {{-- بعدی --}}
                         @if ($products->hasMorePages())
                             <a href="{{ $products->nextPageUrl() }}"
-                                class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                                class="w-10 h-10 flex items-center justify-center text-eco-ink-2 hover:text-eco-clay hover:bg-eco-clay/10 rounded-xl transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                                 </svg>
                             </a>
                         @else
-                            <span class="w-10 h-10 flex items-center justify-center text-gray-300 cursor-not-allowed">
+                            <span class="w-10 h-10 flex items-center justify-center text-eco-ink-3 cursor-not-allowed">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />

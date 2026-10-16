@@ -1,0 +1,38 @@
+/* ===================================================================
+   Eco-Collectible — Listing (فاز ۵ — لیست محصولات)
+   -------------------------------------------------------------------
+   پولیش صفحهٔ products/index روی یوتیلیتی‌های Tailwind پالت eco:
+   پنل فیلتر، نوار مرتب‌سازی، صفحه‌بندی. منطق Blade/JS دست‌نخورده.
+   =================================================================== */
+
+/* پنل فیلتر: کارت تخت به‌جای سایهٔ خاکستری */
+[data-theme="eco-collectible"] #filters-panel > div {
+    background: var(--eco-surface);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* نوار مرتب‌سازی: قرص بژ با بوردر */
+[data-theme="eco-collectible"] #sort-form .flex.items-center.gap-1 {
+    background: var(--eco-canvas-2);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
+}
+[data-theme="eco-collectible"] .sort-btn {
+    border-radius: var(--eco-radius-sm);
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .sort-btn:hover {
+    color: var(--eco-ink);
+    background: rgb(var(--eco-ink-rgb) / .05);
+}
+
+/* اسکرول‌بار نازک فیلتر دسته‌ها */
+[data-theme="eco-collectible"] .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--eco-line-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="eco-collectible"] .sort-btn { transition: none; }
+}

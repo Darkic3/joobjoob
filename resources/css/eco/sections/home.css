@@ -88,8 +88,9 @@
 }
 
 /* ================= پیشنهاد ویژه — «سری محدود» =================
-   جایگزین آتش/ember/گلو: پنل تخت با لهجهٔ کلی، هالهٔ محو ثابت،
-   تایمر چیپ‌های مونو. هیچ انیمیشن دائمی ندارد (فقط ورود آرام).
+   پنل ادیتوریال: نوار بایگانی + ستون روایت (تیتر/تایمر/متر/CTA) +
+   گرید ۲×۲ محصولات. دسکتاپ: سایدبای‌چسبان؛ موبایل: ریل افقی.
+   بدون آتش/ember/گلو؛ فقط ورود آرام.
    ============================================================ */
 
 [data-theme="eco-collectible"] .eco-deals { margin-block: 3rem; }
@@ -114,26 +115,59 @@
     background: radial-gradient(circle at center, rgb(var(--eco-clay-rgb) / .10), transparent 68%);
     pointer-events: none;
 }
-[data-theme="eco-collectible"] .eco-deals-head {
+
+/* ---------- نوار بایگانی (امضای تم) ---------- */
+[data-theme="eco-collectible"] .eco-deals-strip {
     position: relative;
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    align-items: center;
+    gap: .75rem;
+    margin: 0 0 1.25rem;
+    color: var(--eco-ink-3);
+    font-family: var(--eco-font-mono);
+    font-size: .66rem;
+    font-weight: 500;
+    letter-spacing: var(--eco-tracking-mono);
+    white-space: nowrap;
 }
-[data-theme="eco-collectible"] .eco-deals-head-main {
+[data-theme="eco-collectible"] .eco-deals-strip-dash {
+    flex: 1;
+    border-top: 1px dashed var(--eco-line-strong);
+    min-width: 2rem;
+}
+
+/* ---------- چیدمان دوقلو ---------- */
+[data-theme="eco-collectible"] .eco-deals-layout {
+    position: relative;
+    display: grid;
+    gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+    [data-theme="eco-collectible"] .eco-deals-layout {
+        grid-template-columns: minmax(260px, 340px) 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+}
+
+/* ---------- ستون روایت ---------- */
+[data-theme="eco-collectible"] .eco-deals-aside {
     display: flex;
     flex-direction: column;
-    gap: .55rem;
+    align-items: flex-start;
+    gap: .9rem;
     min-width: 0;
+}
+@media (min-width: 1024px) {
+    [data-theme="eco-collectible"] .eco-deals-aside {
+        position: sticky;
+        top: 5.5rem;
+    }
 }
 [data-theme="eco-collectible"] .eco-deals-kicker {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    align-self: flex-start;
     padding: .28rem .75rem;
     border-radius: var(--eco-radius-pill);
     background: var(--eco-clay-soft);
@@ -153,41 +187,66 @@
 }
 [data-theme="eco-collectible"] .eco-deals-kicker-num { opacity: .75; }
 [data-theme="eco-collectible"] .eco-deals-title {
+    margin: 0;
     font-family: var(--eco-font-display);
     font-weight: 700;
-    font-size: clamp(1.35rem, 1vw + 1.05rem, 1.8rem);
-    line-height: 1.4;
+    font-size: clamp(1.5rem, 1.2vw + 1.2rem, 2rem);
+    line-height: 1.35;
     color: var(--eco-ink);
 }
 [data-theme="eco-collectible"] .eco-deals-sub {
-    font-size: .82rem;
+    margin: 0;
+    font-size: .85rem;
+    line-height: 1.9;
     color: var(--eco-ink-2);
 }
-/* تایمر: چیپ‌های مونو روی سطح */
+
+/* ---------- تایمر: لیبل + چیپ‌های مونو ---------- */
 [data-theme="eco-collectible"] .eco-deals-timer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: .7rem;
+    width: 100%;
+    padding: .8rem .9rem;
+    background: var(--eco-canvas-2);
+    border: var(--eco-border);
+    border-radius: var(--eco-radius-md);
 }
 [data-theme="eco-collectible"] .eco-deals-timer-label {
     font-size: .72rem;
     font-weight: 700;
     color: var(--eco-ink-2);
 }
+[data-theme="eco-collectible"] .eco-deals-timer .cd-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: .3rem;
+    margin-inline-start: auto;
+}
+[data-theme="eco-collectible"] .eco-deals-panel .cd-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .25rem;
+}
 [data-theme="eco-collectible"] .eco-deals-panel .cd-chip {
     padding: .45rem .55rem;
-    min-width: 50px;
+    min-width: 54px;
+    text-align: center;
     border-radius: var(--eco-radius-sm);
-    background: var(--eco-canvas-2);
+    background: var(--eco-surface);
     border: 1px solid var(--eco-line);
     color: var(--eco-clay-ink);
-    font-size: 1rem;
+    font-family: var(--eco-font-mono);
+    font-size: 1.1rem;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
     box-shadow: none;
 }
 [data-theme="eco-collectible"] .eco-deals-panel .cd-label {
     font-family: var(--eco-font-mono);
-    font-size: .56rem;
+    font-size: .58rem;
     font-weight: 500;
     letter-spacing: var(--eco-tracking-mono);
     text-transform: none;
@@ -196,19 +255,126 @@
 [data-theme="eco-collectible"] .eco-deals-panel .cd-sep {
     color: var(--eco-line-strong);
     opacity: 1;
-    padding-bottom: 16px;
+    padding-top: .45rem;
+    font-weight: 700;
 }
+
+/* ---------- متر موجودی سری ---------- */
+[data-theme="eco-collectible"] .eco-deals-stock {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    width: 100%;
+}
+[data-theme="eco-collectible"] .eco-deals-stock-track {
+    height: 6px;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-canvas-2);
+    border: 1px solid var(--eco-line);
+    overflow: hidden;
+}
+[data-theme="eco-collectible"] .eco-deals-stock-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--eco-clay);
+    transform: scaleX(var(--sold, 0));
+    transform-origin: inline-start;
+}
+[data-theme="eco-collectible"] .eco-deals-stock-text {
+    margin: 0;
+    font-size: .74rem;
+    font-weight: 600;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-deals-stock-text .mono {
+    font-family: var(--eco-font-mono);
+    color: var(--eco-clay-ink);
+}
+
+/* ---------- CTA + اطمینان‌بخش‌ها ---------- */
+[data-theme="eco-collectible"] .eco-deals-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    width: 100%;
+}
+[data-theme="eco-collectible"] .eco-deals-cta .eco-btn {
+    flex: 1;
+}
+[dir="rtl"] [data-theme="eco-collectible"] .eco-deals-cta .eco-btn svg {
+    transform: rotate(180deg);
+}
+[data-theme="eco-collectible"] .eco-deals-assure {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 0;
+    margin: .1rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+[data-theme="eco-collectible"] .eco-deals-assure li {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--eco-ink-2);
+}
+[data-theme="eco-collectible"] .eco-deals-assure li::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--eco-sage);
+    flex-shrink: 0;
+}
+[data-theme="eco-collectible"] .eco-deals-assure li + li {
+    margin-inline-start: .8rem;
+    padding-inline-start: .8rem;
+    border-inline-start: 1px solid var(--eco-line);
+}
+
+/* ---------- گرید محصولات: دسکتاپ ۲×۲ / موبایل ریل افقی ---------- */
 [data-theme="eco-collectible"] .eco-deals-grid {
     position: relative;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
+    min-width: 0;
 }
 @media (min-width: 768px) {
     [data-theme="eco-collectible"] .eco-deals-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 1.25rem;
     }
+}
+@media (max-width: 767px) {
+    [data-theme="eco-collectible"] .eco-deals-grid {
+        display: flex;
+        gap: .9rem;
+        margin-inline: calc(clamp(1.25rem, 2.5vw, 2rem) * -1);
+        padding-inline: clamp(1.25rem, 2.5vw, 2rem);
+        padding-bottom: .5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+    [data-theme="eco-collectible"] .eco-deals-grid::-webkit-scrollbar {
+        display: none;
+    }
+    [data-theme="eco-collectible"] .eco-deals-cell {
+        flex: 0 0 min(68vw, 260px);
+        scroll-snap-align: start;
+    }
+}
+[data-theme="eco-collectible"] .eco-deals-cell {
+    min-width: 0;
+}
+
+/* سازگاری با نام‌های قبلی (در صورت استفاده در جاهای دیگر) */
+[data-theme="eco-collectible"] .eco-deals-head,
+[data-theme="eco-collectible"] .eco-deals-head-main {
+    display: contents;
 }
 
 /* ================= ریل محصولات (ویژه / پرفروش‌ترین) =================
@@ -374,4 +540,60 @@
     [data-theme="eco-collectible"] .eco-rail-btn svg { transition: none; }
     [data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) { transform: none; }
     [dir="rtl"] [data-theme="eco-collectible"] .eco-rail-btn:hover:not(:disabled) svg { transform: rotate(180deg); }
+}
+
+/* ================= سوشال + ثبت‌نام (فاز ۴ — تکمیل) =================
+   جایگزین neu-flat و هاله‌های accent/گرادیان با کارت تخت Eco و
+   هاله‌های ثابت کلی/ماسه‌ای. منطق Alpine/فرم دست‌نخورده.
+   ============================================================ */
+
+[data-theme="eco-collectible"] .eco-social-card,
+[data-theme="eco-collectible"] .eco-register-card {
+    padding: 0;
+}
+[data-theme="eco-collectible"] .eco-social-halo {
+    position: absolute;
+    inset-inline-start: -40px;
+    top: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgb(var(--eco-clay-rgb) / .10), transparent 70%);
+    pointer-events: none;
+}
+[data-theme="eco-collectible"] .eco-register-halo {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 999px;
+    pointer-events: none;
+}
+[data-theme="eco-collectible"] .eco-register-halo--end {
+    inset-inline-end: -50px;
+    top: -50px;
+    background: radial-gradient(circle, rgb(var(--eco-clay-rgb) / .12), transparent 70%);
+}
+[data-theme="eco-collectible"] .eco-register-halo--start {
+    inset-inline-start: -40px;
+    bottom: -40px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgb(var(--eco-sand-rgb) / .12), transparent 70%);
+}
+
+/* ================= نشان‌های اعتماد (فاز ۴ — تکمیل) ================= */
+
+[data-theme="eco-collectible"] .eco-trust-item {
+    padding: 1.25rem;
+}
+[data-theme="eco-collectible"] .eco-trust-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--trust-color, var(--eco-sage)) 14%, var(--eco-surface));
+    color: var(--trust-color, var(--eco-sage));
+    font-size: 1.25rem;
+    line-height: 1;
 }

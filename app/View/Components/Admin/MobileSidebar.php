@@ -45,8 +45,7 @@ class MobileSidebar extends Component
             || ($this->can)('admin.promo-banners.index');
         $this->showSettingsDivider = ($this->can)('admin.settings.edit')
             || ($this->can)('admin.roles.index')
-            || ($this->can)('admin.users.index')
-            || ($this->can)('admin.languages.index');
+            || ($this->can)('admin.users.index');
 
         // در موبایل یک لینک برای کل گروه محصولات — به اولین بخش در دسترس برو
         $this->productsTarget = ($this->can)('admin.products.index')

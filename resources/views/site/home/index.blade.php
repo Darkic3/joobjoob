@@ -41,33 +41,82 @@
         </section>
     @endif
 
-    {{-- ۳. پیشنهادهای ویژه — «سری محدود» با تایمر آرام (بدون آتش/ember) --}}
+    {{-- ۳. پیشنهادهای ویژه — «سری محدود»: پنل ادیتوریال (روایت + تایمر + CTA) + گرید ۲×۲ --}}
     @if($deals->isNotEmpty())
-        <section id="deals" class="eco-deals reveal-on-scroll">
+        @php
+            $dealsCount = $deals->count();
+            $dealsAvgSold = (int) round($deals->avg('sold_percent'));
+            $dealsMaxOff = (int) $deals->max(fn ($p) => (int) ($p->discount_percentage ?? 0));
+        @endphp
+        <section id="deals" class="eco-deals reveal-on-scroll" aria-labelledby="deals-title">
             <div class="eco-deals-panel">
 
-                <div class="eco-deals-head">
-                    <div class="eco-deals-head-main">
+                {{-- نوار بایگانی (امضای تم): شناسه سری + خط‌چین + شمارش — تزئینی --}}
+                <p class="eco-deals-strip" dir="ltr" aria-hidden="true">
+                    <span class="eco-deals-strip-id">LIMITED&nbsp;/&nbsp;#ECO-DEALS</span>
+                    <span class="eco-deals-strip-dash"></span>
+                    <span class="eco-deals-strip-count" data-digit-raw>{{ $dealsCount }} ITEMS</span>
+                </p>
+
+                <div class="eco-deals-layout">
+                    {{-- ستون روایت: تیتر، تایمر، متر موجودی، CTA، اطمینان‌بخش‌ها --}}
+                    <div class="eco-deals-aside">
                         <span class="eco-deals-kicker">
                             <span class="eco-deals-kicker-dot" aria-hidden="true"></span>
                             <span>{{ __('messages.special_offers') }}</span>
-                            <span class="eco-deals-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $deals->count() }}</span>
+                            <span class="eco-deals-kicker-num" aria-hidden="true" data-digit-raw>/ {{ $dealsCount }}</span>
                         </span>
-                        <h2 class="eco-deals-title">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
+
+                        <h2 id="deals-title" class="eco-deals-title">{{ settingOverride('home_deals_title', __('messages.special_offers')) }}</h2>
                         <p class="eco-deals-sub">{{ settingOverride('home_deals_subtitle', __('messages.dont_miss_out')) }}</p>
+
+                        {{-- تایمر پایان سری — چیپ‌های مونو، بدون انیمیشن دائمی --}}
+                        <div class="eco-deals-timer">
+                            <span class="eco-deals-timer-label">{{ __('messages.deal_ends_in') }}</span>
+                            <x-countdown-timer :ends-at="$dealEndsAt" id="deal-cd"/>
+                        </div>
+
+                        {{-- متر موجودی سری: میانگین فروش + سقف تخفیف --}}
+                        <div class="eco-deals-stock">
+                            <div class="eco-deals-stock-track" role="progressbar"
+                                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $dealsAvgSold }}"
+                                 aria-label="{{ $dealsAvgSold }}٪ {{ __('messages.sold_percent') }}">
+                                <span class="eco-deals-stock-fill" style="--sold: {{ $dealsAvgSold / 100 }};"></span>
+                            </div>
+                            <p class="eco-deals-stock-text">
+                                <span class="mono" dir="ltr">{{ $dealsAvgSold }}٪</span>
+                                {{ __('messages.sold_percent') }}
+                                @if($dealsMaxOff > 0)
+                                    <span aria-hidden="true">·</span>
+                                    {{ __('messages.discount_off') }}
+                                    <span class="mono" dir="ltr">{{ $dealsMaxOff }}٪</span>
+                                @endif
+                            </p>
+                        </div>
+
+                        <div class="eco-deals-cta">
+                            <a href="{{ localizedRoute('products.index') }}" class="eco-btn eco-btn--clay">
+                                <span>{{ settingOverride('home_view_all', __('messages.view_all')) }}</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </a>
+                        </div>
+
+                        {{-- اطمینان‌بخش‌های فشرده --}}
+                        <ul class="eco-deals-assure">
+                            <li>{{ __('messages.trust_authenticity') }}</li>
+                            <li>{{ __('messages.trust_return') }}</li>
+                            <li>{{ __('messages.trust_free_shipping') }}</li>
+                        </ul>
                     </div>
 
-                    {{-- تایمر پایان سری — چیپ‌های مونو، آرام --}}
-                    <div class="eco-deals-timer">
-                        <span class="eco-deals-timer-label">{{ __('messages.deal_ends_in') }}</span>
-                        <x-countdown-timer :ends-at="$dealEndsAt" id="deal-cd"/>
+                    {{-- گرید محصولات سری — دسکتاپ ۲×۲، موبایل ریل افقی --}}
+                    <div class="eco-deals-grid" data-stagger role="list" aria-label="{{ __('messages.special_offers') }}">
+                        @foreach($deals as $product)
+                            <div role="listitem" class="eco-deals-cell">
+                                <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
+                            </div>
+                        @endforeach
                     </div>
-                </div>
-
-                <div class="eco-deals-grid" data-stagger>
-                    @foreach($deals as $product)
-                        <x-product-card :product="$product" :soldPercent="$product->sold_percent" />
-                    @endforeach
                 </div>
             </div>
         </section>

@@ -119,18 +119,19 @@ class SetLocaleFallbackTest extends TestCase
         $this->assertSame('fa', $this->htmlLangOf('/'));
     }
 
-    // ── پنل ادمین: زنجیره‌ی قدیمی حفظ شده است ─────────────────────────
+    // ── پنل ادمین: همیشه تک‌زبانه (فارسی) ─────────────────────────────────
 
-    public function test_admin_login_respects_lang_param(): void
+    public function test_admin_login_ignores_lang_param(): void
     {
+        // ?lang= در ادمین نادیده گرفته می‌شود (بدون ریدایرکت) و همیشه fa
         $html = $this->get('/admin/login?lang=en')->assertOk()->getContent();
 
         preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
 
-        $this->assertSame('en', $m[1] ?? '');
+        $this->assertSame('fa', $m[1] ?? '');
     }
 
-    public function test_admin_respects_user_locale(): void
+    public function test_admin_ignores_user_locale(): void
     {
         $user = User::factory()->create([
             'is_admin' => true,
@@ -143,20 +144,20 @@ class SetLocaleFallbackTest extends TestCase
         $html = $this->get('/admin/dashboard')->assertOk()->getContent();
         preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
 
-        $this->assertSame('ar', $m[1] ?? '');
+        $this->assertSame('fa', $m[1] ?? '');
     }
 
-    public function test_admin_respects_session_locale(): void
+    public function test_admin_ignores_session_locale(): void
     {
         $this->withSession(['locale' => 'tr']);
 
         $html = $this->get('/admin/login')->assertOk()->getContent();
         preg_match('/<html\s+lang="([^"]+)"/', $html, $m);
 
-        $this->assertSame('tr', $m[1] ?? '');
+        $this->assertSame('fa', $m[1] ?? '');
     }
 
-    public function test_admin_user_with_inactive_locale_falls_back(): void
+    public function test_admin_user_with_inactive_locale_stays_fa(): void
     {
         Language::where('code', 'ar')->update(['is_active' => false]);
         app(LocaleService::class)->flush();
@@ -164,7 +165,6 @@ class SetLocaleFallbackTest extends TestCase
         $user = User::factory()->create(['is_admin' => true, 'is_active' => true, 'locale' => 'ar']);
         $this->actingAs($user);
 
-        // ar غیرفعال است → fallback به پیش‌فرض
         $this->assertSame('fa', $this->htmlLangOf('/admin/dashboard'));
     }
 

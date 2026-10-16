@@ -14,20 +14,19 @@
         <div class="mobile-search-panel">
             <form action="{{ localizedRoute('products.index') }}" method="GET"
                   class="flex items-center gap-2">
-                <svg class="w-5 h-5 shrink-0" style="color:var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="w-5 h-5 shrink-0" style="color:var(--eco-ink-3);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-4.35-4.35M17 10.5A6.5 6.5 0 1 1 4 10.5a6.5 6.5 0 0 1 13 0Z"/>
                 </svg>
                 <input type="text" name="q" value="{{ request('q') }}"
                        data-mobile-search-input
                        placeholder="{{ __('messages.search_placeholder') }}"
-                       class="neu-input flex-1 text-sm"
+                       class="eco-input flex-1 text-sm"
                        autocomplete="off">
-                <button type="submit" class="neu-btn px-4 py-2 text-sm font-bold shrink-0"
-                        style="background:var(--accent); color:var(--accent-contrast);">
+                <button type="submit" class="eco-btn eco-btn--clay eco-btn--sm shrink-0">
                     {{ __('messages.search') }}
                 </button>
                 <button type="button" data-mobile-search-close aria-label="{{ __('messages.close') }}"
-                        class="neu-btn neu-btn-icon shrink-0">
+                        class="eco-btn eco-btn--outline eco-btn--icon shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18 18 6M6 6l12 12"/>
                     </svg>
@@ -67,7 +66,7 @@
                     </svg>
                     <span id="wishlist-count-mobile"
                           class="absolute -top-1.5 -end-2.5 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center"
-                          style="background:var(--accent); color:var(--accent-contrast);">{{ $wishlistCount }}</span>
+                          style="background:var(--eco-clay); color:#fff;">{{ $wishlistCount }}</span>
                 </span>
                 <span>{{ __('messages.wishlist') }}</span>
             </a>
@@ -81,7 +80,7 @@
                     </svg>
                     <span id="cart-count-mobile"
                           class="absolute -top-1.5 -end-2.5 rounded-full text-[10px] font-bold w-4 h-4 grid place-items-center"
-                          style="background:var(--accent); color:var(--accent-contrast);">{{ $cartCount }}</span>
+                          style="background:var(--eco-clay); color:#fff;">{{ $cartCount }}</span>
                 </span>
                 <span>{{ __('messages.cart') }}</span>
             </a>

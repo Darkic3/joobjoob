@@ -11,7 +11,7 @@ use Illuminate\View\View;
  * وقتی قفل زبان سایت عمومی فعال باشد (config/site-features.php)، آرایه‌ی
  * `locales` فقط همان یک زبان قفل‌شده را برمی‌گرداند تا هیچ language switcher
  * در هیچ ویویی قابل رندر نباشد (حتی اگر ویویی به‌اشتباه switcher داشته باشد).
- * پنل ادمین همچنان همه‌ی زبان‌های فعال را می‌بیند.
+ * پنل ادمین همیشه تک‌زبانه است (admin_locale) و فقط همان یک زبان را می‌بیند.
  */
 class LocaleComposer
 {
@@ -19,18 +19,27 @@ class LocaleComposer
 
     public function compose(View $view): void
     {
-        $locale = app()->getLocale();
-        $isPublic = ! str_starts_with(request()->path(), 'admin');
+        $isAdmin = str_starts_with(request()->path(), 'admin');
+        // پنل ادمین تک‌زبانه است — مستقل از SetLocale، همیشه زبان قفل‌شده
+        $locale = $isAdmin
+            ? (string) config('site-features.admin_locale', 'fa')
+            : app()->getLocale();
+        $isPublic = ! $isAdmin;
         $locked = $isPublic && (bool) config('site-features.public_locale_locked', false);
+
+        // زبان‌های قابل نمایش در سوییچرها — ادمین و حالت قفل: فقط همان یک زبان
+        if ($isAdmin || $locked) {
+            $one = $this->locales->find($locale);
+            $locales = $one ? [$locale => $one] : [];
+        } else {
+            $locales = $this->locales->active();
+        }
 
         $view->with([
             'currentLocale' => $locale,
             'direction' => $this->locales->isRtl($locale) ? 'rtl' : 'ltr',
             'digitFamily' => $this->locales->digitFamily($locale),
-            // زبان‌های فعال — در حالت قفل عمومی فقط زبان قفل‌شده
-            'locales' => $locked
-                ? array_filter([$locale => $this->locales->find($locale)])
-                : $this->locales->active(),
+            'locales' => $locales,
             // پرچم قفل برای مصرف ویوها (مثلاً seo-head)
             'publicLocaleLocked' => $locked,
         ]);

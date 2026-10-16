@@ -62,7 +62,6 @@ class Sidebar extends Component
         $this->showSettingsDivider = ($this->can)('admin.settings.edit')
             || ($this->can)('admin.roles.index')
             || ($this->can)('admin.users.index')
-            || ($this->can)('admin.languages.index')
             || ($this->can)('admin.shipping-methods.index')
             || ($this->can)('admin.banks.index');
         $this->showAuditLogs = ($this->can)('admin.audit-logs.index');

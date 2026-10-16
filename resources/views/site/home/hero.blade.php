@@ -52,10 +52,20 @@
             <div class="eco-hero-actions">
                 <a href="{{ $heroCtaUrl }}" class="eco-btn eco-btn--clay eco-btn--lg eco-hero-cta">
                     <span>{{ $heroCtaLabel }}</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5"/>
+                        <path d="m11 6-6 6 6 6"/>
+                    </svg>
                 </a>
                 <a href="{{ localizedRoute('products.index') }}" class="eco-btn eco-btn--ghost eco-btn--lg">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/>
+                        <rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/>
+                        <rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/>
+                        <rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>
+                    </svg>
                     <span>{{ __('messages.categories') }}</span>
                 </a>
             </div>
@@ -65,14 +75,19 @@
                 <ul class="eco-hero-ticks">
                     @foreach($heroTicks as $tick)
                         <li>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.4 12.3 2.4 2.4 4.8-5.2"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="m8.4 12.3 2.4 2.4 4.8-5.2"/>
+                            </svg>
                             <span>{{ $tick }}</span>
                         </li>
                     @endforeach
                 </ul>
             @endif
         </div>
-
+        {{--        defalt image --}}
+        {{--        http://shopora.test/uploads/hero-slides/sock-test.svg--}}
         @if($heroSlide && $heroSlide->imageUrl())
             <div class="eco-hero-media">
                 <span class="eco-hero-mat" aria-hidden="true"></span>

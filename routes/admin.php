@@ -9,7 +9,6 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\HeroSlideSearchController;
-use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PromoBannerController;
@@ -61,12 +60,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('settings/{group?}', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');
 
-        // مدیریت زبان‌ها — اکشن‌های سریع ایندکس با پرمیشن ویرایش (toggle / make-default)
-        Route::resource('languages', LanguageController::class)->except('show');
-        Route::patch('languages/{language}/toggle', [LanguageController::class, 'toggle'])->name('languages.toggle');
-        Route::patch('languages/{language}/make-default', [LanguageController::class, 'makeDefault'])->name('languages.make-default');
         // ذخیره ترتیب درگ‌اندروپ (ایندکس) — با پرمیشن ویرایش
-        Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
         Route::post('trust-badges/reorder', [TrustBadgeController::class, 'reorder'])->name('trust-badges.reorder');
         Route::post('promo-banners/reorder', [PromoBannerController::class, 'reorder'])->name('promo-banners.reorder');
         Route::post('brands/reorder', [BrandController::class, 'reorder'])->name('brands.reorder');

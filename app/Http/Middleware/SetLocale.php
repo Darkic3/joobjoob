@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
  *   - /...  (بدون پیشوند)          → زبان پیش‌فرض (canonical — مستقل از کاربر)
  *   - /...?lang=en (بوکمارک قدیمی) → 301 به /en/... (سازگاری با عقب — SEO)
  *
- * پنل ادمین (بدون پیشوند) زنجیره‌ی قدیمی را حفظ می‌کند:
- *   ?lang= → کاربر لاگین‌شده → session → پیش‌فرض
+ * پنل ادمین تک‌زبانه است (config/site-features.php → admin_locale_locked):
+ *   همیشه admin_locale (پیش‌فرض fa) اعمال می‌شود؛ ?lang= و user.locale و
+ *   session برای زبان نادیده گرفته می‌شوند و چیزی در آن‌ها نوشته نمی‌شود.
  *
  * حالت قفل زبان عمومی (config/site-features.php):
  *   وقتی public_locale_locked=true باشد، سایت عمومی فقط به یک زبان اجرا می‌شود.
  *   هر URL پیشونددار یا ?lang= با 301 به نسخه‌ی canonical بدون پیشوند برمی‌گردد.
- *   پنل ادمین از این قفل مستثنا است و رفتار چندزبانه‌اش دست‌نخورده می‌ماند.
  *
  * ⚠️ این میدلور در گروه وب است و پیش از resolve شدن روت اجرا می‌شود —
  * پس `$request->route('locale')` در دسترس نیست و پیشوند را از `$request->path()` می‌خوانیم.
@@ -36,9 +36,28 @@ class SetLocale
         $default = $locales->defaultCode();
         $isAdmin = str_starts_with($request->path(), 'admin');
 
+        // ── پنل ادمین: همیشه تک‌زبانه ─────────────────────────────────────────
+        // ?lang= نادیده گرفته می‌شود (بدون ریدایرکت تا بوکمارک‌های قدیمی و
+        // فرم‌ها نشکنند) و چیزی در user.locale / session نوشته نمی‌شود.
+        if ($isAdmin) {
+            $adminLocale = (string) config('site-features.admin_locale', $default);
+
+            // اگر زبان قفل‌شده در دیتابیس نیست، به پیش‌فرض سرویس برگرد
+            if (! $locales->has($adminLocale)) {
+                $adminLocale = $default;
+            }
+
+            app()->setLocale($adminLocale);
+
+            view()->share('direction', $locales->isRtl($adminLocale) ? 'rtl' : 'ltr');
+            view()->share('currentLocale', $adminLocale);
+            view()->share('publicLocaleLocked', false);
+
+            return $next($request);
+        }
+
         // ── حالت قفل زبان سایت عمومی ─────────────────────────────────────────
-        // فقط سایت عمومی قفل می‌شود؛ ادمین دست‌نخورده می‌ماند.
-        if (! $isAdmin && config('site-features.public_locale_locked', false)) {
+        if (config('site-features.public_locale_locked', false)) {
             $publicLocale = (string) config('site-features.public_locale', $default);
 
             // هر مسیر پیشونددار (/en/...، /xx/...) → 301 به نسخه‌ی بدون پیشوند
@@ -73,12 +92,13 @@ class SetLocale
             return $next($request);
         }
 
-        // ── رفتار عادی (پنل ادمین یا سایت عمومی بدون قفل) ─────────────────────
+        // ── رفتار عادی سایت عمومی (بدون قفل) ─────────────────────────────────
+        // (پنل ادمین بالاتر برمی‌گردد و هرگز به این‌جا نمی‌رسد.)
 
         // استخراج پیشوند زبان از مسیر (مثل en/products → en)
         $segments = explode('/', $request->path());
         $first = $segments[0] ?? '';
-        $urlLocale = (! $isAdmin && $first !== '' && $locales->has($first)) ? $first : null;
+        $urlLocale = ($first !== '' && $locales->has($first)) ? $first : null;
 
         // ۱) پیشوند URL (فقط سایت) — اولویت اول
         if ($urlLocale !== null) {
@@ -95,8 +115,7 @@ class SetLocale
             }
         }
         // ۲) سازگاری با عقب: ?lang= روی سایتِ بدون پیشوند → 301 به نسخه‌ی پیشونددار
-        elseif (! $isAdmin
-            && ! $locales->singleLanguageMode()
+        elseif (! $locales->singleLanguageMode()
             && $request->has('lang')
             && $locales->isActive((string) $request->get('lang'))
             && (string) $request->get('lang') !== $default) {
@@ -106,25 +125,7 @@ class SetLocale
         elseif ($locales->singleLanguageMode()) {
             $locale = $default;
         }
-        // ۴) پنل: پارامتر URL ?lang=xx — فقط اگر فعال باشد
-        elseif ($isAdmin && $request->has('lang') && $locales->isActive((string) $request->get('lang'))) {
-            $locale = (string) $request->get('lang');
-            session(['locale' => $locale]);
-
-            if ($request->user()) {
-                $request->user()->update(['locale' => $locale]);
-            }
-        }
-        // ۵) پنل: کاربر لاگین با ترجیح ذخیره‌شده — فقط اگر فعال باشد
-        elseif ($isAdmin && $request->user() && $locales->isActive((string) $request->user()->locale)) {
-            $locale = $request->user()->locale;
-            session(['locale' => $locale]);
-        }
-        // ۶) پنل: session — فقط اگر فعال باشد
-        elseif ($isAdmin && session()->has('locale') && $locales->isActive((string) session('locale'))) {
-            $locale = session('locale');
-        }
-        // ۷) پیش‌فرض (سایت بدون پیشوند و پنل بدون ترجیح معتبر)
+        // ۴) پیش‌فرض (سایت بدون پیشوند و بدون ترجیح معتبر)
         else {
             $locale = $default;
             session(['locale' => $locale]);
