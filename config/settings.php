@@ -25,7 +25,7 @@ return [
             'type' => 'text',
             'tab' => 'general',
             'required' => true,
-            'default' => 'فروشگاه شاپورا',
+            'default' => 'فروشگاه جوب‌جوب',
         ],
         'site_slogan' => [
             'label' => 'شعار سایت',
@@ -53,7 +53,7 @@ return [
             'type' => 'text',
             'tab' => 'home',
             'required' => false,
-            'default' => 'به فروشگاه شاپورا خوش آمدید',
+            'default' => 'به فروشگاه جوب‌جوب خوش آمدید',
         ],
         'slider_description' => [
             'label' => 'توضیحات اسلایدر',
@@ -259,7 +259,7 @@ return [
             'tab' => 'about',
             'required' => false,
             'ckeditor' => true,
-            'default' => 'فروشگاه شاپورا با هدف ارائه بهترین محصولات با کیفیت و قیمت مناسب فعالیت می‌کند.',
+            'default' => 'فروشگاه جوب‌جوب با هدف ارائه بهترین محصولات با کیفیت و قیمت مناسب فعالیت می‌کند.',
         ],
         'compony_history' => [
             'label' => 'تاریخچه شرکت',

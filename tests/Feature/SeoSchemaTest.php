@@ -55,7 +55,7 @@ class SeoSchemaTest extends TestCase
 
         $organization = $this->node($graph, 'Organization');
         $this->assertSame('http://localhost#organization', $organization['@id']);
-        $this->assertSame('فروشگاه شاپورا', $organization['name']);
+        $this->assertSame('فروشگاه جوب‌جوب', $organization['name']);
     }
 
     public function test_website_schema_declares_the_internal_search_action(): void

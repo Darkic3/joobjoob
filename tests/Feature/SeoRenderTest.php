@@ -44,7 +44,7 @@ class SeoRenderTest extends TestCase
 
         $html = $this->get('/products/'.$product->slug)->assertOk()->getContent();
 
-        $this->assertStringContainsString('<title>هدفون سونی | فروشگاه شاپورا</title>', $html);
+        $this->assertStringContainsString('<title>هدفون سونی | فروشگاه جوب‌جوب</title>', $html);
     }
 
     public function test_site_name_is_not_appended_twice(): void
@@ -52,7 +52,7 @@ class SeoRenderTest extends TestCase
         // صفحهٔ اصلی عنوانش از قبل نام سایت را دارد ⇒ نباید پسوند تکراری بگیرد
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('فروشگاه شاپورا | فروشگاه شاپورا', $html);
+        $this->assertStringNotContainsString('فروشگاه جوب‌جوب | فروشگاه جوب‌جوب', $html);
         $this->assertStringContainsString('<title>', $html);
     }
 
@@ -63,7 +63,7 @@ class SeoRenderTest extends TestCase
 
         $html = $this->get('/products/'.$product->slug)->assertOk()->getContent();
 
-        $this->assertStringContainsString('<title>عنوان متای دستی | فروشگاه شاپورا</title>', $html);
+        $this->assertStringContainsString('<title>عنوان متای دستی | فروشگاه جوب‌جوب</title>', $html);
         $this->assertStringNotContainsString('<title>نام محصول', $html);
     }
 
@@ -76,7 +76,7 @@ class SeoRenderTest extends TestCase
             seo()->title('از کنترلر');
         });
 
-        $this->assertSame('از کنترلر | فروشگاه شاپورا', $seo['title']);
+        $this->assertSame('از کنترلر | فروشگاه جوب‌جوب', $seo['title']);
     }
 
     public function test_per_locale_meta_title_is_used_for_each_language(): void
@@ -90,8 +90,8 @@ class SeoRenderTest extends TestCase
         $fa = $this->get('/products/'.$product->slug)->assertOk()->getContent();
         $en = $this->get('/en/products/'.$product->slug)->assertOk()->getContent();
 
-        $this->assertStringContainsString('<title>عنوان فارسی | فروشگاه شاپورا</title>', $fa);
-        $this->assertStringContainsString('<title>English title | فروشگاه شاپورا</title>', $en);
+        $this->assertStringContainsString('<title>عنوان فارسی | فروشگاه جوب‌جوب</title>', $fa);
+        $this->assertStringContainsString('<title>English title | فروشگاه جوب‌جوب</title>', $en);
     }
 
     // ==========================================
@@ -294,12 +294,12 @@ class SeoRenderTest extends TestCase
         $html = $this->get('/products/'.$product->slug)->assertOk()->getContent();
 
         $this->assertStringContainsString('<meta property="og:type" content="product">', $html);
-        $this->assertStringContainsString('<meta property="og:title" content="هدفون | فروشگاه شاپورا">', $html);
+        $this->assertStringContainsString('<meta property="og:title" content="هدفون | فروشگاه جوب‌جوب">', $html);
         $this->assertStringContainsString(
             '<meta property="og:url" content="http://localhost/products/'.$product->slug.'">',
             $html
         );
-        $this->assertStringContainsString('<meta property="og:site_name" content="فروشگاه شاپورا">', $html);
+        $this->assertStringContainsString('<meta property="og:site_name" content="فروشگاه جوب‌جوب">', $html);
     }
 
     public function test_non_product_pages_use_website_og_type(): void
@@ -396,7 +396,7 @@ class SeoRenderTest extends TestCase
 
         $html = $this->get('/product-categories/'.$category->slug)->assertOk()->getContent();
 
-        $this->assertStringContainsString('<title>متای دسته | فروشگاه شاپورا</title>', $html);
+        $this->assertStringContainsString('<title>متای دسته | فروشگاه جوب‌جوب</title>', $html);
         $this->assertStringContainsString('<meta name="description" content="توضیح دسته">', $html);
     }
 
@@ -411,7 +411,7 @@ class SeoRenderTest extends TestCase
 
         $html = $this->get('/blogs/'.$blog->slug)->assertOk()->getContent();
 
-        $this->assertStringContainsString('<title>مقالهٔ تست | فروشگاه شاپورا</title>', $html);
+        $this->assertStringContainsString('<title>مقالهٔ تست | فروشگاه جوب‌جوب</title>', $html);
         $this->assertStringContainsString('<meta name="description" content="خلاصهٔ مقاله">', $html);
     }
 

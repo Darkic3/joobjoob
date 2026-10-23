@@ -10,7 +10,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            ['key' => 'site_name', 'value' => 'فروشگاه شوپورا', 'type' => 'text', 'group' => 'general', 'label' => 'نام سایت', 'sort' => 1],
+            ['key' => 'site_name', 'value' => 'فروشگاه جوب‌جوب', 'type' => 'text', 'group' => 'general', 'label' => 'نام سایت', 'sort' => 1],
             ['key' => 'site_description', 'value' => 'فروشگاه آنلاین پوشاک مردانه', 'type' => 'textarea', 'group' => 'general', 'label' => 'توضیحات سایت', 'sort' => 2],
             ['key' => 'site_phone', 'value' => '02112345678', 'type' => 'text', 'group' => 'contact', 'label' => 'تلفن', 'sort' => 3],
             ['key' => 'site_email', 'value' => 'info@joobjoob.test', 'type' => 'text', 'group' => 'contact', 'label' => 'ایمیل', 'sort' => 4],

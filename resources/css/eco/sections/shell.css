@@ -165,7 +165,12 @@
 }
 [data-theme="eco-collectible"] .site-badge,
 [data-theme="eco-collectible"] .header-brutal .site-badge,
+[data-theme="eco-collectible"] .site-notif-badge,
 [data-theme="eco-collectible"] .header-brutal .site-notif-badge {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    line-height: 1;
     top: -6px;
     inset-inline-end: -6px;
     min-width: 20px;
@@ -613,6 +618,7 @@
 }
 [data-theme="eco-collectible"] .site-badge,
 [data-theme="eco-collectible"] .header-brutal .site-badge,
+[data-theme="eco-collectible"] .site-notif-badge,
 [data-theme="eco-collectible"] .header-brutal .site-notif-badge {
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;

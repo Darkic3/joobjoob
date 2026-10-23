@@ -24,7 +24,7 @@ class SettingTest extends TestCase
     {
         $service = app(SettingService::class);
 
-        $this->assertSame('فروشگاه شاپورا', $service->get('site_name'));
+        $this->assertSame('فروشگاه جوب‌جوب', $service->get('site_name'));
         $this->assertSame('ارسال رایگان برای خریدهای بالای ۵۰۰ هزار تومان', $service->get('announce_1'));
         $this->assertNull($service->get('social_instagram'));
     }

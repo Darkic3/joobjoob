@@ -12,13 +12,13 @@ class MetaService
 
     // Default meta tags (can be loaded from config or database settings)
     protected array $defaults = [
-        'meta_title' => 'فروشگاه اینترنتی شاپورا',
+        'meta_title' => 'فروشگاه اینترنتی جوب‌جوب',
         'meta_description' => 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.',
-        'meta_keywords' => 'فروشگاه, اینترنتی, خرید, آنلاین, شاپورا',
-        'og_title' => 'فروشگاه اینترنتی شاپورا',
+        'meta_keywords' => 'فروشگاه, اینترنتی, خرید, آنلاین, جوب‌جوب',
+        'og_title' => 'فروشگاه اینترنتی جوب‌جوب',
         'og_description' => 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.',
         'og_image' => '/images/logo-social.png',
-        'twitter_title' => 'فروشگاه اینترنتی شاپورا',
+        'twitter_title' => 'فروشگاه اینترنتی جوب‌جوب',
         'twitter_description' => 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.',
         'twitter_image' => '/images/logo-social.png',
     ];

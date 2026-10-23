@@ -41,7 +41,7 @@ Updates all settings in the group.
 
 **Request body (multipart/form-data):**
 ```
-settings[site_name] = "فروشگاه شاپورا"
+settings[site_name] = "فروشگاه جوب‌جوب"
 settings[site_slogan] = "خرید آسان"
 settings[logo] = (file)              // optional
 ```

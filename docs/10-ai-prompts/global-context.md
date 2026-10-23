@@ -1,7 +1,7 @@
 # Global Context — Always include for AI
 
 > Project identity: **Joobjoob** (APP_NAME=Joobjoob, local http://joobjoob.test, prod https://joobjoob.ir).
-> Forked from Shopora, now fully independent — never call it Shopora, never use shopora.test / shopora.ir / shopora_* cache keys.
+> This project was renamed once during its history — historical references to any previous name may exist in git history only. Always call it Joobjoob and never use any other project name, domain, or cache-key prefix.
 
 Include this in every AI prompt for Joobjoob. Concise minimum to prevent wrong implementation.
 
