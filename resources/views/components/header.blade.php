@@ -72,9 +72,9 @@
             </a>
 
                 {{-- زنگوله اعلانات --}}
-                <div x-data="notificationBell()" class="relative hidden lg:block">
+                <div x-data="notificationBell()" class="relative hidden lg:flex lg:items-center shrink-0 self-center">
                     <button type="button" @click="toggle()"
-                            class="neu-btn neu-btn-icon site-action-btn relative"
+                            class="neu-btn neu-btn-icon site-action-btn relative shrink-0"
                             title="{{ __('messages.notifications') }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
@@ -147,8 +147,9 @@
                             {{ __('messages.view_all_notifications') }}
                         </a>
                     </div>
+                </div>
 
-                <a href="{{ localizedRoute('dashboard') }}" class="site-account-btn relative hidden lg:inline-flex"
+                <a href="{{ localizedRoute('dashboard') }}" class="site-account-btn relative hidden lg:inline-flex items-center justify-center shrink-0 self-center"
                    title="{{ auth()->user()->name }}" aria-label="{{ __('messages.dashboard') }}">
                     <span class="site-account-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                 </a>
