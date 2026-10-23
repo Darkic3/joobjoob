@@ -617,6 +617,7 @@ class CrawlOptimistCommand extends Command
     {
         try {
             Cache::put('crawl_live_status', [
+                'crawler' => 'products',
                 'success' => $this->successCount,
                 'failed' => $this->failCount,
                 'current' => $url,

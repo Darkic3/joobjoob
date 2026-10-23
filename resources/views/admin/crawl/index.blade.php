@@ -19,9 +19,18 @@
             </a>
 
             <div class="flex flex-col sm:flex-row gap-3 items-end w-full">
-                <div class="flex gap-2 flex-1">
-                    <input type="number" name="limit" id="crawl-limit" placeholder="{{ __('admin.crawl.limit_placeholder') }}" min="1" max="1000" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-48">
-                    <input type="text" name="pages" id="crawl-pages" placeholder="{{ __('admin.crawl.pages_placeholder') }}" value="1-88" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-40">
+                <div class="flex gap-2 flex-1 flex-wrap">
+                    <select id="crawl-type" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none">
+                        <option value="products">{{ __('admin.crawl.type_products') }} — {{ __('admin.crawl.type_products_hint') }}</option>
+                        <option value="categories">{{ __('admin.crawl.type_categories') }} — {{ __('admin.crawl.type_categories_hint') }}</option>
+                    </select>
+                    <span id="crawl-products-fields" class="flex gap-2">
+                        <input type="number" name="limit" id="crawl-limit" placeholder="{{ __('admin.crawl.limit_placeholder') }}" min="1" max="1000" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-48">
+                        <input type="text" name="pages" id="crawl-pages" placeholder="{{ __('admin.crawl.pages_placeholder') }}" value="1-88" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-40">
+                    </span>
+                    <span id="crawl-categories-fields" class="hidden gap-2">
+                        <input type="text" name="root" id="crawl-root" placeholder="{{ __('admin.crawl.root_placeholder') }}" value="جوراب" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none w-40">
+                    </span>
                 </div>
                 <button type="button" id="crawl-run-btn" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium shadow-sm transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -170,6 +179,7 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.crawl.crawler_type') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.crawl.status_success') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.crawl.products_imported') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('admin.crawl.products_failed') }}</th>
@@ -183,6 +193,7 @@
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($recentCrawls as $crawl)
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors">
+                            <td class="px-6 py-4 text-gray-800 dark:text-gray-100">{{ ($crawl->crawler ?? 'products') === 'categories' ? __('admin.crawl.type_categories') : __('admin.crawl.type_products') }}</td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium
                                     @if($crawl->status === 'success') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
@@ -213,7 +224,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                 {{ __('admin.crawl.no_crawls') }}
                             </td>
                         </tr>
@@ -240,8 +251,19 @@
         const failCount = document.getElementById('crawl-fail-count');
         const currentProduct = document.getElementById('crawl-current-product');
         const errorBox = document.getElementById('crawl-error');
+        const typeSelect = document.getElementById('crawl-type');
+        const productsFields = document.getElementById('crawl-products-fields');
+        const categoriesFields = document.getElementById('crawl-categories-fields');
         const runLabel = `{{ __('admin.crawl.run_now') }}`;
         const runningLabel = `{{ __('admin.crawl.running') }}`;
+
+        typeSelect.addEventListener('change', function () {
+            const isCategories = this.value === 'categories';
+            productsFields.classList.toggle('hidden', isCategories);
+            productsFields.classList.toggle('flex', !isCategories);
+            categoriesFields.classList.toggle('hidden', !isCategories);
+            categoriesFields.classList.toggle('flex', isCategories);
+        });
 
         let pollingInterval = null;
         let activeLogId = null;
@@ -297,12 +319,19 @@
 
         btn.addEventListener('click', function () {
             errorBox.classList.add('hidden');
+            const crawler = typeSelect.value;
             const limit = document.getElementById('crawl-limit').value;
             const pages = document.getElementById('crawl-pages').value || '1-88';
+            const root = document.getElementById('crawl-root').value || 'جوراب';
 
             const formData = new FormData();
-            formData.append('pages', pages);
-            if (limit) formData.append('limit', limit);
+            formData.append('crawler', crawler);
+            if (crawler === 'categories') {
+                formData.append('root', root);
+            } else {
+                formData.append('pages', pages);
+                if (limit) formData.append('limit', limit);
+            }
 
             setButtonBusy(true);
             liveStatus.classList.remove('hidden');

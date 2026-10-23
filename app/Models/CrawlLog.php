@@ -11,6 +11,7 @@ class CrawlLog extends Model
     use HasFactory;
 
     protected $fillable = [
+        'crawler',
         'products_found',
         'products_imported',
         'products_failed',

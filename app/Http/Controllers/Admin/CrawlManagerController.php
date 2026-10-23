@@ -43,12 +43,16 @@ class CrawlManagerController extends Controller
     public function run(Request $request)
     {
         $validated = $request->validate([
+            'crawler' => 'nullable|in:products,categories',
             'limit' => 'nullable|integer|min:1|max:1000',
-            'pages' => ['nullable', 'string', 'max:50', 'regex:/^\d{1,3}(-\d{1,3})?$/'],
+            'pages' => 'nullable|string|max:50|regex:/^\d{1,3}(-\d{1,3})?$/',
+            'root' => 'nullable|string|max:100',
         ]);
 
+        $crawler = $validated['crawler'] ?? 'products';
         $limit = $validated['limit'] ?? null;
         $pages = $validated['pages'] ?? '1-88';
+        $root = trim($validated['root'] ?? '') ?: 'جوراب';
         $isAjax = $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest';
 
         try {
@@ -61,6 +65,7 @@ class CrawlManagerController extends Controller
             }
 
             $log = CrawlLog::create([
+                'crawler' => $crawler,
                 'status' => 'running',
                 'started_at' => now(),
                 'limit' => $limit,
@@ -72,15 +77,16 @@ class CrawlManagerController extends Controller
             ]);
 
             Cache::put('crawl_live_status', [
+                'crawler' => $crawler,
                 'success' => 0,
                 'failed' => 0,
                 'current' => null,
                 'current_name' => null,
-                'total_pages' => 0,
+                'total_pages' => $crawler === 'products' ? count($this->parsePages($pages)) : 1,
                 'current_page' => 0,
             ], 3600);
 
-            $this->spawnCrawlProcess($log->id, $limit, $pages);
+            $this->spawnCrawlProcess($crawler, $log->id, $limit, $pages, $root);
 
             if ($isAjax) {
                 return response()->json([
@@ -106,18 +112,22 @@ class CrawlManagerController extends Controller
     /**
      * اجرای artisan در پروسس جدا (detached) تا ریکوئست وب بلاک نشود.
      */
-    private function spawnCrawlProcess(int $logId, ?int $limit, string $pages): void
+    private function spawnCrawlProcess(string $crawler, int $logId, ?int $limit, string $pages, string $root): void
     {
         $parts = [
             PHP_BINARY,
             base_path('artisan'),
-            'products:crawl',
+            $crawler === 'categories' ? 'products:crawl-categories' : 'products:crawl',
             '--log-id=' . $logId,
-            '--pages=' . $pages,
         ];
 
-        if ($limit) {
-            $parts[] = '--limit=' . $limit;
+        if ($crawler === 'categories') {
+            $parts[] = '--root=' . $root;
+        } else {
+            $parts[] = '--pages=' . $pages;
+            if ($limit) {
+                $parts[] = '--limit=' . $limit;
+            }
         }
 
         $command = implode(' ', array_map('escapeshellarg', $parts));
@@ -129,12 +139,26 @@ class CrawlManagerController extends Controller
         }
     }
 
+    private function parsePages(string $pages): array
+    {
+        if (str_contains($pages, '-')) {
+            $parts = explode('-', $pages);
+            $start = (int) trim($parts[0]);
+            $end = (int) trim($parts[1]);
+
+            return range($start, $end);
+        }
+
+        return [(int) $pages];
+    }
+
     /**
      * دریافت وضعیت زنده کرالر (برای پنل ادمین — polling بدون رفرش).
      */
     public function status(Request $request)
     {
         $live = Cache::get('crawl_live_status', [
+            'crawler' => 'products',
             'success' => 0,
             'failed' => 0,
             'current' => null,
@@ -149,6 +173,7 @@ class CrawlManagerController extends Controller
         }
 
         return response()->json([
+            'crawler' => $live['crawler'] ?? $log?->crawler ?? 'products',
             'success' => $live['success'] ?? 0,
             'failed' => $live['failed'] ?? 0,
             'current' => $live['current'] ?? null,
@@ -158,6 +183,7 @@ class CrawlManagerController extends Controller
             'is_running' => Cache::has('crawl_live_status'),
             'log' => $log ? [
                 'id' => $log->id,
+                'crawler' => $log->crawler,
                 'status' => $log->status,
                 'products_found' => $log->products_found,
                 'products_imported' => $log->products_imported,
