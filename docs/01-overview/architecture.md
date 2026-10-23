@@ -1,4 +1,4 @@
-# Memari-e System — Shopora Architecture
+# Memari-e System — Joobjoob Architecture
 
 > **Manba-e Haghighi:** `app/Providers/AppServiceProvider.php`, `app/Http/Controllers/**`, `app/Services/**`, `app/DTOs/**`, `app/Helpers/**`, `app/Models/**`, `app/Payments/**`, `app/Observers/**`, `app/View/Composers/**`, `app/Http/Middleware/**`, `bootstrap/app.php`, `routes/**`
 > **Ghanoon:** Har che dar in file hast bayad dar code vojoud dashte bashad — hich chize ekhtera'i nist.
@@ -29,7 +29,7 @@ Controller (App\Http\Controllers\Admin\*  |  App\Http\Controllers\Site\*)
 Model (App\Models\* — Eloquent + SoftDeletes + fillable/casts + relations)
   │
   ▼
-Database (MySQL `shopora` — migrations in database/migrations/*.php)
+Database (MySQL `joobjoob` — migrations in database/migrations/*.php)
   │
   ▼
 View (resources/views/**/*.blade.php  +  Alpine.js  +  ViewComposers)
@@ -75,8 +75,8 @@ Tamam-e mantegh-e tejari dar Service jam shode, na dar Controller na dar Model.
 | `RecentlyViewedService` | `app/Services/RecentlyViewedService.php` (105 lines) | Session `recently_viewed`, max 20, has/add/remove/clear |
 | `ProductService` | `app/Services/ProductService.php` (17k) | CRUD + sync specs/variants/images/associations |
 | `OrderService` | `app/Services/OrderService.php` (11k) | Create order, shipping, discount, payment token |
-| `SettingService` | `app/Services/SettingService.php` (197 lines) | `rememberForever shopora_settings_all` + flush |
-| `LocaleService` | `app/Services/LocaleService.php` (185 lines) | `rememberForever shopora_languages_all` + active/default/dir |
+| `SettingService` | `app/Services/SettingService.php` (197 lines) | `rememberForever joobjoob_settings_all` + flush |
+| `LocaleService` | `app/Services/LocaleService.php` (185 lines) | `rememberForever joobjoob_languages_all` + active/default/dir |
 | `HeroSlideService` | `app/Services/HeroSlideService.php` | CRUD hero slides, normalizeTrusts max 5 |
 | `BlogService`, `BrandService`, `SpecificationService`, `TrustBadgeService`, `PromoBannerService` | `app/Services/*Service.php` | Module CRUD + Cache::forget |
 | `CouponService` | `app/Services/CouponService.php` | apply/calculateForCart, session coupon |
@@ -92,7 +92,7 @@ Tamam-e mantegh-e tejari dar Service jam shode, na dar Controller na dar Model.
 
 - **Masir:** `app/DTOs/*.php` — 9 file: `ProductDTO`, `HeroSlideDTO`, `BlogDTO`, `BlogCategoryDTO`, `BrandDTO`, `ProductCategoryDTO`, `PromoBannerDTO`, `SpecificationDTO`, `TrustBadgeDTO`.
 - **Olgou:** `readonly class` + `fromRequest(Request $request): self` + private normalize + getters.
-- **Shopora estefade:** DTO faghat baraye form-haye pichideye Admin (product ba variants/specs/images, hero ba trusts/linkable). Site controller-ha DTO nadarand — mostaghim `$request->input()`.
+- **Joobjoob estefade:** DTO faghat baraye form-haye pichideye Admin (product ba variants/specs/images, hero ba trusts/linkable). Site controller-ha DTO nadarand — mostaghim `$request->input()`.
 - **Mesal — ProductDTO:**
 
 ```php
@@ -123,7 +123,7 @@ Helper-ha tavasot-e `composer.json autoload.files` dar hame ja load mishavand �
 
 | Helper File | Function | Posht-e Sahn-e |
 |---|---|---|
-| `app/Helpers/settings.php` | `setting(key, default)` → `app(SettingService)->get()` | `Cache::rememberForever shopora_settings_all` |
+| `app/Helpers/settings.php` | `setting(key, default)` → `app(SettingService)->get()` | `Cache::rememberForever joobjoob_settings_all` |
 | `app/Helpers/settings.php` | `settingOverride(key, default)` → `getStored()` | Faghat agar admin save karde |
 | `app/Helpers/locale.php` | `locale()` → `app(LocaleService)` | Singleton service accessor |
 | `app/Helpers/locale.php` | `localizedRoute(name, params, code)` | canonical vs `locale.` prefix |
@@ -399,9 +399,9 @@ readonly class XxxDTO {
 
 ## 9. Cheez-hayi Ke Vojoud Nadarand — No Repository / Action / Event / Job / Policy
 
-> **Verify shode ba:** `ls F:/Projects/shopora/app/Repositories` → Not found, `ls app/Actions` → Not found, `ls app/Events` → Not found, `ls app/Jobs` → Not found, `ls app/Policies` → Not found
+> **Verify shode ba:** `ls F:/Projects/joobjoob/app/Repositories` → Not found, `ls app/Actions` → Not found, `ls app/Events` → Not found, `ls app/Jobs` → Not found, `ls app/Policies` → Not found
 
-| Pattern | Vaziat dar Shopora | Jaye Gozin |
+| Pattern | Vaziat dar Joobjoob | Jaye Gozin |
 |---|---|---|
 | `Repository` | ❌ Hich `app/Repositories/*` nist | Mostaghim `Model::where` dar Service/Controller |
 | `Action` (single-use class) | ❌ Hich `app/Actions/*` nist | Logic dar `Service::create/update/delete` |
@@ -422,9 +422,9 @@ Helper-ha container ra mostaghim seda mizanand — control inversion-e kamel nis
 View/Config
   │
   ├─► setting('site_name')          ──► app(SettingService::class)->get('site_name')
-  │                                      └─► Cache::rememberForever('shopora_settings_all') → Setting::all()->map
+  │                                      └─► Cache::rememberForever('joobjoob_settings_all') → Setting::all()->map
   ├─► locale()->active()             ──► app(LocaleService::class)->active()
-  │                                      └─► Cache::rememberForever('shopora_languages_all') → Language::ordered()->get()
+  │                                      └─► Cache::rememberForever('joobjoob_languages_all') → Language::ordered()->get()
   ├─► localizedRoute('products.show', ['product'=>$p])  ──► route('products.show') or route('locale.products.show', ['locale'=>code])
   ├─► format_price(5000000)          ──► NumberHelper::formatPrice(5000000, app()->getLocale())
   │                                      └─► match('fa','ar' => U+066C '٬', default => ',')
@@ -434,8 +434,8 @@ View/Config
 
 | Helper | File | Service Locator Call | Cache Key |
 |---|---|---|---|
-| `setting()` | `app/Helpers/settings.php:10` | `app(SettingService::class)->get(key)` | `shopora_settings_all` |
-| `locale()` | `app/Helpers/locale.php:14` | `app(LocaleService::class)` | `shopora_languages_all` |
+| `setting()` | `app/Helpers/settings.php:10` | `app(SettingService::class)->get(key)` | `joobjoob_settings_all` |
+| `locale()` | `app/Helpers/locale.php:14` | `app(LocaleService::class)` | `joobjoob_languages_all` |
 | `format_price()` | `app/Helpers/format_price.php:14` | `NumberHelper::formatPrice` | — |
 | `ImageHandler::handle()` | `app/Helpers/ImageHandler.php:12` | `ImageUploader::upload` + `ImageResizer::resize` | — (filesystem `public/uploads`) |
 | `Sms::sendLookup()` | `app/Helpers/Sms.php: sendLookup` | `Http::post(Kavenegar base_url)` | — |
@@ -444,7 +444,7 @@ View/Config
 - Evidence:
   - `composer.json:30 files: [jdate.php, hijri.php, date.php, settings.php, locale.php, format_price.php]`
   - `app/Helpers/settings.php:10 function setting()`, `app/Helpers/locale.php:14 function locale(), 23 localizedRoute()`, `app/Helpers/format_price.php:14 format_price()`
-  - `app/Services/SettingService.php:17 CACHE_ALL=shopora_settings_all, 53 rememberForever`, `app/Services/LocaleService.php:21 CACHE_ALL=shopora_languages_all, 41 rememberForever`
+  - `app/Services/SettingService.php:17 CACHE_ALL=joobjoob_settings_all, 53 rememberForever`, `app/Services/LocaleService.php:21 CACHE_ALL=joobjoob_languages_all, 41 rememberForever`
 
 ---
 

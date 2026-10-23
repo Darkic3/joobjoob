@@ -26,7 +26,7 @@ Other helpers:
 ## Verified Paths (2026-09-07 — `ls` host)
 
 ```
-public/storage -> /f/Projects/shopora/storage/app/public  (symlink mojood)
+public/storage -> /f/Projects/joobjoob/storage/app/public  (symlink mojood)
 public/uploads/ -> 9 folder: bank, blog-categories, blogs, brands, hero-slides, product-categories, products, receipts, settings
 ```
 

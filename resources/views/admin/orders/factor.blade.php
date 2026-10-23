@@ -206,7 +206,7 @@
         {{-- هدر --}}
         <div class="inv-header">
             <div>
-                <div class="inv-brand">{{ config('app.name', 'Shopora') }}</div>
+                <div class="inv-brand">{{ config('app.name', 'Joobjoob') }}</div>
                 <div class="inv-brand-sub">فاکتور خرید</div>
             </div>
             <div class="inv-title">
@@ -235,7 +235,7 @@
         <div class="inv-parties">
             <div class="inv-party">
                 <div class="inv-party-title">فروشنده</div>
-                <div class="inv-party-name">{{ setting('site_name', config('app.name', 'Shopora')) }}</div>
+                <div class="inv-party-name">{{ setting('site_name', config('app.name', 'Joobjoob')) }}</div>
                 <div class="inv-party-detail">
                     @if(config('app.company_address'))
                         {{ config('app.company_address') }}<br>

@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Purpose — What FormRequests Do in Shopora
+## 1. Purpose — What FormRequests Do in Joobjoob
 
 - **Validation is the Controller gate.** Every admin write (`store`, `update`) and sensitive site flow (discount code, receipt update) goes through a `FormRequest`. The Controller declares `store(ProductRequest $request)` and **never** calls `Validator::make(...)` inline — validation is declarative on the Request class.
 
@@ -37,7 +37,7 @@ class XxxRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        // optional — coerce BEFORE rules run. Shopora uses it only for auto-slug:
+        // optional — coerce BEFORE rules run. Joobjoob uses it only for auto-slug:
         //   if (empty($this->slug) && !empty($this->name['fa'])) $this->merge(['slug'=> $this->prepareSlug($this->name['fa'])]);
         //   if (empty($this->slug)) $this->merge(['slug'=> $this->prepareSlug($this->title)]);
         // BlogCategory: $this->merge(['url'=> $this->prepareSlug($this->title,$this->url)]);

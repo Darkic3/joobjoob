@@ -541,24 +541,500 @@
 [data-theme="eco-collectible"] .back-to-top-arrow { color: var(--eco-clay-ink); }
 [data-theme="eco-collectible"] .back-to-top.complete .back-to-top-arrow { color: #fff; }
 
+/* ================= ۸) منوها — آیکون‌ها و آیتم‌ها =================
+   پولیش آیکون‌ها و آیتم‌های منو: ناو دسکتاپ، اکشن‌های هدر، منوی
+   تمام‌صفحهٔ موبایل، نوار پایین موبایل، لینک‌های فوتر و سایدبار داشبورد. */
+
+[data-theme="eco-collectible"] .site-nav-link,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .4rem 1rem .4rem .55rem;
+}
+[dir="ltr"] [data-theme="eco-collectible"] .site-nav-link,
+[dir="ltr"] [data-theme="eco-collectible"] .header-brutal .site-nav-link {
+    padding: .4rem .55rem .4rem 1rem;
+}
+
+/* کاشی آیکون لینک ناو */
+[data-theme="eco-collectible"] .site-nav-ico,
+[data-theme="eco-collectible"] .header-brutal .site-nav-ico {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-clay-rgb) / .16);
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-nav-ico svg,
+[data-theme="eco-collectible"] .header-brutal .site-nav-ico svg {
+    width: 16px;
+    height: 16px;
+}
+[data-theme="eco-collectible"] .site-nav-link:hover .site-nav-ico,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link:hover .site-nav-ico {
+    background: var(--eco-clay);
+    color: #fff;
+    box-shadow: var(--eco-shadow-xs);
+    transform: translateY(-1px);
+}
+[data-theme="eco-collectible"] .site-nav-link.is-active .site-nav-ico,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link.is-active .site-nav-ico {
+    background: rgb(255 255 255 / .18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .22);
+}
+[data-theme="eco-collectible"] .site-nav-link.is-active,
+[data-theme="eco-collectible"] .header-brutal .site-nav-link.is-active {
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* ---------- اکشن‌های هدر: هاور زنده‌تر + بج‌های تمیز ---------- */
+[data-theme="eco-collectible"] .site-action-btn svg,
+[data-theme="eco-collectible"] .header-brutal .site-action-btn svg {
+    transition: transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-action-btn:hover svg,
+[data-theme="eco-collectible"] .header-brutal .site-action-btn:hover svg {
+    transform: scale(1.1);
+}
+[data-theme="eco-collectible"] .site-action-btn:active svg,
+[data-theme="eco-collectible"] .header-brutal .site-action-btn:active svg {
+    transform: scale(.94);
+}
+[data-theme="eco-collectible"] .site-badge,
+[data-theme="eco-collectible"] .header-brutal .site-badge,
+[data-theme="eco-collectible"] .header-brutal .site-notif-badge {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    box-shadow: var(--eco-shadow-xs), 0 0 0 2px var(--eco-surface);
+}
+
+/* ================= منوی تمام‌صفحهٔ موبایل ================= */
+
+[data-theme="eco-collectible"] .site-menu-link,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link {
+    align-items: center;
+    gap: 1rem;
+    padding: .7rem .8rem;
+    border: 1px solid transparent;
+    border-radius: var(--eco-radius-lg);
+}
+[data-theme="eco-collectible"] .site-menu-label,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-label {
+    flex: 1;
+    min-width: 0;
+}
+
+/* کاشی آیکون آیتم منو */
+[data-theme="eco-collectible"] .site-menu-ico,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-ico {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-clay-rgb) / .18);
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-menu-ico svg,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-ico svg {
+    width: 24px;
+    height: 24px;
+}
+[data-theme="eco-collectible"] .site-menu-link:hover .site-menu-ico,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link:hover .site-menu-ico,
+[data-theme="eco-collectible"] .site-menu-link.is-active .site-menu-ico,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link.is-active .site-menu-ico {
+    background: var(--eco-clay);
+    color: #fff;
+    box-shadow: var(--eco-shadow-sm);
+    transform: translateY(-2px);
+}
+[data-theme="eco-collectible"] .site-menu-link:hover,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link:hover {
+    border-color: var(--eco-line);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .site-menu-link.is-active,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-link.is-active {
+    border-color: var(--eco-line);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-sm);
+    color: var(--eco-ink);
+}
+
+/* شمارهٔ مونو آیتم — تگ کوچک با بوردر */
+[data-theme="eco-collectible"] .site-menu-num,
+[data-theme="eco-collectible"] .menu-brutal .site-menu-num {
+    padding: .2rem .5rem;
+    border: 1px solid var(--eco-line);
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* ================= نوار پایین موبایل ================= */
+
+[data-theme="eco-collectible"] .mobile-bar-item {
+    position: relative;
+    padding-top: 12px;
+}
+
+/* نشانگر فعال — خط کوچک بالای آیتم */
+[data-theme="eco-collectible"] .mobile-bar-item::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    inset-inline: 0;
+    width: 20px;
+    height: 3px;
+    margin-inline: auto;
+    border-radius: var(--eco-radius-pill);
+    background: var(--eco-clay);
+    transform: scaleX(0);
+    transition: transform var(--eco-dur-med) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .mobile-bar-active::before {
+    transform: scaleX(1);
+}
+[data-theme="eco-collectible"] .mobile-bar-item svg {
+    width: 22px;
+    height: 22px;
+    transition:
+        transform var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .mobile-bar-active svg {
+    transform: translateY(-1px) scale(1.08);
+}
+[data-theme="eco-collectible"] .mobile-bar-active {
+    font-weight: 700;
+}
+
+/* بج شمارندهٔ نوار پایین */
+[data-theme="eco-collectible"] .mobile-bar-badge {
+    position: absolute;
+    top: 1px;
+    inset-inline-end: -9px;
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 4px;
+    border-radius: var(--eco-radius-pill);
+    border: 2px solid var(--eco-surface);
+    background: var(--eco-clay);
+    color: #fff;
+    font-family: var(--eco-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* ================= فوتر ================= */
+
+/* تیتر ستون‌ها — در دسکتاپ هم نمایش داده می‌شود (دکمهٔ آکاردئونِ بی‌اثر) */
+@media (min-width: 768px) {
+    [data-theme="eco-collectible"] .site-footer-acc-btn {
+        display: flex;
+        cursor: default;
+        padding: 0;
+    }
+    [data-theme="eco-collectible"] .site-footer-acc-chevron {
+        display: none;
+    }
+    [data-theme="eco-collectible"] .site-footer-acc-btn .site-footer-heading {
+        margin-bottom: 1.1rem;
+    }
+}
+
+/* تیتر ستون‌ها — نشان مربعی گرادینتی */
+[data-theme="eco-collectible"] .site-footer-heading-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--eco-clay), var(--eco-sand));
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* لینک‌های فوتر — شورون به‌جای نقطه + لغزش نرم */
+[data-theme="eco-collectible"] .site-footer-links a {
+    gap: .55rem;
+}
+[data-theme="eco-collectible"] .site-footer-links a::before {
+    content: '';
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+    border-radius: 0;
+    background: none;
+    background-color: var(--eco-clay);
+    opacity: .4;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m14.5 5.5-7 6.5 7 6.5'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m14.5 5.5-7 6.5 7 6.5'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    transition:
+        opacity var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease);
+}
+[dir="ltr"] [data-theme="eco-collectible"] .site-footer-links a::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9.5 5.5 7 6.5-7 6.5'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9.5 5.5 7 6.5-7 6.5'/%3E%3C/svg%3E");
+}
+[data-theme="eco-collectible"] .site-footer-links a:hover::before {
+    background: var(--eco-clay);
+    background-color: var(--eco-clay);
+    box-shadow: none;
+    opacity: 1;
+    transform: translateX(-3px);
+}
+[dir="ltr"] [data-theme="eco-collectible"] .site-footer-links a:hover::before {
+    transform: translateX(3px);
+}
+
+/* آیکون‌های تماس — کاشی بزرگ‌تر با هاور پرشونده */
+[data-theme="eco-collectible"] .site-footer-contact-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-clay-rgb) / .18);
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-footer-contact-icon svg {
+    width: 15px;
+    height: 15px;
+}
+[data-theme="eco-collectible"] .site-footer-contact li:hover .site-footer-contact-icon {
+    background: var(--eco-clay);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: var(--eco-shadow-xs);
+}
+
+/* دکمه‌های شبکه‌های اجتماعی — ۴۰px منظم + رنگ اختصاصی هر شبکه در هاور */
+[data-theme="eco-collectible"] .site-social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-social-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-social-btn:hover svg {
+    transform: scale(1.12);
+}
+[data-theme="eco-collectible"] .site-social--instagram:hover {
+    background: linear-gradient(45deg, #F09433, #DC2743 55%, #BC1888);
+    border-color: transparent;
+}
+[data-theme="eco-collectible"] .site-social--telegram:hover {
+    background: #229ED9;
+    border-color: #229ED9;
+}
+[data-theme="eco-collectible"] .site-social--whatsapp:hover {
+    background: #25D366;
+    border-color: #25D366;
+}
+[data-theme="eco-collectible"] .site-social--twitter:hover {
+    background: #141414;
+    border-color: #141414;
+}
+[data-theme="eco-collectible"] .site-social--youtube:hover {
+    background: #FF0000;
+    border-color: #FF0000;
+}
+
+/* نشان‌های اعتماد — آیکون بزرگ‌تر + هاور */
+[data-theme="eco-collectible"] .site-footer-badge {
+    gap: .6rem;
+    padding: .55rem .9rem .55rem .55rem;
+    transition:
+        transform var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[dir="ltr"] [data-theme="eco-collectible"] .site-footer-badge {
+    padding: .55rem .55rem .55rem .9rem;
+}
+[data-theme="eco-collectible"] .site-footer-badge-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 1.05rem;
+    transition: transform var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-footer-badge:hover {
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .site-footer-badge:hover .site-footer-badge-icon {
+    transform: scale(1.1) rotate(-4deg);
+}
+
+/* آکاردئون موبایل — شورون چرخان + تیتر لمسی */
+[data-theme="eco-collectible"] .site-footer-acc-btn {
+    border-radius: var(--eco-radius-md);
+    transition: background-color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-footer-acc-chevron {
+    transition: transform var(--eco-dur-med) var(--eco-ease), color var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .site-footer-acc.is-open .site-footer-acc-chevron {
+    transform: rotate(180deg);
+    color: var(--eco-clay-ink);
+}
+
+/* ================= سایدبار داشبورد ================= */
+
+[data-theme="eco-collectible"] .dashboard-nav-head {
+    border: 1px solid var(--eco-line);
+    border-radius: var(--eco-radius-md);
+    background: var(--eco-surface);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .dashboard-nav-avatar {
+    background: var(--eco-clay-soft);
+    color: var(--eco-clay-ink);
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-clay-rgb) / .18);
+}
+[data-theme="eco-collectible"] .dashboard-nav-name { color: var(--eco-ink); }
+[data-theme="eco-collectible"] .dashboard-nav-mobile { color: var(--eco-ink-2); }
+[data-theme="eco-collectible"] .dashboard-nav-sep {
+    border-top: 1px solid var(--eco-line);
+}
+[data-theme="eco-collectible"] .dashboard-nav-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    width: 100%;
+    padding: .55rem .6rem;
+    border: 1px solid transparent;
+    border-radius: var(--eco-radius-md);
+    color: var(--eco-ink-2);
+    font-size: .87rem;
+    font-weight: 500;
+    text-align: start;
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        border-color var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .dashboard-nav-link:hover {
+    background: var(--eco-clay-soft);
+    color: var(--eco-ink);
+    border-color: transparent;
+}
+[data-theme="eco-collectible"] .dashboard-nav-ico {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: rgb(var(--eco-clay-rgb) / .1);
+    color: var(--eco-clay-ink);
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-clay-rgb) / .14);
+    transition:
+        background-color var(--eco-dur-fast) var(--eco-ease),
+        color var(--eco-dur-fast) var(--eco-ease),
+        transform var(--eco-dur-fast) var(--eco-ease),
+        box-shadow var(--eco-dur-fast) var(--eco-ease);
+}
+[data-theme="eco-collectible"] .dashboard-nav-link:hover .dashboard-nav-ico {
+    transform: translateY(-1px);
+    box-shadow: var(--eco-shadow-xs);
+}
+[data-theme="eco-collectible"] .dashboard-nav-link.is-active {
+    background: var(--eco-ink);
+    border-color: var(--eco-ink);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: var(--eco-shadow-sm);
+}
+[data-theme="eco-collectible"] .dashboard-nav-link.is-active .dashboard-nav-ico {
+    background: rgb(255 255 255 / .16);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .22);
+}
+[data-theme="eco-collectible"] .dashboard-nav-logout {
+    color: var(--eco-danger);
+}
+[data-theme="eco-collectible"] .dashboard-nav-logout .dashboard-nav-ico {
+    background: rgb(var(--eco-danger-rgb) / .1);
+    color: var(--eco-danger);
+    box-shadow: inset 0 0 0 1px rgb(var(--eco-danger-rgb) / .16);
+}
+[data-theme="eco-collectible"] .dashboard-nav-logout:hover {
+    background: rgb(var(--eco-danger-rgb) / .08);
+    color: var(--eco-danger);
+}
+[data-theme="eco-collectible"] .dashboard-nav-logout:hover .dashboard-nav-ico {
+    background: var(--eco-danger);
+    color: #fff;
+    box-shadow: var(--eco-shadow-xs);
+}
+
 /* ================= ۷) حرکتِ کم ================= */
 
 @media (prefers-reduced-motion: reduce) {
     [data-theme="eco-collectible"] .site-header,
     [data-theme="eco-collectible"] .site-logo-mark,
     [data-theme="eco-collectible"] .site-nav-link,
+    [data-theme="eco-collectible"] .site-nav-ico,
     [data-theme="eco-collectible"] .site-search-input,
     [data-theme="eco-collectible"] .site-action-btn,
     [data-theme="eco-collectible"] .site-hamburger,
     [data-theme="eco-collectible"] .site-menu-backdrop,
     [data-theme="eco-collectible"] .site-menu-link,
+    [data-theme="eco-collectible"] .site-menu-ico,
+    [data-theme="eco-collectible"] .site-menu-footer,
     [data-theme="eco-collectible"] .site-menu-account,
     [data-theme="eco-collectible"] .site-menu-account-link,
     [data-theme="eco-collectible"] .mobile-bar-pill,
+    [data-theme="eco-collectible"] .mobile-bar-item,
     [data-theme="eco-collectible"] .mobile-search-panel,
     [data-theme="eco-collectible"] .site-footer-badge,
+    [data-theme="eco-collectible"] .site-footer-links a,
+    [data-theme="eco-collectible"] .site-footer-contact-icon,
     [data-theme="eco-collectible"] .site-social-btn,
     [data-theme="eco-collectible"] .site-login-btn,
+    [data-theme="eco-collectible"] .dashboard-nav-link,
     [data-theme="eco-collectible"] .back-to-top {
         transition: none !important;
     }

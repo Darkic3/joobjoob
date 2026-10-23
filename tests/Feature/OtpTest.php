@@ -91,7 +91,7 @@ class OtpTest extends TestCase
         $this->assertSame('verify', $fake->lastTemplate);
         $this->assertSame($user->fresh()->confirm_code, $fake->lastTokens['token']);
         // سرویس OTP نام سایت رو پاکسازی می‌کنه: اگر با «فروشگاه» شروع شود کلمه‌ی دوم ارسال می‌شود
-        $rawName = setting('site_name', config('app.name', 'Shopora'));
+        $rawName = setting('site_name', config('app.name', 'Joobjoob'));
         $parts = preg_split('/\s+/', trim($rawName));
         $expectedToken2 = (count($parts) >= 2 && $parts[0] === 'فروشگاه') ? $parts[1] : $parts[0];
         $this->assertSame($expectedToken2, $fake->lastTokens['token2']);

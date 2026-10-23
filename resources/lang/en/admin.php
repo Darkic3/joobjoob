@@ -85,7 +85,7 @@ return [
         'greeting_noon' => 'Good afternoon',
         'greeting_evening' => 'Good evening',
         'admin' => 'Admin',
-        'welcome' => 'Welcome to the Shopora admin panel.',
+        'welcome' => 'Welcome to the Joobjoob admin panel.',
         'today_is' => 'Today is :date and all systems are operational.',
         'new_post' => 'Write New Post',
         'view_site' => 'View Site',

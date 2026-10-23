@@ -1,6 +1,6 @@
 # Blog — Logic (Deep Trace)
 
-> **Module:** `blog` — Weblog-e Shopora (maqalat + daste-bandi)
+> **Module:** `blog` — Weblog-e Joobjoob (maqalat + daste-bandi)
 > **Stack:** `Blog` + `BlogCategory` + `BlogService` + `BlogDTO` + `ImageHandler` + `HasSlug` + `UrlRule`
 > **Status:** ✅ verified-trace — بازنویسی از کد واقعی (2026-09-06)
 
@@ -259,7 +259,7 @@ Hich filtering/normalization-i nist (ba bar aks-e ProductDTO) — field-ha kam h
 ## 8. Seeders & Tests
 
 - **BlogCategorySeeder** (`database/seeders/BlogCategorySeeder.php:12-21`): 3 daste (`buying-guide`, `store-news`, `fashion-tips`) ba `updateOrCreate(['slug'=>...])` (`:19`).
-- **BlogSeeder** (`database/seeders/BlogSeeder.php:12-63`): daste-ha ba slug peyda mishavand (`:14-15`), admin-e `admin@shopora.test` (`:16`) — agar nabood `return` (`:18-20`). 3 maqal-e namone ba `updateOrCreate` ba slug (`:59`).
+- **BlogSeeder** (`database/seeders/BlogSeeder.php:12-63`): daste-ha ba slug peyda mishavand (`:14-15`), admin-e `admin@joobjoob.test` (`:16`) — agar nabood `return` (`:18-20`). 3 maqal-e namone ba `updateOrCreate` ba slug (`:59`).
 - **Tests:** `tests/Feature/ImageRemovalTest.php:88-102` (`remove_image=1` → image null), `:105-120` (bedoon image/bedoon remove → image-e ghadimi hefz mishavad). `HomeBlogSectionTest` (bakhsh 7).
 
 ---

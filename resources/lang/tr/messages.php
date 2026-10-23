@@ -261,9 +261,9 @@ return [
             'hero_badge' => 'Hikayemiz',
             'story_title' => 'Biz kimiz?',
             'story' => [
-                'Shopora, 2021 yılında basit bir fikirle başladı: çevrimiçi alışveriş, yerel mağazandan alışveriş yapmak kadar güven hissettirmeli. Bugün binlerce ürünle aynı fikri sürdürüyoruz — gerçek kalite, adil fiyat ve insani destek.',
+                'Joobjoob, 2021 yılında basit bir fikirle başladı: çevrimiçi alışveriş, yerel mağazandan alışveriş yapmak kadar güven hissettirmeli. Bugün binlerce ürünle aynı fikri sürdürüyoruz — gerçek kalite, adil fiyat ve insani destek.',
                 'Alışveriş deneyiminin sadece teslim edilen bir paket olmadığına inanıyoruz. Bir ürünü seçtiğiniz andan kullanana kadar her ayrıntı bizim için önemlidir. Bu yüzden her ürün gönderimden önce kontrol edilir ve beklentinizi karşılamayan bir ürün koşulsuz değiştirilir.',
-                'Ekibimiz küçük ama kararlıdır; bu kararlılık on iki binden fazla müşterinin Shopora alışverişini arkadaşlarına tavsiye etmesini sağladı.',
+                'Ekibimiz küçük ama kararlıdır; bu kararlılık on iki binden fazla müşterinin Joobjoob alışverişini arkadaşlarına tavsiye etmesini sağladı.',
             ],
             'stats' => [
                 ['value' => '12,000+', 'label' => 'Mutlu müşteri'],
@@ -271,7 +271,7 @@ return [
                 ['value' => '98.2%', 'label' => 'Alışveriş memnuniyeti'],
                 ['value' => '24/7', 'label' => 'Hızlı destek'],
             ],
-            'values_title' => 'Neden Shopora?',
+            'values_title' => 'Neden Joobjoob?',
             'values' => [
                 ['title' => 'Orijinal ürünler', 'text' => 'Tüm ürünler güvenilir tedarikçilerden alınır ve gönderimden önce orijinallik ve durum açısından kontrol edilir.'],
                 ['title' => 'Hızlı ve güvenli kargo', 'text' => 'Siparişler en kısa sürede paketlenir ve güvenilir kuryelerle ülke geneline teslim edilir.'],

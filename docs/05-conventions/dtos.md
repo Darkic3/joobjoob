@@ -10,7 +10,7 @@
 
 **Problem DTO solves:** Admin forms send 15–30 fields (scalars + arrays + `UploadedFile`s + nested structures like `variants`, `specs`, `trusts`). Passing raw `Request` or associative `array` to `ProductService` would leak HTTP concerns into the domain and require ad-hoc key checks (`isset($data['price']) ? (int)$data['price'] : 0`) duplicated across `store`/`update`.
 
-**Shopora convention — when to use DTO vs `array`:**
+**Joobjoob convention — when to use DTO vs `array`:**
 
 | Use DTO | Use `array` |
 |---------|-------------|

@@ -57,7 +57,7 @@ trait HasSeoFeatures
         $value = Str::replace('{name}', $this->name ?? '', $value);
         $value = Str::replace('{title}', $this->title ?? '', $value);
         $value = Str::replace('{description}', $this->description ?? '', $value);
-        $value = Str::replace('{app_name}', config('app.name', 'Shopora'), $value);
+        $value = Str::replace('{app_name}', config('app.name', 'Joobjoob'), $value);
         // Add more placeholders as needed
 
         return $value;

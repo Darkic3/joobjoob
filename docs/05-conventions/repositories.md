@@ -7,7 +7,7 @@
 
 ## 1. Purpose — Why No Repository Here?
 
-- **Shopora intentionally skips the Repository pattern.** Search of `app/` yields no `Repository` class, no `app/Repositories/` folder, no `*Repository` contract. Data access is performed **directly via Eloquent Models inside Services** (e.g. `Product::query()->with(...)->where(...)->paginate()` in `ProductService::getPaginatedProducts`).
+- **Joobjoob intentionally skips the Repository pattern.** Search of `app/` yields no `Repository` class, no `app/Repositories/` folder, no `*Repository` contract. Data access is performed **directly via Eloquent Models inside Services** (e.g. `Product::query()->with(...)->where(...)->paginate()` in `ProductService::getPaginatedProducts`).
 
 - **Rationale (inferred from code shape):**
   - Eloquent already *is* the repository (active record + query builder). Wrapping `Product::where('is_active',true)` behind `ProductRepository::active()` would duplicate scope semantics without adding testability (Laravel's in-memory SQLite + `RefreshDatabase` tests don't benefit from abstraction).
@@ -257,7 +257,7 @@ if ($discount->basket_minimum_price > $cart->subtotal()) abort(400, 'حداقل 
 ## 6. Invariants & Rules for Query Authors
 
 - **No repository abstraction:** call `Model::scope` + `Service::getPaginated*` directly. Do not wrap `Product::active()` behind `ProductRepository::active()`.
-- **No global scopes:** Shopora never auto-filters `where('is_active',true)` at booted time — callers must opt in via `scopeActive()`. Exception is `SoftDeletes` which *does* globally hide `deleted_at != null` unless `withTrashed()`.
+- **No global scopes:** Joobjoob never auto-filters `where('is_active',true)` at booted time — callers must opt in via `scopeActive()`. Exception is `SoftDeletes` which *does* globally hide `deleted_at != null` unless `withTrashed()`.
 - **Scope naming mirrors column where possible, but watch variants:** `Brand` `active` maps column `active`, `Bank` `status`, `Specification` `active` — do not rename scope without checking column. New models: prefer column `is_active` + scope `scopeActive` for consistency.
 - **Services own `when()` chains:** scopes are small predicates; any filter with branching, JSON `->` where, `whereHas`, or aggregated search belongs in Service builder, not Model.
 - **Eager loading is mandatory on Service builders:** `with(['category','images','brand'])` prevents N+1 on admin index pages. Always eager-load relations consumed by the view.

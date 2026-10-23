@@ -84,7 +84,7 @@ return [
         'greeting_noon' => 'İyi günler',
         'greeting_evening' => 'İyi akşamlar',
         'admin' => 'Yönetici',
-        'welcome' => 'Shopora yönetim paneline hoş geldiniz.',
+        'welcome' => 'Joobjoob yönetim paneline hoş geldiniz.',
         'today_is' => 'Bugün :date ve tüm sistemler çalışır durumda.',
         'new_post' => 'Yeni Yazı Yaz',
         'view_site' => 'Siteyi Görüntüle',

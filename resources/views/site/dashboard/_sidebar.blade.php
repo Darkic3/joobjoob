@@ -9,19 +9,18 @@
     ];
 @endphp
 
-<aside class="space-y-1">
+<aside class="dashboard-nav space-y-1">
     {{-- هدر سایدبار --}}
-    <div class="flex items-center gap-3 px-4 py-3 mb-2">
-        <div class="w-10 h-10 rounded-2xl grid place-items-center shrink-0"
-             style="background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)); color: var(--accent);">
+    <div class="dashboard-nav-head flex items-center gap-3 px-4 py-3 mb-2">
+        <div class="dashboard-nav-avatar w-10 h-10 rounded-2xl grid place-items-center shrink-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
             </svg>
         </div>
         <div class="min-w-0">
-            <p class="text-sm font-bold truncate" style="color: var(--text-primary);">{{ auth()->user()->name }}</p>
-            <p class="text-[11px] truncate" style="color: var(--text-secondary);" dir="ltr">{{ auth()->user()->mobile }}</p>
+            <p class="dashboard-nav-name text-sm font-bold truncate">{{ auth()->user()->name }}</p>
+            <p class="text-[11px] truncate dashboard-nav-mobile" dir="ltr">{{ auth()->user()->mobile }}</p>
         </div>
     </div>
 
@@ -34,30 +33,30 @@
                 : ($currentRoute === $item['route'] || str_starts_with($currentRoute, $item['route'] . '.'));
         @endphp
         <a href="{{ route($item['route']) }}"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200"
-           style="{{ $isActive
-               ? 'background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); font-weight: 700;'
-               : 'color: var(--text-secondary);' }}">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
-                {!! $item['icon'] !!}
-            </svg>
+           class="dashboard-nav-link {{ $isActive ? 'is-active' : '' }}">
+            <span class="dashboard-nav-ico">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    {!! $item['icon'] !!}
+                </svg>
+            </span>
             <span>{{ $item['label'] }}</span>
         </a>
     @endforeach
 
     {{-- خط جداکننده --}}
-    <div class="my-2 mx-4" style="border-top: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);"></div>
+    <div class="dashboard-nav-sep my-2 mx-4"></div>
 
     {{-- خروج --}}
     <form action="{{ localizedRoute('logout') }}" method="POST">
         @csrf
-        <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm transition-all duration-200 hover:opacity-80"
-                style="color: var(--danger);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
+        <button type="submit" class="dashboard-nav-link dashboard-nav-logout">
+            <span class="dashboard-nav-ico">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </span>
             <span>{{ __('messages.logout') }}</span>
         </button>
     </form>

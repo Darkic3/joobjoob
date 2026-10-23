@@ -9,7 +9,7 @@
 
 ## 1. Purpose (Hadaf-e Module)
 
-Contact module sade-tarin module-e Shopora ast: karbar-e site (guest ya login-shode — farqi nemikonad) form-e «تماس با ما» ra por mikonad, peyam dar jadval-e `contact_requests` zakhire mishavad, be admin-ha notification-e in-app `contact.new` dade mishavad, va admin peyam-ha ra dar inbox-e panel mibinad, be onvane «خوانده‌شده» alamat mizanad ya hazf mikonad. **Hich Service/DTO/FormRequest/Event vojood nadarad** — validation inline dar controller, write yek `create`-e sade.
+Contact module sade-tarin module-e Joobjoob ast: karbar-e site (guest ya login-shode — farqi nemikonad) form-e «تماس با ما» ra por mikonad, peyam dar jadval-e `contact_requests` zakhire mishavad, be admin-ha notification-e in-app `contact.new` dade mishavad, va admin peyam-ha ra dar inbox-e panel mibinad, be onvane «خوانده‌شده» alamat mizanad ya hazf mikonad. **Hich Service/DTO/FormRequest/Event vojood nadarad** — validation inline dar controller, write yek `create`-e sade.
 
 **Evidence:**
 - `app/Models/ContactRequest.php:8` — `class ContactRequest extends Model` (bedoon SoftDeletes, bedoon HasFactory)

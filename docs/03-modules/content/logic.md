@@ -4,7 +4,7 @@
 > **Desc:** Hero slides linkable_id string, trust max 5, placement, promo banner style/tone
 
 ## Purpose
-Hero slides linkable_id string, trust max 5, placement, promo banner style/tone. Core domain of Shopora.
+Hero slides linkable_id string, trust max 5, placement, promo banner style/tone. Core domain of Joobjoob.
 
 ## Responsibilities
 - CRUD via Admin resources (except show)

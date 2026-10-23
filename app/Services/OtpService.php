@@ -135,7 +135,7 @@ class OtpService
         try {
             // token = کد OTP (فقط عدد — بدون فاصله)
             // token2 = نام سایت (پاکسازی‌شده برای سازگاری با قالب کاوه‌نگار)
-            $siteName = $this->cleanSiteName(setting('site_name', config('app.name', 'Shopora')));
+            $siteName = $this->cleanSiteName(setting('site_name', config('app.name', 'Joobjoob')));
             $response = $this->sms->sendLookup($template, ['token' => $code, 'token2' => $siteName], $mobile);
 
             if ($response instanceof RedirectResponse) {

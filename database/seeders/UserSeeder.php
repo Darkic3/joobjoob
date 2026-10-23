@@ -14,9 +14,9 @@ class UserSeeder extends Seeder
         $mainRole = Role::where('name', 'main')->first();
 
         $users = [
-            ['name' => 'علی احمدی', 'email' => 'ali@shopora.test', 'mobile' => '09121111111', 'is_admin' => false, 'is_active' => true],
-            ['name' => 'سارا کریمی', 'email' => 'sara@shopora.test', 'mobile' => '09122222222', 'is_admin' => false, 'is_active' => true],
-            ['name' => 'محمد رضایی', 'email' => 'mohammad@shopora.test', 'mobile' => '09123333333', 'is_admin' => false, 'is_active' => true],
+            ['name' => 'علی احمدی', 'email' => 'ali@joobjoob.test', 'mobile' => '09121111111', 'is_admin' => false, 'is_active' => true],
+            ['name' => 'سارا کریمی', 'email' => 'sara@joobjoob.test', 'mobile' => '09122222222', 'is_admin' => false, 'is_active' => true],
+            ['name' => 'محمد رضایی', 'email' => 'mohammad@joobjoob.test', 'mobile' => '09123333333', 'is_admin' => false, 'is_active' => true],
         ];
 
         foreach ($users as $userData) {

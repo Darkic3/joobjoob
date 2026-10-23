@@ -1,4 +1,4 @@
-# Schema Dictionary — Shopora Database
+# Schema Dictionary — Joobjoob Database
 
 > Source of truth: `database/migrations` — 73 files read verbatim 2026-09-04. No inference.
 > Conventions: Type = Blueprint method, Index = index/unique/primary, FK = constrained/foreignId, SoftDeletes = softDeletes.

@@ -1,4 +1,4 @@
-# ERD — Shopora Database
+# ERD — Joobjoob Database
 
 > Source: `database/migrations` — 73 files verified 2026-09-04. All relationships from FK/morph definitions only.
 

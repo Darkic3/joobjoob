@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ══════════════════════════════════════════════════════════════
-# Shopora — Automated Deployment Script (Steps 4–9)
+# Joobjoob — Automated Deployment Script (Steps 4–9)
 # Run via SSH after uploading code to the server.
 #
 # Usage:
@@ -175,7 +175,7 @@ if [ "$ERRORS" -eq 0 ]; then
     log "  2. curl -I https://yourdomain.ir/          (should return 200)"
     log "  3. php artisan about                       (verify drivers)"
     log "  4. Set up cron job (Step 10):"
-    log "     * * * * * cd /path/to/shopora && php artisan schedule:run >> /dev/null 2>&1"
+    log "     * * * * * cd /path/to/joobjoob && php artisan schedule:run >> /dev/null 2>&1"
     log "  5. Run smoke tests (Step 14)"
     log "  6. Tag v1.0.0: git tag v1.0.0 && git push --tags"
 else

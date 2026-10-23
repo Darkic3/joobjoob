@@ -69,7 +69,7 @@ class AdminOwnerSeeder extends Seeder
         $owner = config('admin.owner', []);
 
         $name = $owner['name'] ?? 'مدیر اصلی';
-        $email = $owner['email'] ?? 'admin@shopora.test';
+        $email = $owner['email'] ?? 'admin@joobjoob.test';
         $mobile = $owner['mobile'] ?? '09120000000';
         $password = $owner['password'] ?? null;
 

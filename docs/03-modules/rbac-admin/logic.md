@@ -4,7 +4,7 @@
 > **Desc:** Gate admin, is_admin bypass, permission per routeName
 
 ## Purpose
-Gate admin, is_admin bypass, permission per routeName. Part of Shopora modular domain.
+Gate admin, is_admin bypass, permission per routeName. Part of Joobjoob modular domain.
 
 ## Responsibilities
 - Business rules for RBAC / Admin

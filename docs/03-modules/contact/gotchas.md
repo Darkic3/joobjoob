@@ -21,7 +21,7 @@ Argome sevom-e `__()` **locale** ast, na fallback value! Baraye department-e nam
 
 ## 3. Hard delete — SoftDeletes nadarad
 
-`ContactRequest.php:8` extends Model-e khales; `destroy()` (`Admin/ContactController.php:41`) radif-ra bedoon bazgasht pak mikonad. Hazf = bazgasht-napazir (bar khalaf-e aksar-e module-ha-ye Shopora).
+`ContactRequest.php:8` extends Model-e khales; `destroy()` (`Admin/ContactController.php:41`) radif-ra bedoon bazgasht pak mikonad. Hazf = bazgasht-napazir (bar khalaf-e aksar-e module-ha-ye Joobjoob).
 
 ## 4. Search-e admin ruye phone nemigardad
 

@@ -4,7 +4,7 @@
 > **Desc:** 7-step locale priority, rememberForever, localizedRoute, rtl/ltr dir
 
 ## Purpose
-7-step locale priority, rememberForever, localizedRoute, rtl/ltr dir. Core domain of Shopora.
+7-step locale priority, rememberForever, localizedRoute, rtl/ltr dir. Core domain of Joobjoob.
 
 ## Responsibilities
 - CRUD via Admin resources (except show)

@@ -42,7 +42,7 @@
             <div class="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-lg">S</span>
             </div>
-            <span class="font-bold text-gray-800 dark:text-gray-100">Shopora</span>
+            <span class="font-bold text-gray-800 dark:text-gray-100">Joobjoob</span>
         </a>
         <button @click="$dispatch('close-mobile')" class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

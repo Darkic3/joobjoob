@@ -565,7 +565,7 @@ class SchemaBuilder
 
     private function siteName(): string
     {
-        return (string) setting('site_name', config('app.name', 'Shopora'));
+        return (string) setting('site_name', config('app.name', 'Joobjoob'));
     }
 
     /** توضیح صفحه — همان مقداری که به‌عنوان meta description رندر می‌شود */

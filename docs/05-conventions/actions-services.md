@@ -16,9 +16,9 @@
 
 ---
 
-## 2. Service vs Action — Decision Table (Shopora Convention)
+## 2. Service vs Action — Decision Table (Joobjoob Convention)
 
-| Criterion | **Service** (what Shopora uses) | **Action** (not used — do not create) |
+| Criterion | **Service** (what Joobjoob uses) | **Action** (not used — do not create) |
 |-----------|----------------------------------|----------------------------------------|
 | Granularity | One class per **aggregate** (`Product`, `Order`, `Cart`, `Blog`) owning multiple verbs | One class per **single use case** (`CreateProductAction`, `AttachSpecificationsAction`) |
 | State | May hold dependencies (`ProductService` holds none; `OrderService` holds `BankPaymentService` + `StockService` via constructor) | Stateless single `__invoke` with all deps injected |
@@ -65,8 +65,8 @@
 | `AuditService` | `log(string event, $auditable, ?array old, ?array new, ?array meta, ?string desc, ?int userId): AuditLog` · `orderCreated`, `orderStatusChanged`, `orderStockReserved/Restored`, `productCreated/Updated`, `productPriceChanged`, `productStockChanged` | **Static** methods only; wraps `AuditLog::create`; `event` names like `order.created`, `order.status_changed` |
 | `NotificationService` | `notifyUser(User,string type,string title,string body,string? actionUrl,array data): Notification` · `notifyAdmins(type,title,body,url,data)` · `markRead/markAllRead`, `unreadCount` | `TYPES` const enumerates like `order.created`, `order.new`, `order.paid`; persists to `notifications` table |
 | `DashboardService` | (admin dashboard aggregations) | Groups order/product stats |
-| `LocaleService` | `codes(): array` · `current(): Language` · `resolve(string header): Language` | `CACHE_ALL='shopora_languages_all'`, `Cache::rememberForever`; `codes()` includes DB + catalog `config('languages')` |
-| `SettingService` | `get(string key, mixed default)` · `all(): array` · `set(string key, mixed val): void` · `clearCache()` | `CACHE_ALL='shopora_settings_all'`; `Cache::rememberForever`; `setting()` helper delegates here |
+| `LocaleService` | `codes(): array` · `current(): Language` · `resolve(string header): Language` | `CACHE_ALL='joobjoob_languages_all'`, `Cache::rememberForever`; `codes()` includes DB + catalog `config('languages')` |
+| `SettingService` | `get(string key, mixed default)` · `all(): array` · `set(string key, mixed val): void` · `clearCache()` | `CACHE_ALL='joobjoob_settings_all'`; `Cache::rememberForever`; `setting()` helper delegates here |
 | `RecentlyViewedService` / `WishlistService` | `push/track`, `get/sync` | Singletons; session+DB variants |
 | `OtpService` | `send(string mobile): array` · `verify(string mobile, string code): bool` · `resend` | `CODE_LENGTH=4`, throttled routes; `Sms` helper |
 | `WelcomeDiscountService` | `maybeCreateFor(User): ?Discount` · `buildCode()` | `DISCOUNT_PERCENT=10`, `DISCOUNT_COUNT=1`, `MAX_USAGE_PER_USER=1`, `EXPIRY_DAYS=30`, `CODE_PREFIX='WELCOME-'`, `CODE_LENGTH=6` |

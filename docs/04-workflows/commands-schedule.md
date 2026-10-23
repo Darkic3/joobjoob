@@ -87,7 +87,7 @@ Schedule::command('orders:cancel-expired --minutes=15')->everyFiveMinutes()->wit
 
 ```
 # Crontab — har daghighe schedule:run ra seda bezan
-* * * * * cd /path/to/shopora && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /path/to/joobjoob && php artisan schedule:run >> /dev/null 2>&1
 # Ya: php artisan schedule:work (foreground worker, baraye dev)
 ```
 

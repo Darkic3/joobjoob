@@ -46,7 +46,7 @@ Tests: 9 failed, 549 passed (1937 assertions)
 
 | تست شکسته | علت |
 |---|---|
-| `hreflang urls point to prefixed versions` | ریشهٔ URL در تست‌ها `http://shopora.test` بود، تست انتظار `http://localhost` داشت |
+| `hreflang urls point to prefixed versions` | ریشهٔ URL در تست‌ها `http://joobjoob.test` بود، تست انتظار `http://localhost` داشت |
 | `canonical tag present` | همان |
 | `localized route helper` | همان |
 | `localized url helper uses current route` | همان |
@@ -54,7 +54,7 @@ Tests: 9 failed, 549 passed (1937 assertions)
 | `hreflang exact count and x default` | همان |
 | `every site route has a locale twin` | روت‌های زیرساختی دوقلوی `locale.*` نداشتند |
 
-**ریشهٔ مشکل اول تا ششم:** `phpunit.xml` مقدار `APP_URL` را تعیین نمی‌کرد، پس مقدار فایل `.env` توسعه‌دهنده (`http://shopora.test`) به تست‌ها نشت می‌کرد و همهٔ assertهای مربوط به canonical/hreflang/host می‌شکستند. ایراد کد نبود؛ ایراد **غیرقطعی بودن محیط تست** بود.
+**ریشهٔ مشکل اول تا ششم:** `phpunit.xml` مقدار `APP_URL` را تعیین نمی‌کرد، پس مقدار فایل `.env` توسعه‌دهنده (`http://joobjoob.test`) به تست‌ها نشت می‌کرد و همهٔ assertهای مربوط به canonical/hreflang/host می‌شکستند. ایراد کد نبود؛ ایراد **غیرقطعی بودن محیط تست** بود.
 
 **اصلاح:** افزودن `<env name="APP_URL" value="http://localhost"/>` به `phpunit.xml`.
 **دلیل:** تست‌های canonical/hreflang باید مستقل از `.env` ماشین توسعه‌دهنده باشند؛ در غیر این صورت روی هر ماشین نتیجهٔ متفاوت می‌دهند و به‌عنوان تور ایمنی بی‌ارزش می‌شوند.
@@ -168,13 +168,13 @@ Tests: 9 failed, 549 passed (1937 assertions)
 
 | مورد | مقدار ثبت‌شده | اثر بر SEO |
 |---|---|---|
-| `APP_URL` (`.env`) | `http://shopora.test` | دامنهٔ پروداکشن نامعلوم ⇒ همهٔ URLهای مطلق از **ریشهٔ درخواست** ساخته می‌شوند |
+| `APP_URL` (`.env`) | `http://joobjoob.test` | دامنهٔ پروداکشن نامعلوم ⇒ همهٔ URLهای مطلق از **ریشهٔ درخواست** ساخته می‌شوند |
 | `APP_ENV` (`.env`) | `production` | مراقبت: `APP_DEBUG=false` روی محیط توسعه |
 | `CACHE_STORE` | `database` | `Cache::tags()` پشتیبانی نمی‌شود ⇒ فقط کلید نامدار + `Cache::forget` |
 | `CACHE_PREFIX` | خالی | کلیدهای کش بدون پیشوند |
 | `SESSION_DRIVER` / `QUEUE_CONNECTION` | `database` / `database` | — |
 | `public/.htaccess` | Apache، front controller با `!-f` + ۳۰۱ اسلش انتهایی | روت داینامیک `/robots.txt` پس از حذف فایل استاتیک کار می‌کند؛ نرمال‌سازی اسلش در میدل‌ور لازم نیست |
-| `phpunit.xml` | دیتابیس تست جدا `shopora_test`، `CACHE_STORE=array` | تست‌ها دیتای واقعی `shopora` را لمس نمی‌کنند |
+| `phpunit.xml` | دیتابیس تست جدا `joobjoob_test`، `CACHE_STORE=array` | تست‌ها دیتای واقعی `joobjoob` را لمس نمی‌کنند |
 | `.github/workflows/deploy.yml` | با هر push روی `master` دیپلوی FTP روی cPanel، **بدون هیچ تست** | تنها تور ایمنی، تست محلی قبل از push است |
 
 ---

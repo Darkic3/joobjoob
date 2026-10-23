@@ -4,7 +4,7 @@
 > **Desc:** AuditService::log auditable, RequestLog payload only password filtered
 
 ## Purpose
-AuditService::log auditable, RequestLog payload only password filtered. Core domain of Shopora.
+AuditService::log auditable, RequestLog payload only password filtered. Core domain of Joobjoob.
 
 ## Responsibilities
 - CRUD via Admin resources (except show)

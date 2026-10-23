@@ -14,7 +14,7 @@
 Key-value config system grouped into tabs. Admin edits settings via tabbed UI; site reads via `setting()` helper with two-layer cache (static request memory + `Cache::rememberForever`). File uploads (images → WebP, non-images → raw) stored in `public/uploads/settings/`.
 
 **Key design decisions:**
-- Single unified cache key `shopora_settings_all` (all settings in one query + one cache entry)
+- Single unified cache key `joobjoob_settings_all` (all settings in one query + one cache entry)
 - Static `$memory` array prevents duplicate queries within a request
 - `settingOverride()` bypasses config defaults for translatable strings
 - File uploads use `ImageHandler` (images) or `Uploader` (non-images) — never raw `store()`
@@ -76,7 +76,7 @@ Key-value config system grouped into tabs. Admin edits settings via tabbed UI; s
 - Prevents duplicate DB queries within a single request
 - Reset on `flush()`
 
-**Layer 2: Unified cache** (`Cache::rememberForever('shopora_settings_all')`)
+**Layer 2: Unified cache** (`Cache::rememberForever('joobjoob_settings_all')`)
 - All settings loaded in ONE query: `Setting::all()->mapWithKeys()`
 - Cast per type: `json → json_decode`, `boolean → (bool)`, `select/text → (string)`
 - Flushed on `updateGroup()` via `flush()`
@@ -110,7 +110,7 @@ Like `get()` but **ignores config defaults** — returns only if admin explicitl
 ### 3.6 `flush(): void`
 ```php
 self::$memory = null;           // clear request memory
-Cache::forget('shopora_settings_all'); // clear unified cache
+Cache::forget('joobjoob_settings_all'); // clear unified cache
 ```
 
 ---
@@ -183,7 +183,7 @@ No Site routes — settings are admin-only.
 
 | Rule | Evidence |
 |------|----------|
-| Single cache key for all settings | `SettingService::CACHE_ALL = 'shopora_settings_all'` |
+| Single cache key for all settings | `SettingService::CACHE_ALL = 'joobjoob_settings_all'` |
 | Request memory prevents N queries | `self::$memory` static property |
 | File upload: images → WebP | `handleFileUpload` checks `str_starts_with(mime, 'image/')` |
 | File upload: preserve old on no-new | `elseif ($isFileType) → $value = Setting::where('key', $key)->value('value')` |

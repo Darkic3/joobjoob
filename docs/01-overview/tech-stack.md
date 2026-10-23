@@ -1,4 +1,4 @@
-# Stack-e Fanni — Shopora Tech Stack
+# Stack-e Fanni — Joobjoob Tech Stack
 
 > **Manba-e Haghighi:** `composer.json`, `package.json`, `vite.config.js`, `tailwind.config.js`, `config/*.php`, `bootstrap/app.php`, `app/Providers/AppServiceProvider.php`, `.env` / `.env.example`
 > **Ghanoon:** Hame adad-ha va config-ha mostaghim az file khande shode — hich hadsi nist.
@@ -9,7 +9,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  PHP 8.2  +  Laravel 11  +  MySQL (shopora)                 │
+│  PHP 8.2  +  Laravel 11  +  MySQL (joobjoob)                 │
 │  Vite 5 + Tailwind 3 + Alpine 3 + Swiper + GSAP            │
 │  Cache=database  Queue=database  Session=database           │
 │  Mail=log  Filesystem=local/public/uploads                   │
@@ -140,7 +140,7 @@ export default defineConfig({
 | Prefix | `Str::slug(APP_NAME,'_').'_cache_'` | `config/cache.php:105` |
 | Pattern used | `Cache::rememberForever(key, fn)` + `Cache::forget(key)` — na `remember` ba TTL | `app/Services/SettingService.php:53 rememberForever`, `app/Services/LocaleService.php:41 rememberForever` |
 
-- **Key-haye asli:** `shopora_settings_all` (SettingService), `shopora_languages_all` (LocaleService), `promo_banners_active`, `trust_badges_active`, `admin.permissions.version` + per-user `admin.permissions.v{version}.{id}`.
+- **Key-haye asli:** `joobjoob_settings_all` (SettingService), `joobjoob_languages_all` (LocaleService), `promo_banners_active`, `trust_badges_active`, `admin.permissions.version` + per-user `admin.permissions.v{version}.{id}`.
 - Evidence: `config/cache.php:18,41`, `.env: CACHE_STORE=database`, `app/Services/SettingService.php:17 CACHE_ALL`, `app/Services/LocaleService.php:21 CACHE_ALL`
 
 ### 4.2 Queue — Database Driver
@@ -202,7 +202,7 @@ export default defineConfig({
 |---|---|---|
 | Default mailer | `log` | `config/mail.php:17`, `.env: MAIL_MAILER=log` |
 | Means | Hich email ersal nemishavad — log be `storage/logs/laravel.log` | `config/mail.php:68` + `LOG_CHANNEL=stack` |
-| From | `hello@example.com` / `Shopora` | `config/mail.php:99`, `.env: MAIL_FROM_ADDRESS` |
+| From | `hello@example.com` / `Joobjoob` | `config/mail.php:99`, `.env: MAIL_FROM_ADDRESS` |
 | SMTP config | Vojoud darad vali estefade nemishavad (host 127.0.0.1:2525) | `config/mail.php:39 smtp` + `.env: MAIL_HOST=127.0.0.1` |
 
 ### 4.5 Filesystem — Local + Public/Uploads
@@ -323,7 +323,7 @@ Gate::define('admin', fn ($user) => $user->isAdmin());
 | Gate name | `admin` | `app/Providers/AppServiceProvider.php:38 Gate::define('admin', ...)` |
 | Check | `$user->is_admin` boolean — `true` → superadmin | `app/Models/User.php: isAdmin()`, `app/Models/Traits/HasAdminPermissions.php` |
 | Superadmin | `is_admin=true` → bypass hame permission check-ha (AdminPermission middleware) | `app/Http/Middleware/AdminPermission.php:43 if ($user->is_admin) return $next` |
-| Owner seed | `AdminOwnerSeeder` — env `ADMIN_OWNER_EMAIL=admin@shopora.test`, `MOBILE=09120000000` | `.env: ADMIN_OWNER_*`, `database/seeders/AdminOwnerSeeder.php` |
+| Owner seed | `AdminOwnerSeeder` — env `ADMIN_OWNER_EMAIL=admin@joobjoob.test`, `MOBILE=09120000000` | `.env: ADMIN_OWNER_*`, `database/seeders/AdminOwnerSeeder.php` |
 
 ### 6.2 RBAC Tables (Custom — No Package)
 

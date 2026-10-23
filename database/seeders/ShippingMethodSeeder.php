@@ -25,7 +25,7 @@ class ShippingMethodSeeder extends Seeder
                 'sender_city_id' => $tehran?->id,
                 'sender_phone' => '02112345678',
                 'sender_mobile' => '09121234567',
-                'sender_email' => 'shipping@shopora.test',
+                'sender_email' => 'shipping@joobjoob.test',
                 'sender_address' => 'تهران، خیابان ولیعصر، پلاک ۱۲۳',
                 'sender_postal_code' => '1234567890',
                 'estimated_days_min' => 2, 'estimated_days_max' => 4,

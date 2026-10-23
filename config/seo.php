@@ -227,9 +227,9 @@ return [
     | (MetaService / SeoService / کامپوننت SeoHead قدیمی). در فاز ۶ حذف می‌شوند.
     |--------------------------------------------------------------------------
     */
-    'default_title' => env('APP_NAME', 'Shopora'),
+    'default_title' => env('APP_NAME', 'Joobjoob'),
     'default_image' => null,
-    'default_og_site_name' => env('APP_NAME', 'Shopora'),
+    'default_og_site_name' => env('APP_NAME', 'Joobjoob'),
     'default_twitter_site' => null,
     'twitter_site' => null,
     'twitter_creator' => null,

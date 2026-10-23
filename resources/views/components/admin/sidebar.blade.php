@@ -13,7 +13,7 @@
             <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200"
                   x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0"
                   class="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">
-                Shopora
+                Joobjoob
             </span>
         </a>
 

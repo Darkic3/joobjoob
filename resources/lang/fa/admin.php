@@ -86,7 +86,7 @@ return [
         'greeting_noon' => 'ظهر بخیر',
         'greeting_evening' => 'عصر بخیر',
         'admin' => 'مدیر',
-        'welcome' => 'خوش آمدید به پنل مدیریت Shopora.',
+        'welcome' => 'خوش آمدید به پنل مدیریت Joobjoob.',
         'today_is' => 'امروز :date است و همه سیستم‌ها آماده به کار هستند.',
         'new_post' => 'نوشتن مطلب جدید',
         'view_site' => 'مشاهده سایت',

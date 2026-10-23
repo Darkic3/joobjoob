@@ -84,7 +84,7 @@ return [
         'greeting_noon' => 'مساء الخير',
         'greeting_evening' => 'مساء الخير',
         'admin' => 'مدير',
-        'welcome' => 'مرحباً بك في لوحة تحكم Shopora.',
+        'welcome' => 'مرحباً بك في لوحة تحكم Joobjoob.',
         'today_is' => 'اليوم هو :date وكل الأنظمة جاهزة للعمل.',
         'new_post' => 'كتابة مقال جديد',
         'view_site' => 'عرض الموقع',

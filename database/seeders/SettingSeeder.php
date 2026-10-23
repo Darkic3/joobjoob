@@ -13,7 +13,7 @@ class SettingSeeder extends Seeder
             ['key' => 'site_name', 'value' => 'فروشگاه شوپورا', 'type' => 'text', 'group' => 'general', 'label' => 'نام سایت', 'sort' => 1],
             ['key' => 'site_description', 'value' => 'فروشگاه آنلاین پوشاک مردانه', 'type' => 'textarea', 'group' => 'general', 'label' => 'توضیحات سایت', 'sort' => 2],
             ['key' => 'site_phone', 'value' => '02112345678', 'type' => 'text', 'group' => 'contact', 'label' => 'تلفن', 'sort' => 3],
-            ['key' => 'site_email', 'value' => 'info@shopora.test', 'type' => 'text', 'group' => 'contact', 'label' => 'ایمیل', 'sort' => 4],
+            ['key' => 'site_email', 'value' => 'info@joobjoob.test', 'type' => 'text', 'group' => 'contact', 'label' => 'ایمیل', 'sort' => 4],
             ['key' => 'site_address', 'value' => 'تهران، خیابان ولیعصر، پلاک ۱۲۳', 'type' => 'text', 'group' => 'contact', 'label' => 'آدرس', 'sort' => 5],
             ['key' => 'newsletter_placeholder', 'value' => 'ایمیل خود را وارد کنید', 'type' => 'text', 'group' => 'general', 'label' => 'متن جایگزین خبرنامه', 'sort' => 6],
             ['key' => 'free_shipping_above', 'value' => '500000', 'type' => 'text', 'group' => 'shipping', 'label' => 'ارسال رایگان بالای (تومان)', 'sort' => 7],

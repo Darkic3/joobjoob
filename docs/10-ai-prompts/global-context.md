@@ -1,6 +1,9 @@
 # Global Context — Always include for AI
 
-Include this in every AI prompt for Shopora. Concise minimum to prevent wrong implementation.
+> Project identity: **Joobjoob** (APP_NAME=Joobjoob, local http://joobjoob.test, prod https://joobjoob.ir).
+> Forked from Shopora, now fully independent — never call it Shopora, never use shopora.test / shopora.ir / shopora_* cache keys.
+
+Include this in every AI prompt for Joobjoob. Concise minimum to prevent wrong implementation.
 
 ## Stack
 Laravel 11, PHP 8.2, Blade+Alpine, Vite/Tailwind, DB MySQL, Cache/Session/Queue = database, Filesystem local public/uploads.

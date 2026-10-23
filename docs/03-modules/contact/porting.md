@@ -8,17 +8,17 @@
 | # | File | Note |
 |---|---|---|
 | 1 | `app/Models/ContactRequest.php` | Bedoon dependency — faqat Eloquent (`:1-44`) |
-| 2 | `app/Http/Controllers/Site/PageController.php` | ⚠️ dar Shopora in controller 5 static page-ra ham handle mikonad (`PAGES` const `:16`). Agar target-e shoma page-manager nadarad, faghat `sendContact` (`:36-60`) + `pageData`-e contact (`:71-78`) ra bekonid |
+| 2 | `app/Http/Controllers/Site/PageController.php` | ⚠️ dar Joobjoob in controller 5 static page-ra ham handle mikonad (`PAGES` const `:16`). Agar target-e shoma page-manager nadarad, faghat `sendContact` (`:36-60`) + `pageData`-e contact (`:71-78`) ra bekonid |
 | 3 | `app/Http/Controllers/Admin/ContactController.php` | Copy-e kamel (`:1-46`) |
 
 ## 2. Database
 
 - [ ] Migration: `database/migrations/2026_08_11_000001_create_contact_requests_table.php` (`contact_requests`: name, email, phone(40), department(40), message text, read_at, timestamps — bedoon index).
-- [ ] Optional seeder: `database/seeders/ContactRequestSeeder.php` (3 record-e sample — `:12-16`); register dar `DatabaseSeeder` (dar Shopora: `:57`).
+- [ ] Optional seeder: `database/seeders/ContactRequestSeeder.php` (3 record-e sample — `:12-16`); register dar `DatabaseSeeder` (dar Joobjoob: `:57`).
 
 ## 3. Routes
 
-- [ ] Site: `POST /contact` → `PageController::sendContact` **ba middleware `throttle:5,1`** → name `site.contact.send` (`routes/site.php:71-73`). Dar Shopora dakhel-e closure-e `$siteRoutes` ast ke do-bar register mishavad (canonical `:169` + `{locale}` prefix `:172-176` → `locale.site.contact.send`) — agar localization dar target nist, faghat copy-e canonical kafi ast.
+- [ ] Site: `POST /contact` → `PageController::sendContact` **ba middleware `throttle:5,1`** → name `site.contact.send` (`routes/site.php:71-73`). Dar Joobjoob dakhel-e closure-e `$siteRoutes` ast ke do-bar register mishavad (canonical `:169` + `{locale}` prefix `:172-176` → `locale.site.contact.send`) — agar localization dar target nist, faghat copy-e canonical kafi ast.
 - [ ] Admin: 3 route-e dasti (resource nist!) dar `routes/admin.php:78-80` — `GET contact` (index), `GET contact/{contact}` (show), `DELETE contact/{contact}` (destroy) — dakhel-e middleware group-e admin (`routes/admin.php:34`).
 - [ ] Optional: `GET /page/{page}` (`site.page`) baraye safhe-ye form-e contact (`PageController::show:18`).
 
@@ -27,7 +27,7 @@
 | # | File | Note |
 |---|---|---|
 | 1 | `resources/views/site/pages/_contact.blade.php` | Form + info-cards; action ba `route('site.contact.send')` (`:40`) |
-| 2 | `resources/views/site/pages/show.blade.php` | Wrapper-e partial (dar Shopora dar `:27` partial-e dynamic include mishavad) |
+| 2 | `resources/views/site/pages/show.blade.php` | Wrapper-e partial (dar Joobjoob dar `:27` partial-e dynamic include mishavad) |
 | 3 | `resources/views/admin/contact/list.blade.php` | Inbox — search, checkbox-e unread, badge, delete-form |
 | 4 | `resources/views/admin/contact/show.blade.php` | Detail — delete-form, label-ha, `show_date()` |
 
@@ -36,7 +36,7 @@ Layout-ha (`layouts.admin.app`, layout-e site) + helper-ha (`show_date` az `app/
 ## 5. Throttle wiring
 
 - [ ] `throttle:5,1` roye POST `/contact` (default-e Laravel — RateLimiter custom talab nist). Key-e pishfarz: domain+IP baraye guest.
-- [ ] Dar Shopora admin login niz `throttle:5,1` darad (`routes/admin.php:28`) — motaalleq-e contact nist, copy nakonid.
+- [ ] Dar Joobjoob admin login niz `throttle:5,1` darad (`routes/admin.php:28`) — motaalleq-e contact nist, copy nakonid.
 
 ## 6. Notification (optional — joda-portable)
 
@@ -50,7 +50,7 @@ Layout-ha (`layouts.admin.app`, layout-e site) + helper-ha (`show_date` az `app/
 
 ## 8. RBAC (agar target admin panel-e permission-dar darad)
 
-- [ ] 3 permission: `admin.contact.index`, `admin.contact.show`, `admin.contact.destroy` — dar Shopora az config `config/permissions.php:209-215` generate mishavand (gheyr-e mostaghim: access `destroy` → key `.delete`).
+- [ ] 3 permission: `admin.contact.index`, `admin.contact.show`, `admin.contact.destroy` — dar Joobjoob az config `config/permissions.php:209-215` generate mishavand (gheyr-e mostaghim: access `destroy` → key `.delete`).
 - [ ] Middleware-e `adminPermission` + `User::canAccess` (`app/Models/Traits/HasAdminPermissions.php:49-56`) ya mo-adel-e aan.
 - [ ] Dar views-e admin, button-ha ba `canAccess(...)` check mishavand (`list.blade.php:99,104`, `show.blade.php:20`).
 

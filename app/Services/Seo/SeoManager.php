@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SeoManager
 {
-    private const ATTRIBUTE = 'shopora_seo_state';
+    private const ATTRIBUTE = 'joobjoob_seo_state';
 
     /** کلیدهای متای پیش‌فرض که override می‌پذیرند */
     private const ALLOWED_KEYS = [

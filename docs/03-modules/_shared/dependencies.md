@@ -144,8 +144,8 @@ graph TD
 | `StateService` / `CityService` | — | `State` / `City` — **static**, read-only | `app/Services/StateService.php`, `CityService.php` |
 | `BankPaymentService` | `orders` (update vaziat-e pardakht) | `Bank`, `Order` | `app/Services/BankPaymentService.php` |
 | `ShippingCalculator` | — | `ShippingMethod`, `Address`, session `cart` (`:104`), Chapar API (`:77`) — **static** | `app/Services/ShippingCalculator.php` |
-| `SettingService` | `settings` (`DB::transaction :108`) + upload | `Setting`, cache `shopora_settings_all` (`:53`) | `app/Services/SettingService.php` |
-| `LocaleService` | — (neveshtan dar `Admin\LanguageController` anjam mishavad) | `Language`, cache `shopora_languages_all` (`:41`) | `app/Services/LocaleService.php` |
+| `SettingService` | `settings` (`DB::transaction :108`) + upload | `Setting`, cache `joobjoob_settings_all` (`:53`) | `app/Services/SettingService.php` |
+| `LocaleService` | — (neveshtan dar `Admin\LanguageController` anjam mishavad) | `Language`, cache `joobjoob_languages_all` (`:41`) | `app/Services/LocaleService.php` |
 | `BlogService` / `BrandService` / `HeroSlideService` | `blogs` / `brands` / `hero_slides` + `ImageHandler` | model-e khod | `app/Services/{BlogService,BrandService,HeroSlideService}.php` |
 | `PromoBannerService` / `TrustBadgeService` / `SpecificationService` | model-e khod (CRUD) | cache `promo_banners_active` / `trust_badges_active` (`Cache::remember 3600`) | `PromoBannerService.php:15,63,113` + `TrustBadgeService.php:15,96,145` |
 | `DashboardService` | — | **hich model** — data-e demo hardcode (124/45/18/1240) | `app/Services/DashboardService.php:27-58` |
@@ -250,7 +250,7 @@ Har taghir-e schema-e `Product` (`final_price`, `stock`, `name` JSON, `is_active
 | `CartService` API | `Site\CartController`, `Site\CheckoutController`, `Site\OtpController:139`, `SiteLayoutComposer`, `CouponService::calculateForCart(:129 — type-hint-e CartService!)` |
 | `CouponService::apply/recordUsage` | `CheckoutController` (:121, 216) + `CartService::applyCoupon/discount` (:404, 432) |
 | `OtpService` | `Site\OtpController` + `WelcomeDiscountService` + `Sms` helper (Kavenegar) + `setting('otp_template')` (:123) |
-| Cache `shopora_settings_all` / `shopora_languages_all` | `SettingService`/`LocaleService` + helper-haye `setting()`/`locale()` + flush dar `Admin\SettingController` / `Admin\LanguageController:44` |
+| Cache `joobjoob_settings_all` / `joobjoob_languages_all` | `SettingService`/`LocaleService` + helper-haye `setting()`/`locale()` + flush dar `Admin\SettingController` / `Admin\LanguageController:44` |
 | Cache `trust_badges_active` / `promo_banners_active` | `TrustBadgeService` (:15, 96, 145) / `PromoBannerService` (:15, 63, 113) + `FooterComposer` + `Site\HomeController` |
 | `AddressService` (static) | `Site\CartController:43`, `CheckoutController:54`, `Site\DashboardController:94, 124, 153` — chon static ast, test/mock sakhtar ast |
 | `LocaleService::flush` hazf shavad | `Admin\LanguageController:44` — cache-e `rememberForever` monde va zabane jadid nist mishavad |

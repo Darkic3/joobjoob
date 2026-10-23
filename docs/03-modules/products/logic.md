@@ -1,6 +1,6 @@
 # Products — Logic (Deep Trace)
 
-> **Module:** `products` — Catalog-e asli-e Shopora
+> **Module:** `products` — Catalog-e asli-e Joobjoob
 > **Stack:** `Product` + `ProductCategory` + `Brand` + `Specification` + `ProductVariant` + `ProductImage` + `Property` + `ProductAssociation` + `RecentlyViewedService` + `StockService` + `TrustBadgeService`
 > **Tag:** `08d468f` or later — trace-e mostaghim az code, bedoon hads
 
@@ -8,7 +8,7 @@
 
 ## 1. Purpose (Hadaf-e Module)
 
-Products module masoul-e catalog-e markazi-e Shopora ast: CRUD-e mahsoul, modiriat-e tasavir (WebP + 3 size resize), modiriat-e moshakhasat-e entekhabi (`select`) va matni (`text`), variant-ha (SKU ghabel-e entekhab ba ghimat/mojoodi-e joda), vizhegi-haye azad (`Property` ba `title/value` JSON), va ertebatat-e `related/complement` ast. Hadaf-e asli joda kardan-e logic-e form va filter az View va Service ast — `Admin/ProductController::formData` va `activeFilterChips` mesal-e roshan-e in jodasazi hastand. Samt-e Site niz listing, quickView, category page, product detail ba derakht-e nazarat va moshakhasat-e variant-driven ra poshesh midahad.
+Products module masoul-e catalog-e markazi-e Joobjoob ast: CRUD-e mahsoul, modiriat-e tasavir (WebP + 3 size resize), modiriat-e moshakhasat-e entekhabi (`select`) va matni (`text`), variant-ha (SKU ghabel-e entekhab ba ghimat/mojoodi-e joda), vizhegi-haye azad (`Property` ba `title/value` JSON), va ertebatat-e `related/complement` ast. Hadaf-e asli joda kardan-e logic-e form va filter az View va Service ast — `Admin/ProductController::formData` va `activeFilterChips` mesal-e roshan-e in jodasazi hastand. Samt-e Site niz listing, quickView, category page, product detail ba derakht-e nazarat va moshakhasat-e variant-driven ra poshesh midahad.
 
 **Evidence:**
 - `app/Models/Product.php:12` — `class Product extends Model { use HasFactory, SoftDeletes }`

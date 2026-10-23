@@ -87,7 +87,7 @@
             @endif
         </div>
         {{--        defalt image --}}
-        {{--        http://shopora.test/uploads/hero-slides/sock-test.svg--}}
+        {{--        http://joobjoob.test/uploads/hero-slides/sock-test.svg--}}
         @if($heroSlide && $heroSlide->imageUrl())
             <div class="eco-hero-media">
                 <span class="eco-hero-mat" aria-hidden="true"></span>

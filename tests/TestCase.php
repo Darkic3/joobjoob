@@ -26,10 +26,10 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * ایمنی دیتابیس — قبل از هر کاری (حتی قبل از migrate:fresh ترِیت RefreshDatabase)
-     * مطمئن می‌شویم تست‌ها هرگز به دیتابیس واقعی پروژه (shopora) وصل نمی‌شوند.
+     * مطمئن می‌شویم تست‌ها هرگز به دیتابیس واقعی پروژه (joobjoob) وصل نمی‌شوند.
      *
      * اگر bootstrap/cache/config.php وجود داشته باشد، Laravel کانفیگ را از همان کش
-     * می‌خواند و مقدارهای phpunit.xml (مثل DB_DATABASE=shopora_test) را نادیده می‌گیرد —
+     * می‌خواند و مقدارهای phpunit.xml (مثل DB_DATABASE=joobjoob_test) را نادیده می‌گیرد —
      * در آن حالت migrate:fresh تست‌ها می‌تواند دیتابیس واقعی را خالی کند. پس تست را متوقف می‌کنیم.
      */
     protected function guardTestDatabase(): void

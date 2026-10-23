@@ -32,11 +32,11 @@ php artisan migrate --force
 
 - [ ] `APP_DEBUG=false` in `.env`
 - [ ] `APP_ENV=production` in `.env`
-- [ ] `APP_URL=https://shopora.ir` (or actual domain)
+- [ ] `APP_URL=https://joobjoob.ir` (or actual domain)
 - [ ] `DB_CONNECTION=mysql` (NOT sqlite)
 - [ ] `DB_HOST=127.0.0.1` (or correct DB host)
-- [ ] `DB_DATABASE=shopora` (correct DB name)
-- [ ] `DB_USERNAME=shopora_user` (correct DB user)
+- [ ] `DB_DATABASE=joobjoob` (correct DB name)
+- [ ] `DB_USERNAME=joobjoob_user` (correct DB user)
 - [ ] `DB_PASSWORD=***` (strong password)
 - [ ] `QUEUE_CONNECTION=database` (or `sync` for single-server)
 - [ ] `SESSION_DRIVER=database` (or `file` — NOT `array`)
@@ -93,7 +93,7 @@ crontab -e
 
 **Required cron entry:**
 ```
-* * * * * cd /path/to/shopora && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /path/to/joobjoob && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 **Verify:**
@@ -172,7 +172,7 @@ crontab -e
 
 ## 4️⃣ Smoke Test — Post-Deploy (Final Verification)
 
-**Domain:** `https://shopora.ir` (or actual production URL)
+**Domain:** `https://joobjoob.ir` (or actual production URL)
 
 ### Test 1: Guest Cart → OTP Login → Cart Merge (P1-05 ✅)
 

@@ -4,7 +4,7 @@
 > **Desc:** Filterable 7 filters, scopeFilter, search across title/slug
 
 ## Purpose
-Filterable 7 filters, scopeFilter, search across title/slug. Core domain of Shopora.
+Filterable 7 filters, scopeFilter, search across title/slug. Core domain of Joobjoob.
 
 ## Responsibilities
 - CRUD via Admin resources (except show)

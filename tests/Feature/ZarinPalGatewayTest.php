@@ -62,7 +62,7 @@ class ZarinPalGatewayTest extends TestCase
 
     private function gateway(): ZarinPal
     {
-        return new ZarinPal($this->bank, 'Shopora');
+        return new ZarinPal($this->bank, 'Joobjoob');
     }
 
     // ── تبدیل واحد ──

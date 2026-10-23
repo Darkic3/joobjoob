@@ -140,7 +140,7 @@ class LocaleServiceTest extends TestCase
         $service = app(LocaleService::class);
 
         $this->assertCount(4, $service->all());
-        $this->assertTrue(Cache::has('shopora_languages_all'));
+        $this->assertTrue(Cache::has('joobjoob_languages_all'));
 
         // یک زبان جدید اضافه کن و flush کن — باید در all() بعدی دیده شود
         Language::create([

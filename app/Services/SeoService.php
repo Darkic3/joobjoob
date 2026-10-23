@@ -45,7 +45,7 @@ class SeoService
         }
 
         // 4. From config default
-        return config('seo.default_title', config('app.name', 'Shopora'));
+        return config('seo.default_title', config('app.name', 'Joobjoob'));
     }
 
     /**
@@ -231,7 +231,7 @@ class SeoService
      */
     protected function replaceDynamicPlaceholders(string $value): string
     {
-        $value = str_replace('{site_name}', config('app.name', 'Shopora'), $value);
+        $value = str_replace('{site_name}', config('app.name', 'Joobjoob'), $value);
 
         if ($this->model) {
             if (property_exists($this->model, 'name')) {

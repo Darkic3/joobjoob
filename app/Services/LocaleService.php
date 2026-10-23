@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class LocaleService
 {
-    private const CACHE_ALL = 'shopora_languages_all';
+    private const CACHE_ALL = 'joobjoob_languages_all';
 
     /**
      * حافظه‌ی ریکوئست — همه‌ی زبان‌ها keyed by code.

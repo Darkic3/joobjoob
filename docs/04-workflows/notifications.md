@@ -160,7 +160,7 @@ Step 6  agar RedirectResponse → otp_sms_not_configured
 
 | Template (Kavenegar) | Moteghayyer-ha (tokens) | Mesal-e Meghdar |
 |----------------------|-------------------------|-----------------|
-| `verify` (OTP, default) | `token` (code), `token2` (siteName) | `token=4821`, `token2=Shopora` |
+| `verify` (OTP, default) | `token` (code), `token2` (siteName) | `token=4821`, `token2=Joobjoob` |
 | `otp_template` (custom, az settings) | haman `token`, `token2` | admin dar `settings` gharar midahad |
 
 > Template-haye digar-e Kavenegar (masalan etela-e sefaresh) dar code estefade **nemishavand** — faghat OTP lookup estefade mishavad. Notification-haye sefaresh faghat database hastand, na SMS.

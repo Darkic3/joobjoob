@@ -274,9 +274,9 @@ return [
             'hero_badge' => 'Our Story',
             'story_title' => 'Who we are',
             'story' => [
-                'Shopora started in 2021 with a simple idea: online shopping should feel as trustworthy as buying from your local store. Today, with thousands of products across many categories, we still chase that idea — real quality, fair prices and human support.',
+                'Joobjoob started in 2021 with a simple idea: online shopping should feel as trustworthy as buying from your local store. Today, with thousands of products across many categories, we still chase that idea — real quality, fair prices and human support.',
                 'We believe a shopping experience is not just a delivered parcel. From the moment you pick a product until the day you use it, every detail matters to us. That is why every item is checked before shipment, and if anything is not what you expected, we replace it without questions.',
-                'Our team is small but committed — and that commitment is why more than twelve thousand customers have recommended shopping at Shopora to their friends.',
+                'Our team is small but committed — and that commitment is why more than twelve thousand customers have recommended shopping at Joobjoob to their friends.',
             ],
             'stats' => [
                 ['value' => '12,000+', 'label' => 'Happy customers'],
@@ -284,7 +284,7 @@ return [
                 ['value' => '98.2%', 'label' => 'Purchase satisfaction'],
                 ['value' => '24/7', 'label' => 'Responsive support'],
             ],
-            'values_title' => 'Why Shopora?',
+            'values_title' => 'Why Joobjoob?',
             'values' => [
                 ['title' => 'Authentic products', 'text' => 'Every product is sourced from verified suppliers and checked for authenticity and condition before shipment.'],
                 ['title' => 'Fast, reliable shipping', 'text' => 'Orders are packed as quickly as possible and delivered nationwide through trusted couriers.'],

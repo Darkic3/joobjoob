@@ -7,7 +7,7 @@
 
 ## 1. Purpose — Why Constants, Not Enums Here
 
-- **Shopora declares no PHP-native `enum`** (`grep -rn "enum " app/` returns only a comment). Instead it uses **`public const` + `protected $casts`** + **`in:` validation** to achieve enum semantics:
+- **Joobjoob declares no PHP-native `enum`** (`grep -rn "enum " app/` returns only a comment). Instead it uses **`public const` + `protected $casts`** + **`in:` validation** to achieve enum semantics:
 
   | Type | Storage | Validation | Helpers |
   |------|---------|-----------|---------|
@@ -58,8 +58,8 @@
 | `PromoBannerService` | `CACHE_KEY='promo_banners_active'`, `SITE_MAX_BANNERS=4` | `PromoBannerService.php:15,20` | `Cache::remember/get` + `booted: Cache::forget(CACHE_KEY)` |
 | `TrustBadgeService` | `CACHE_KEY='trust_badges_active'`, `SITE_MAX_BADGES=6`, `FOOTER_MAX_BADGES=6` | `TrustBadgeService.php:15,20,25` | Same caching pattern |
 | `WelcomeDiscountService` | `DISCOUNT_PERCENT=10`, `DISCOUNT_COUNT=1`, `MAX_USAGE_PER_USER=1`, `EXPIRY_DAYS=30`, `CODE_PREFIX='WELCOME-'`, `CODE_LENGTH=6` | `WelcomeDiscountService.php:21-26` | `WELCOME-XXXXXX` percent coupon on signup |
-| `LocaleService` | `CACHE_ALL='shopora_languages_all'` | `LocaleService.php:21` | `Cache::rememberForever(CACHE_ALL, fn()=>Language::all())` |
-| `SettingService` | `CACHE_ALL='shopora_settings_all'` | `SettingService.php:17` | `setting()` helper caching |
+| `LocaleService` | `CACHE_ALL='joobjoob_languages_all'` | `LocaleService.php:21` | `Cache::rememberForever(CACHE_ALL, fn()=>Language::all())` |
+| `SettingService` | `CACHE_ALL='joobjoob_settings_all'` | `SettingService.php:17` | `setting()` helper caching |
 | `OtpService` | `CODE_LENGTH=4` | `OtpService.php:25` | — |
 | `Audit` | `event ∈ {'order.created','order.status_changed','order.cancelled','order.stock_reserved','product.price_changed',...}` — const-like strings in `AuditService` | `AuditService.php` | `scopeEvent/Events` |
 | `Notification` | `TYPES` map (11 entries) | `NotificationService.php:13` | icon+color per type |

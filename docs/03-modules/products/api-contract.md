@@ -7,7 +7,7 @@
 
 ## 1. Naghshe-e Kolli-e Route-ha
 
-Shopora 2 gorouh-e route baraye products darad:
+Joobjoob 2 gorouh-e route baraye products darad:
 
 - **Admin (CRUD):** `Route::resource('products', ProductController::class)` zir-e `prefix admin + name admin. + middleware [auth, adminPermission, log.admin]` — `routes/admin.php:22, 32, 46`
 - **Site (Public):** 7 route-e mostaghim dar closure-e `$siteRoutes` — `routes/site.php:47-57` — ke **2 bar** sabt mishavand: yek bar bedoon pishvand (canonical `fa`) va yek bar ba `prefix {locale} + name locale.` (`routes/site.php:161-170`). Natije: har URI-e Site 2 name darad.
@@ -164,10 +164,10 @@ Request class: `App\Http\Requests\Admin\ProductRequest` (`:10`). `authorize()` h
 
 ```bash
 # Admin — list ba filter
-curl -b cookies.txt "https://shopora.test/admin/products?search=گوشی&category=3&brand_id=2&status=1&sort=price_asc&availability=in_stock&price_min=1000000&price_max=50000000&featured=1&best_seller=1&page=1"
+curl -b cookies.txt "https://joobjoob.test/admin/products?search=گوشی&category=3&brand_id=2&status=1&sort=price_asc&availability=in_stock&price_min=1000000&price_max=50000000&featured=1&best_seller=1&page=1"
 
 # Admin — create product (multipart)
-curl -b cookies.txt -X POST "https://shopora.test/admin/products" \
+curl -b cookies.txt -X POST "https://joobjoob.test/admin/products" \
   -F "product_category_id=3" -F "brand_id=2" \
   -F "name[fa]=گوشی سامسونگ" -F "name[en]=Samsung Phone" \
   -F "slug=samsung-phone" -F "price=25000000" -F "discount_price=22000000" -F "stock=10" \
@@ -180,22 +180,22 @@ curl -b cookies.txt -X POST "https://shopora.test/admin/products" \
   -H "X-CSRF-TOKEN: $TOKEN"
 
 # Admin — delete image dar update
-curl -b cookies.txt -X PUT "https://shopora.test/admin/products/42" \
+curl -b cookies.txt -X PUT "https://joobjoob.test/admin/products/42" \
   -F "_method=PUT" -F "product_category_id=3" -F "name[fa]=..." -F "name[en]=..." -F "slug=..." \
   -F "delete_images[]=7" -F "delete_images[]=8" -F "main_image_id=9"
 
 # Site — product index ba filter JSON search
-curl "https://shopora.test/products?category=phones&min_price=1000000&max_price=50000000&brand=samsung&sort=price_asc&q=گوشی"
+curl "https://joobjoob.test/products?category=phones&min_price=1000000&max_price=50000000&brand=samsung&sort=price_asc&q=گوشی"
 
 # Site — quick view (partial HTML)
-curl "https://shopora.test/products/samsung-phone/quick-view"
+curl "https://joobjoob.test/products/samsung-phone/quick-view"
 
 # Site — store review (guest)
-curl -X POST "https://shopora.test/products/samsung-phone/reviews" \
+curl -X POST "https://joobjoob.test/products/samsung-phone/reviews" \
   -d "rating=5&comment=عالی بود&guest_name=علی&guest_phone=09123456789" -H "X-CSRF-TOKEN: $TOKEN"
 
 # Site — vote review (auth required, JSON)
-curl -b cookies.txt -X POST "https://shopora.test/products/samsung-phone/reviews/123/vote" \
+curl -b cookies.txt -X POST "https://joobjoob.test/products/samsung-phone/reviews/123/vote" \
   -d "type=like" -H "Accept: application/json" -H "X-CSRF-TOKEN: $TOKEN"
 # → {"success":true,"action":"added","likes":5,"dislikes":2,"user_vote":"like"}
 ```

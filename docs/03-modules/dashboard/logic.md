@@ -4,7 +4,7 @@
 > **Desc:** Admin dashboard stats, newOrdersCount pending_confirmation/wait_for_verification
 
 ## Purpose
-Admin dashboard stats, newOrdersCount pending_confirmation/wait_for_verification. Core domain of Shopora.
+Admin dashboard stats, newOrdersCount pending_confirmation/wait_for_verification. Core domain of Joobjoob.
 
 ## Responsibilities
 - CRUD via Admin resources (except show)

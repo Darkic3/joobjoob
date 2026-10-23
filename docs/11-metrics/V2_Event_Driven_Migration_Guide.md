@@ -121,19 +121,19 @@ QUEUE_CONNECTION=database
 ### 5.1 Supervisor / Cron baraye Worker
 
 ```ini
-# /etc/supervisor/conf.d/shopora-worker.conf  (ya cPanel cron fallback)
-[program:shopora-worker]
-command=php /home/shopora/artisan queue:work --sleep=3 --tries=3 --queue=notifications,audit,default --max-time=3600
+# /etc/supervisor/conf.d/joobjoob-worker.conf  (ya cPanel cron fallback)
+[program:joobjoob-worker]
+command=php /home/joobjoob/artisan queue:work --sleep=3 --tries=3 --queue=notifications,audit,default --max-time=3600
 autostart=true
 autorestart=true
-user=shopora
+user=joobjoob
 numprocs=1
 ```
 
 Fallback shared host (bedone supervisor):
 
 ```cron
-* * * * * cd /home/shopora && php artisan queue:work --stop-when-empty >> /dev/null 2>&1
+* * * * * cd /home/joobjoob && php artisan queue:work --stop-when-empty >> /dev/null 2>&1
 # Ya schedule: $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();
 ```
 

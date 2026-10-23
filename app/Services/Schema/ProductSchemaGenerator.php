@@ -70,7 +70,7 @@ class ProductSchemaGenerator
                 'priceValidUntil' => $priceValidUntil,
                 'seller' => [
                     '@type' => 'Organization',
-                    'name' => config('app.name', 'Shopora'),
+                    'name' => config('app.name', 'Joobjoob'),
                 ],
             ],
             'aggregateRating' => $aggregateRating,

@@ -1,4 +1,4 @@
-# Migrations — Shopora Database
+# Migrations — Joobjoob Database
 
 > **Verified:** 73 files in `database/migrations` (read 2026-09-04). Listed in execution order (`ls -1` = `php artisan migrate` order). No invented migrations.
 > Execution order is lexicographic filename sort. Duplicated timestamps are ordered alphabetically within the same second (e.g. `add_*` before `create_*`).

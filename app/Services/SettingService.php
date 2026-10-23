@@ -14,7 +14,7 @@ class SettingService
     /**
      * کلید کش یکپارچه تمام تنظیمات (به‌جای یک کش جدا برای هر کلید)
      */
-    private const CACHE_ALL = 'shopora_settings_all';
+    private const CACHE_ALL = 'joobjoob_settings_all';
 
     /**
      * حافظه‌ی درخواست — همه‌ی تنظیمات فقط یک بار با یک کوئری لود می‌شوند

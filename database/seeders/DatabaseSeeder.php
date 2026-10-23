@@ -28,10 +28,10 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
 
             // ── ۵) محصولات و مشخصات ──
-            ProductCategorySeeder::class,
-            BrandSeeder::class,
-            SpecificationSeeder::class,
-            ProductSeeder::class,
+//            ProductCategorySeeder::class,
+//            BrandSeeder::class,
+//            SpecificationSeeder::class,
+//            ProductSeeder::class,
 
             // ── ۶) محتوا ──
             HeroSlideSeeder::class,

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Import products from a CSV file into the Shopora database. Supports:
+Import products from a CSV file into the Joobjoob database. Supports:
 - **Upsert** — if slug exists, product is updated; otherwise created
 - **Image download** — automatic download and WebP conversion via ImageHandler
 - **Chunk processing** — memory-efficient for large files

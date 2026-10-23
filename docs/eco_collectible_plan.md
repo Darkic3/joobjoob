@@ -7,10 +7,10 @@
 
 | مورد | وضعیت |
 |---|---|
-| سیستم استایل | Tailwind 3.4 + توکن‌های CSS در [neumorphism.css](file:///f:/Projects/shopora/resources/css/neumorphism.css) |
-| لایهٔ بزرگ | [neumorphism-pro.css](file:///f:/Projects/shopora/resources/css/neumorphism-pro.css) — ۴۱۲۰ خط، ۱۶۰KB (هیرو، دسته‌ها، deals، هدر، فوتر، محصول، سبد…) |
-| مکانیزم تم | `data-theme` روی `<html>` از [SetTheme.php](file:///f:/Projects/shopora/app/Http/Middleware/SetTheme.php) و `config/site-features.php` (قفل روی `light-neumorphism`) |
-| ناهمگونی | [product-card](file:///f:/Projects/shopora/resources/views/components/product-card.blade.php) و `products/index` با رنگ‌های خام Tailwind (indigo/gray/red) نوشته شده‌اند؛ بقیه با `neu-*` و صدها `style=""` اینلاین (سبد خرید: ۱۹۹ مورد) |
+| سیستم استایل | Tailwind 3.4 + توکن‌های CSS در [neumorphism.css](file:///f:/Projects/joobjoob/resources/css/neumorphism.css) |
+| لایهٔ بزرگ | [neumorphism-pro.css](file:///f:/Projects/joobjoob/resources/css/neumorphism-pro.css) — ۴۱۲۰ خط، ۱۶۰KB (هیرو، دسته‌ها، deals، هدر، فوتر، محصول، سبد…) |
+| مکانیزم تم | `data-theme` روی `<html>` از [SetTheme.php](file:///f:/Projects/joobjoob/app/Http/Middleware/SetTheme.php) و `config/site-features.php` (قفل روی `light-neumorphism`) |
+| ناهمگونی | [product-card](file:///f:/Projects/joobjoob/resources/views/components/product-card.blade.php) و `products/index` با رنگ‌های خام Tailwind (indigo/gray/red) نوشته شده‌اند؛ بقیه با `neu-*` و صدها `style=""` اینلاین (سبد خرید: ۱۹۹ مورد) |
 | فونت | Vazirmatn + JetBrains Mono (لود شده) + Estedad (محلی، فقط هیرو) |
 | داده | فیلد SKU/متریال نداریم؛ ولی `product_specification` وجود دارد (منبع تگ متریال) |
 
@@ -54,10 +54,10 @@
 - حالت‌های focus-visible، disabled، loading
 
 ### فاز ۲ — پوستهٔ سایت (Shell)
-- نوار اعلان، [header](file:///f:/Projects/shopora/resources/views/components/header.blade.php)، منوی موبایل، [mobile-bar](file:///f:/Projects/shopora/resources/views/components/mobile-bar.blade.php)، [footer](file:///f:/Projects/shopora/resources/views/components/footer.blade.php)، back-to-top، layout‌های `app` و `guest`
+- نوار اعلان، [header](file:///f:/Projects/joobjoob/resources/views/components/header.blade.php)، منوی موبایل، [mobile-bar](file:///f:/Projects/joobjoob/resources/views/components/mobile-bar.blade.php)، [footer](file:///f:/Projects/joobjoob/resources/views/components/footer.blade.php)، back-to-top، layout‌های `app` و `guest`
 
 ### فاز ۳ — کارت محصول (قلب تم)
-- بازنویسی [product-card](file:///f:/Projects/shopora/resources/views/components/product-card.blade.php): شناسهٔ کلکسیونی، تگ متریال از مشخصات، تگ وضعیت، قاب تصویر با پس‌زمینهٔ بژ و سایهٔ محو زیر محصول، قیمت تراکوتا با مونو، دکمهٔ `rounded-lg`
+- بازنویسی [product-card](file:///f:/Projects/joobjoob/resources/views/components/product-card.blade.php): شناسهٔ کلکسیونی، تگ متریال از مشخصات، تگ وضعیت، قاب تصویر با پس‌زمینهٔ بژ و سایهٔ محو زیر محصول، قیمت تراکوتا با مونو، دکمهٔ `rounded-lg`
 - منطق PHP کلاس کامپوننت حفظ می‌شود؛ فقط پراپرتی‌های جدید (`collectibleId`, `materialTag`, `statusTag`) اضافه می‌شوند
 - category-card، quick-view، promo-banner-card
 

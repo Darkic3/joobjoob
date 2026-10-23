@@ -13,7 +13,7 @@ class BlogSeeder extends Seeder
     {
         $guideCat = BlogCategory::where('slug', 'buying-guide')->first();
         $tipsCat = BlogCategory::where('slug', 'fashion-tips')->first();
-        $admin = User::where('email', 'admin@shopora.test')->first();
+        $admin = User::where('email', 'admin@joobjoob.test')->first();
 
         if (! $admin) {
             return;

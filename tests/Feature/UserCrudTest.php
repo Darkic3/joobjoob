@@ -63,12 +63,12 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'کاربر جدید',
                 'mobile' => '09135556677',
-                'email' => 'new@shopora.test',
+                'email' => 'new@joobjoob.test',
                 'password' => 'secret123',
             ])
             ->assertRedirect();
 
-        $user = User::where('email', 'new@shopora.test')->firstOrFail();
+        $user = User::where('email', 'new@joobjoob.test')->firstOrFail();
         $this->assertTrue(Hash::check('secret123', $user->password));
         $this->assertFalse($user->is_admin); // پیش‌فرض عادی
         $this->assertTrue($user->is_active); // پیش‌فرض فعال
@@ -80,7 +80,7 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'بدون رمز',
                 'mobile' => '09135556688',
-                'email' => 'nopass@shopora.test',
+                'email' => 'nopass@joobjoob.test',
             ])
             ->assertSessionHasErrors('password');
     }
@@ -93,7 +93,7 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'تکراری',
                 'mobile' => $existing->mobile,
-                'email' => 'dup@shopora.test',
+                'email' => 'dup@joobjoob.test',
                 'password' => 'secret123',
             ])
             ->assertSessionHasErrors('mobile');
@@ -109,14 +109,14 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'هکر',
                 'mobile' => '09135556699',
-                'email' => 'hacker@shopora.test',
+                'email' => 'hacker@joobjoob.test',
                 'password' => 'secret123',
                 'is_admin' => 1,
                 'is_active' => 0,
             ])
             ->assertRedirect();
 
-        $user = User::where('email', 'hacker@shopora.test')->firstOrFail();
+        $user = User::where('email', 'hacker@joobjoob.test')->firstOrFail();
         $this->assertFalse($user->is_admin);
         $this->assertTrue($user->is_active);
     }
@@ -127,13 +127,13 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'مدیر دوم',
                 'mobile' => '09135556600',
-                'email' => 'admin2@shopora.test',
+                'email' => 'admin2@joobjoob.test',
                 'password' => 'secret123',
                 'is_admin' => 1,
             ])
             ->assertRedirect();
 
-        $user = User::where('email', 'admin2@shopora.test')->firstOrFail();
+        $user = User::where('email', 'admin2@joobjoob.test')->firstOrFail();
         $this->assertTrue($user->is_admin);
     }
 
@@ -149,13 +149,13 @@ class UserCrudTest extends TestCase
             ->post('/admin/users', [
                 'name' => 'کاربر با نقش',
                 'mobile' => '09135556611',
-                'email' => 'withrole@shopora.test',
+                'email' => 'withrole@joobjoob.test',
                 'password' => 'secret123',
                 'roles' => [$main->id, $normalRole->id],
             ])
             ->assertRedirect();
 
-        $user = User::where('email', 'withrole@shopora.test')->firstOrFail();
+        $user = User::where('email', 'withrole@joobjoob.test')->firstOrFail();
 
         // نقش سیستمی حذف شده، فقط نقش عادی وصل است → جلوگیری از ارتقاء دسترسی
         $this->assertFalse($user->roles->contains('id', $main->id));

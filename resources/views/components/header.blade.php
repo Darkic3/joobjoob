@@ -14,18 +14,27 @@
             <span class="site-logo-text truncate">{{ $siteName }}</span>
         </a>
 
-        {{-- ناو دسکتاپ --}}
+        {{-- ناو دسکتاپ — هر لینک یک کاشی آیکون دارد که در هاور/فعال پررنگ می‌شود --}}
         <nav class="hidden lg:flex items-center gap-1 ms-3" aria-label="{{ __('messages.navigation') }}">
             <a href="{{ localizedRoute('home') }}"
                class="site-nav-link {{ request()->routeIs('home', 'locale.home') ? 'is-active' : '' }}">
-                {{ __('messages.home') }}
+                <span class="site-nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+                </span>
+                <span>{{ __('messages.home') }}</span>
             </a>
             <a href="{{ localizedRoute('products.index') }}"
                class="site-nav-link {{ request()->routeIs('products.index', 'locale.products.index', 'products.category', 'locale.products.category') ? 'is-active' : '' }}">
-                {{ __('messages.products') }}
+                <span class="site-nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+                </span>
+                <span>{{ __('messages.products') }}</span>
             </a>
             <a href="{{ localizedRoute('products.index') }}#deals" class="site-nav-link">
-                {{ __('messages.special_offers') }}
+                <span class="site-nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path d="M6 6h.008v.008H6V6Z"/></svg>
+                </span>
+                <span>{{ __('messages.special_offers') }}</span>
             </a>
         </nav>
 
@@ -178,17 +187,26 @@
         <nav class="site-menu-nav" aria-label="{{ __('messages.navigation') }}">
             <a href="{{ localizedRoute('home') }}"
                class="site-menu-link {{ request()->routeIs('home', 'locale.home') ? 'is-active' : '' }}">
-                <span class="site-menu-num">01</span>
+                <span class="site-menu-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+                </span>
                 <span class="site-menu-label">{{ __('messages.home') }}</span>
+                <span class="site-menu-num">01</span>
             </a>
             <a href="{{ localizedRoute('products.index') }}"
                class="site-menu-link {{ request()->routeIs('products.*', 'locale.products.*') ? 'is-active' : '' }}">
-                <span class="site-menu-num">02</span>
+                <span class="site-menu-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+                </span>
                 <span class="site-menu-label">{{ __('messages.products') }}</span>
+                <span class="site-menu-num">02</span>
             </a>
             <a href="{{ localizedRoute('products.index') }}#deals" class="site-menu-link">
-                <span class="site-menu-num">03</span>
+                <span class="site-menu-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path d="M6 6h.008v.008H6V6Z"/></svg>
+                </span>
                 <span class="site-menu-label">{{ __('messages.special_offers') }}</span>
+                <span class="site-menu-num">03</span>
             </a>
         </nav>
 

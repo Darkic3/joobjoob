@@ -16,7 +16,7 @@ Enable AI to implement a feature with only minimal context (global + module slic
    ```
 2. **Prompt template**:
    ```
-   You are working on Shopora (Laravel 11, MySQL, Blade).
+   You are working on Joobjoob (Laravel 11, MySQL, Blade).
    Context:
    [paste global-context]
    [paste module logic + api-contract]

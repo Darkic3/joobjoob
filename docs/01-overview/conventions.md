@@ -1,4 +1,4 @@
-# Gharardad-ha va Convention-ha — Shopora Conventions
+# Gharardad-ha va Convention-ha — Joobjoob Conventions
 
 > **Manba-e Haghighi:** `database/migrations/*.php`, `app/Models/*.php`, `app/DTOs/*.php`, `app/Services/*.php`, `app/Helpers/*.php`, `routes/*.php`, `config/*.php`
 > **Ghanoon:** Har gharardad ba dalil-e file va khat — hich chize pishfarz-e farzi nist.
@@ -407,13 +407,13 @@ $new_width2=500;  $new_height2=500;  $tmp2=...; imagewebp($tmp2, $path_medium.$f
 
 ## 9. Cache — rememberForever + flush (Na TTL)
 
-### 9.1 Olgou-ye Cache dar Shopora
+### 9.1 Olgou-ye Cache dar Joobjoob
 
-Shopora az `Cache::rememberForever` estefade mikonad — na `remember` ba TTL. In be manaye cache ta zaman-e `flush()` ast.
+Joobjoob az `Cache::rememberForever` estefade mikonad — na `remember` ba TTL. In be manaye cache ta zaman-e `flush()` ast.
 
 ```php
 // app/Services/SettingService.php:17,53
-private const CACHE_ALL = 'shopora_settings_all';
+private const CACHE_ALL = 'joobjoob_settings_all';
 private static ?array $memory = null; // static memory baraye haman request — yek query bishtar nist
 public function all(): array {
     if (self::$memory !== null) return self::$memory;
@@ -422,7 +422,7 @@ public function all(): array {
 public function flush(): void { self::$memory = null; Cache::forget(self::CACHE_ALL); }
 
 // app/Services/LocaleService.php:21,41 — daghighan haman olgou
-private const CACHE_ALL = 'shopora_languages_all';
+private const CACHE_ALL = 'joobjoob_languages_all';
 private static ?array $memory = null;
 public function all(): array {
     if (self::$memory !== null) return self::$memory;
@@ -435,8 +435,8 @@ public function flush(): void { self::$memory = null; Cache::forget(self::CACHE_
 
 | Cache Key | Nevesande (rememberForever) | Pak-konande (forget/flush) | Trigger-e Flush | File |
 |---|---|---|---|---|
-| `shopora_settings_all` | `SettingService::all()` | `SettingService::flush()` → `Cache::forget` | `SettingService::updateGroup()` ba'd az `DB::transaction` → `flush()` | `app/Services/SettingService.php:17,53,148` |
-| `shopora_languages_all` | `LocaleService::all()` | `LocaleService::flush()` | `LanguageService/Controller::store/update/destroy/toggle/makeDefault/reorder` → `flush()` | `app/Services/LocaleService.php:21,41,183` |
+| `joobjoob_settings_all` | `SettingService::all()` | `SettingService::flush()` → `Cache::forget` | `SettingService::updateGroup()` ba'd az `DB::transaction` → `flush()` | `app/Services/SettingService.php:17,53,148` |
+| `joobjoob_languages_all` | `LocaleService::all()` | `LocaleService::flush()` | `LanguageService/Controller::store/update/destroy/toggle/makeDefault/reorder` → `flush()` | `app/Services/LocaleService.php:21,41,183` |
 | `promo_banners_active` | `PromoBannerService::getActive()` (ya PromoBanner model event) | `PromoBanner::saved/deleted` event → `Cache::forget` + `PromoBannerService:113 Cache::forget` | Hame `save/delete` rouye PromoBanner | `app/Models/PromoBanner.php:80 saved/deleted, app/Services/PromoBannerService.php:113` |
 | `trust_badges_active` | `TrustBadgeService::getActiveForFooter()` | `TrustBadge::saved/deleted` event → `Cache::forget` + `TrustBadgeService:145` | Hame `save/delete` TrustBadge | `app/Models/TrustBadge.php:63, app/Services/TrustBadgeService.php:145` |
 | `admin.permissions.version` | `HasAdminPermissions::version()` → `Cache::rememberForever` | `Cache::forget` dar `HasAdminPermissions` | Taghir-e permission/role assignment | `app/Models/Traits/HasAdminPermissions.php:27` |
@@ -498,8 +498,8 @@ After updateGroup(): flush() → self::$memory = null + Cache::forget → next c
 | linkable_id getter | `app/DTOs/HeroSlideDTO.php` | `109 getLinkableId(): ?string` |
 | Image WebP | `app/Helpers/ImageUploader.php` | `75 imagewebp 90`, `app/Helpers/Helper.php:123 imagewebp` |
 | Image GD | `app/Helpers/Helper.php` | `92 imagecreatefromjpeg, 97 png, 100 webp` |
-| Cache rememberForever | `app/Services/SettingService.php` | `53 Cache::rememberForever shopora_settings_all` |
-| Cache rememberForever | `app/Services/LocaleService.php` | `41 Cache::rememberForever shopora_languages_all` |
+| Cache rememberForever | `app/Services/SettingService.php` | `53 Cache::rememberForever joobjoob_settings_all` |
+| Cache rememberForever | `app/Services/LocaleService.php` | `41 Cache::rememberForever joobjoob_languages_all` |
 | Cache forget | `app/Models/PromoBanner.php` | `80 saved → Cache::forget promo_banners_active` |
 | Cache flush | `app/Services/SettingService.php` | `148 flush() → Cache::forget + memory=null` |
 | Upload path | `config/paths.php` | `12 upload => env('UPLOAD_PATH','uploads')` |

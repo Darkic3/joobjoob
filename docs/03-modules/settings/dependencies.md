@@ -27,7 +27,7 @@
 
 | Dependency | Usage | Notes |
 |------------|-------|-------|
-| `Cache::rememberForever()` | Unified cache | Single key `shopora_settings_all` |
+| `Cache::rememberForever()` | Unified cache | Single key `joobjoob_settings_all` |
 | `DB::transaction()` | Atomic group update | All fields in group updated together |
 | `ImageHandler::handle()` | Image upload → WebP | For `file` type fields |
 | `Uploader::upload()` | Non-image upload | For `video` type fields |

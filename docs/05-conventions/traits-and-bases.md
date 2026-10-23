@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Purpose — How Shopora Uses Traits
+## 1. Purpose — How Joobjoob Uses Traits
 
 - **No Base Model, no Base Controller helpers.** `app/Http/Controllers/Controller.php` is literally empty (`abstract class Controller {}`); `App\Models\*` extend `Illuminate\Database\Eloquent\Model` directly with no shared `BaseModel`. Reuse is achieved **only** via Traits mixed into individual classes.
 

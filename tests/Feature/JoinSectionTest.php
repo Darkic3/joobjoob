@@ -47,14 +47,14 @@ class JoinSectionTest extends TestCase
     public function test_socials_column_renders_from_settings(): void
     {
         app(SettingService::class)->updateGroup('socials', [
-            'social_instagram' => 'https://instagram.com/shopora',
-            'social_telegram' => 'https://t.me/shopora',
+            'social_instagram' => 'https://instagram.com/joobjoob',
+            'social_telegram' => 'https://t.me/joobjoob',
         ], []);
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('https://instagram.com/shopora', false)
-            ->assertSee('https://t.me/shopora', false)
+            ->assertSee('https://instagram.com/joobjoob', false)
+            ->assertSee('https://t.me/joobjoob', false)
             ->assertSee(__('messages.socials.instagram'))
             ->assertSee(__('messages.socials.telegram'));
     }
