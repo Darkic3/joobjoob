@@ -26,4 +26,4 @@ yarn-error.log
 /documents/others
 .DS_Store
 Thumbs.db
-
+.env.bak-20260914
