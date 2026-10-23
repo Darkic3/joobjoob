@@ -6,7 +6,6 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -65,17 +64,41 @@ class AdminOwnerSeeder extends Seeder
 
         $this->command->info('✅ نقش سیستمی «main» آماده است ('.$mainRole->permissions()->count().' دسترسی).');
 
-        // ───────────────────────── ۳) ادمین اصلی ─────────────────────────
+        // ───────────────────────── ۳) ادمین اصلی (فقط از env) ─────────────────────────
+        // مقادیر از config('admin.owner.*') می‌آیند که خودش از env خوانده می‌شود
+        // (config/admin.php). رشته خالی = تنظیم‌نشده = پیش‌فرض + هشدار.
         $owner = config('admin.owner', []);
 
-        $name = $owner['name'] ?? 'مدیر اصلی';
-        $email = $owner['email'] ?? 'admin@joobjoob.test';
-        $mobile = $owner['mobile'] ?? '09120000000';
-        $password = $owner['password'] ?? null;
+        $name = trim((string) ($owner['name'] ?? ''));
+        $email = strtolower(trim((string) ($owner['email'] ?? '')));
+        $mobile = trim((string) ($owner['mobile'] ?? ''));
+        $envPassword = (string) ($owner['password'] ?? '');
 
-        // جستجو با ایمیل یا موبایل (هر دو یکتا هستند) تا خطای duplicate نگیرد
-        $user = User::where('email', $email)->orWhere('mobile', $mobile)->first()
-            ?? new User(['email' => $email]);
+        $source = [
+            'name' => $name !== '' ? 'env' : 'fallback',
+            'email' => $email !== '' ? 'env' : 'fallback',
+            'mobile' => $mobile !== '' ? 'env' : 'fallback',
+            'password' => $envPassword !== '' ? 'env' : 'generated',
+        ];
+
+        if ($name === '') {
+            $name = 'مدیر اصلی';
+        }
+        if ($email === '') {
+            $email = 'admin@joobjoob.test';
+        }
+        if ($mobile === '') {
+            $mobile = '09120000000';
+        }
+
+        if (app()->configurationIsCached()) {
+            $this->command->warn('⚠️ کانفیگ کش شده است (config:cache). اگر .env را تازه ویرایش کرده‌اید، اول `php artisan config:clear` بزنید؛ وگرنه مقادیر قدیمی سید می‌شوند.');
+        }
+
+        // اول با ایمیل، بعد با موبایل — orWhere بدون گروه‌بندی ممکن است رکورد اشتباه بدهد
+        $user = User::where('email', $email)->first()
+            ?? User::where('mobile', $mobile)->first()
+            ?? new User;
 
         $user->name = $name;
         $user->email = $email;
@@ -83,11 +106,14 @@ class AdminOwnerSeeder extends Seeder
         $user->is_admin = true;
         $user->is_active = true;
 
-        if ($password) {
-            $user->password = Hash::make($password);
+        // ⚠️ رمز را خام بدهید — مدل User کست `hashed` دارد و خودش هش می‌کند.
+        // صدا زدن Hash::make در اینجا ممنوع (در لاراول‌های قدیمی دابل‌هش و لاگین غیرممکن می‌شد).
+        $generatedPassword = null;
+        if ($envPassword !== '') {
+            $user->password = $envPassword;
         } elseif (! $user->exists) {
-            $password = Str::password(16);
-            $user->password = Hash::make($password);
+            $generatedPassword = Str::password(16);
+            $user->password = $generatedPassword;
         }
 
         $user->save();
@@ -98,11 +124,14 @@ class AdminOwnerSeeder extends Seeder
             $user->forgetPermissionCache();
         }
 
-        $this->command->info("✅ ادمین اصلی آماده ورود است: {$email}");
+        $this->command->info("✅ ادمین اصلی آماده ورود است: {$email} / موبایل: {$mobile}");
+        foreach ($source as $field => $from) {
+            $this->command->line("   • {$field}: ".($from === 'env' ? 'از env خوانده شد' : ($from === 'generated' ? 'رمز تصادفی ساخته شد' : '⚠️ env خالی بود — پیش‌فرض استفاده شد')));
+        }
 
-        // رمز تولیدشده فقط برای کاربر تازه‌ساخته و فقط یک بار نمایش داده می‌شود
-        if ($password && ! $owner['password']) {
-            $this->command->warn("رمز عبور تولیدشده (فقط همین یک بار نمایش داده می‌شود): {$password}");
+        // رمز تولیدشده فقط همین یک بار نمایش داده می‌شود
+        if ($generatedPassword !== null) {
+            $this->command->warn("رمز عبور تولیدشده (فقط همین یک بار نمایش داده می‌شود): {$generatedPassword}");
         }
     }
 }

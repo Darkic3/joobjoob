@@ -13,9 +13,13 @@ class BlogSeeder extends Seeder
     {
         $guideCat = BlogCategory::where('slug', 'buying-guide')->first();
         $tipsCat = BlogCategory::where('slug', 'fashion-tips')->first();
-        $admin = User::where('email', 'admin@joobjoob.test')->first();
+        // ادمین را داینامیک پیدا کن — ایمیل ادمین از env می‌آید و ثابت نیست
+        $admin = User::where('is_admin', true)->first()
+            ?? User::where('email', config('admin.owner.email'))->first();
 
         if (! $admin) {
+            $this->command?->warn('⚠️ ادمینی پیدا نشد (AdminOwnerSeeder را اول اجرا کنید) — مقاله‌ای ساخته نشد.');
+
             return;
         }
 

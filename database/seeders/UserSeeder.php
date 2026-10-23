@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -22,7 +21,8 @@ class UserSeeder extends Seeder
         foreach ($users as $userData) {
             $user = User::updateOrCreate(
                 ['email' => $userData['email']],
-                array_merge($userData, ['password' => Hash::make('password')])
+                // رمز خام — مدل User کست `hashed` دارد و خودش هش می‌کند (Hash::make ممنوع)
+                array_merge($userData, ['password' => 'password'])
             );
             if ($mainRole && ! $user->roles()->where('role_id', $mainRole->id)->exists()) {
                 $user->roles()->attach($mainRole->id);
